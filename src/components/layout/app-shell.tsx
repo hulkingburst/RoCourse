@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Heart } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -44,6 +45,16 @@ export function AppShell({
               hands-on course for building your first Roblox games.
             </p>
             <p className="font-mono">Learn by building, not by copying.</p>
+            <a
+              href="https://throne.com/hulkingburst"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Donate to support RoCourse"
+              className="flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              <Heart className="h-3 w-3" />
+              Donate
+            </a>
           </div>
         </footer>
       </div>
