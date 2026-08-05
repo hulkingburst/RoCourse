@@ -158,20 +158,29 @@ export function LessonStepper({
 
         {total > 1 && (
           <div className="mb-2 flex items-center gap-1.5">
-            {stepMetas.map((meta, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => index <= maxActive && goTo(index)}
-                disabled={index > maxActive}
-                aria-label={`Go to step ${index + 1}`}
-                className={cn(
-                  "h-1.5 flex-1 rounded-full transition-colors",
-                  solvedSteps[index] ? "bg-success" : index <= active ? "bg-primary" : "bg-muted",
-                  index <= maxActive ? "cursor-pointer hover:opacity-80" : "cursor-not-allowed opacity-40"
-                )}
-              />
-            ))}
+            {stepMetas.map((meta, index) => {
+              const stepDone = meta.hasActivity
+                ? Boolean(solvedSteps[index]) || complete
+                : index < active || complete;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => index <= maxActive && goTo(index)}
+                  disabled={index > maxActive}
+                  aria-label={`Go to step ${index + 1}`}
+                  className={cn(
+                    "h-1.5 flex-1 rounded-full transition-colors",
+                    stepDone
+                      ? "bg-success"
+                      : index <= active
+                        ? "bg-primary"
+                        : "bg-muted",
+                    index <= maxActive ? "cursor-pointer hover:opacity-80" : "cursor-not-allowed opacity-40"
+                  )}
+                />
+              );
+            })}
           </div>
         )}
         <div className="mb-5 text-xs font-medium text-muted-foreground">
