@@ -1,0 +1,117 @@
+---
+slug: debugging
+title: Debugging — reading errors like a pro
+description: Turn scary red Output lines into a precise map of what's wrong, and fix errors in a set order.
+sectionId: leveling-up
+order: 0
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [debugging, errors, output]
+objectives:
+  - Decode the structure of a Roblox error message
+  - Locate the failing line from a stack trace
+  - Fix errors in order: read, locate, reason, fix, retest
+prerequisites: [modules, players]
+keywords: [debugging, error, stacktrace, output]
+---
+
+You've hit errors all course — that was the point. This lesson turns error-reading from luck into a skill. By the end, a red Output line stops being scary and becomes a precise map of what's wrong.
+
+<Step>
+
+## Anatomy of an error
+
+Roblox errors follow one shape:
+
+```text
+ServerScriptService.MoneySystem:14: attempt to perform arithmetic on a string
+```
+
+Four fields, left to right:
+
+| Field | Example | Meaning |
+| --- | --- | --- |
+| Where it ran | `ServerScriptService.MoneySystem` | the script (and its path) |
+| Line number | `:14` | which line threw |
+| Message | `attempt to perform arithmetic on a string` | what actually happened |
+| (Usually) context | — | which variable was at fault, if Roblox knows |
+
+That first field isn't just "which script" — the full path tells you *where the script lives*, which tells you *who can touch it*. A bug in a LocalScript is a client problem; a bug in a Script is a server problem. The error is already telling you which side to investigate.
+
+<Mcq
+  question="The error 'Workspace.Script:7' tells you what first?"
+  options={[
+    "The whole script is broken",
+    "Start at Workspace.Script, line 7",
+    "The game crashed",
+    "Line 7 is fine",
+  ]}
+  answer={1}
+  explanation="The path and line are a precise map. Go there first, read the line, work outward."
+/>
+
+</Step>
+
+<Step>
+
+## The reading order
+
+When an error appears, don't stare at your whole script. Do this:
+
+1. **Read the location.** Which script, which line. Open it.
+2. **Read the line.** What is this line actually doing? (What variable, what call?)
+3. **Name the suspicious thing.** Is a variable maybe nil? A string where a number belongs?
+4. **Add a print above it.** See what the values actually are:
+
+```luau
+local coins = player.leaderstats.Coins
+print("coins is:", coins, "value:", coins and coins.Value)
+
+coins.Value = coins.Value + 10
+```
+
+`print` showing `coins is: nil` beats any guess. The problem isn't your math — it's that `Coins` was never created (wrong name, or created in the wrong PlayerAdded).
+
+<FillBlank
+  prompt="Step 4 of the reading order is to add a ____ above the suspicious line to see the real values."
+  answer="print"
+  explanation="A print statement reveals the actual values instead of forcing you to guess."
+/>
+
+</Step>
+
+<Step>
+
+## One change, one test
+
+The discipline that keeps debugging honest: **change one thing, Play, watch that same line.**
+
+Changing three things at once is how you get errors that blame the wrong line. When the fix works, re-test the *same* way you reproduced it. If you can't reproduce the bug, you can't verify the fix.
+
+<Note>
+The most common beginner error is 'attempt to index nil' — `thing.Name` where `thing` is nil. Usually it means the object wasn't found (misspelled name), didn't exist yet (needs WaitForChild), or was never assigned. The message plus line number names the exact line — go read that line.
+</Note>
+
+<WriteCode
+  instruction="A script errors on a line where coins could be nil. Write the print line that reveals what coins actually is before the crash."
+  answer={["print(\"coins is:\", coins)"]}
+  starterCode="local coins = player.leaderstats.Coins
+-- reveal what coins is
+"
+  explanation="Print the variable itself — if it shows nil, the object wasn't found."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Changing many things at once.** One change, one test. Bisect, don't shotgun.
+- **Guessing instead of printing.** Every guess is slower than one print. Get the actual values.
+- **Reading only the last line of a stack trace.** The top frame is the deepest cause; read upward.
+- **Ignoring which side the error came from.** A client error and a server error are different worlds. The path tells you which.
+
+Next: the print-debugging habit that senior developers actually use.
+
+</Step>

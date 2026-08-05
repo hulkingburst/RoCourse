@@ -1,0 +1,94 @@
+---
+slug: players
+title: Players — the people in your game
+description: Meet the Player object — the account behind the name — and the two facts about it that matter most.
+sectionId: objects
+order: 0
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [players, playeradded, identity]
+objectives:
+  - Get all players with Players:GetPlayers()
+  - Listen for PlayerAdded
+  - Distinguish the Player from the character
+prerequisites: [events, leaderstats]
+keywords: [player, playeradded, character, identity]
+---
+
+Everything you've built so far has treated "the player" as a name on a leaderboard. Time to meet the actual person: the **Player** object — the account-level object that owns a name, a UserId, and leaderstats.
+
+<Step>
+
+## The Player object
+
+A Player is the account-level object: their name, their UserId, their leaderstats. Two facts matter most:
+
+```luau
+local Players = game:GetService("Players")
+
+-- everyone currently connected
+local everyone = Players:GetPlayers()
+
+-- fire when a new person joins
+Players.PlayerAdded:Connect(function(player)
+    print(player.Name .. " joined with ID " .. player.UserId)
+end)
+```
+
+`Players:GetPlayers()` answers "who is here right now". `PlayerAdded` answers "someone just arrived". Together they cover everyone in your game.
+
+<Mcq
+  question="What does Players:GetPlayers() return?"
+  options={[
+    "The number of players",
+    "A table of all players currently connected",
+    "The LocalPlayer only",
+    "A list of player names as strings",
+  ]}
+  answer={1}
+  explanation="GetPlayers() returns a table of Player objects for everyone in the server right now."
+/>
+
+</Step>
+
+<Step>
+
+## Player vs character
+
+The Player is the account; the **character** is the 3D body standing on your baseplate. They're separate objects, and the character can change — every time a player dies and respawns, an old character is removed and a new one is created.
+
+<Note>
+The player persists across the whole session — account, stats, identity. The character is a temporary body, thrown away on death. "Respawn" is simply "make a new body" without touching the account. This distinction is everywhere in Roblox code.
+</Note>
+
+<FillBlank
+  prompt="The Player is the ____; the character is the temporary ____ standing in the world."
+  answer="account / body"
+  explanation="The Player persists (identity, stats); the character is the throwaway body that respawns."
+/>
+
+</Step>
+
+<Step>
+
+## Why the separation matters
+
+Because they're separate, you code for them differently:
+
+- **Account-level stuff** — leaderstats, saved data, bans — targets the `player`.
+- **World-level stuff** — health, position, death — targets the `character`.
+
+Get it backwards and your code breaks: setting health on the player does nothing (players don't have health — characters do), and saving the character does nothing (characters get destroyed).
+
+<WriteCode
+  instruction="When a player joins, print a greeting that includes their name. Write the connect line for PlayerAdded."
+  answer={["Players.PlayerAdded:Connect(function(player)", "print(player.Name .. \" joined!\")", "end)"]}
+  starterCode='local Players = game:GetService("Players")
+-- greet each new player
+'
+  explanation="Connect PlayerAdded and print inside the callback, using the player the event hands you."
+/>
+
+Next: the body — characters and Humanoids.
+
+</Step>

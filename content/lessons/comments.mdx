@@ -1,0 +1,91 @@
+---
+slug: comments
+title: Comments — notes for your future self
+description: Leave plain-English notes in your code with -- so you and anyone else can understand what a script does.
+sectionId: luau-basics
+order: 14
+difficulty: beginner
+estimatedMinutes: 3
+tags: [comments, readability, style]
+objectives:
+  - Write single-line comments with --
+  - Comment the why, not the what
+  - Keep comments true when you edit code
+prerequisites: [scripts]
+keywords: [comments, readability, double dash]
+---
+
+Luau ignores anything after `--` on a line. That sounds useless until you realize it's a notebook glued to your code.
+
+<Step>
+
+## The basic comment
+
+```luau
+-- This gives the player a coin
+local coins = 0
+coins = coins + 1
+```
+
+Everything from `--` to the end of the line is ignored by Luau — it's for humans. You can also tuck a comment after a line of code:
+
+```luau
+local coins = 0
+coins = coins + 1  -- a coin was picked up
+```
+
+<Note>
+The editor colors comments differently (usually green). If you type `--` and your text stays normal-colored, you probably used a different symbol.
+</Note>
+
+<FillBlank
+  prompt="Finish the comment so it explains what the next line does:  -- ____ the player's total  local score = score + 10"
+  answer="double"
+  explanation="A comment should say what the code does — here, that the score is being doubled."
+/>
+
+</Step>
+
+<Step>
+
+## Comment the why, not the what
+
+The code already says *what* it does — `coins = coins + 1` is obvious. Comments are for the part the code can't tell you: the *why*.
+
+```luau
+-- Coins have to be awarded on the server so players can't cheat
+local coins = serverCoins + 1
+
+-- Everything below needs the player's character to exist first
+task.wait()
+local humanoid = character.Humanoid
+```
+
+Good comment, good reason. Bad comment, no reason:
+
+```luau
+-- This adds one to coins
+coins = coins + 1   -- (don't write this)
+```
+
+<Note>
+Comments can also carve sections: a `-- === Rewards ===` line before a block of reward code makes long scripts skimmable.
+</Note>
+
+</Step>
+
+<Step>
+
+## Comments lie when you edit
+
+The one rule that keeps comments useful: **when you change the code, change the comment.** A comment that says one thing while the code does another is worse than no comment — it actively misleads you.
+
+<WriteCode
+  instruction="Write a comment above this line explaining why the wait matters, then the wait call. Add to the starter code."
+  answer={["-- wait for the character to spawn", "task.wait()"]}
+  starterCode='-- your comment + wait here
+print("Character ready")'
+  explanation="A comment explaining why the wait is there, then the task.wait() itself."
+/>
+
+</Step>

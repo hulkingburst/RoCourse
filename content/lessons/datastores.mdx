@@ -1,0 +1,125 @@
+---
+slug: datastores
+title: DataStores — saving between visits
+description: Give your game a real memory with DataStoreService, so a player's coins survive the game closing.
+sectionId: data
+order: 3
+difficulty: beginner
+estimatedMinutes: 5
+tags: [datastore, save, load, persistence]
+objectives:
+  - Get a DataStore with GetDataStore
+  - Save with SetAsync and load with GetAsync
+  - Explain the key / value shape of a store
+prerequisites: [leaderstats, user-id]
+keywords: [datastore, dataservice, save, load, setasync, getasync]
+---
+
+Right now, everything you've built dies when the game stops. Close the test and your coins are gone. Real games remember you. That memory lives in a **DataStore** — and this lesson is where your game gets a brain that survives restart.
+
+<Warning>
+DataStores only fully work in **published** games. If you test from Studio, saves won't stick around — that's expected, not a bug. You'll test the full loop once we publish.
+</Warning>
+
+<Step>
+
+## The shape of saving
+
+Saving is always the same dance:
+
+1. **Get the store.** One shared storage area, like a filing cabinet.
+2. **Load** — on join, pull out that player's file.
+3. **Save** — when they leave (or periodically), write it back.
+
+```luau
+local DataStoreService = game:GetService("DataStoreService")
+local coinsStore = DataStoreService:GetDataStore("Coins")
+```
+
+`GetDataStore("Coins")` gives you a filing cabinet named "Coins". Inside it, each key is a player. So "Sam's file" = key `"Sam"`, value `50`.
+
+<Mcq
+  question='What does GetDataStore("Coins") give you?'
+  options={[
+    "A single number",
+    "A filing cabinet named Coins, holding many keys",
+    "The player's coins",
+    "A leaderboard",
+  ]}
+  answer={1}
+  explanation="A DataStore is a cabinet. Keys inside it are players; each key holds that player's saved value."
+/>
+
+</Step>
+
+<Step>
+
+## Save and load
+
+Two methods do almost all the work:
+
+```luau
+coinsStore:SetAsync(player.UserId, coins)   -- write a value
+local coins = coinsStore:GetAsync(player.UserId)  -- read it back
+```
+
+- `SetAsync(key, value)` — "set asynchronously": write the value to the store. Roblox does the slow network work in the background so your game doesn't freeze.
+- `GetAsync(key)` — returns the saved value, or `nil` if there's no save yet.
+
+Notice the key is `player.UserId` — the permanent number from last lesson. The key is *who*; the value is *what*.
+
+<FillBlank
+  prompt="In coinsStore:SetAsync(player.UserId, coins), the key is ____ and the value is ____."
+  answer="player.UserId / coins"
+  explanation="The key identifies which player's file; the value is the data being stored."
+/>
+
+</Step>
+
+<Step>
+
+## The full save loop
+
+Load on join, save on leave. That's the entire shape of persistence:
+
+```luau
+local DataStoreService = game:GetService("DataStoreService")
+local coinsStore = DataStoreService:GetDataStore("Coins")
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+    local coins = coinsStore:GetAsync(player.UserId) or 0
+    -- ...build leaderstats with coins...
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    local coins = player.leaderstats.Coins.Value
+    coinsStore:SetAsync(player.UserId, coins)
+end)
+```
+
+Every game with player progress — cash, levels, pets — is this pattern with different values.
+
+<WriteCode
+  instruction="A player is leaving. Write the line that saves their coins (held in player.leaderstats.Coins.Value) to the store under their UserId."
+  answer={["coinsStore:SetAsync(player.UserId, player.leaderstats.Coins.Value)"]}
+  starterCode="Players.PlayerRemoving:Connect(function(player)
+    -- your save line
+end)"
+  explanation="SetAsync writes the value under the player's permanent key."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Testing saves in Studio and thinking it's broken.** Saves don't persist in Studio — the store only fully works in a published place.
+- **Saving on PlayerAdded.** That saves the *starter* value before they've earned anything. Save on leave.
+- **Using the key as the saved value.** The *key* is UserId, the *value* is coins. Getting them backwards stores a number with a number for a key.
+- **Forgetting the nil check.** New player, no save → `GetAsync` gives nil. Default it with `or 0`.
+
+Next: loading a player's data in detail — and handling brand-new players.
+
+</Step>

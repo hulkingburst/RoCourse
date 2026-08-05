@@ -1,0 +1,85 @@
+---
+slug: workspace-parts
+title: The Workspace and parts
+description: Build your first objects — parts in the Workspace, and the three numbers that place anything in 3D space.
+sectionId: getting-started
+order: 3
+difficulty: beginner
+estimatedMinutes: 5
+tags: [workspace, parts, building, properties]
+objectives:
+  - Understand that the Workspace holds everything visible in a game
+  - Insert, move, resize, and recolor parts
+  - Read and change Position and Size in Properties
+prerequisites: [studio-interface]
+keywords: [parts, workspace, position, studio build]
+---
+
+Every visible thing in a Roblox game — the ground you stand on, the walls, the obstacles — is made out of **parts**. Parts are the LEGO bricks of Roblox. A whole game is just a collection of parts.
+
+<Step>
+
+## The Workspace is the game world
+
+In the Explorer, the **Workspace** is the top folder, and it's special: everything inside it is part of the game world. Put a part in Workspace and players can see it. Put a script in Workspace and it runs.
+
+When we say "the game world", in code we'll refer to it as `workspace` (lowercase). That connection — the folder named Workspace in your Explorer, and `workspace` in scripts — trips people up for weeks. They're the same thing.
+
+</Step>
+
+<Step>
+
+## Make some parts
+
+1. In the Explorer, click on **Workspace** to select it.
+2. In the top toolbar, click the **Part** button (or press **Shift + 1**). Click once to enter build mode, then click anywhere in the 3D view to drop a part.
+3. Drop a few parts. Drag them with the move tool (**Shift + 2**), resize with the scale tool (**Shift + 3**), spin with the rotate tool (**Shift + 4**).
+
+These shortcut numbers are worth learning now — you'll use them constantly.
+
+<Note>
+The keyboard shortcuts only work when the mouse is over the 3D view.
+</Note>
+
+</Step>
+
+<Step>
+
+## Where is a part? The Position property
+
+Click one of your parts and look at **Position** in Properties. You'll see three numbers:
+
+```text
+Position   0, 5, 0
+```
+
+Those are **X, Y, Z** — left/right, up/down, forward/back. Every point in the 3D view has exactly one set of coordinates, and when scripts move things around, they change these numbers.
+
+Change the Y number to `10` and press Enter. Your part teleported straight up. You just "wrote" a position — a script will do the same thing later, but with code.
+
+</Step>
+
+<Step>
+
+## Size, color, and saving
+
+While a part is selected:
+
+- **Size** is another set of three numbers (width, height, depth). The Baseplate is huge; your new parts are small cubes.
+- **Color** is a color picker. Give each of your parts a different color so you can tell them apart.
+
+Even though places autosave to the cloud, press **Ctrl + S** (Cmd + S on Mac) a few times while you work. It saves to your actual account and takes a second.
+
+<Mcq
+  question="A part has Position 0, 5, 0. Which axis does the 5 refer to?"
+  options={[
+    "Left/right",
+    "Up/down",
+    "Forward/back",
+    "Size",
+  ]}
+  answer={1}
+  explanation="The second number is Y, which is height. A Y of 5 means 5 studs above the ground."
+/>
+
+</Step>

@@ -1,0 +1,120 @@
+---
+slug: loops
+title: Loops — doing things over and over
+description: Run code forever, or until a condition changes — the heartbeat of every game.
+sectionId: luau-basics
+order: 10
+difficulty: beginner
+estimatedMinutes: 5
+tags: [loops, while, repeat, task.wait]
+objectives:
+  - Write a while loop that runs forever with a wait between iterations
+  - Write a while loop whose condition eventually turns false
+  - Avoid the infinite loop that freezes your game
+prerequisites: [conditionals]
+keywords: [while, repeat, task.wait, infinite loop]
+---
+
+Every living game has a heartbeat: something that runs constantly, checking and updating. The sun rotating, a shop restocking, enemies respawning. That heartbeat is a **loop**.
+
+<Step>
+
+## The forever loop: while true
+
+```luau
+while true do
+    print("tick")
+    task.wait(1)
+end
+```
+
+- `while true do` — "keep going as long as true is true", i.e. forever.
+- The lines between `do` and `end` run.
+- `task.wait(1)` — pause for 1 second before the next round.
+
+Without the `task.wait`, the loop would spin millions of times a second — printing "tick" so fast it locks up your game. **A loop that runs forever needs a pause.** Think of `while true` as breathing: the wait is the breath.
+
+<Mcq
+  question="What is wrong with this loop?"
+  options={[
+    "Nothing — it's perfect",
+    "It has no task.wait, so it will freeze the game",
+    "while can't be used with print",
+    "It needs an end statement",
+  ]}
+  answer={1}
+  explanation="An endless loop with no pause spins millions of times a second. Every forever loop needs a wait."
+/>
+
+</Step>
+
+<Step>
+
+## A loop that ends
+
+You don't need forever. This counts down:
+
+```luau
+local count = 5
+
+while count > 0 do
+    print(count)
+    count = count - 1
+    task.wait(1)
+end
+
+print("Go!")
+```
+
+Each pass, `count` drops by one. The moment it hits 0, the condition is false, the loop stops, and the script continues. This is exactly how countdown timers work in games.
+
+<Note>
+A loop that must end needs its condition to *change*: something inside the loop must move the value toward false. No change, no end.
+</Note>
+
+</Step>
+
+<Step>
+
+## The one that checks at the end: repeat
+
+`repeat` runs the block first, then checks:
+
+```luau
+repeat
+    task.wait(0.5)
+    print("checking...")
+until coins >= 100
+```
+
+The difference: `while` checks *before* each run, `repeat` checks *after*. So a `repeat` loop always runs at least once. Use it when you need the check to happen after some work — like waiting for a condition that starts false.
+
+<FillBlank
+  prompt="While loops check the condition ____ they run; repeat loops check ____ they run."
+  answer="before / after"
+  explanation="while checks before each run; repeat checks after, so it always runs at least once."
+/>
+
+</Step>
+
+<Step>
+
+## How loops break
+
+Loops end in two ways: a condition goes false (`while` and `repeat`), or you force an exit with `break` (rarely needed in this course). 
+
+<Warning>
+An infinite loop with no `task.wait` will freeze Studio, and you'll have to stop the game manually. When you're testing a loop and the game hangs, the first thing to check is: is there a wait, and does my condition ever turn false?
+</Warning>
+
+<WriteCode
+  instruction="Write a while loop that counts 3, 2, 1 (with a 1-second wait each), then a print of 'Go!' after it ends."
+  answer={["local count = 3", "while count > 0 do", "print(count)", "count = count - 1", "task.wait(1)", "end", "print(\"Go!\")"]}
+  starterCode="-- countdown from 3
+"
+  explanation="Start count at 3, loop while it's above 0, drop it by one each pass so the loop ends, then print Go!."
+/>
+
+Next: a loop that counts a fixed number of times — `for`.
+
+</Step>

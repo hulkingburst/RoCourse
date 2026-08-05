@@ -1,0 +1,395 @@
+---
+slug: final-project
+title: The final project — one complete game
+description: Build a full clicker with a working shop, persistent saves, and polish — every system in this course in one place.
+sectionId: final-project
+order: 0
+difficulty: advanced
+estimatedMinutes: 10
+tags: [project, capstone, game]
+objectives:
+  - Assemble every system from the course into one complete game
+  - Organize the code with ModuleScripts
+  - Playtest the full loop: earn, spend, save, reload, recover
+prerequisites: [datastore-testing, upgrades, clicker, debugging]
+keywords: [project, capstone, full game, assemble]
+---
+
+This is it: the whole course in one build. You're going to assemble a complete game — a clicker with a shop, per-player upgrades, real saving, and polish — using *every* system you've built. If you can finish this, you can build anything in Roblox.
+
+<Step>
+
+## The game and the plan
+
+**"Coin Tycoon."** Click a coin to earn coins. Buy upgrades that multiply your clicks. Your progress saves between visits. Same loop as the clicker — but now it's a *product*: organized, polished, and persistent.
+
+```
+CLIENT                          SERVER
+ClickButton ──FireServer──▶    ClickHandler: award coins × multiplier
+BuyButton  ──FireServer──▶    BuyHandler: check wallet, raise level
+labels ◀───FireClient────    every change pushes updated totals
+                              SaveService: autosave + save on leave
+                              LoadService: restore on join
+```
+
+Everything flows one direction: **player → client → server → data → back to screen.**
+
+<Mcq
+  question="In the final project, who decides what a click is worth?"
+  options={[
+    "The client button",
+    "The server's ClickHandler",
+    "The player's screen",
+    "The label text",
+  ]}
+  answer={1}
+  explanation="Same as every lesson: the client reports, the server decides."
+/>
+
+</Step>
+
+<Step>
+
+## Step 0-1 — folder layout and GameConfig
+
+In ReplicatedStorage, create:
+
+```
+ReplicatedStorage
+  Shared
+    GameConfig (ModuleScript)
+    CoinMath   (ModuleScript)
+  RemoteEvents
+    ClickCoin
+    BuyUpgrade
+```
+
+ServerScriptService gets two scripts: `Economy` (clicks + purchases) and `SaveSystem` (load/save). StarterPlayer > StarterPlayerScripts gets one LocalScript: `ClientUI`.
+
+**GameConfig** is the single source of truth for every number:
+
+```luau
+local config = {
+    coinsPerClick = 1,
+    upgradeBaseCost = 25,
+    coinsKey = "Coins",
+    multiplierKey = "Multiplier",
+}
+
+return config
+```
+
+Change `upgradeBaseCost` here and the whole economy reprices.
+
+<FillBlank
+  prompt="The RemoteEvents live in a folder named ____ so server and client both reach them."
+  answer="ReplicatedStorage"
+  explanation="ReplicatedStorage is visible to both server and client — the home for shared objects."
+/>
+
+</Step>
+
+<Step>
+
+## Step 2 — CoinMath module
+
+All the money math in one testable module:
+
+```luau
+local CoinMath = {}
+
+function CoinMath.rewardForClick(multiplier)
+    return 1 * multiplier
+end
+
+function CoinMath.upgradeCost(baseCost, currentLevel)
+    return baseCost * (currentLevel + 1)
+end
+
+function CoinMath.passiveIncome(multiplier)
+    return multiplier * 1
+end
+
+return CoinMath
+```
+
+Every script that needs a price or a reward calls these functions — no duplicated formulas.
+
+<WriteCode
+  instruction="Finish the CoinMath module so require hands back the table of functions."
+  answer={["return CoinMath"]}
+  starterCode="local CoinMath = {}
+
+function CoinMath.rewardForClick(multiplier)
+    return 1 * multiplier
+end
+
+-- your line here
+"
+  explanation="A module ends with its return — that's what every require-er receives."
+/>
+
+</Step>
+
+<Step>
+
+## Step 3 — SaveSystem
+
+The persistence layer, using your datastores knowledge — it saves *two* values as one table:
+
+```luau
+local Players = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local Shared = game:GetService("ReplicatedStorage").Shared
+local GameConfig = require(Shared.GameConfig)
+
+local saveStore = DataStoreService:GetDataStore("CoinTycoonSaves")
+
+function createStats(player, coins, multiplier)
+    local stats = Instance.new("Folder")
+    stats.Name = "leaderstats"
+    stats.Parent = player
+
+    local coinsValue = Instance.new("NumberValue")
+    coinsValue.Name = GameConfig.coinsKey
+    coinsValue.Value = coins
+    coinsValue.Parent = stats
+
+    local multValue = Instance.new("NumberValue")
+    multValue.Name = GameConfig.multiplierKey
+    multValue.Value = multiplier
+    multValue.Parent = stats
+end
+
+Players.PlayerAdded:Connect(function(player)
+    local data = saveStore:GetAsync(player.UserId)
+    if data == nil then
+        data = { coins = 0, multiplier = 1 }
+    end
+    createStats(player, data.coins, data.multiplier)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    local coins = player.leaderstats[GameConfig.coinsKey].Value
+    local multiplier = player.leaderstats[GameConfig.multiplierKey].Value
+    saveStore:SetAsync(player.UserId, { coins = coins, multiplier = multiplier })
+end)
+```
+
+Load on join, save on leave, default for new players — the datastores lesson, upgraded to a table.
+
+<Mcq
+  question="Why save both values as one table instead of two separate SetAsync calls?"
+  options={[
+    "Tables are smaller",
+    "One save lands atomically — the whole save or nothing",
+    "SetAsync requires tables",
+    "It's faster to type",
+  ]}
+  answer={1}
+  explanation="Two separate saves can get out of sync. One table saves all progress atomically."
+/>
+
+</Step>
+
+<Step>
+
+## Step 4 — Economy
+
+Clicks and purchases, both through remotes, both server-decided:
+
+```luau
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Shared = ReplicatedStorage.Shared
+local GameConfig = require(Shared.GameConfig)
+local CoinMath = require(Shared.CoinMath)
+
+local clickEvent = ReplicatedStorage.RemoteEvents.ClickCoin
+local buyEvent = ReplicatedStorage.RemoteEvents.BuyUpgrade
+
+function getStats(player)
+    local stats = player.leaderstats
+    if not stats then return nil, nil end
+    return stats[GameConfig.coinsKey], stats[GameConfig.multiplierKey]
+end
+
+function pushUpdate(player)
+    local coins, multiplier = getStats(player)
+    if coins and multiplier then
+        clickEvent:FireClient(player, coins.Value, multiplier.Value)
+    end
+end
+
+clickEvent.OnServerEvent:Connect(function(player)
+    local coins, multiplier = getStats(player)
+    if coins and multiplier then
+        local reward = CoinMath.rewardForClick(multiplier.Value)
+        coins.Value = coins.Value + reward
+        pushUpdate(player)
+    end
+end)
+
+buyEvent.OnServerEvent:Connect(function(player, upgradeId)
+    if upgradeId ~= "multiplier" then return end
+
+    local coins, multiplier = getStats(player)
+    if not (coins and multiplier) then return end
+
+    local nextLevel = multiplier.Value + 1
+    local cost = CoinMath.upgradeCost(GameConfig.upgradeBaseCost, multiplier.Value)
+
+    if coins.Value >= cost then
+        coins.Value = coins.Value - cost
+        multiplier.Value = nextLevel
+    end
+
+    pushUpdate(player)
+end)
+```
+
+Each handler is tiny: **verify, decide, apply, report.** All the noise lives in the modules.
+
+<FillBlank
+  prompt="In the buy handler, the server refuses a purchase it doesn't recognize with the line: if upgradeId ~= ____ then return end"
+  answer='"multiplier"'
+  explanation="The server rejects any upgradeId it doesn't understand — no free store."
+/>
+
+</Step>
+
+<Step>
+
+## Step 5 — ClientUI
+
+The whole client: build the UI, send clicks, send purchases, receive updates:
+
+```luau
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+local clickEvent = ReplicatedStorage.RemoteEvents.ClickCoin
+local buyEvent = ReplicatedStorage.RemoteEvents.BuyUpgrade
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+local coinsLabel = Instance.new("TextLabel")
+coinsLabel.Size = UDim2.new(1, 0, 0, 60)
+coinsLabel.Text = "Coins: 0"
+coinsLabel.TextSize = 30
+coinsLabel.BackgroundTransparency = 1
+coinsLabel.Parent = screenGui
+
+local coinButton = Instance.new("TextButton")
+coinButton.Size = UDim2.new(0, 240, 0, 140)
+coinButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+coinButton.AnchorPoint = Vector2.new(0.5, 0.5)
+coinButton.Text = "Click!"
+coinButton.TextSize = 26
+coinButton.Parent = screenGui
+
+local buyButton = Instance.new("TextButton")
+buyButton.Size = UDim2.new(0, 240, 0, 60)
+buyButton.Position = UDim2.new(0.5, 0, 0.7, 0)
+buyButton.AnchorPoint = Vector2.new(0.5, 0.5)
+buyButton.Text = "Buy upgrade (25 coins)"
+buyButton.Parent = screenGui
+
+coinButton.Activated:Connect(function()
+    clickEvent:FireServer()
+end)
+
+buyButton.Activated:Connect(function()
+    buyEvent:FireServer("multiplier")
+end)
+
+local function updateUI(coins, multiplier)
+    coinsLabel.Text = "Coins: " .. coins
+    buyButton.Text = "Buy upgrade (" .. 25 * (multiplier + 1) .. " coins)"
+end
+
+clickEvent.OnClientEvent:Connect(updateUI)
+```
+
+The button label even prices the next upgrade — but notice it's only *display*. The real price check lives on the server. The UI can claim anything; the server's wallet is the truth.
+
+<WriteCode
+  instruction="The client must send a purchase request when the buy button is clicked. Write the line inside the Activated callback."
+  answer={["buyEvent:FireServer(\"multiplier\")"]}
+  starterCode="buyButton.Activated:Connect(function()
+    -- request the purchase
+end)"
+  explanation="The button reports intent; the server prices and verifies it."
+/>
+
+</Step>
+
+<Step>
+
+## Step 6 — polish
+
+A game you just assembled still feels flat. Add feel with a tween — a button that pops on every click:
+
+```luau
+coinButton.Activated:Connect(function()
+    local TweenService = game:GetService("TweenService")
+    local pop = TweenService:Create(coinButton, TweenInfo.new(0.1), {
+        Size = UDim2.new(0, 260, 0, 150),
+    })
+    pop:Play()
+    pop.Completed:Wait()
+    TweenService:Create(coinButton, TweenInfo.new(0.1), {
+        Size = UDim2.new(0, 240, 0, 140),
+    }):Play()
+
+    clickEvent:FireServer()
+end)
+```
+
+A button that pops on every click is the difference between "a screen" and "a game."
+
+<Mcq
+  question="Why does the polish step tween the button on the client?"
+  options={[
+    "The server requires it",
+    "Feel-effects are per-player and client-side",
+    "Tweens can't run on the server",
+    "It's faster to write",
+  ]}
+  answer={1}
+  explanation="Polish is feel, and feel is per-player — so it belongs in the LocalScript."
+/>
+
+</Step>
+
+<Step>
+
+## Playtest and ship
+
+Run this as your final test — the exact loop every game must pass:
+
+1. **Earn:** click until you have 30 coins. Multiplier starts at x1.
+2. **Spend:** buy the first upgrade. Coins drop by 25, multiplier becomes x2.
+3. **Verify:** clicks now pay 2.
+4. **Save:** stop the game.
+5. **Reload:** play again. Coins *and* multiplier are back.
+6. **Recover:** if anything didn't survive, debug in this order: `GetAsync` default → `PlayerRemoving` save → table key names match → Studio data store access enabled.
+
+**The course is complete when step 5 shows your exact coins and multiplier.**
+
+- **Stretch goals** — an auto-income loop using `CoinMath.passiveIncome`, a "power click" upgrade, a coin tween that flies to the corner, a third NumberValue for the leaderboard. Every one is a variation of the pipeline you've mastered.
+
+- **Common mistakes, final edition** — skipping modules (the split *is* the debuggability); renaming a stat and missing the saves; testing saves without Studio access enabled; letting the client label decide anything (it's a mirror, not a bank).
+
+<WriteCode
+  instruction="After reloading, you should see your saved state. Write the five key actions of the playtest in order: earn, spend, verify, save, reload."
+  answer={["earn", "spend", "verify", "save", "reload"]}
+  starterCode="-- the playtest loop
+"
+  explanation="Earn, spend, verify the math, save, then reload to prove it persisted."
+/>
+
+You built a real, publishable game from zero. Everything from here is the same systems, bigger ambitions.
+
+</Step>

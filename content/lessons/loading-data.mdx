@@ -1,0 +1,126 @@
+---
+slug: loading-data
+title: Loading a player's data
+description: Pull a player's save on join, default brand-new players to zero, and hand the number to leaderstats.
+sectionId: data
+order: 4
+difficulty: beginner
+estimatedMinutes: 5
+tags: [loading, getasync, nil]
+objectives:
+  - Load saved data inside PlayerAdded
+  - Handle the nil case for brand-new players
+  - Pass the loaded value into leaderstats
+prerequisites: [datastores, user-id]
+keywords: [getasync, loading, nil, defaults]
+---
+
+Saving is half the loop; loading is the half players actually see. This lesson wires `GetAsync` into `PlayerAdded` so a returning player gets their coins back — and a brand-new player starts at zero.
+
+<Step>
+
+## Loading on join
+
+Inside `PlayerAdded`, pull the player's file:
+
+```luau
+local DataStoreService = game:GetService("DataStoreService")
+local coinsStore = DataStoreService:GetDataStore("Coins")
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+    local coins = coinsStore:GetAsync(player.UserId)
+    print(player.Name .. " has " .. coins .. " coins saved")
+end)
+```
+
+`GetAsync(key)` returns the saved value. For a returning player that's their real coin count — the number you stored when they last left.
+
+<Mcq
+  question="GetAsync returns nil when…"
+  options={[
+    "The player's character died",
+    "The player has never saved before",
+    "The store is full",
+    "The player left",
+  ]}
+  answer={1}
+  explanation="No save yet = nil. That's how you detect a brand-new player."
+/>
+
+</Step>
+
+<Step>
+
+## First-time players: the nil check
+
+A brand-new player has no save, so `GetAsync` gives `nil`. Before doing anything with the number, decide what a missing save means:
+
+```luau
+local coins = coinsStore:GetAsync(player.UserId)
+if coins == nil then
+    coins = 0
+end
+```
+
+The shorthand does the same thing in one line:
+
+```luau
+local coins = coinsStore:GetAsync(player.UserId) or 0
+```
+
+`or 0` reads: *"give me the saved value, or if that's nil, give me 0."* It's the standard "default for new players" line in every Roblox game.
+
+<FillBlank
+  prompt="local coins = coinsStore:GetAsync(id) or ____  — what default goes here for a brand-new player?"
+  answer="0"
+  explanation="A first-time player starts with zero coins, so default the nil to 0."
+/>
+
+</Step>
+
+<Step>
+
+## From loaded number to leaderboard
+
+Now the two patterns meet: the loaded value feeds straight into leaderstats.
+
+```luau
+Players.PlayerAdded:Connect(function(player)
+    local coins = coinsStore:GetAsync(player.UserId) or 0
+
+    local stats = Instance.new("Folder")
+    stats.Name = "leaderstats"
+    stats.Parent = player
+
+    local coinsValue = Instance.new("NumberValue")
+    coinsValue.Name = "Coins"
+    coinsValue.Value = coins      -- <-- the loaded number
+    coinsValue.Parent = stats
+end)
+```
+
+Returning player: the leaderboard shows their saved coins. New player: it shows 0. Same code, both cases — the `or 0` did the deciding.
+
+<WriteCode
+  instruction="Inside PlayerAdded, load the player's coins from the store, defaulting to 0 if they have no save. Use the or shorthand."
+  answer={["local coins = coinsStore:GetAsync(player.UserId) or 0"]}
+  starterCode="Players.PlayerAdded:Connect(function(player)
+    -- load coins, defaulting new players to 0
+end)"
+  explanation="GetAsync, then or 0 so a missing save becomes zero coins."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Skipping the nil check.** New player, no save → `coins` is nil → `coinsValue.Value = nil` leaves the stat empty or errors. Always default it.
+- **Loading outside PlayerAdded.** You need the player object to exist first, so the load belongs inside the join handler.
+- **Forgetting you still need the save.** Loading is only half the loop — the data must be written back on leave, or next join loads nothing.
+
+Next: keeping saves safe with the full save loop and autosave.
+
+</Step>

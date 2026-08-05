@@ -1,0 +1,113 @@
+---
+slug: print-debugging
+title: Print debugging — narrating your code
+description: Strategic print statements turn a black box into a story — and reveal exactly which step failed.
+sectionId: leveling-up
+order: 1
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [debugging, print, output, tracing]
+objectives:
+  - Place prints before and after a suspicious step
+  - Bisect a bug by reading which prints appear
+  - Use prints to trace an event firing
+prerequisites: [debugging]
+keywords: [print, debugging, trace, bisect]
+---
+
+Every senior developer's secret is embarrassing: they add print statements. Strategic prints turn a black box into a narrated story — and they're the fastest way to find where logic goes wrong.
+
+<Step>
+
+## The before / after trick
+
+Three prints tell you *which* step failed:
+
+```luau
+print("click received from", player.Name)          -- did the event fire?
+print("coins before:", coins.Value)                -- what state did we enter?
+coins.Value = coins.Value + 10
+print("coins after:", coins.Value)                 -- did it change?
+```
+
+- Event never fired? The first print never shows — look at the connection.
+- Coins didn't change? The last print matches the middle one — look at the math.
+- The gap between two prints is where the bug lives.
+
+<FillBlank
+  prompt="Your print('before') shows up, but print('after') never does. The bug is ____ the two prints."
+  answer="between"
+  explanation="You've bisected the bug: the code before ran, the code after didn't. The problem is in the gap."
+/>
+
+</Step>
+
+<Step>
+
+## Bisecting with prints
+
+When you don't know where the problem is, don't guess — divide the code in half and print at the middle:
+
+```luau
+print("A: start")
+-- ...setup...
+print("B: got the part")    -- half the distance
+-- ...handler...
+print("C: handler ran")
+```
+
+If "B" shows but "C" doesn't, the bug is between B and C. Narrow again inside that stretch. Each run halves the search — a few runs finds any bug.
+
+<Mcq
+  question="Your print('before') shows up in Output, but print('after') never does. What does that mean?"
+  options={[
+    "The event didn't fire",
+    "The bug is between those two prints",
+    "Output is broken",
+    "The server is offline",
+  ]}
+  answer={1}
+  explanation="You've bisected the bug: the code before ran, the code after didn't. The problem is in the gap."
+/>
+
+</Step>
+
+<Step>
+
+## Tracing an event
+
+Prints are how you answer "did the event even fire?" — the first question of every event bug:
+
+```luau
+clickEvent.OnServerEvent:Connect(function(player)
+    print("click from", player.Name)
+    -- ...
+end)
+```
+
+If nothing prints, the connection never fired — wrong event, wrong name, or the script never connected. If it prints but nothing happens after, the bug is downstream. One line of print told you which half to investigate.
+
+<WriteCode
+  instruction="Before doing work, print that a click arrived and whose it was. Write the print line for the OnServerEvent callback."
+  answer={["print(\"click from\", player.Name)"]}
+  starterCode="clickEvent.OnServerEvent:Connect(function(player)
+    -- trace the click
+    local coins = player.leaderstats.Coins
+end)"
+  explanation="A print at the top of the handler tells you whether the event fired at all."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Removing prints before the bug is fixed.** Strip them in a cleanup pass, not during the hunt.
+- **Printing too little.** One print at the end says the end ran — it doesn't say where it broke. Print at the checkpoints.
+- **Printing after the crash line.** A print on the crashing line never runs. Print *before* the suspicious line.
+- **Forgetting which side prints come from.** Client prints and server prints are separate Output streams in a live game. Watch the right one.
+
+Next: the classic bugs — and how to smell them coming.
+
+</Step>

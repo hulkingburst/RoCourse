@@ -1,0 +1,88 @@
+---
+slug: numbers
+title: Numbers and math
+description: Add, subtract, multiply, divide, and find remainders — the arithmetic your game does a thousand times a day.
+sectionId: luau-basics
+order: 4
+difficulty: beginner
+estimatedMinutes: 4
+tags: [numbers, math, arithmetic]
+objectives:
+  - Use the five arithmetic operators
+  - Combine operators with parentheses
+  - Write a score that goes up by more than one at a time
+prerequisites: [types]
+keywords: [numbers, math, operators, arithmetic, modulo]
+---
+
+Games are math happening fast enough to look like a game. Every coin pickup, damage tick, and score multiplier is just arithmetic. Let's make it second nature.
+
+<Step>
+
+## The five operators
+
+| Operator | Does | Example |
+| --- | --- | --- |
+| `+` | add | `10 + 5` → 15 |
+| `-` | subtract | `10 - 5` → 5 |
+| `*` | multiply | `10 * 5` → 50 |
+| `/` | divide | `10 / 5` → 2 |
+| `%` | remainder | `10 % 3` → 1 |
+
+That last one, `%`, gives you what's *left over* after division. `10 % 3` is 1 because 3 goes into 10 three times with 1 left. Remainders are how games tell even from odd, and how timers detect "every 5th tick".
+
+<FillBlank
+  prompt="Compute 7 % 3.  Fill in the result:  print(7 % 3)  -->  ____"
+  answer="1"
+  explanation="3 goes into 7 twice (that's 6), with 1 left over. The remainder is 1."
+/>
+
+</Step>
+
+<Step>
+
+## Doing math on boxes
+
+You already saw the counting pattern — now it takes multipliers:
+
+```luau
+local score = 100
+score = score + 10      --> 110
+score = score * 2       --> 220
+score = score - 50      --> 170
+score = score / 2       --> 85
+```
+
+Each line reads the box, does math, and stores the result back. That's how you build a double-score power-up or a speed boost: multiply the box.
+
+<Note>
+Luau also has the shorthand versions `+=`, `-=`, `*=`, `/=`. `score += 10` is exactly `score = score + 10`. Both are fine — pick one and be consistent.
+</Note>
+
+</Step>
+
+<Step>
+
+## Order of operations
+
+Math follows the usual rules: multiplication and division happen before addition and subtraction.
+
+```luau
+print(2 + 3 * 4)  --> 14, not 20
+```
+
+`3 * 4` runs first, then the `+`. When you want to override the order, use parentheses:
+
+```luau
+print((2 + 3) * 4)  --> 20
+```
+
+<WriteCode
+  instruction="A player earned 5 coins, then the game doubles everyone's total. Start a coins box at 0, add 5, then double it."
+  answer={["local coins = 0", "coins = coins + 5", "coins = coins * 2"]}
+  starterCode="-- your three lines here
+"
+  explanation="Three steps: create the box, add the pickup, then multiply for the double."
+/>
+
+</Step>

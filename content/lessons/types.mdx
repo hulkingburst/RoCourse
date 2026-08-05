@@ -1,0 +1,136 @@
+---
+slug: types
+title: Types — numbers, strings, and booleans
+description: The kinds of values you can put in a variable, why "1" is not 1, and how to convert between them.
+sectionId: luau-basics
+order: 3
+difficulty: beginner
+estimatedMinutes: 5
+tags: [types, numbers, strings, booleans, nil]
+objectives:
+  - Distinguish numbers, strings, booleans, and nil
+  - Convert between text and numbers with tostring and tonumber
+  - Explain why "1" + 1 is an error but 1 + 1 is not
+prerequisites: [variables]
+keywords: [types, number, string, boolean, nil, tostring, tonumber]
+---
+
+A variable is a box. This lesson is about what can go *in* the box — because Luau won't let you mix everything together. Learn the four types now and you'll dodge a huge share of beginner errors later.
+
+<Step>
+
+## The four types you'll use
+
+**Number** — whole numbers, decimals, negatives. Health, speed, and time are all numbers.
+
+```luau
+local coins = 5
+local speed = 3.5
+```
+
+**String** — text wrapped in quotes. `"Sam"` is a string; `Sam` without quotes is an error (Luau thinks you mean a variable named Sam).
+
+```luau
+local playerName = "Sam"
+```
+
+**Boolean** — only two values: `true` or `false`. Booleans are how your game says yes or no: "is the door open?", "did they win?"
+
+```luau
+local hasKey = false
+```
+
+**nil** — means "no value." A variable that has never been assigned holds `nil`.
+
+<Mcq
+  question="Which of these stores a boolean?"
+  options={[
+    "local a = 5",
+    "local b = 'five'",
+    "local c = true",
+    "local d = nil",
+  ]}
+  answer={2}
+  explanation="true and false are the only boolean values. 'five' is a string, 5 is a number, nil is nothing."
+/>
+
+</Step>
+
+<Step>
+
+## Why "1" is not 1
+
+This is the trap that catches everyone:
+
+```luau
+print(1 + 1)    --> 2    (two numbers)
+print("1" + 1)  --> ERROR: attempt to perform arithmetic on a string
+```
+
+The number `1` and the string `"1"` are completely different things. You can add numbers. You cannot add text.
+
+Same for concatenation the other way — you can't glue a number onto a string without converting:
+
+```luau
+local coins = 5
+print("You have " .. coins .. " coins.")  --> You have 5 coins.
+```
+
+Wait — that worked! When you glue with `..`, Luau is friendly and converts numbers to text for you. But when you try to add with `+`, it's strict. Memorize it: **gluing is friendly, adding is strict.**
+
+<Mcq
+  question="Why does print('5' + 2) produce an error?"
+  options={[
+    "Luau can't add at all",
+    "'5' is a string, and addition requires numbers",
+    "The number 2 is too small",
+    "You forgot local",
+  ]}
+  answer={1}
+  explanation="Addition is strict: both sides must be numbers. '5' is a string. Convert it with tonumber first."
+/>
+
+</Step>
+
+<Step>
+
+## Converting on purpose
+
+Sometimes you have a string that's actually a number — like the text from a UI input box, where the player typed "10". You need to convert it before math:
+
+```luau
+local typed = "10"
+local amount = tonumber(typed)  -- "10" becomes 10
+
+print(amount + 5)  --> 15
+```
+
+And the reverse — `tostring` turns anything into text when you need a string specifically:
+
+```luau
+local lives = 3
+local text = tostring(lives)  -- 3 becomes "3"
+```
+
+<WriteCode
+  instruction="A TextBox gave you the string '7'. Convert it to a number and add 3, then print the result."
+  answer={["print(tonumber(\"7\") + 3)"]}
+  starterCode='local typed = "7"
+-- your line here
+'
+  explanation="tonumber turns the string into the number 7, then + 3 gives 10."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting quotes around text.** `local name = Sam` errors; `local name = "Sam"` works.
+- **Trying to add player input directly.** Numbers typed into a TextBox arrive as strings. Run them through `tonumber` first.
+- **Expecting `..` and `+` to behave the same.** `..` converts for you, `+` refuses. Keep them straight.
+
+Next lesson: doing the same job more than once — functions.
+
+</Step>

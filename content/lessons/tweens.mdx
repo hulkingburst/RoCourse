@@ -1,0 +1,155 @@
+---
+slug: tweens
+title: Tweens — smooth movement and polish
+description: Animate parts and UI with TweenService instead of teleporting them, and feel the difference polish makes.
+sectionId: objects
+order: 5
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [tween, animation, tweening, polish]
+objectives:
+  - Create a TweenInfo and tween a part's position or size
+  - Tween a UI element
+  - Know the difference between CFrame and Position for moving parts
+prerequisites: [instances]
+keywords: [tween, tweeninfo, tweenService, smooth, animation]
+---
+
+Teleporting a part with `part.Position = newPos` snaps it — instant, harsh, and cheap-feeling. Games that feel good move things *smoothly*. That's **tweening**: animating a value from what it is to what you want it to be, over time.
+
+<Step>
+
+## The recipe
+
+```luau
+local TweenService = game:GetService("TweenService")
+
+local coin = workspace.Coin
+
+local info = TweenInfo.new(0.5) -- how long the tween takes, in seconds
+local goals = { Size = Vector3.new(2, 2, 2) } -- where we're going
+
+local tween = TweenService:Create(coin, info, goals)
+tween:Play()
+```
+
+Three pieces:
+
+- **TweenInfo** — how the animation behaves: duration, easing style, repetition.
+- **goals** — a table of the properties you want to change *to*.
+- `TweenService:Create(object, info, goals)` — builds the animation; `:Play()` runs it.
+
+The coin smoothly grows from its current size to 2×2×2 over half a second. No snapping.
+
+<Mcq
+  question="What is the goal table in TweenService:Create for?"
+  options={[
+    "The object to animate",
+    "The properties to change and their target values",
+    "The duration of the tween",
+    "The easing style",
+  ]}
+  answer={1}
+  explanation="Goals list 'property → target', like { Size = Vector3.new(2,2,2) }. The engine animates toward them."
+/>
+
+</Step>
+
+<Step>
+
+## Easing — moving vs feeling
+
+`TweenInfo.new(0.5)` is a linear slide — robotic. Add an easing style and motion gets character:
+
+```luau
+local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+```
+
+- `Quad, Out` — starts fast, eases into the goal (the classic, feels natural).
+- `Bounce` — overshoots and bounces at the end.
+- `Elastic` — rubber-band wobble.
+
+Matching: a coin pickup bounces with **Bounce**, a door slides with **Quad, Out**, a boss health bar drains with **Quad, In**. Easing is where the polish lives.
+
+<Note>
+For a gentle up-down bob, add the loop arguments: `TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true)` — repeat count 0 means forever, and `true` alternates direction.
+</Note>
+
+<FillBlank
+  prompt="To make a tween bounce at the end instead of sliding, you change the ____ style in TweenInfo."
+  answer="easing"
+  explanation="EasingStyle (Bounce, Quad, Elastic) is what gives the motion its character."
+/>
+
+</Step>
+
+<Step>
+
+## CFrame vs Position
+
+Moving a rotated part with `Position` works, but the standard way is `CFrame` — it carries *rotation too*:
+
+```luau
+local goals = {
+    CFrame = coin.CFrame + Vector3.new(0, 5, 0), -- 5 studs up
+}
+```
+
+`coin.CFrame + Vector3.new(...)` means "wherever you are, add this offset." You'll tween `CFrame` for world objects (it handles rotation) and `Position`/`Size` for GUI and simple cases.
+
+<Mcq
+  question="Why tween CFrame instead of Position for world objects?"
+  options={[
+    "CFrame includes rotation, so it moves the whole transform correctly",
+    "Position doesn't work at all",
+    "CFrame is faster to type",
+    "Position only works on GUIs",
+  ]}
+  answer={0}
+  explanation="CFrame carries both position and rotation. Position alone can't handle rotated objects cleanly."
+/>
+
+</Step>
+
+<Step>
+
+## Tweening the UI
+
+The same service animates GUI elements:
+
+```luau
+local shopPanel = player.PlayerGui:WaitForChild("ShopPanel")
+
+local goals = {
+    Position = UDim2.new(0.5, 0, 0.5, 0), -- slide to center
+}
+
+local tween = TweenService:Create(shopPanel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goals)
+tween:Play()
+```
+
+A shop panel that slides out instead of teleporting is a different-feeling game for the same five lines. This is how you'll open and close the upgrade shop in the final project.
+
+<WriteCode
+  instruction="A coin pops bigger when clicked. Write the Play line that actually runs the tween you created."
+  answer={["pop:Play()"]}
+  starterCode="local pop = TweenService:Create(coin, popInfo, popGoals)
+-- run the tween
+"
+  explanation="Create builds the animation; Play runs it. Forgetting Play is the classic silent no-op."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting to call :Play().** `TweenService:Create` builds the animation but does nothing until `:Play()`. The classic silent no-op.
+- **Tweening the same property from two loops.** Two tweens fighting over Size = flicker. One animation per property at a time.
+- **Using TweenInfo.new(0) with no easing thought.** Zero-duration tweens are teleports with extra steps. Give motion time.
+- **Tweening parts on the server that players need to see.** Tween CFrame is fine server-side — it replicates. But fancy per-player feel belongs client-side.
+
+Next section: **publishing** — getting this into the hands of real players.
+
+</Step>

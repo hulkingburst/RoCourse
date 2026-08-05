@@ -1,0 +1,138 @@
+---
+slug: data-security
+title: Data security — never trust the player
+description: Why the server is the only one who can give out coins, and what happens when you forget.
+sectionId: data
+order: 6
+difficulty: beginner
+estimatedMinutes: 5
+tags: [security, exploiters, server, authority]
+objectives:
+  - Explain why the server must be the source of truth
+  - Recognize the exploit where clients give themselves rewards
+  - Understand what players can and can't change from their own computer
+prerequisites: [datastores, events]
+keywords: [security, exploiter, server authority, trust]
+---
+
+Here's the uncomfortable truth of online games: **your players are not all trustworthy.**
+
+Some players modify the game running on their own computer. A few do it by hand, but the ones that matter do it automatically. These players are called **exploiters**, and building so they can't break anything is what this lesson is about.
+
+<Step>
+
+## The bad version: client gives client coins
+
+Remember the two computers from the scripts lesson? A **LocalScript runs on the player's machine**. So this:
+
+```luau
+-- LocalScript (runs on the PLAYER's computer)
+game.Players.LocalPlayer.leaderstats.Coins.Value = 999999
+```
+
+…runs on the *player's own computer*. And here's the horror: if the leaderstats folder is replicated to clients, that line can actually change what the leaderboard shows.
+
+A player who wants free coins just runs one line of code. Congratulations — your economy is broken.
+
+<Mcq
+  question="Where do LocalScripts run?"
+  options={[
+    "On the server",
+    "On the player's own computer",
+    "On Roblox's cloud for everyone",
+    "In the Output window",
+  ]}
+  answer={1}
+  explanation="LocalScripts run on the player's machine. That's why they're powerful for feel — and untrustworthy for data."
+/>
+
+</Step>
+
+<Step>
+
+## The good version: server decides, client asks
+
+The rule, in one sentence:
+
+> **The server is the only thing that can change real data. Clients can only request.**
+
+So coins work like this:
+
+1. The client clicks the coin. That's a *request*.
+2. The server decides: did they really click? Is it a fair request? If so — and only so — the server gives coins.
+3. The leaderboard shows whatever the server set.
+
+If an exploiter sends a million fake clicks, the server checks each one and says "no" — because the server doesn't care what the client's screen claims. The client can *claim* anything; the server *awards* what it verifies.
+
+<FillBlank
+  prompt="In a secure game, when the client clicks a coin, it sends a ____ and the server does the ____."
+  answer="request / deciding"
+  explanation="Clients request actions; the server decides whether and how to award."
+/>
+
+</Step>
+
+<Step>
+
+## The first security habit: verify
+
+A server callback that rewards coins should always *verify* before it awards:
+
+```luau
+function onCoinClicked(player)
+    if player ~= nil and player:IsDescendantOf(game.Players) then
+        local coins = player.leaderstats.Coins
+        coins.Value = coins.Value + 10
+    end
+end
+```
+
+The `if` checks the player is real before touching their data. That's the mindset: **assume the worst, verify the minimum.**
+
+<WriteCode
+  instruction="A player wants to buy something. Write the guard that only lets the purchase happen if their coins are at least 100."
+  answer={["if player.leaderstats.Coins.Value >= 100 then"]}
+  starterCode="-- guard the purchase
+"
+  explanation="Verify the player can actually afford it before any reward or purchase happens."
+/>
+
+</Step>
+
+<Step>
+
+## Three rules to live by
+
+1. **Never let a client set its own money.** Real data changes only on the server.
+2. **Clients request; servers decide.** Clicks, buys, and claims are requests to the server, not commands.
+3. **Verify before you award.** Who is this player? Did this action actually happen?
+
+<Note>
+Your first games won't attract exploiters. But the *habit* matters: building "server decides" from day one costs nothing extra, and it means the day your game gets popular, you don't have to rebuild the economy.
+</Note>
+
+<Mcq
+  question="An exploiter sends your server 1,000,000 fake 'click coin' requests. What happens if your reward code is server-side?"
+  options={[
+    "They get 10,000,000 coins",
+    "The server decides each one on its own terms",
+    "The server crashes",
+    "The exploiter gets banned",
+  ]}
+  answer={1}
+  explanation="Server-side code evaluates each request and decides. The client can't change the outcome by itself."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Giving rewards in a LocalScript.** Every "earn" must be server-side. If the code that changes data can run on the player's machine, so can the exploit.
+- **Thinking 'my players are nice.'** Assume all clients are hostile, and your good players never notice a difference.
+- **Hiding code to protect it.** Exploiters don't need to read your code — they run their own on their machine. Protection is about *authority* (server decides), not secrecy.
+
+Next: the plumbing that lets the client ask the server — RemoteEvents.
+
+</Step>

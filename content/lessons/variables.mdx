@@ -1,0 +1,129 @@
+---
+slug: variables
+title: Variables — remembering things
+description: Store a number, a word, or an object in a named box called a variable, and change what's inside it.
+sectionId: luau-basics
+order: 1
+difficulty: beginner
+estimatedMinutes: 8
+tags: [variables, assignment, naming]
+objectives:
+  - Declare a variable with local and give it a value
+  - Reassign a variable's value later in the script
+  - Name variables clearly so code reads like English
+prerequisites: [scripts]
+keywords: [variable, local, assignment, naming, luau]
+---
+
+Scripts that can't remember anything are useless. Right now your scripts read a line, do a thing, and forget it. This lesson gives your scripts a memory: **variables**.
+
+<Step>
+
+## What a variable is
+
+A variable is a named box. You put something in it, and later you can take it out or swap what's inside. "Box" is the right mental model — the box has a name, and the contents can change.
+
+```luau
+local coins = 0
+```
+
+Read that as: *"make a box called `coins`, and put the number 0 in it."*
+
+The word `local` means "this box exists only inside this part of the script" — you'll use it on every variable. It keeps your script tidy and prevents surprises. Just write `local` every time.
+
+</Step>
+
+<Step>
+
+## Using the box
+
+Once a box exists, you can read it and change it:
+
+```luau
+local coins = 0
+
+print(coins)      --> 0
+
+coins = 5         -- put a new number in the box
+print(coins)      --> 5
+
+coins = coins + 1 -- take what's in the box, add 1, put it back
+print(coins)      --> 6
+```
+
+That last line is worth sitting with: `coins = coins + 1` reads the box, does math, and stores the result back in the same box. It's how you'll count almost everything in Roblox — kills, clicks, coins.
+
+<Note>
+`print(coins)` prints the *contents* of the box, not the word "coins". The name of the box is not the same as what's inside it.
+</Note>
+
+<PredictOutput
+  answer={["2"]}
+  explanation="lives starts at 3, loses 1, so the box now holds 2. print shows the contents, not the name."
+>
+
+```luau
+local lives = 3
+lives = lives - 1
+print(lives)
+```
+
+</PredictOutput>
+
+</Step>
+
+<Step>
+
+## Naming rules (and the habit that saves your sanity)
+
+Names can't have spaces and can't start with a number. So `player coins` is illegal, and `2fast` is illegal. Everything else — `playerCoins`, `PlayerCoins`, `player_coins` — works.
+
+The **style Roblox uses is `camelCase`**: lowercase first letter, capital for each new word. `playerCoins`, not `PlayerCoins`.
+
+But the real rule is: **name it what it is.** The difference between `local x = 0` and `local enemiesDefeated = 0` is not style. It's whether you can read this script a month from now.
+
+<FillBlank
+  prompt="A variable that counts the player's total coins. Fill in the missing name:  local ____ = 0"
+  answer="totalCoins"
+  explanation="No spaces, no leading digits, and camelCase. totalCoins tells you exactly what's inside."
+/>
+
+</Step>
+
+<Step>
+
+## The counting pattern
+
+`coins = coins + 1` is the pattern you'll reach for constantly: read the box, add one, put it back.
+
+<WriteCode
+  instruction="A player just earned a coin. Write the line that adds 1 to the coins box."
+  answer={["coins = coins + 1", "coins += 1"]}
+  starterCode='local coins = 0
+
+print("Coins: " .. coins)'
+  explanation="coins = coins + 1 reads the box, adds 1, and stores the result back in the same box."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting `local`.** Luau will create a global variable instead, which other scripts can see and mess with. Keep everything `local` until a later lesson tells you otherwise.
+- **Using `local` twice on the same box.** `local coins = 0` declares the box. Later, `coins = 5` *changes* it — no `local`. Re-declaring with `local` makes a fresh box, which loses your value.
+- **Naming the box after what you *want* it to be, not what it is.** A variable named `enemy` holding the player's health will confuse you forever.
+
+Put the lines in the order they should run:
+
+<ArrangeCode
+  lines={[
+    "local coins = 0",
+    "coins = coins + 1",
+    "print(coins)",
+  ]}
+  explanation="First create the box, then count a coin, then look inside."
+/>
+
+</Step>

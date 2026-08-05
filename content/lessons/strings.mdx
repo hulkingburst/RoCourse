@@ -1,0 +1,84 @@
+---
+slug: strings
+title: Strings — text in code
+description: Quotes, concatenation with .., and building messages that include numbers — text is how your game talks to players.
+sectionId: luau-basics
+order: 5
+difficulty: beginner
+estimatedMinutes: 4
+tags: [strings, concatenation, text]
+objectives:
+  - Write strings with single or double quotes
+  - Glue strings and numbers together with ..
+  - Build a message that changes as the game changes
+prerequisites: [types]
+keywords: [string, concatenation, quotes, text, luau]
+---
+
+Numbers are the bones of a game; strings are the voice. Every "You won!", damage number, and leaderboard name is a string. Let's learn to build them.
+
+<Step>
+
+## What a string is
+
+A string is text wrapped in quotes. Either quote works:
+
+```luau
+local greeting = "Hello"
+local name = 'Sam'
+```
+
+The important rule: the opening and closing quote must **match**. `"Sam'` is an error. And numbers in quotes become text: `"5"` is a string, not the number 5.
+
+<FillBlank
+  prompt={`Fix the broken string so its quotes match:  local message = 'Hello"  →  use what?`}
+  answer={`"Hello"`}
+  explanation="The opening and closing quotes must match. Use two single quotes or two double quotes."
+/>
+
+</Step>
+
+<Step>
+
+## Gluing strings together: ..
+
+The `..` operator joins text — that's **concatenation**.
+
+```luau
+local firstName = "Sam"
+local lastName = "Player"
+print(firstName .. " " .. lastName)  --> Sam Player
+```
+
+Notice the `" "` in the middle — that's a string containing a single space. Text doesn't get spaces for free; you have to put them in.
+
+<Note>
+`..` is friendly with types: it converts numbers and booleans to text automatically. `"Coins: " .. 5` becomes `Coins: 5`.
+</Note>
+
+</Step>
+
+<Step>
+
+## Building messages that change
+
+This is the pattern you'll use constantly — glue fixed text together with changing values:
+
+```luau
+local coins = 50
+print("You have " .. coins .. " coins.")
+-- -> You have 50 coins.
+```
+
+The message stays the same shape, but the number inside changes as the game changes. That's how every score popup and kill feed in Roblox works.
+
+<WriteCode
+  instruction="Print a message reporting the player's lives. The lives box starts at 3. Build the whole message with .. so it reads 'Lives: 3'."
+  answer={["print(\"Lives: \" .. lives)"]}
+  starterCode="local lives = 3
+-- your print here
+"
+  explanation="Glue the label, the space, and the lives box together with .. ."
+/>
+
+</Step>

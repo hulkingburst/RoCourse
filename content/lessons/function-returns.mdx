@@ -1,0 +1,128 @@
+---
+slug: function-returns
+title: Getting answers back — return
+description: A function that computes a result and hands it to you with return — so calls become values.
+sectionId: luau-basics
+order: 8
+difficulty: beginner
+estimatedMinutes: 5
+tags: [functions, return, output]
+objectives:
+  - Send a result out of a function with return
+  - Use the call site as a value in a larger expression
+  - Explain what happens after a function hits return
+prerequisites: [functions, numbers]
+keywords: [return, function, output, value]
+---
+
+Functions that only print are fine, but the real power is when a function *computes something and hands it back*. That hand-back is `return`.
+
+<Step>
+
+## How return works
+
+```luau
+function double(value)
+    return value * 2
+end
+
+local doubledScore = double(10)
+print(doubledScore) --> 20
+```
+
+`return` sends the result out of the function, and the call site *becomes* that result. So `double(10)` becomes `20`, and that's what lands in `doubledScore`.
+
+Read it out loud: *"the function takes 10, doubles it, and the place where I called it turns into 20."*
+
+<PredictOutput
+  answer={["9"]}
+  explanation="add(4, 5) runs the body with a=4, b=5, and return hands back 9. The print then shows 9."
+>
+
+```luau
+function add(a, b)
+    return a + b
+end
+
+print(add(4, 5))
+```
+
+</PredictOutput>
+
+</Step>
+
+<Step>
+
+## Calls become values
+
+Because a call becomes its result, you can use it anywhere a value fits:
+
+```luau
+function triple(n)
+    return n * 3
+end
+
+local total = triple(5) + triple(2)   --> 15 + 6
+print(total)                          --> 21
+```
+
+The two calls are just numbers by the time `+` runs. That's the whole trick: `return` turns *function call* into *value*.
+
+<FillBlank
+  prompt="local x = double(3) + 1 where double doubles its input. What number does x hold?"
+  answer="7"
+  explanation="double(3) becomes 6, then + 1 makes 7."
+/>
+
+</Step>
+
+<Step>
+
+## Return stops the function
+
+The moment a function hits `return`, it stops — nothing after it on that call runs:
+
+```luau
+function go()
+    return "first"
+    print("never printed")
+end
+```
+
+That `print` is dead code. It's how you build early exits: check a condition, and `return` early if something's wrong.
+
+```luau
+function buyIfEnough(coins, price)
+    if coins < price then
+        return "not enough"
+    end
+    return "bought"
+end
+```
+
+<Note>
+A function can also return nothing at all — then its result is `nil`. That's fine; plenty of functions exist just to *do* a job.
+</Note>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Returning but never using the result.** `double(10)` by itself does the math and throws it away. Catch it: `local x = double(10)`.
+- **Expecting print and return to be the same.** `print` shows you something. `return` hands a value back to the caller. A function can do one, the other, both, or neither.
+- **Putting work after return.** It never runs.
+
+<WriteCode
+  instruction="A player has 30 coins and an item costs 10. Write a function salePrice that returns half the item's price, then print the result."
+  answer={["function salePrice(price)", "return price / 2", "end", "print(salePrice(10))"]}
+  starterCode="local coins = 30
+-- define salePrice, then use it
+"
+  explanation="Define the function, return half of its input, then print the call so the result is used."
+/>
+
+Next: making decisions with `if`.
+
+</Step>

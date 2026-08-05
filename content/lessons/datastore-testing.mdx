@@ -1,0 +1,122 @@
+---
+slug: datastore-testing
+title: Testing saves — the live persistence loop
+description: Enable data stores in Studio, then watch your coins survive across restarts, sessions, and even other players.
+sectionId: publishing
+order: 2
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [datastore, testing, saves, persistence]
+objectives:
+  - Enable Studio access to data stores
+  - Verify coins persist across restarts and sessions
+  - Test the load-on-join, save-on-leave loop live
+prerequisites: [datastores, publishing]
+keywords: [datastore, test, save, load, persist, studioaccess]
+---
+
+Now the payoff of the whole data section: watching a player's coins **survive the game ending.** This lesson turns on Studio's data store testing and walks the save loop live, end to end.
+
+<Step>
+
+## Enable data store access in Studio
+
+Studio refuses to touch real data stores by default — safety. Turn it on:
+
+1. In the top bar, click **Game Settings**.
+2. Go to **Security** (or the "Security" tab).
+3. Tick **"Enable Studio Access to API Services"**.
+
+That one checkbox is the difference between "saves never happen in Studio" and "your full save loop runs." Without it, everything you built in the datastores lesson silently does nothing here.
+
+<Note>
+This setting is per-experience, and it's exactly what real developers flip on for testing. Your published game already has full access — this just gives your Studio tests the same powers.
+</Note>
+
+<Mcq
+  question="What does 'Enable Studio Access to API Services' do?"
+  options={[
+    "Makes your game public",
+    "Lets Studio tests use real data stores",
+    "Deletes old saves",
+    "Speeds up the game",
+  ]}
+  answer={1}
+  explanation="Without it, Studio refuses to touch the stores, so saves silently never happen during tests."
+/>
+
+</Step>
+
+<Step>
+
+## Verify the loop: earn, stop, play
+
+1. Open your game, and with the coin-clicker running, earn some coins.
+2. Press **Stop**. On Stop, every player is removed — which fires `PlayerRemoving`, which calls `SetAsync`. That's your save.
+3. Press **Play** again. `PlayerAdded` fires, `GetAsync` pulls the saved number, and your leaderboard should show **exactly the coins you left with.**
+
+If it does, the loop is closed: load on join, save on leave, store in between.
+
+<Note>
+Why did nothing save before this lesson? Because Studio had no permission. The code was always correct — the environment was refusing. This is the single most common "my saves don't work" story, and it's never the code.
+</Note>
+
+<FillBlank
+  prompt="Pressing Stop fires PlayerRemoving, which runs the ____ call that writes the save."
+  answer="SetAsync"
+  explanation="PlayerRemoving → SetAsync is the save path. Stop removes every player, triggering it."
+/>
+
+</Step>
+
+<Step>
+
+## Verify across restarts and players
+
+The full test is two rooms:
+
+- **Across restarts:** close Studio entirely, reopen the project, Play. Coins should still be there. (The store lives in Roblox's cloud, not your computer.)
+- **Across players:** make the experience Friends-only, send the link, and have a friend click the coin. They should see *their own* balance start at 0, and *their own* save when they return. Each UserId is its own file.
+
+<Mcq
+  question="A friend earns 10 coins in your game. You earn 20. When you both return tomorrow, what should you each see?"
+  options={[
+    "Both see the same number",
+    "Each sees their own saved number, keyed by their UserId",
+    "Both start at zero",
+    "The higher number for both",
+  ]}
+  answer={1}
+  explanation="Each player saves under their own UserId, so each loads their own balance."
+/>
+
+</Step>
+
+<Step>
+
+## Watch the store from the creator page
+
+For the truly satisfying check, open your experience in the Roblox website creator dashboard. Roblox logs a history of data store usage there — you can watch your `SetAsync`/`GetAsync` calls happen live as you test. It's the smoking gun when debugging saves: the call either appears or it doesn't.
+
+<WriteCode
+  instruction="A player's data didn't survive a reload. Write the checklist item you check FIRST in this order: the GetAsync default, PlayerRemoving saves, key names matching, or Studio access."
+  answer={["Studio access to API services enabled"]}
+  starterCode="-- the first thing to check
+"
+  explanation="Enable Studio Access first — the most common cause of 'saves don't work' is a permission problem, not a code problem."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Testing saves before enabling the setting.** It's not a code bug — it's a permission bug. Flip the checkbox first, always.
+- **Watching only one side.** If saves fail, check both directions: did `SetAsync` run on leave, and did `GetAsync` return the value on join?
+- **Expecting the same game state, not just the coins.** The store holds only what you explicitly saved. Save all the data you care about, not just Coins.
+- **Trusting a single restart test.** The store is shared and persistent. One green run is promising; close and reopen to be sure.
+
+Next section: **leveling up** — reading errors like a pro and growing beyond this course.
+
+</Step>

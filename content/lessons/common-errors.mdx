@@ -1,0 +1,101 @@
+---
+slug: common-errors
+title: The classic errors — and their smell
+description: Match a symptom to its usual cause — nil indexing, string arithmetic, wrong-side changes — and fix in one line.
+sectionId: leveling-up
+order: 2
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [errors, bugs, troubleshooting]
+objectives:
+  - Recognize the four classic beginner bugs
+  - Match each error to its usual fix
+  - Know the Studio-vs-live difference
+prerequisites: [debugging]
+keywords: [errors, bugs, nil, troubleshooting]
+---
+
+Some errors repeat so often they have names. Learn their smell and the fix is usually one line.
+
+<Step>
+
+## The four classic bugs
+
+| Symptom | Usually means |
+| --- | --- |
+| `attempt to index nil` | object not found / doesn't exist yet → WaitForChild or check the name |
+| `attempt to perform arithmetic on a string` | forgot tonumber on player input |
+| Event fires but nothing changes | you changed the wrong object, or the change is client-side |
+| Works in Studio, broken live | latency / timing / data stores → add prints, watch live |
+
+Match your error to the smell, apply the reading order from the last lesson, and the fix is usually one line.
+
+<Mcq
+  question="You get 'attempt to index nil' on the line character.Humanoid.WalkSpeed. What's the usual cause?"
+  options={[
+    "WalkSpeed is misspelled",
+    "Humanoid doesn't exist yet — it needs WaitForChild",
+    "The character is invisible",
+    "WalkSpeed can't be set",
+  ]}
+  answer={1}
+  explanation="character.Humanoid is nil — the child isn't loaded yet. character:WaitForChild('Humanoid') fixes it."
+/>
+
+</Step>
+
+<Step>
+
+## The nil-index family
+
+`thing.Name` where `thing` is nil is the most common beginner error. The cause is almost always one of three:
+
+1. **Misspelled name.** `workspace.Coinz` when the part is `Coin`.
+2. **Doesn't exist yet.** The object appears a moment after the script runs → `WaitForChild`.
+3. **Never assigned.** The variable was set in another script or another PlayerAdded.
+
+The error names the exact line. Go read that line, name the nil thing, and pick the cause from the list.
+
+<FillBlank
+  prompt="If player.leaderstats.Coins is nil because the folder hasn't been created yet, the fix is to create it in ____."
+  answer="PlayerAdded"
+  explanation="leaderstats must be created when the player joins — inside PlayerAdded — before anything reads it."
+/>
+
+</Step>
+
+<Step>
+
+## String arithmetic and wrong-side changes
+
+`attempt to perform arithmetic on a string` means a number landed where a string sat — usually player input straight from a TextBox. Fix: `tonumber()`.
+
+"Event fires but nothing changes" is trickier — the code ran, but on the wrong object or the wrong side. A server print shows the server's value; a client print shows the client's. When they disagree, you changed the wrong copy.
+
+<Note>
+Works-in-Studio-broken-live is the advanced smell: data stores (needs the checkbox or a published game), latency (test live), or timing (characters loading). Add prints and watch live.
+</Note>
+
+<WriteCode
+  instruction="A player typed '10' into a TextBox. Before adding it to coins, convert it. Write the conversion line."
+  answer={["local amount = tonumber(typed)"]}
+  starterCode='local typed = "10"
+-- convert before math
+'
+  explanation="TextBox input arrives as a string — tonumber makes it a number so the arithmetic works."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Fixing the message, not the cause.** Match the smell first — the same error can have three different causes.
+- **Assuming Studio and live behave the same.** DataStores, latency, and timing are the usual suspects. Test live.
+- **Ignoring which side.** A client error and a server error are different worlds.
+- **Fixing one error, missing the next.** Errors often come in waves — fix the first, Play, and the next may surface.
+
+Next: the map of everything you've learned — and what comes after.
+
+</Step>

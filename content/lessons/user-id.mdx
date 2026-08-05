@@ -1,0 +1,65 @@
+---
+slug: user-id
+title: UserId — the permanent key
+description: Player names change and get recycled — UserId is the number that identifies one person forever.
+sectionId: data
+order: 2
+difficulty: beginner
+estimatedMinutes: 3
+tags: [userid, identity, keys]
+objectives:
+  - Read a player's UserId
+  - Explain why UserId beats player.Name as a key
+  - Use UserId to address one specific player
+prerequisites: [leaderstats]
+keywords: [userid, key, identity, datastore]
+---
+
+Every Roblox account has a **UserId**: a number that identifies that person forever, across every game, and never changes. When your game needs to remember *which* player is which, this number is the answer.
+
+<Step>
+
+## Reading a UserId
+
+Every player has it:
+
+```luau
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+    print(player.Name .. " has UserId " .. player.UserId)
+end)
+```
+
+The Name is what you see ("Sam"), the UserId is the number underneath ("123456789"). Two different players can both be named "Sam" — but never the same UserId.
+
+<FillBlank
+  prompt="The property that gives a player their permanent, unique ID number is player.____"
+  answer="UserId"
+  explanation="player.UserId is the permanent unique number for that account."
+/>
+
+</Step>
+
+<Step>
+
+## Why UserId and not the name
+
+Player names look unique, but they're a trap:
+
+- **Names can change.** Someone renames, and your "Sam" record now points at a stranger.
+- **Names get recycled.** A deleted name can be claimed by a new player.
+- **Two players can share a name** across the migration of a nickname.
+
+A UserId is assigned once, never changes, and is never reused. That's why it's the correct key for anything long-lived — saves, bans, leaderboards.
+
+<WriteCode
+  instruction="When a player joins, print a message that identifies them permanently. Build the message with .. and include their UserId."
+  answer={["print(player.Name .. \" has UserId \" .. player.UserId)"]}
+  starterCode="Players.PlayerAdded:Connect(function(player)
+    -- your print here
+end)"
+  explanation="Glue the readable name together with the permanent UserId in one message."
+/>
+
+</Step>

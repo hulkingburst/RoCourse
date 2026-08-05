@@ -1,0 +1,123 @@
+---
+slug: guis
+title: GUIs — building interfaces in code
+description: Create ScreenGui, Frame, and TextButton elements from a script, and lay out a simple on-screen button.
+sectionId: gameplay
+order: 0
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [gui, screenui, frame, textbutton, ui]
+objectives:
+  - Create UI elements with Instance.new
+  - Name the GUI family tree
+  - Wire a TextButton's Activated event
+prerequisites: [remotes, leaderstats]
+keywords: [gui, screenui, textbutton, anchorpoint, ui, interface]
+---
+
+Everything you see on a Roblox player's screen — the health bar, the shop, the "PRESS E" prompt — is a **GUI**: a graphic drawn over the 3D world. This course builds them in **code**, because code-built GUIs can be duplicated per-player, changed at runtime, and — crucially — you learn exactly how they work.
+
+<Step>
+
+## The GUI family tree
+
+All GUIs hang from a **ScreenGui** (which lives in `player.PlayerGui`), and everything inside is a **GuiObject**:
+
+| Object | What it is |
+| --- | --- |
+| `ScreenGui` | The root — everything visible on screen hangs here |
+| `Frame` | A rectangle that holds other GUI elements |
+| `TextButton` | A clickable button with a label |
+| `TextLabel` | Just text, no click |
+| `ImageLabel` | A picture |
+
+There's one more root worth knowing: **StarterGui**, which holds GUIs that every player starts with. Put a GUI there and every player gets their own copy.
+
+<Mcq
+  question="A GUI must live inside which object for a player to see it?"
+  options={[
+    "ServerScriptService",
+    "The player's PlayerGui",
+    "ReplicatedStorage",
+    "The Workspace",
+  ]}
+  answer={1}
+  explanation="GUIs render from PlayerGui (per-player) or StarterGui (shared starting GUIs)."
+/>
+
+</Step>
+
+<Step>
+
+## The recipe: create, style, parent
+
+```luau
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+local button = Instance.new("TextButton")
+button.Name = "ClickButton"
+button.Text = "Click me!"
+button.Size = UDim2.new(0, 200, 0, 50)
+button.Position = UDim2.new(0.5, 0, 0.8, 0)
+button.AnchorPoint = Vector2.new(0.5, 0.5)
+button.Parent = screenGui
+```
+
+Every GUI object follows the same three steps: **create it, set its properties, parent it.** Create a ScreenGui per player inside `player.PlayerGui`, then hang controls off it.
+
+<FillBlank
+  prompt="The three steps to add any GUI element are: create it with Instance.new, set its ____, then ____ it to its parent."
+  answer="properties / parent"
+  explanation="Instance.new makes it, properties style it, and parenting puts it in the tree so it renders."
+/>
+
+</Step>
+
+<Step>
+
+## Clicking the button — client side
+
+The button exists on the player's screen, so it belongs to a **LocalScript** in their PlayerGui (or StarterPlayerScripts). The click event:
+
+```luau
+button.Activated:Connect(function()
+    print("Button clicked")
+end)
+```
+
+`Activated` works for mouse *and* touch — it's the one to use for buttons. A GUI button alone is just a pretty thing on a player's screen. To make it *do* something, it sends a RemoteEvent — the exact bridge from the last section:
+
+```luau
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local clickEvent = ReplicatedStorage.CoinClicked
+
+button.Activated:Connect(function()
+    clickEvent:FireServer()
+end)
+```
+
+The button is the client's *voice*. The reward decision stays on the server.
+
+<WriteCode
+  instruction="A GUI button should report itself to the server when clicked. Write the connect line that fires the clickEvent."
+  answer={["button.Activated:Connect(function()", "clickEvent:FireServer()", "end)"]}
+  starterCode="local clickEvent = ReplicatedStorage.CoinClicked
+-- wire the button up
+"
+  explanation="Connect Activated, then fire the event up to the server inside the callback."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Creating the GUI on the server.** GUIs are a *client* thing — build them in a LocalScript, into the player's PlayerGui.
+- **Forgetting that StarterPlayerScripts runs for every player.** Build per-player from `Players.LocalPlayer`'s PlayerGui, or GUIs double up.
+- **Hitting the wrong click event.** `MouseButton1Click` ignores touch. `Activated` covers mouse and touch — use it.
+
+Next: the numbers that place every element on screen.
+
+</Step>

@@ -1,0 +1,87 @@
+---
+slug: studio-interface
+title: Finding your way around Studio
+description: The Explorer, Properties, and Output panels — the three places you'll live in as a developer.
+sectionId: getting-started
+order: 2
+difficulty: beginner
+estimatedMinutes: 5
+tags: [studio, interface, explorer, properties, output]
+objectives:
+  - Identify the Explorer, Properties, and Output panels
+  - Explain what each panel is for
+  - Show and hide panels from the View menu
+prerequisites: [installing-studio]
+keywords: [explorer, properties, output, panel, ui]
+---
+
+Open your Baseplate project again. Before we write a single line of code, you need to be able to find things on this screen — otherwise the rest of the course is you hunting around.
+
+Studio has dozens of panels, but for this course you only need three. Once you know what each one does, everything else is decoration.
+
+<Step>
+
+## The Explorer — what exists
+
+Usually on the right side of the screen, the **Explorer** is a tree: a list of everything in your place, nested inside each other.
+
+```text
+Workspace
+  Baseplate
+Camera
+Lighting
+ReplicatedStorage
+ServerScriptService
+StarterGui
+StarterPlayer
+```
+
+When we say "a part is in the Workspace", the Explorer is where you'll see that relationship. This parent/child idea — one thing living inside another — is the single most important concept in Roblox scripting, so get used to reading this tree.
+
+</Step>
+
+<Step>
+
+## Properties — the details of what's selected
+
+Usually below the Explorer, the **Properties** panel shows the settings of whatever object is selected: name, color, size, position, and hundreds of others.
+
+Select the **Baseplate** in the Explorer, look at Properties, and change the color to something obnoxious — bright pink, say — and watch the 3D view update. You just edited a game property without writing code.
+
+</Step>
+
+<Step>
+
+## The Output window — what the code said
+
+Usually at the bottom of the screen, the **Output** window is where scripts print messages and where **error messages** appear. Right now it's empty, which is correct — nothing is running yet. In two lessons we'll make it say something.
+
+<Note>
+If any of these panels is missing, open the **View** menu at the top and tick the checkbox next to its name. That's the official way to show or hide panels.
+</Note>
+
+</Step>
+
+<Step>
+
+## Which panel has the answer?
+
+When something goes wrong in a Roblox game, the answer is almost always in one of these three places:
+
+- **Explorer** — what exists, and what's inside what
+- **Properties** — the details of whatever is selected
+- **Output** — what the code printed, and where it broke
+
+<Mcq
+  question="You click a part in the 3D view and want to change how big it is. Where do you look?"
+  options={[
+    "The Output window",
+    "The Explorer",
+    "The Properties panel",
+    "The game settings page",
+  ]}
+  answer={2}
+  explanation="Properties shows the settings of the selected object, including Size."
+/>
+
+</Step>

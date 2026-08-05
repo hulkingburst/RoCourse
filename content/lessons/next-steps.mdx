@@ -1,0 +1,99 @@
+---
+slug: next-steps
+title: Next steps — the map of what you've learned
+description: Take stock of the full system you've built, then chart your course beyond this course.
+sectionId: leveling-up
+order: 3
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [roadmap, next steps, review]
+objectives:
+  - Review the complete system you've built across this course
+  - Name the three pillars that make a game trustworthy
+  - Pick a direction for your next project
+prerequisites: [debugging]
+keywords: [next steps, roadmap, review, continue]
+---
+
+Stop. Look back. In a few lessons you went from "what is the Explorer" to a live, published game with a secure economy that saves across sessions. Before the final project, let's name what you actually built — because you're going to rebuild it, on purpose, bigger.
+
+<Step>
+
+## The system you've assembled
+
+Every lesson added one layer — and they connect into one pipeline:
+
+> **a player does something, the server decides what it means, the data changes, and the player sees it.**
+
+Click → server → leaderstats → screen. That pipeline is 90% of every Roblox game ever made. The editor, the language, the data, the trust, the interface, the economy, the feel — they're not seven separate skills. They're one connected flow.
+
+<Mcq
+  question="Which is NOT one of the three pillars of a trustworthy game?"
+  options={[
+    "Server authority",
+    "Client polish",
+    "Persistent data",
+    "Bigger maps",
+  ]}
+  answer={3}
+  explanation="Map size is scale, not trust. The three pillars are who decides, how it feels, and whether it survives."
+/>
+
+</Step>
+
+<Step>
+
+## The three pillars
+
+Check any game you can trust against three pillars:
+
+1. **Server authority** — rewards, money, and purchases are decided by the server.
+2. **Client polish** — what the player sees and feels (GUIs, tweens, sound) is client-side.
+3. **Persistent data** — progress outlives the session, keyed per player.
+
+When a popular game gets a security scandal or a save-wipe bug, it's one of these three failing. You built all three correctly on day one. That's not luck — it's the system.
+
+<FillBlank
+  prompt="The three pillars are server ____, client ____, and ____ data."
+  answer="authority / polish / persistent"
+  explanation="Who decides (server), how it feels (client), whether it survives (data)."
+/>
+
+</Step>
+
+<Step>
+
+## What you haven't covered (and where to go)
+
+Be honest about the gaps — every one is a door:
+
+- **Modules at scale** — your config is small; real games have dozens of modules. Learn the **service pattern** (one module per system: MoneyService, SaveService, UI).
+- **Looping environments** — combining many loops with events is next; `bindToClose` and `task.wait` discipline come with it.
+- **Datastores beyond one value** — real saves store tables with versioning. Learn `UpdateAsync` and save-versioning.
+- **Testing with real players** — dev servers, private servers, and playtest groups are the professional loop.
+
+The Roblox creator documentation is excellent now — search any of these terms there. And your own code from this course is your best reference: it's *your* style, *your* decisions.
+
+<WriteCode
+  instruction="Name your next project in one sentence: what the player does, what the server decides, and what persists. Write the three-part loop."
+  answer={["player does something / server decides meaning / progress persists"]}
+  starterCode="-- your three-sentence loop
+"
+  explanation="If you can write the loop in three parts, you can build it — that's what this course teaches."
+/>
+
+</Step>
+
+<Step>
+
+## Your next project
+
+Before the final lesson builds a bigger game, spend a session sketching what you'd like it to be. Not a feature list — a *loop*:
+
+- What does the player *do*? (click, collect, fight, explore)
+- What does the server *decide*? (reward, respawn, score)
+- What persists? (money, level, progress)
+
+Three sentences. If you can write them, you can build them. Next and final lesson: the project — putting everything together into one complete game.
+
+</Step>

@@ -1,0 +1,91 @@
+---
+slug: sharing-permissions
+title: Permissions and sharing
+description: Decide who can play your game, test safely with friends, and get the link into testers' hands.
+sectionId: publishing
+order: 1
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [permissions, sharing, testing]
+objectives:
+  - Set who can play with Permissions
+  - Share the experience link
+  - Explain private servers and dev testing
+prerequisites: [publishing]
+keywords: [permissions, share, friends, link]
+---
+
+You've published. Now: who gets in? Permissions decide that, and they're the difference between a safe test with friends and strangers wandering into a half-built world.
+
+<Step>
+
+## Who can play
+
+Game Settings → **Permissions** controls the door:
+
+- **Public** — anyone on Roblox can play. Your game is discoverable.
+- **Friends** — only your friends (and people they invite) can play.
+- **Private** — effectively only people you specifically allow.
+
+The safe order: build Friends → test → when the game is solid, widen to Public. You can change this any time.
+
+<Mcq
+  question="Where do you set whether strangers or only friends can play?"
+  options={[
+    "In the clicker script",
+    "Game Settings → Permissions",
+    "The Output window",
+    "ReplicatedStorage",
+  ]}
+  answer={1}
+  explanation="Permissions live in Game Settings. Friends-only is the safe testing choice."
+/>
+
+</Step>
+
+<Step>
+
+## Getting the link to testers
+
+Publishing ≠ discovered. To get testers quickly:
+
+1. Open your experience on the Roblox website.
+2. Copy the **experience link** from the page.
+3. Send it to your friends — desktop players can also search the experience name.
+
+The link is the quickest path from "I built this" to "someone else is playing it." You'll send it a lot while testing.
+
+<Note>
+With permissions set to Friends, the link only works for friends — exactly what you want during a bug hunt.
+</Note>
+
+<FillBlank
+  prompt="After publishing, you get testers into the game by copying the ____ link and sending it to friends."
+  answer="experience"
+  explanation="The experience link is the fastest way to get people into your published game."
+/>
+
+</Step>
+
+<Step>
+
+## Private servers and test servers
+
+Two terms worth knowing:
+
+- **Private servers** — paid/owned copies of your game where only invited people play. Great for tournaments and group practice; not needed yet.
+- **Dev/Test servers** — professional developers run these to test changes without touching the live game. When your game has a real audience, this becomes your safety net.
+
+For now, Friends permissions + a link is the whole testing loop.
+
+<WriteCode
+  instruction="You just published and want two friends to test before strangers. Write the two actions: set permissions to ____, then ____ the link."
+  answer={["Friends", "share"]}
+  starterCode="-- the safe testing setup
+"
+  explanation="Set Permissions to Friends, then share the experience link with them."
+/>
+
+Next: proving your saves actually survive — testing the persistence loop.
+
+</Step>

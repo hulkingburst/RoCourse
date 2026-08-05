@@ -1,0 +1,139 @@
+---
+slug: events
+title: Events — reacting to the world
+description: Instead of watching and waiting, let Roblox call your code when something happens — a touch, a click, a player joining.
+sectionId: luau-basics
+order: 15
+difficulty: beginner
+estimatedMinutes: 5
+tags: [events, connect, touched, clickdetector]
+objectives:
+  - Hook up a function to an event with .Connect
+  - Use the .Touched event of a part
+  - Use a ClickDetector for a part you can click
+prerequisites: [functions, task-wait]
+keywords: [event, connect, touched, clickdetector, callback]
+---
+
+So far your scripts run top to bottom and finish. But games aren't linear — a player can touch a coin *any time*, or never. How do you write code that waits patiently and springs into action only when the moment comes? You don't wait. You **listen**. That's events.
+
+<Step>
+
+## The idea: Roblox calls you back
+
+An event is a signal an object fires when something happens. When you write:
+
+```luau
+part.Touched:Connect(function(hit)
+    print("Something touched the part!")
+end)
+```
+
+You're not running anything yet. You're telling Roblox: *"whenever `part` gets touched, call this function."* The function is a **callback** — code that isn't run by you, but by the engine, at exactly the right moment.
+
+This is the single most useful pattern in Roblox. Most of your game will be event callbacks.
+
+<Mcq
+  question="What does :Connect do?"
+  options={[
+    "Runs the function immediately",
+    "Registers the function to run whenever the event fires",
+    "Deletes the event",
+    "Stops the script",
+  ]}
+  answer={1}
+  explanation="Connect doesn't run anything now. It signs up your callback so the engine calls it on each event."
+/>
+
+</Step>
+
+<Step>
+
+## .Touched — the first event
+
+The `.Touched` event fires whenever any other part touches the part. It passes one argument to your function: the thing that touched it.
+
+```luau
+local coin = workspace.Coin
+
+coin.Touched:Connect(function(hit)
+    print("Touched by " .. hit.Name)
+end)
+```
+
+Note the function is *anonymous* — no name, created in place, and passed straight to `:Connect`. The engine will call it with `hit` filled in whenever the event fires.
+
+<Note>
+Because physics are loose, `.Touched` can fire with odd objects or repeatedly as parts jostle. In a later lesson you'll check whether the touching thing is actually a player's character.
+</Note>
+
+</Step>
+
+<Step>
+
+## ClickDetector — for clickable parts
+
+A ClickDetector is a child object that makes a part clickable. The `.MouseClick` event fires when a player clicks it.
+
+```luau
+local button = workspace.MysteryBox
+
+button.ClickDetector.MouseClick:Connect(function(player)
+    print(player.Name .. " clicked the box!")
+end)
+```
+
+`MouseClick` gives you the *player* who clicked — exactly who you need for player-specific rewards.
+
+<Mcq
+  question="The MouseClick callback function receives which value?"
+  options={[
+    "The part that was clicked",
+    "The player who clicked",
+    "The number of clicks",
+    "Nothing",
+  ]}
+  answer={1}
+  explanation="MouseClick passes the player. That's what makes clickable parts useful for per-player rewards."
+/>
+
+</Step>
+
+<Step>
+
+## Other events you'll meet soon
+
+Events are everywhere in Roblox:
+
+| Event | Fires when |
+| --- | --- |
+| `part.Touched` | something touches a part |
+| `part.ClickDetector.MouseClick` | a player clicks a clickable part |
+| `game.Players.PlayerAdded` | a player joins the server |
+| `player.CharacterAdded` | a player's character spawns |
+
+They're all connected the same way: `thing.EventName:Connect(function(...) end)`.
+
+<WriteCode
+  instruction="Make a part named coin respond when clicked. Write the connect line so it prints the clicking player's name."
+  answer={["coin.ClickDetector.MouseClick:Connect(function(player)", "print(player.Name .. \" clicked!\")", "end)"]}
+  starterCode="local coin = workspace.Coin
+-- your connect here
+"
+  explanation="Grab the ClickDetector, connect MouseClick, and the callback receives the player who clicked."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Writing `:Connect()` when you meant to call the function.** `coin.Touched:Connect(myFunction())` calls myFunction immediately and connects its *return value* — usually nil, so nothing ever runs. Pass the function *without* parentheses: `:Connect(myFunction)`.
+- **Forgetting the ClickDetector.** A part isn't clickable until it has one. No detector, no MouseClick.
+- **Expecting the callback to run at Connect time.** Nothing happens when you write the code. It waits for the event.
+- **Connecting inside a loop.** Connect inside `while true` stacks a new callback every tick, and the event fires all of them at once. Connect once, at the top of your script.
+
+That's the whole Luau basics box: scripts, variables, types, numbers, strings, booleans, functions, conditionals, loops, tables, timing, and events. Next section: **data** — how a player's progress is stored and trusted.
+
+</Step>

@@ -1,0 +1,98 @@
+---
+slug: gui-styling
+title: Making GUIs look good
+description: Colors, text styling, rounded corners, and transparency — the properties that turn boxes into an interface.
+sectionId: gameplay
+order: 2
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [gui, styling, color, corner, text]
+objectives:
+  - Set a GUI element's background and text colors
+  - Round corners with a UICorner
+  - Tune text size and boldness
+prerequisites: [guis, udim2]
+keywords: [guicolor, uicorner, transparency, textsize]
+---
+
+A plain gray box isn't an interface. The properties in this lesson are the difference between "something appeared" and "something looks like a game."
+
+<Step>
+
+## Colors
+
+```luau
+button.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+```
+
+`Color3` is a color. `fromRGB(red, green, blue)` makes one from three numbers, 0–255 each. Set `BackgroundColor3` for the fill and `TextColor3` for the label.
+
+<Note>
+Want a transparent background? `button.BackgroundTransparency = 1` makes it invisible (1 = fully see-through). You'll see this used for floating text labels.
+</Note>
+
+<FillBlank
+  prompt="Make a color that is full red, no green, no blue using Color3:  local red = Color3.____(255, 0, 0)"
+  answer="fromRGB"
+  explanation="Color3.fromRGB(255, 0, 0) is pure red — 255 red, 0 green, 0 blue."
+/>
+
+</Step>
+
+<Step>
+
+## Rounded corners
+
+Every part of a GUI can have rounded corners by adding a **UICorner** child:
+
+```luau
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = button
+```
+
+`UDim.new(0, 12)` is a 12-pixel radius — same scale/offset idea as UDim2, minus the second dimension. A radius of 12 makes a soft, modern corner.
+
+<Mcq
+  question="What makes a GUI element's corners rounded?"
+  options={[
+    "button.Rounded = true",
+    "Adding a UICorner child with a CornerRadius",
+    "Setting BackgroundColor3 to white",
+    "A CornerTransparency of 0",
+  ]}
+  answer={1}
+  explanation="A UICorner child with a CornerRadius rounds the corners. It's a child object, not a property."
+/>
+
+</Step>
+
+<Step>
+
+## Text
+
+```luau
+label.Text = "Coins: 12"
+label.TextSize = 28
+label.Font = Enum.Font.GothamBold
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+```
+
+- `Text` — what it says.
+- `TextSize` — the size in points.
+- `Font` — the typeface. `Enum.Font.GothamBold` is the chunky Roblox standard.
+
+<Note>
+Text can have a shadow or stroke too — `TextStrokeTransparency = 0.2` puts a subtle outline around the letters so they read over bright backgrounds.
+</Note>
+
+<WriteCode
+  instruction="Make a TextLabel that says 'Click!' in bold, 30-point white text. Write the three lines that set Text, TextSize, and Font."
+  answer={["label.Text = \"Click!\"", "label.TextSize = 30", "label.Font = Enum.Font.GothamBold"]}
+  starterCode="-- style the label
+"
+  explanation="Set the text, bump the size, and switch to the bold font."
+/>
+
+</Step>

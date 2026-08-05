@@ -1,0 +1,160 @@
+---
+slug: modules
+title: ModuleScripts — organizing your code
+description: Split one giant script into reusable, readable pieces with ModuleScripts and require.
+sectionId: gameplay
+order: 7
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [modulescript, require, organization, refactoring]
+objectives:
+  - Create a ModuleScript that returns useful values
+  - Load it from another script with require
+  - Move shared data into a module
+prerequisites: [upgrades, functions]
+keywords: [modulescript, require, module, organization, luau]
+---
+
+Your clicker works, but all the logic is stuffed into one Script. It's getting hard to read, and the constants (prices, click values) are buried mid-code. Real Roblox projects split logic into **ModuleScripts** — separate files that other scripts can load and reuse.
+
+<Step>
+
+## What a ModuleScript is
+
+A ModuleScript is a file that *returns a value* when it's loaded. The loading is done by `require`, and the returned value can be anything: a number, a table of config, a table of functions. Its superpower is that **every script that requires it shares the same copy** — change one line in the module and every user sees it.
+
+<Mcq
+  question="What does require return?"
+  options={[
+    "The module's name",
+    "Whatever the ModuleScript's return statement gives",
+    "A copy of the ModuleScript",
+    "nil, always",
+  ]}
+  answer={1}
+  explanation="A module is defined by its return value. Config table, function table, anything — that's what require hands back."
+/>
+
+</Step>
+
+<Step>
+
+## The simplest module: shared config
+
+Create a ModuleScript in ReplicatedStorage named `GameConfig`, and put this in it:
+
+```luau
+local config = {
+    coinsPerClick = 1,
+    upgradeBaseCost = 25,
+    saveInterval = 60,
+}
+
+return config
+```
+
+That's it. A ModuleScript is a script that ends in `return`. Load it anywhere with:
+
+```luau
+local GameConfig = require(ReplicatedStorage.GameConfig)
+
+print(GameConfig.coinsPerClick) --> 1
+```
+
+Now your prices live in one obvious place. Change `upgradeBaseCost` and every script that requires it sees the new price — no hunting through a giant file.
+
+<FillBlank
+  prompt="A ModuleScript gives require its value with a final ____ statement."
+  answer="return"
+  explanation="The return statement is the module's entire output. No return means require hands back nil."
+/>
+
+</Step>
+
+<Step>
+
+## A module of functions
+
+Config is just the start. Modules can hold *logic*:
+
+```luau
+local CoinMath = {}
+
+function CoinMath.rewardForClick(multiplier)
+    return 1 * multiplier
+end
+
+function CoinMath.upgradeCost(baseCost, currentLevel)
+    return baseCost * (currentLevel + 1)
+end
+
+return CoinMath
+```
+
+```luau
+local CoinMath = require(ReplicatedStorage.CoinMath)
+
+local reward = CoinMath.rewardForClick(3)
+print(reward) --> 3
+```
+
+The empty `local CoinMath = {}` starts an empty table, functions get attached to it, and the table is returned. This is the standard way to organize: **one module per concern.** Prices, coin math, UI builders — each gets its own file.
+
+<Note>
+A ModuleScript doesn't run at all until something `require`s it — and it runs *once*, with the result shared by everyone who requires it. That sharing is why config and math belong in modules: one source of truth.
+</Note>
+
+<WriteCode
+  instruction="A ModuleScript holds a function that doubles a number. Write the module's final line so require hands back the table."
+  answer={["return CoinMath"]}
+  starterCode="local CoinMath = {}
+
+function CoinMath.double(n)
+    return n * 2
+end
+
+-- your line here
+"
+  explanation="The module ends by returning the table of functions — that's what every require-er gets."
+/>
+
+</Step>
+
+<Step>
+
+## Refactor your clicker
+
+Move the upgrade prices out of the server Script into `GameConfig`:
+
+1. Create `GameConfig` in ReplicatedStorage.
+2. At the top of your server Script, add `local GameConfig = require(ReplicatedStorage.GameConfig)`.
+3. Replace the hardcoded numbers with `GameConfig.coinsPerClick` and `GameConfig.upgradeBaseCost`.
+
+Run it — behavior identical, but now the numbers live in one obvious file. That's refactoring: **same behavior, better structure.**
+
+<Mcq
+  question="Two scripts require the same ModuleScript. What do they get?"
+  options={[
+    "Two separate copies",
+    "One shared instance",
+    "An error",
+    "A random value",
+  ]}
+  answer={1}
+  explanation="Modules run once and the result is shared. That's exactly why config belongs in modules."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting the `return`.** A ModuleScript with no return gives require nil — and every use of it errors. The return is the whole point.
+- **Putting side effects in a module.** `print("loaded")` in a module fires once, when first required. Keep modules as pure data/logic.
+- **Requiring from the wrong place.** A server script can't see a module in a client-only location and vice versa. ReplicatedStorage for shared, ServerScriptService for server-only.
+- **Copy-pasting constants everywhere instead of a module.** That's how two halves of your game drift apart.
+
+That closes the Game Systems section: interfaces, economies, and organization. Next section: **objects** — the parts, players, and effects that bring the world to life.
+
+</Step>

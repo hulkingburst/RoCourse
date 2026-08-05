@@ -1,0 +1,116 @@
+---
+slug: save-loop
+title: The save loop and autosave
+description: Save on leave, and back that up with periodic autosaves so a crash can't wipe an hour of progress.
+sectionId: data
+order: 5
+difficulty: beginner
+estimatedMinutes: 5
+tags: [saving, playerremoving, autosave]
+objectives:
+  - Save a player's data on PlayerRemoving
+  - Run a periodic autosave with task.spawn
+  - Explain why saving only on leave is risky
+prerequisites: [loading-data, task-wait]
+keywords: [save, playerremoving, autosave, task.spawn]
+---
+
+Saving on leave works — until it doesn't. If a player's game crashes, the app closes, or the server shuts down unexpectedly, `PlayerRemoving` may never fire, and their progress is gone. The fix is **autosave**: write the data regularly, not just at the end.
+
+<Step>
+
+## Save on leave
+
+`PlayerRemoving` fires when a player leaves the server:
+
+```luau
+Players.PlayerRemoving:Connect(function(player)
+    local coins = player.leaderstats.Coins.Value
+    coinsStore:SetAsync(player.UserId, coins)
+end)
+```
+
+This is the safety net for *clean* exits — pressing Leave, or finishing a round. It's the moment you know the player is done, so it's the natural place to write their final state.
+
+<Note>
+The player still exists during PlayerRemoving — you can read their leaderstats. Just don't try to show them anything; they're on their way out.
+</Note>
+
+<FillBlank
+  prompt="The event that fires when a player leaves the server is ____."
+  answer="PlayerRemoving"
+  explanation="Players.PlayerRemoving fires when a player leaves, giving you a last chance to save."
+/>
+
+</Step>
+
+<Step>
+
+## The autosave loop
+
+A clean exit isn't guaranteed. Autosave covers the gap: every N seconds, write everyone's data.
+
+```luau
+task.spawn(function()
+    while true do
+        task.wait(60)  -- once a minute
+
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.leaderstats then
+                coinsStore:SetAsync(player.UserId, player.leaderstats.Coins.Value)
+            end
+        end
+    end
+end)
+```
+
+- `Players:GetPlayers()` — a table of everyone currently in the server.
+- The `if player.leaderstats then` guard skips players who haven't been set up yet.
+- `task.spawn` keeps this loop running alongside the rest of the script — it never blocks the game.
+
+<Mcq
+  question="Why save periodically instead of only on PlayerRemoving?"
+  options={[
+    "It makes the code longer",
+    "A crash or abrupt close can skip PlayerRemoving, losing progress",
+    "Players expect to see saves happening",
+    "DataStores require it",
+  ]}
+  answer={1}
+  explanation="PlayerRemoving can be skipped by crashes. Autosave writes progress continuously so little is ever lost."
+/>
+
+</Step>
+
+<Step>
+
+## Saving in bounds
+
+Two habits keep autosave from causing trouble:
+
+- **Rate limits.** DataStores have limits on how often you can write. One save per player per minute is gentle and safe for a beginner game.
+- **Check before you write.** Only save players who have data set up — `if player.leaderstats then` — so you never save a nil folder.
+
+<WriteCode
+  instruction="Inside a PlayerRemoving handler, write the line that saves the leaving player's coins to the store."
+  answer={["coinsStore:SetAsync(player.UserId, player.leaderstats.Coins.Value)"]}
+  starterCode="Players.PlayerRemoving:Connect(function(player)
+    -- save their coins
+end)"
+  explanation="Read the player's Coins value and write it to the store under their UserId."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Relying only on PlayerRemoving.** It can be skipped by crashes. Autosave is the belt-and-suspenders backup.
+- **Autosaving every frame.** DataStore writes are rate-limited and slow. Every minute is plenty for a beginner game.
+- **Saving before data exists.** Guard with `if player.leaderstats then` so early joins don't write nil.
+- **Starting the autosave loop without task.spawn.** A plain while loop at the top of the script would block everything after it. Wrap it.
+
+Next: the uncomfortable truth about who you can trust.
+
+</Step>

@@ -1,0 +1,120 @@
+---
+slug: leaderstats
+title: leaderstats — the player leaderboard
+description: Show each player's stats at the top-right of the screen, and update them from scripts.
+sectionId: data
+order: 0
+difficulty: beginner
+estimatedMinutes: 5
+tags: [leaderstats, leaderboard, stats]
+objectives:
+  - Create the Leaderstats folder for a player
+  - Add and update number stats
+  - Trigger it with PlayerAdded
+prerequisites: [events, variables]
+keywords: [leaderstats, leaderboard, playeradded, stats]
+---
+
+The little list at the top-right of every Roblox game — the one showing each player's score or cash — is called the **leaderboard**. It's the first place you'll *see* your data working, and it's built from a folder called **leaderstats**.
+
+<Step>
+
+## The recipe
+
+Every player object in Roblox automatically carries a folder: `player.leaderstats`. Whatever you put inside it shows up on the leaderboard. The recipe is:
+
+1. When a player joins, create their `leaderstats` folder.
+2. Add a child — usually a NumberValue — for each stat.
+3. Change the `Value` of that NumberValue, and the leaderboard updates itself.
+
+<Mcq
+  question="What exactly does Roblox look for to show a leaderboard?"
+  options={[
+    "Any folder in the Workspace",
+    "A Folder named leaderstats inside each player",
+    "A NumberValue named Coins",
+    "A Script named Stats",
+  ]}
+  answer={1}
+  explanation="Each player must have a Folder literally named leaderstats; its children are the stats."
+/>
+
+</Step>
+
+<Step>
+
+## The join hook
+
+A player joining is an event — `PlayerAdded`:
+
+```luau
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+    local stats = Instance.new("Folder")
+    stats.Name = "leaderstats"
+    stats.Parent = player
+
+    local coins = Instance.new("NumberValue")
+    coins.Name = "Coins"
+    coins.Value = 0
+    coins.Parent = stats
+end)
+```
+
+- `game:GetService("Players")` — the service that manages players.
+- `Players.PlayerAdded:Connect(function(player) ... end)` — an event; `player` is the new player.
+- `Instance.new("Folder")` creates a Folder named `leaderstats`, parented to the player.
+- `Instance.new("NumberValue")` creates a NumberValue named `Coins`, set to 0, parented into the folder.
+
+<Note>
+Roblox looks for a Folder with that *exact* name inside each player. Misspell it — `Leaderstats`, `leaderStats` — and nothing shows. The name is a contract.
+</Note>
+
+<FillBlank
+  prompt="The folder must be named exactly ____ (all lowercase) or the leaderboard won't render."
+  answer="leaderstats"
+  explanation="Capital L, lowercase rest, no space. The exact name is the contract with Roblox."
+/>
+
+</Step>
+
+<Step>
+
+## Updating stats
+
+The magic: change the NumberValue's `Value`, and the leaderboard updates live.
+
+```luau
+local coin = workspace.Coin
+
+coin.ClickDetector.MouseClick:Connect(function(player)
+    local coins = player.leaderstats.Coins
+    coins.Value = coins.Value + 10
+end)
+```
+
+`player.leaderstats.Coins` reaches into the player's folder and grabs the NumberValue. You read it, add 10, write it back. The leaderboard reflects it instantly.
+
+<WriteCode
+  instruction="A player wins a round. Write the line that gives them 100 more coins on the leaderboard. Start from their Coins value."
+  answer={["player.leaderstats.Coins.Value += 100", "player.leaderstats.Coins.Value = player.leaderstats.Coins.Value + 100"]}
+  starterCode="-- reward the player
+"
+  explanation="Reach into leaderstats, grab the Coins NumberValue, and raise its Value by 100."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Misspelling leaderstats.** Capital L, lowercase rest, no space. The contract is exact.
+- **Parenting the folder to the wrong thing.** It must go on the *player*, not Workspace, not a part.
+- **Creating leaderstats before the player exists.** That's why it lives in `PlayerAdded` — at that moment you *have* the player object.
+- **Expecting a normal Folder to show up.** Only the folder named `leaderstats` is special.
+
+Next: getting to know the player themselves — the `Players` service.
+
+</Step>

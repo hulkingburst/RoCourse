@@ -1,0 +1,122 @@
+---
+slug: conditionals
+title: Conditionals — if this, then that
+description: Make your scripts decide things — check a condition, and run different code depending on the answer.
+sectionId: luau-basics
+order: 9
+difficulty: beginner
+estimatedMinutes: 5
+tags: [conditionals, if, else, elseif]
+objectives:
+  - Write if, elseif, and else branches
+  - Explain that only one branch runs
+  - Check a condition with and / or
+prerequisites: [booleans]
+keywords: [if, else, elseif, comparison, luau]
+---
+
+Your scripts can count coins now. But a game needs *judgment*: *if* the player has enough coins, let them buy; *if* they touch a spike, they take damage; *if* they've won, celebrate. That judgment is **conditionals**, and they're how scripts make decisions.
+
+<Step>
+
+## The basic shape
+
+```luau
+if coins >= 50 then
+    print("Enough coins!")
+end
+```
+
+Read it as: *"if it's true that coins is 50 or more, run the lines inside — otherwise skip them."* The lines inside only run when the condition is true.
+
+A condition is just an expression that produces a boolean — `true` or `false`. You met booleans already; this is where they earn their keep.
+
+<PredictOutput
+  answer={["big"]}
+  explanation="10 is greater than 5, so the condition is true and the first branch runs."
+>
+
+```luau
+local x = 10
+if x > 5 then
+    print("big")
+else
+    print("small")
+end
+```
+
+</PredictOutput>
+
+</Step>
+
+<Step>
+
+## More branches: elseif and else
+
+```luau
+if coins >= 100 then
+    print("Whale! Splurge on the deluxe pack.")
+elseif coins >= 50 then
+    print("Decent. You can afford the basic pack.")
+else
+    print("Keep grinding — not enough yet.")
+end
+```
+
+Luau checks top to bottom: first `if`, then each `elseif`, and if none matched, it runs `else`. **Only one branch ever runs.** `elseif` and `else` are optional — a lone `if` is fine.
+
+<Mcq
+  question="When does the else branch run?"
+  options={[
+    "Every time the if runs",
+    "Only when no earlier condition was true",
+    "Only when the first condition is true",
+    "Randomly",
+  ]}
+  answer={1}
+  explanation="Luau tries the if, then each elseif in order. Only if none matched does else run."
+/>
+
+</Step>
+
+<Step>
+
+## Combining conditions
+
+What if a sale needs *two* things to be true — enough coins **and** a membership?
+
+```luau
+if coins >= 50 and hasMembership then
+    print("Welcome to the members shop.")
+end
+```
+
+- `and` — both sides must be true.
+- `or` — at least one side true.
+
+You can chain them: `if a and b or c then`. Add parentheses when it gets complicated: `if (a and b) or c then`.
+
+<WriteCode
+  instruction="A prize is given when the player's score is at least 100 OR they found the golden key. Write the if-line condition."
+  answer={["if score >= 100 or hasGoldenKey then"]}
+  starterCode="local score = 90
+local hasGoldenKey = true
+-- your if line here
+"
+  explanation="Either condition being true should trigger the prize, so use or."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Using `=` inside an if.** `if coins = 50` errors. Compare with `==`.
+- **Mixing up `and` and `or`.** `if a and b` needs both. `if a or b` needs one. When in doubt, read it out loud.
+- **Thinking more branches run.** Only the first branch whose condition is true runs. Once it matches, the rest are skipped.
+- **Writing a condition that's always true.** `if coins >= 0` is true for every non-negative number. If you meant exactly zero, write `== 0`.
+
+Next: doing something over and over — loops.
+
+</Step>

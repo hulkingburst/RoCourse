@@ -1,0 +1,164 @@
+---
+slug: upgrades
+title: Upgrades — spending coins with the server checking the bill
+description: Build a shop where players buy click multipliers, and the server verifies the price before anything changes.
+sectionId: gameplay
+order: 5
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [upgrades, shop, economy, purchase]
+objectives:
+  - Store an upgrade level per player
+  - Buy upgrades through a RemoteEvent with the price checked on the server
+  - Apply the upgrade to the click reward
+prerequisites: [clicker, conditionals]
+keywords: [upgrade, shop, purchase, multiplier, economy]
+---
+
+Your clicker makes coins. Now it needs somewhere to spend them — an **upgrades shop**. Buying has one rule, and it's the security rule again: *the server checks the bill.* A player can *say* "I bought the multiplier," but only the server knows if they could afford it.
+
+<Step>
+
+## Where the upgrade lives
+
+The upgrade level is real data, so it lives **on the player's leaderstats** — just like coins:
+
+```luau
+local multiplier = Instance.new("NumberValue")
+multiplier.Name = "Multiplier"
+multiplier.Value = 1
+multiplier.Parent = stats -- your leaderstats folder
+```
+
+Add this in the same `PlayerAdded` block that makes Coins. Now every player has a Multiplier stat. The leaderboard will even show it, which is fun — but our real use is in the click math.
+
+<Mcq
+  question="Where does the upgrade level live?"
+  options={[
+    "In a RemoteEvent",
+    "In the player's leaderstats, as a NumberValue",
+    "In a LocalScript",
+    "On the button's Text",
+  ]}
+  answer={1}
+  explanation="The upgrade is real data, so it lives server-side in the player's leaderstats folder."
+/>
+
+</Step>
+
+<Step>
+
+## The purchase flow
+
+A purchase is a three-step conversation over a RemoteEvent:
+
+1. **Client:** "I'd like to buy the multiplier" → `FireServer("multiplier")`.
+2. **Server:** check the player has enough coins → if yes, subtract and raise the level → tell everyone the news.
+3. **Client:** update the UI with the new coins and multiplier.
+
+Notice the client sends an *intent* ("multiplier"), never a price. The server owns the pricing.
+
+<FillBlank
+  prompt="In the purchase flow, the client sends an ____ (like 'multiplier'), and the server supplies the ____."
+  answer="intent / price"
+  explanation="The client asks; the server decides the price and whether the player can afford it."
+/>
+
+</Step>
+
+<Step>
+
+## Server: the checkout counter
+
+```luau
+local purchaseEvent = ReplicatedStorage.BuyUpgrade
+local UPGRADE_BASE_COST = 25
+
+purchaseEvent.OnServerEvent:Connect(function(player, upgradeId)
+    if upgradeId ~= "multiplier" then
+        return -- don't recognize it, ignore it
+    end
+
+    local coins = player.leaderstats.Coins
+    local multiplier = player.leaderstats.Multiplier
+
+    local nextLevel = multiplier.Value + 1
+    local cost = UPGRADE_BASE_COST * nextLevel
+
+    if coins.Value >= cost then
+        coins.Value = coins.Value - cost
+        multiplier.Value = nextLevel
+        purchaseEvent:FireClient(player, coins.Value, multiplier.Value)
+    else
+        purchaseEvent:FireClient(player, coins.Value, multiplier.Value)
+    end
+end)
+```
+
+Two checks before spending:
+
+- `if upgradeId ~= "multiplier"` — reject anything it doesn't understand.
+- `if coins.Value >= cost` — the whole point. The client may *claim* a purchase; the server **checks the wallet**.
+
+The cost grows with level (`cost = base * nextLevel`) — the classic formula that makes early upgrades cheap and late ones expensive.
+
+<WriteCode
+  instruction="Before honoring a purchase, the server must check the player can afford it. Write the if-condition using their coins and the cost."
+  answer={["if coins.Value >= cost then"]}
+  starterCode="-- guard the purchase
+"
+  explanation="The server verifies the player has at least cost coins before spending anything."
+/>
+
+</Step>
+
+<Step>
+
+## Applying the multiplier to clicks
+
+Update the click handler on the server:
+
+```luau
+clickEvent.OnServerEvent:Connect(function(player)
+    local coins = player.leaderstats.Coins
+    local multiplier = player.leaderstats.Multiplier
+
+    if coins then
+        coins.Value = coins.Value + (1 * multiplier.Value)
+        clickEvent:FireClient(player, coins.Value)
+    end
+end)
+```
+
+Clicks now earn `1 × multiplier`. Buy a few levels and the clicker visibly accelerates. You have an economy.
+
+<Note>
+The multiplier's power lives in the click math, not in the shop — which is why the shop just changes a number and the whole game changes with it.
+</Note>
+
+<Mcq
+  question="A player with 10 coins tries to buy the 25-coin upgrade. What happens?"
+  options={[
+    "They get it anyway",
+    "The server refuses and sends back their real balance",
+    "The game crashes",
+    "The server silently gives them 15 coins",
+  ]}
+  answer={1}
+  explanation="The server checks coins.Value >= cost before spending. Too poor means no purchase — and an honest update."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Checking the price on the client.** "If coins >= cost" in a LocalScript is a sign on a gate that doesn't exist. Price checks belong on the server.
+- **Trusting upgradeId blindly.** A handler that treats any string as a valid purchase is a free-store. Reject unknowns.
+- **Letting the client pick the price.** The client never passes cost. It passes an intent; the server prices it.
+- **Forgetting to update the client after a refusal.** FireClient on *both* branches so the UI shows the true state.
+
+Next: the shop panel that puts this purchase in the player's hands.
+
+</Step>

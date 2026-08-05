@@ -1,0 +1,102 @@
+---
+slug: player-added
+title: Players — who is in your game
+description: The Players service, the PlayerAdded event that greets everyone who joins, and why the server knows who's asking.
+sectionId: data
+order: 1
+difficulty: beginner
+estimatedMinutes: 4
+tags: [players, playeradded, service]
+objectives:
+  - Grab a service with game:GetService
+  - Greet every joining player with PlayerAdded
+  - Recognize LocalPlayer on the client side
+prerequisites: [events]
+keywords: [players, playeradded, localplayer, service]
+---
+
+Every person in your game is a **Player** object, and Roblox keeps them all in one place: the **Players** service. Nearly every multiplayer feature starts by grabbing it.
+
+<Step>
+
+## Grabbing the service
+
+Roblox groups its features into **services**, and you reach them all the same way:
+
+```luau
+local Players = game:GetService("Players")
+```
+
+This line is the doorway. From here, `Players` has everything player-shaped: who's in the game, when someone joins, when someone leaves.
+
+<Note>
+`game:GetService("...")` is how you get *every* service — Players, DataStoreService, ReplicatedStorage, and more. One pattern, used everywhere.
+</Note>
+
+<Mcq
+  question="Which line gives you access to the Players service?"
+  options={[
+    "local Players = game.PlayersService",
+    "local Players = game:GetService(\"Players\")",
+    "local Players = Instance.new(\"Players\")",
+    "local Players = workspace.Players",
+  ]}
+  answer={1}
+  explanation='game:GetService("Players") is the standard doorway to the Players service.'
+/>
+
+</Step>
+
+<Step>
+
+## Greeting new players: PlayerAdded
+
+`PlayerAdded` fires the moment a player joins the server — once per player, in order:
+
+```luau
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+    print(player.Name .. " joined!")
+end)
+```
+
+The callback receives the new player's object. This is where you'll build their leaderstats, load their saved data, and set up everything they need before they spawn.
+
+<Note>
+A player can also *rejoin* — leave and come back — which fires PlayerAdded again. The event is per join, not per person.
+</Note>
+
+<FillBlank
+  prompt="The event that fires when a player joins is called ____."
+  answer="PlayerAdded"
+  explanation="Players.PlayerAdded fires once per player, the moment they join the server."
+/>
+
+</Step>
+
+<Step>
+
+## LocalPlayer — the client's own view
+
+On the client side, there's a special shortcut: `game.Players.LocalPlayer`. It's *the player running this computer* — your own character from your own screen.
+
+```luau
+-- LocalScript
+local Players = game:GetService("Players")
+local me = Players.LocalPlayer
+```
+
+There's no LocalPlayer on the server (the server has no "me"). That's why you'll see LocalPlayer only in LocalScripts.
+
+<WriteCode
+  instruction="Write the two lines a LocalScript needs to grab the current player's name into a variable called me."
+  answer={["local Players = game:GetService(\"Players\")", "local me = Players.LocalPlayer"]}
+  starterCode="-- get the players service, then LocalPlayer
+"
+  explanation="First the service, then LocalPlayer — the player running this computer."
+/>
+
+Next: telling every player apart forever — UserId.
+
+</Step>

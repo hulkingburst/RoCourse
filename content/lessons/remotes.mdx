@@ -1,0 +1,162 @@
+---
+slug: remotes
+title: RemoteEvents — the client asks, the server decides
+description: The secure bridge between player and server, and the pattern that keeps your economy safe.
+sectionId: data
+order: 7
+difficulty: beginner
+estimatedMinutes: 5
+tags: [remoteevent, fireclient, fireallclients, communication]
+objectives:
+  - Create a RemoteEvent shared between client and server
+  - Fire from the client with FireServer and handle it on the server
+  - Send updates from the server with FireClient / FireAllClients
+prerequisites: [data-security, events]
+keywords: [remoteevent, fireclient, fireallclients, fireserver, networking]
+---
+
+Two computers are running your game: the player's and the server's. They need to talk. The **RemoteEvent** is the phone line between them. You've learned *why* the client must ask the server — now you build the asking.
+
+<Step>
+
+## The layout
+
+A RemoteEvent lives in a place both sides can see — **ReplicatedStorage** is the classic home (it exists on both computers, unlike ServerScriptService which the client never sees).
+
+```luau
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local coinEvent = Instance.new("RemoteEvent")
+coinEvent.Name = "CoinClicked"
+coinEvent.Parent = ReplicatedStorage
+```
+
+One object, two directions of phone calls. The client calls the server with `:FireServer`. The server calls *one* client with `:FireClient` or *every* client with `:FireAllClients`.
+
+<Mcq
+  question="Which method does the client use to send a request to the server?"
+  options={[
+    "FireClient",
+    "FireServer",
+    "FireAllClients",
+    "OnServerEvent",
+  ]}
+  answer={1}
+  explanation="The client fires up with FireServer. The server fires down with FireClient/FireAllClients."
+/>
+
+</Step>
+
+<Step>
+
+## Client asks (FireServer)
+
+```luau
+-- LocalScript (on the player's computer)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local coinEvent = ReplicatedStorage.CoinClicked
+
+coinEvent:FireServer()
+```
+
+That's the whole ask: "hey server, I clicked." No coins here. The client just *reports* the click. The power to give coins lives entirely on the server.
+
+<FillBlank
+  prompt="The method a LocalScript calls to send a message up to the server is :____"
+  answer="FireServer"
+  explanation="The client reports upward with FireServer."
+/>
+
+</Step>
+
+<Step>
+
+## Server decides (OnServerEvent)
+
+```luau
+-- Script (on the server)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local coinEvent = ReplicatedStorage.CoinClicked
+
+coinEvent.OnServerEvent:Connect(function(player)
+    local coins = player.leaderstats.Coins
+    if coins then
+        coins.Value = coins.Value + 10
+    end
+end)
+```
+
+`OnServerEvent` hands you the `player` who fired — the server never has to guess who's asking. The client reports, the server verifies (the `if coins` check) and decides.
+
+<Note>
+The first argument to your callback is the player — and it can't be forged. Roblox derives identity from the connection itself, not from data the client sent. An exploiter can't pretend to be someone else.
+</Note>
+
+<Mcq
+  question="What is the first argument your OnServerEvent callback receives?"
+  options={[
+    "The part that was clicked",
+    "The values the client sent",
+    "The player who fired",
+    "The RemoteEvent itself",
+  ]}
+  answer={2}
+  explanation="Roblox provides the firing player automatically — identity comes from the connection, not from data."
+/>
+
+</Step>
+
+<Step>
+
+## Server sends back (FireClient / FireAllClients)
+
+The server needs to tell clients things too — "your UI should update", "the round ended".
+
+```luau
+-- to a specific player
+coinEvent:FireClient(player, newCoins)
+
+-- to everyone
+coinEvent:FireAllClients("round over")
+```
+
+And on the client side, you *receive*:
+
+```luau
+-- LocalScript
+coinEvent.OnClientEvent:Connect(function(message)
+    print("The server says: " .. message)
+end)
+```
+
+Any values you pass after the target get delivered to the other side. This is the full bridge: **client fires up, server fires down.**
+
+<WriteCode
+  instruction="The server wants to tell ONE specific player their new coin total. Write the fire line to the player variable."
+  answer={["coinEvent:FireClient(player, newCoins)"]}
+  starterCode="-- send newCoins to one player
+"
+  explanation="FireClient targets a single player; FireAllClients targets everyone."
+/>
+
+</Step>
+
+<Step>
+
+## The full secure coin flow
+
+1. **Client:** the player clicks the coin → LocalScript fires `FireServer()`.
+2. **Server:** `OnServerEvent` fires → verifies → adds 10 coins.
+3. **Leaderboard:** the NumberValue updates and everyone sees it.
+
+The client never once told the server "give me coins." It said "I clicked," and the server decided what that click was worth. That's the pattern to copy for every reward in your game.
+
+- **Common mistakes**
+- **Putting reward logic in the LocalScript.** If the click handler gives coins, it's on the player's machine — exploitable. The LocalScript only *reports*.
+- **Parenting the RemoteEvent to ServerScriptService.** The client can't see it there, so it can't fire it. ReplicatedStorage is the shared home.
+- **Trusting values the client sends.** "Give me 999 coins" as an argument is a request, not a fact.
+- **Firing without a handler.** Nothing listening on the other end means nothing happens.
+
+Next section: putting all of this to work in a real game — Game Systems.
+
+</Step>

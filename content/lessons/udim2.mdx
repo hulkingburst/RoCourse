@@ -1,0 +1,110 @@
+---
+slug: udim2
+title: UDim2 — sizing and placing GUI
+description: The scale-and-offset coordinate system that keeps GUIs on the right spot at every screen size.
+sectionId: gameplay
+order: 1
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [udim2, position, anchorpoint, layout]
+objectives:
+  - Read a UDim2 as two pairs: scale and offset
+  - Set an element's Size and Position
+  - Center an element with AnchorPoint
+prerequisites: [guis]
+keywords: [udim2, scale, offset, anchorpoint, vector2]
+---
+
+Where a GUI element sits and how big it is — that's the job of **UDim2**. It looks cryptic at first, but it's just two pairs of numbers, and once you get the pattern, layout stops being guesswork.
+
+<Step>
+
+## Scale and offset
+
+A `UDim2` is two pairs of numbers: **scale** then **offset**, for width then height.
+
+```luau
+UDim2.new(0, 200, 0, 50)
+```
+
+- **Scale** (0 to 1) — a *fraction of the screen*. `0.5` is halfway across.
+- **Offset** — an exact number of *pixels*.
+
+So `UDim2.new(0, 200, 0, 50)` means "200 by 50 pixels." And `UDim2.new(0.5, 0, 0.5, 0)` means "half the screen wide, half the screen tall" — it stretches with the window.
+
+<Note>
+Use scale for things that should resize with the screen (a full-width bar), offset for things with a fixed size (a button).
+</Note>
+
+<FillBlank
+  prompt="In UDim2.new(0, 300, 0, 80), the number 300 is an ____ measured in pixels."
+  answer="offset"
+  explanation="The first number of each pair is scale (a fraction); the second is offset (pixels). 300 is a pixel offset."
+/>
+
+</Step>
+
+<Step>
+
+## Size and Position
+
+The two properties work the same way:
+
+```luau
+label.Size = UDim2.new(1, 0, 0, 60)      -- full width, 60 tall
+button.Size = UDim2.new(0, 200, 0, 120)  -- 200 by 120
+button.Position = UDim2.new(0.5, 0, 0.5, 0)  -- center of the screen
+```
+
+`Size` is how big; `Position` is where. `UDim2.new(0.5, 0, 0.5, 0)` for Position puts the element at the screen's center — but with a catch you'll fix next.
+
+<Mcq
+  question="Which UDim2 makes a button exactly 100 pixels wide and 40 pixels tall?"
+  options={[
+    "UDim2.new(100, 0, 40, 0)",
+    "UDim2.new(0, 100, 0, 40)",
+    "UDim2.new(1, 0, 1, 0)",
+    "UDim2.new(0.5, 100, 0.5, 40)",
+  ]}
+  answer={1}
+  explanation="Scale is first in each pair, offset second. Pixel sizes go in the offset slots: (0, 100, 0, 40)."
+/>
+
+</Step>
+
+<Step>
+
+## AnchorPoint — the secret to centering
+
+A GUI's `Position` points to the top-left *corner* of the element by default. `UDim2.new(0.5, 0, 0.5, 0)` with no anchor puts the button's top-left corner at screen center — it looks off-center.
+
+`AnchorPoint` changes which point of the element sticks to the Position:
+
+```luau
+button.AnchorPoint = Vector2.new(0.5, 0.5)
+button.Position = UDim2.new(0.5, 0, 0.5, 0)
+```
+
+`Vector2.new(0.5, 0.5)` says "treat my center as my anchor." Now Position truly centers the button. **Center anything by setting AnchorPoint to (0.5, 0.5) and Position to (0.5, X) / (0.5, Y).**
+
+<WriteCode
+  instruction="Center a 200x100 button on the screen. Write the three lines: AnchorPoint, then Size, then Position — using Vector2 and UDim2."
+  answer={["button.AnchorPoint = Vector2.new(0.5, 0.5)", "button.Size = UDim2.new(0, 200, 0, 100)", "button.Position = UDim2.new(0.5, 0, 0.5, 0)"]}
+  starterCode="-- center the button
+"
+  explanation="Anchor the center, fix the size in pixels, then sit it at the center of the screen."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Mixing up the order.** UDim2 is scale, offset, scale, offset — not offset first. `UDim2.new(200, 0, 50, 0)` is not "200 by 50".
+- **Forgetting AnchorPoint and wondering why things aren't centered.** Off-center by a corner? Missing anchor.
+- **Using offsets for everything.** A 200-pixel-wide bar looks tiny on a 4K screen. Use scale for screen-relative sizing.
+
+Next: making those GUIs look good.
+
+</Step>

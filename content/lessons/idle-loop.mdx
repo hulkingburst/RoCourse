@@ -1,0 +1,116 @@
+---
+slug: idle-loop
+title: Idle income — coins without clicking
+description: A server loop that pays every player every second — your first passive mechanic and a classic idle-game heart.
+sectionId: gameplay
+order: 4
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [idle, loop, income, task]
+objectives:
+  - Loop over all players with Players:GetPlayers
+  - Award passive income on the server
+  - Push every update through the same FireClient
+prerequisites: [clicker]
+keywords: [idle, income, while true, getplayers]
+---
+
+Idle games — where coins pile up even when you do nothing — run on one simple idea: a server loop that pays everyone on a timer. It's the same clicker loop, minus the click.
+
+<Step>
+
+## The passive loop
+
+```luau
+local Players = game:GetService("Players")
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+
+        for _, player in ipairs(Players:GetPlayers()) do
+            local coins = player.leaderstats.Coins
+            if coins then
+                coins.Value = coins.Value + 1
+                clickEvent:FireClient(player, coins.Value)
+            end
+        end
+    end
+end)
+```
+
+- `Players:GetPlayers()` — a table of everyone in the server.
+- `task.spawn` keeps the loop running alongside the rest of the script.
+- The `if coins then` guard skips players whose stats aren't set up yet.
+- Every payout reuses the *same* `FireClient` the clicks use — the label updates however coins arrive.
+
+<Mcq
+  question="What does Players:GetPlayers() return?"
+  options={[
+    "The number of players",
+    "A table of all players in the server",
+    "The LocalPlayer",
+    "A leaderboard",
+  ]}
+  answer={1}
+  explanation="GetPlayers() returns a table of every player currently in the server — perfect for looping."
+/>
+
+</Step>
+
+<Step>
+
+## The guard matters
+
+A player joins and `PlayerAdded` runs — but until their leaderstats folder is created, they have no `Coins`. The loop races that setup:
+
+```luau
+if coins then
+    coins.Value = coins.Value + 1
+end
+```
+
+Without the guard, `nil.Value` errors and the whole loop dies on the first player without stats. The guard is what makes the loop safe to run from the moment the game starts.
+
+<FillBlank
+  prompt="Before adding idle coins to a player, the loop checks the player has a Coins value with:  if ____ then"
+  answer="coins"
+  explanation="if coins then skips players whose leaderstats aren't built yet, preventing a nil crash."
+/>
+
+</Step>
+
+<Step>
+
+## One FireClient for everything
+
+Clicks, idle ticks, purchases — they all change coins, and they all push the update the same way:
+
+```luau
+clickEvent:FireClient(player, coins.Value)
+```
+
+The client's `OnClientEvent` doesn't care *why* the total changed. It just reflects the new number. That's the design payoff: one receive handler, many sources of income.
+
+<WriteCode
+  instruction="Inside the idle loop, after adding 1 coin, push the new total to the player's screen. Write the fire line."
+  answer={["clickEvent:FireClient(player, coins.Value)"]}
+  starterCode="-- inside the for loop, after coins.Value + 1
+"
+  explanation="Same FireClient the clicks use — the label updates no matter where the coins came from."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Running the loop without task.spawn.** A plain while loop at the top of the script blocks everything after it. Wrap it.
+- **Skipping the guard.** The loop starts before players have stats — `if coins then` prevents the crash.
+- **Forgetting the wait.** `while true` with no `task.wait` is a freeze and a coins fountain at once.
+- **Starting multiple loops.** If the script restarts, task.spawn a fresh loop — never stack them in a reconnect handler.
+
+Next: spending those coins — the upgrades shop.
+
+</Step>

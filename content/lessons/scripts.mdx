@@ -1,0 +1,133 @@
+---
+slug: scripts
+title: Scripts — where code lives and runs
+description: What a script actually is, the difference between Scripts and LocalScripts, and how instructions run top to bottom.
+sectionId: luau-basics
+order: 0
+difficulty: beginner
+estimatedMinutes: 5
+tags: [scripts, localscript, server, client]
+objectives:
+  - Explain the difference between a Script and a LocalScript
+  - Read a script as a list of instructions that runs top to bottom
+  - Know how to find where a script is running from (script.Parent)
+prerequisites: [play-testing]
+keywords: [script, localscript, server, client, roblox scripting]
+---
+
+In the last lesson you made a script print a message. That script was a tiny list of instructions that Roblox read once, from top to bottom, when the game started. That's all a script is.
+
+This lesson is about *where* scripts live and *which one runs where* — because Roblox is not one computer running your game. It's two.
+
+<Step>
+
+## Every Roblox game is two programs
+
+When someone plays your game, there are actually **two copies of the game running**:
+
+1. **The server** — runs on Roblox's computers. It's the official, trustworthy copy. It decides what's really true in the game.
+2. **The client** — runs on the player's own computer. It's what they see and control. It sends the player's clicks and presses to the server.
+
+That's why there are two kinds of scripts:
+
+| Script type | Runs on | Used for |
+| --- | --- | --- |
+| **Script** | The server | Game rules, money, things every player must agree on |
+| **LocalScript** | One player's computer | The player's own screen, controls, and feel |
+
+<Mcq
+  question="A LocalScript runs on…"
+  options={[
+    "The server only",
+    "One player's computer",
+    "Roblox's computers, for everyone",
+    "Every player's computer at once",
+  ]}
+  answer={1}
+  explanation="LocalScripts run on one player's own computer — their screen, their controls. Scripts run on the server for everyone."
+/>
+
+</Step>
+
+<Step>
+
+## Reading a script top to bottom
+
+Scripts execute top to bottom, one line at a time. This script:
+
+```luau
+local part = workspace.Baseplate
+
+print("Found the baseplate")
+
+part.Anchored = false
+```
+
+means: grab the baseplate, tell me when you've done it, then let it fall. Order matters — if you wrote `part.Anchored = false` before defining `part`, the script would error, because it doesn't know what `part` is yet.
+
+<Note>
+You already know the Output window from the last lesson. `print` is how you watch your script work line by line. Use it freely — real developers leave print statements in code all the time while they're building.
+</Note>
+
+</Step>
+
+<Step>
+
+## Finding things: workspace and script.Parent
+
+Look at this line:
+
+```luau
+local part = workspace.Baseplate
+```
+
+- `workspace` means the Workspace folder (remember: the game world).
+- `.Baseplate` means "the object inside it named Baseplate".
+
+So this line reads: *"get the object named Baseplate, which lives in Workspace, and call it `part`."*
+
+There's another way to find things that matters a lot: a script can look at its own place in the world.
+
+```luau
+local parent = script.Parent
+```
+
+`script` is a script's name for itself, and `script.Parent` is whatever folder or object that script is sitting inside. Developers use this constantly — the script moves with its parent and always finds what it's attached to.
+
+<FillBlank
+  prompt="A Script named 'CoinScript' sits inside a part named 'Coin'. What does script.Parent give you?  local parent = script.____"
+  answer="Parent"
+  explanation="script.Parent is whatever the script is sitting inside — here, the part named Coin."
+/>
+
+</Step>
+
+<Step>
+
+## Where to put scripts
+
+A **Script** in **ServerScriptService** runs when the game starts. A **LocalScript** in **StarterPlayer > StarterPlayerScripts** runs for each player.
+
+For the rest of this section, put everything in **ServerScriptService** unless a lesson says otherwise — it keeps server code and client code separate, and you'll build from there.
+
+<WriteCode
+  instruction="You want a line that grabs the script's own parent so the script can find whatever it's attached to. Write the assignment using script."
+  answer={["local parent = script.Parent"]}
+  starterCode="-- find your own parent
+"
+  explanation="script.Parent is whatever folder or object this script sits inside."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Putting a LocalScript in ServerScriptService.** A LocalScript there runs, but on the server, where it has no player to work with. Keep them in their proper folders.
+- **Expecting a script to run twice.** A Script in Workspace runs once per server, not once per player. If you want code that runs for every player, you'll learn the `PlayerAdded` event later.
+- **Misspelling what you're looking for.** `workspace.Baseplat` errors. The Output tells you exactly which line — believe it.
+
+Next up: making scripts *remember* things with variables.
+
+</Step>

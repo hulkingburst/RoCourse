@@ -1,0 +1,88 @@
+---
+slug: play-testing
+title: Playtesting and your first script
+description: Press Play, run your first script, and learn why test changes don't stick around.
+sectionId: getting-started
+order: 4
+difficulty: beginner
+estimatedMinutes: 5
+tags: [playtest, output, print, scripts]
+objectives:
+  - Playtest and stop a place safely
+  - Understand what happens to changes made during a test
+  - Run a tiny script that prints a message
+prerequisites: [workspace-parts]
+keywords: [play, playtest, print, script]
+---
+
+This is the lesson where you make something *happen*. Up until now you've been arranging furniture. Now you're going to run code for the first time.
+
+<Step>
+
+## Play and Stop
+
+At the top of Studio there's a **Play** button (looks like a play icon). Press it.
+
+Two things happen:
+
+1. A window opens showing the game like a player would see it.
+2. A character spawns on your baseplate — the default humanoid character.
+
+Walk around with **WASD** and jump with **Space**. This is what your game feels like to a player. When you're done, press **Stop** (the red stop icon).
+
+</Step>
+
+<Step>
+
+## Test changes don't save
+
+<Warning>
+Anything you change **while the game is playing** is thrown away when you press Stop. Change a part's color during a test, press Stop, and it's back to the old color. This is by design — it's how you experiment without wrecking your real work.
+</Warning>
+
+<Mcq
+  question="You change a part's color while Playtesting. What happens when you press Stop?"
+  options={[
+    "The color stays changed forever",
+    "The color changes back to what it was before",
+    "Roblox saves a copy of both colors",
+    "The part gets deleted",
+  ]}
+  answer={1}
+  explanation="Everything you do during a test is thrown away on Stop. Edit the real game by stopping first."
+/>
+
+</Step>
+
+<Step>
+
+## Your first script
+
+Scripts are how you make your game do things. A script is a text file with instructions, and Roblox reads them when the game starts.
+
+1. In the Explorer, hover over **Workspace** and click the **+** icon that appears next to it.
+2. Choose **Script**. A new script appears in the Workspace with a file icon, and its editor opens.
+
+That script comes with a sample line already in it. Delete it and type exactly this:
+
+```luau
+print("Hello from the Workspace")
+```
+
+</Step>
+
+<Step>
+
+## Make it run
+
+Press **Play** again. When the game starts, that script runs, and at the bottom of your Studio screen — in the **Output** window — you should see:
+
+```text
+Hello from the Workspace
+```
+
+<Expandable title="Why did the message appear in Output instead of on the screen?">
+`print()` doesn't draw anything on the screen. It's a note to yourself — it sends a line of text to the Output window so you can see that the code ran and what values it had at that moment. Developers use print constantly while building.
+</Expandable>
+
+</Step>

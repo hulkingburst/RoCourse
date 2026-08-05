@@ -1,0 +1,126 @@
+---
+slug: functions
+title: Functions — reusable instructions
+description: Wrap a job in a named function, give it inputs, and call it whenever you need that job done.
+sectionId: luau-basics
+order: 7
+difficulty: beginner
+estimatedMinutes: 5
+tags: [functions, parameters, arguments]
+objectives:
+  - Define a function with function name() ... end
+  - Pass inputs through parameters
+  - Call a function whenever you need that job done
+prerequisites: [types]
+keywords: [function, parameter, argument, luau]
+---
+
+Here's a script that gives a player coins twice:
+
+```luau
+local coins = 0
+coins = coins + 5
+coins = coins + 5
+```
+
+It works, but imagine doing this for fifty features. Copy-pasting the same lines everywhere is how bugs are born. **Functions** are the cure: you write the job once, give it a name, and call it whenever you need it.
+
+<Step>
+
+## Writing your first function
+
+```luau
+function addCoins(amount)
+    coins = coins + amount
+end
+```
+
+Reading it left to right:
+
+- `function` — I'm about to define a job.
+- `addCoins` — its name. You call the job by this name.
+- `(amount)` — the *parameter*: a box the function gets filled when you call it.
+- `coins = coins + amount` — the actual job.
+- `end` — the job stops here.
+
+Defining a function does **nothing** by itself. You have to call it:
+
+```luau
+addCoins(5)  -- gives 5 coins
+addCoins(10) -- gives 10 coins
+```
+
+One function, two calls, two different results. The magic is the parameter — every call fills the box with a different value.
+
+<Mcq
+  question="What does defining a function by itself do?"
+  options={[
+    "Runs the job immediately",
+    "Nothing — it just defines the job until you call it",
+    "Prints the function's name",
+    "Errors, because functions need arguments",
+  ]}
+  answer={1}
+  explanation="Defining only sets up the job. Nothing runs until you call the function by name."
+/>
+
+</Step>
+
+<Step>
+
+## Parameters and arguments
+
+These two words get used interchangeably, but here's the precise version: **parameters** are the names in the definition (`amount`), **arguments** are the values you pass at the call site (`5`, `10`).
+
+You can have as many parameters as you need:
+
+```luau
+function giveReward(playerName, amount, reason)
+    print(playerName .. " earned " .. amount .. " coins for " .. reason)
+end
+
+giveReward("Sam", 100, "winning")
+```
+
+<FillBlank
+  prompt="In function giveReward(playerName, amount, reason), the names inside the parentheses are called ____."
+  answer="parameters"
+  explanation="The names in the definition are parameters; the values passed when calling are arguments."
+/>
+
+</Step>
+
+<Step>
+
+## The pattern you'll see everywhere
+
+Nearly every useful function is: **take inputs, do work.** Even the built-in tools are functions:
+
+```luau
+print("hi", 5)       -- takes whatever, shows it
+tonumber("10")       -- takes a string, returns a number
+```
+
+You've been calling functions since the second lesson. `print(...)` is a function with a variable number of inputs.
+
+<WriteCode
+  instruction="Define a function named cheer that prints 'Go!' whenever it's called."
+  answer={["function cheer()", "print(\"Go!\")", "end"]}
+  starterCode="-- define your function here
+"
+  explanation="function, a name, empty parentheses (no inputs needed), the job, then end."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting `end`.** Every `function` needs its `end`. Luau errors — the Output tells you the line, and usually it's the missing `end`.
+- **Calling without passing the arguments.** `addCoins()` when the function needs `(amount)` gives you `nil` inside, and `nil + 5` errors.
+- **Forgetting to call at all.** Defining `addCoins` and never calling it means nothing happens.
+
+Next: getting answers *back* from a function with `return`.
+
+</Step>

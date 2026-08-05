@@ -1,0 +1,113 @@
+---
+slug: for-loops
+title: Counting with for loops
+description: When you know how many times to run, let for keep the counter — reward every player, spawn 5 obstacles, print 1 to 10.
+sectionId: luau-basics
+order: 11
+difficulty: beginner
+estimatedMinutes: 4
+tags: [loops, for, counter]
+objectives:
+  - Write a for loop that runs a set number of times
+  - Use the loop's counter variable inside the body
+  - Count backward and in steps
+prerequisites: [loops]
+keywords: [for, loop, counter, numeric for]
+---
+
+When you know in advance exactly how many times to run, `for` is the cleanest loop in the language — it keeps its own counter, so you don't have to.
+
+<Step>
+
+## The basic for loop
+
+```luau
+for i = 1, 5 do
+    print("Round " .. i)
+end
+```
+
+This runs the block 5 times, with `i` as 1, then 2, then 3, 4, 5. The `for` loop keeps its own counter — no manual bookkeeping like the `while` version needed.
+
+This is how you give every player in the server a reward, give out 10 items, or spawn 5 obstacles.
+
+<Mcq
+  question="for i = 1, 3 do print('Hi') end — how many times does it print 'Hi'?"
+  options={[
+    "1",
+    "2",
+    "3",
+    "Forever",
+  ]}
+  answer={2}
+  explanation="The for loop runs its block 3 times: i=1, i=2, i=3."
+/>
+
+</Step>
+
+<Step>
+
+## Using the counter
+
+The counter isn't just decoration — it's a variable you use inside the loop:
+
+```luau
+for i = 1, 5 do
+    print("Checkpoint " .. i)
+end
+```
+
+Here `i` makes each message unique. You'll use this constantly: numbering spawns, labeling rounds, building a row of obstacles where each one's position depends on `i`.
+
+<FillBlank
+  prompt="for i = 1, 4 do print(i) end — what does the last printed number equal?"
+  answer="4"
+  explanation="The counter runs from 1 to 4 inclusive, so 4 prints last."
+/>
+
+</Step>
+
+<Step>
+
+## Counting backward and in steps
+
+A third number controls the step:
+
+```luau
+for i = 5, 1, -1 do   -- 5, 4, 3, 2, 1
+    print("Launching in " .. i .. "...")
+    task.wait(1)
+end
+
+for i = 1, 10, 2 do   -- 1, 3, 5, 7, 9
+    print(i)
+end
+```
+
+The first example is a countdown — a negative step counts down. The second skips by 2. The step is optional and defaults to 1.
+
+<Note>
+`for` is the right tool when you know the stop point in advance. If you're waiting for a condition to change — coins reaching 100, say — `while` or `repeat` is the tool instead.
+</Note>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting that `for` needs no manual counter.** Don't write `i = i + 1` inside a for loop — it already counts.
+- **Trying to change the stop point mid-loop.** The range is set when the loop starts.
+- **Using `for` for changing conditions.** If the end depends on game state, use `while`.
+
+<WriteCode
+  instruction="Use a for loop to print 'Spawn' five times."
+  answer={["for i = 1, 5 do", "print(\"Spawn\")", "end"]}
+  starterCode="-- your for loop
+"
+  explanation="for i = 1, 5 runs the body five times; the body just prints."
+/>
+
+Next: putting lists of things in one box — tables.
+
+</Step>

@@ -1,0 +1,106 @@
+---
+slug: publishing
+title: Publishing — getting your game online
+description: Take the clicker from a Studio test to a live Roblox experience, and handle the settings that matter.
+sectionId: publishing
+order: 0
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [publish, upload, experience, settings]
+objectives:
+  - Publish a place as an experience
+  - Set up basic experience settings and permissions
+  - Understand the difference between Studio and live
+prerequisites: [clicker, modules]
+keywords: [publish, upload, experience, live, robux]
+---
+
+Everything so far ran in Studio's little sandbox. Now you take the clicker and put it where people can actually play it. Publishing is a few clicks — but the settings matter, and this is also when your DataStore finally starts working for real.
+
+<Step>
+
+## Publish the place
+
+1. **File → Publish to Roblox As…** (top-left menu).
+2. Name it something real. Your clicker is now an **experience** — that's the official word for a game.
+3. Click **Create**.
+
+The place is now uploaded. Players could theoretically join already, but not yet — you haven't told Roblox it's public or shared a link to it.
+
+<Mcq
+  question="What's the difference between playing in Studio and playing a published game, for a DataStore?"
+  options={[
+    "There's no difference",
+    "In Studio, saves don't persist; in a published game they do",
+    "Published games can't use DataStores",
+    "DataStores only work on the server",
+  ]}
+  answer={1}
+  explanation="DataStoreService is real in production. Studio testing doesn't persist — one of the biggest 'why isn't it saving' traps."
+/>
+
+</Step>
+
+<Step>
+
+## The settings that matter
+
+In the **Game Settings** (top bar → Game Settings, or the config button on the experience page):
+
+- **Creator** — your account (personal or group).
+- **Devices** — your clicker works on computer and phone with no changes, since the button uses `Activated`.
+- **Permissions** — who can play. "Public" means anyone. "Friends" is useful for testing.
+- **Server type** — "Standard" for a normal game. "Private servers" come later.
+- **"Allow Studio Testing to Play"** — a setting that matters *right now* for data stores.
+
+The single most important habit: **write down the Experience ID** (on the experience's page under the name). It's your game's permanent license plate — you'll need it for settings, data, and debugging.
+
+<FillBlank
+  prompt="The permanent number that identifies your published game is the ____ ID."
+  answer="Experience"
+  explanation="The Experience ID is your game's permanent identifier, used for settings, data, and debugging."
+/>
+
+</Step>
+
+<Step>
+
+## What changes when it's live
+
+Publishing is not a bigger Studio — it's a different world, in a few specific ways:
+
+| Studio test | Published game |
+| --- | --- |
+| You are the only player | Real players, real connections |
+| DataStores don't persist | DataStores actually save |
+| No lag in your city | Server latency matters |
+| You start with studio tools | Players start in the game |
+
+Most code runs identically. The lessons that *do* change — data stores, latency, security — are exactly the ones you've built properly, so they'll be the differences you *don't* have to debug.
+
+<Note>
+With the remote security you built, the game is safe to share — the economy is server-side. That was the point of the whole data section.
+</Note>
+
+<WriteCode
+  instruction="A friend wants to test your game. Which two Game Settings do you touch first? Write the permission choice and the share action as two short steps."
+  answer={["Permissions: Friends", "share the experience link"]}
+  starterCode="-- how do you let a friend in safely?
+"
+  explanation="Set permissions to Friends for safe testing, then send them the experience link."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Publishing with permissions open during testing.** Set Friends first, widen later when you're ready for strangers.
+- **Assuming Studio behavior equals live behavior.** DataStores are the big one, but latency and race conditions appear live too. Test live, not just in Studio.
+- **Forgetting the Experience ID.** You'll need it constantly. Save it now.
+- **Thinking publishing is the end.** Publishing is the start of the test loop — you'll iterate between Studio and live constantly.
+
+Next: who can play — permissions and sharing.
+
+</Step>

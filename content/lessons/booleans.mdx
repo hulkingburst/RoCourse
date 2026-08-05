@@ -1,0 +1,106 @@
+---
+slug: booleans
+title: Booleans — yes, no, maybe
+description: True and false, comparing values with == and friends, and combining questions with and / or.
+sectionId: luau-basics
+order: 6
+difficulty: beginner
+estimatedMinutes: 4
+tags: [booleans, comparison, logic]
+objectives:
+  - Compare values with ==, ~=, <, >, <=, >=
+  - Combine conditions with and / or
+  - Store a yes-or-no answer in a boolean variable
+prerequisites: [types]
+keywords: [boolean, comparison, and, or, true, false]
+---
+
+Before your game can decide anything, it has to *ask questions*. "Is the door open?" "Did they win?" Every answer is a boolean: `true` or `false`. This lesson is how you ask those questions.
+
+<Step>
+
+## The comparison operators
+
+A comparison is a question, and its answer is always a boolean:
+
+| Operator | Means | Example | True when |
+| --- | --- | --- | --- |
+| `==` | equal to | `a == b` | a and b are the same |
+| `~=` | not equal to | `a ~= b` | a and b differ |
+| `>` | greater | `a > b` | a is bigger |
+| `<` | less | `a < b` | a is smaller |
+| `>=` | greater or equal | `a >= b` | a is at least b |
+| `<=` | less or equal | `a <= b` | a is at most b |
+
+<Warning>
+The biggest beginner trap in Lua: **`=` vs `==`**. One `=` *puts a value in a box* (assignment). Two `==` *asks a question* (comparison). `if coins == 50` asks "are there exactly 50?" — `if coins = 50` errors.
+</Warning>
+
+<Mcq
+  question="Which operator checks whether two values are equal?"
+  options={[
+    "=",
+    "==",
+    "~=",
+    "=>",
+  ]}
+  answer={1}
+  explanation="== asks the equality question. = assigns, ~= is not-equal, and => doesn't exist."
+/>
+
+</Step>
+
+<Step>
+
+## Questions have answers
+
+A comparison produces a value — a boolean you can store, print, or use:
+
+```luau
+local coins = 80
+local rich = coins >= 100   --> false
+
+print(coins == 80)   --> true
+print(coins ~= 80)   --> false
+```
+
+`rich` isn't a magic word — it's just a box holding the answer to the question. The game checks it later and behaves accordingly.
+
+<FillBlank
+  prompt="Fill in the missing operator so the box holds true:  local canAfford = coins ____ 50   (coins is 60)"
+  answer=">="
+  explanation="60 is at least 50, so coins >= 50 is true. Any of >=, >, ~=, == would be wrong except >= and >. The intended one is >=."
+/>
+
+</Step>
+
+<Step>
+
+## Combining questions: and / or
+
+Some decisions need more than one question. What if a sale needs enough coins **and** a membership?
+
+```luau
+local hasMembership = true
+
+if coins >= 50 and hasMembership then
+    print("Welcome to the members shop.")
+end
+```
+
+- `and` — both sides must be true.
+- `or` — at least one side true.
+
+You can chain them: `if a and b or c then`. Add parentheses when it gets complicated: `if (a and b) or c then`.
+
+<WriteCode
+  instruction="A door opens when the player has the key AND the room is unlocked. Write a comparison that is true only when both hold."
+  answer={["hasKey and roomUnlocked", "(hasKey and roomUnlocked)"]}
+  starterCode="local hasKey = true
+local roomUnlocked = true
+-- your expression here
+"
+  explanation="and is true only when both sides are true — exactly what a two-condition door needs."
+/>
+
+</Step>

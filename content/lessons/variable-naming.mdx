@@ -1,0 +1,72 @@
+---
+slug: variable-naming
+title: Naming variables well
+description: The naming rules every variable follows, the camelCase style Roblox uses, and why good names beat good luck.
+sectionId: luau-basics
+order: 2
+difficulty: beginner
+estimatedMinutes: 3
+tags: [variables, naming, style]
+objectives:
+  - Apply the hard rules: no spaces, no leading digits, no reserved words
+  - Use camelCase for multi-word variable names
+  - Name variables after what they are
+prerequisites: [variables]
+keywords: [naming, camelcase, identifier, variables]
+---
+
+Variables can hold anything — but their names have rules. Learn the rules once and you'll never fight the editor about them again.
+
+<Step>
+
+## The hard rules
+
+A variable name can't have a space, can't start with a number, and can't be a reserved word like `if` or `end`.
+
+So `player coins` is illegal, `2fast` is illegal, and `if` is illegal. Everything else — `playerCoins`, `PlayerCoins`, `player_coins` — works.
+
+```luau
+local playerCoins = 0  -- good
+local player_coins = 0 -- works
+local PlayerCoins = 0  -- works, but usually means something else
+```
+
+<Note>
+The editor will tell you the moment you break a rule — it underlines the name in red. When you see that, fix the name, don't fight it.
+</Note>
+
+</Step>
+
+<Step>
+
+## The style Roblox uses: camelCase
+
+Roblox code uses **camelCase**: a lowercase first letter, then a capital for each new word. `playerCoins`, not `PlayerCoins` or `player_coins`.
+
+Why? Because in Luau, a capital first letter usually means something special (you'll meet modules and types later). Sticking to camelCase keeps your code looking like everyone else's — which makes it easy to read and to share.
+
+<FillBlank
+  prompt="Rewrite this name in camelCase:  high score  →  local ____ = 0"
+  answer="highScore"
+  explanation="Lowercase first, capital for each new word, no space: highScore."
+/>
+
+</Step>
+
+<Step>
+
+## The real rule: name it what it is
+
+The difference between `local x = 0` and `local enemiesDefeated = 0` is not style. It's whether you can read this script a month from now.
+
+Ask yourself: if someone reads the name out loud, does it say what's inside the box? `coins` holds a number of coins. `hit` holds the thing that got hit. `part` holds a part. A variable named `enemy` that holds the player's health will confuse you forever — name it what it is.
+
+<WriteCode
+  instruction="A variable holds the total number of coins a player has collected. Write a well-named declaration starting with local, set to 0."
+  answer={["local totalCoins = 0", "local coins = 0", "local coinCount = 0"]}
+  starterCode="-- your variable here
+"
+  explanation="Descriptive, camelCase, lowercase first letter: totalCoins or coins both say exactly what's inside."
+/>
+
+</Step>

@@ -1,0 +1,106 @@
+---
+slug: task-wait
+title: Timing — task.wait and friends
+description: Pause a script, schedule work for later, and run two things at once — the clock behind every animation.
+sectionId: luau-basics
+order: 13
+difficulty: beginner
+estimatedMinutes: 4
+tags: [task, wait, timing, coroutine]
+objectives:
+  - Pause a script with task.wait
+  - Delay a single action with task.delay
+  - Explain the difference between pausing and delaying
+prerequisites: [loops, functions]
+keywords: [task, wait, delay, spawn, timing]
+---
+
+Games are full of timing: "open the door in 3 seconds", "shake the screen, then stop", "play the sound, then reset". The `task` library is the clock.
+
+<Step>
+
+## task.wait — pause
+
+`task.wait(seconds)` pauses the script for that long:
+
+```luau
+print("Start")
+task.wait(2)
+print("Two seconds later")
+```
+
+The script freezes there for 2 seconds, then continues on the next line. You already met this in loops — it's the breath that keeps `while true` from freezing the game.
+
+<Note>
+`task.wait()` with no argument waits one frame — about 1/60th of a second. You'll see it used to let the game catch up between heavy steps.
+</Note>
+
+<FillBlank
+  prompt="print('A'), then task.wait(3), then print('B') — how many seconds pass between printing A and printing B?"
+  answer="3"
+  explanation="task.wait(3) pauses the script for 3 seconds before the next line runs."
+/>
+
+</Step>
+
+<Step>
+
+## task.delay — schedule, don't pause
+
+`task.delay(seconds, function)` doesn't pause anything. It *schedules* a function to run later, while the rest of the script keeps going:
+
+```luau
+print("Bomb armed")
+task.delay(3, function()
+    print("Boom!")
+end)
+print("Back to business")
+```
+
+The order prints "Bomb armed", then "Back to business", then 3 seconds later "Boom!". The script didn't stop — it fired off a "call me in 3 seconds" note and moved on.
+
+<Note>
+This is a sneak preview of a huge idea in Roblox: running things *at the same time*. `task.delay` starts one mini-program that runs later, while the main script continues.
+</Note>
+
+</Step>
+
+<Step>
+
+## Running at the same time: task.spawn
+
+`task.spawn(function)` starts a function immediately, but as a separate track:
+
+```luau
+task.spawn(function()
+    task.wait(2)
+    print("Side track done")
+end)
+
+print("Main track")
+```
+
+The main script prints "Main track" right away; the side track sleeps 2 seconds, then prints "Side track done". Both run at the same time — the main track doesn't wait for the side track.
+
+<WriteCode
+  instruction="An explosion happens 2 seconds after the fuse is lit, but the script must keep going. Write the scheduling line using task.delay and a function that prints 'BOOM'."
+  answer={["task.delay(2, function()", "print(\"BOOM\")", "end)"]}
+  starterCode='print("Fuse lit")
+-- your scheduling here
+'
+  explanation="task.delay(2, fn) schedules the print for 2 seconds from now without pausing the script."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Using task.wait where task.delay fits.** Waiting pauses *your* script; delaying schedules work *and moves on*. If "the rest must keep running", use delay or spawn.
+- **Forgetting task.wait in forever loops.** Instant freeze — this is the #1 hang in beginner games.
+- **Expecting task.delay's function to run immediately.** It runs after the seconds pass, not now.
+
+Next: making your code readable with comments.
+
+</Step>

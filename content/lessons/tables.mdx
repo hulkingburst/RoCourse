@@ -1,0 +1,130 @@
+---
+slug: tables
+title: Tables — boxes that hold many things
+description: List values in one box, count them, and pull values out by number — your first data structure.
+sectionId: luau-basics
+order: 12
+difficulty: beginner
+estimatedMinutes: 5
+tags: [tables, arrays, data]
+objectives:
+  - Build a table with {} and read values with [n]
+  - Add to a table with table.insert
+  - Loop through a table with ipairs
+prerequisites: [variables, for-loops]
+keywords: [table, array, ipairs, table.insert]
+---
+
+So far every box holds one thing. But a game is full of *lists*: the players in the server, the items in a shop, the enemies on a wave. Luau's answer is the **table** — one box that holds many things.
+
+<Step>
+
+## Making a table
+
+Curly braces make an empty table, or one with values already inside:
+
+```luau
+local empty = {}
+local powerups = { "double", "shield", "speed" }
+```
+
+Each value sits in a numbered slot, starting at 1. To read one, use square brackets:
+
+```luau
+print(powerups[1])  --> double
+print(powerups[2])  --> shield
+print(powerups[3])  --> speed
+```
+
+<Note>
+Luau counts from 1, not 0. That trips up people coming from other languages — `powerups[0]` is nothing here.
+</Note>
+
+<FillBlank
+  prompt="local fruits = { 'apple', 'banana' } — what does fruits[2] give you?"
+  answer="banana"
+  explanation="Slot 1 is 'apple', slot 2 is 'banana'. Luau counts from 1."
+/>
+
+</Step>
+
+<Step>
+
+## Adding and counting
+
+A table can grow after you make it:
+
+```luau
+local powerups = { "double" }
+
+table.insert(powerups, "shield")
+table.insert(powerups, "speed")
+
+print(#powerups)  --> 3  (# is "how many slots")
+```
+
+`table.insert` appends a new value to the end. The `#` operator answers "how many things are in this table?" — you'll use it constantly.
+
+<WriteCode
+  instruction="Make a table named inventory and add the string 'sword' to it with table.insert."
+  answer={["local inventory = {}", "table.insert(inventory, \"sword\")"]}
+  starterCode="-- build your inventory
+"
+  explanation="Start with an empty {} table, then table.insert pushes 'sword' onto the end."
+/>
+
+</Step>
+
+<Step>
+
+## Walking through a table: ipairs
+
+When you need to look at every slot, loop with `ipairs`:
+
+```luau
+for index, value in ipairs(powerups) do
+    print(index .. ": " .. value)
+end
+```
+
+Each trip through the loop gives you the slot number and its value. This is how you give every player a reward, check every enemy, or count every item.
+
+```luau
+local coins = { 5, 10, 15 }
+
+local total = 0
+for _, amount in ipairs(coins) do
+    total = total + amount
+end
+print(total)  --> 30
+```
+
+The underscore `_` just means "I don't need the index." This pattern — start a total, add every value, print the total — is the sum pattern you'll reuse forever.
+
+<PredictOutput
+  answer={["1: one", "2: two"]}
+  explanation="ipairs walks every slot, printing index and value each time."
+>
+
+```luau
+local words = { "one", "two" }
+for i, w in ipairs(words) do
+    print(i .. ": " .. w)
+end
+```
+
+</PredictOutput>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Starting at 0.** Luau tables start at 1. `fruits[0]` is nothing.
+- **Forgetting `ipairs` needs a table.** `for i, v in ipairs(singleValue)` errors — ipairs walks a table.
+- **Trying to read a slot that isn't there.** `powerups[99]` gives `nil`, not an error. Check with `#` first.
+
+Next: pausing and scheduling with `task`.
+
+</Step>

@@ -1,0 +1,174 @@
+---
+slug: clicker
+title: The clicker game — clicks become coins
+description: Build your first playable loop — click a big button, earn coins, watch your balance climb, all through the secure client-server bridge.
+sectionId: gameplay
+order: 3
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [clicker, game, loop, gui, coins]
+objectives:
+  - Wire a click button through a RemoteEvent to server-awarded coins
+  - Show the player's coins on their screen via FireClient
+  - Put the whole secure loop together in one working game
+prerequisites: [guis, remotes, udim2]
+keywords: [clicker, coins, game loop, gameplay]
+---
+
+Now you build your first actual game: a **clicker**. Click a big button, earn a coin, watch your total climb. It's tiny, but it's a *real* game — a player, an action, a reward, an update. Every future project is this loop wearing a costume.
+
+<Step>
+
+## The system map
+
+Three pieces, one loop:
+
+```
+CLIENT (LocalScript)          SERVER (Script)
+   button on screen      →    OnServerEvent: verify, award +1 coin
+   shows coin total  ←───     FireClient: "here's your new total"
+```
+
+The client reports clicks. The server decides and records. The server tells the client the new number to display. **Clicks are never trusted, coins are never granted by the client.**
+
+<Mcq
+  question="In the clicker loop, who decides how many coins a click is worth?"
+  options={[
+    "The client, when it fires",
+    "The server, in the OnServerEvent handler",
+    "The player's leaderboard",
+    "The button's Text",
+  ]}
+  answer={1}
+  explanation="The client only reports the click. The server decides the reward and applies it."
+/>
+
+</Step>
+
+<Step>
+
+## The server (a Script in ServerScriptService)
+
+```luau
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local clickEvent = ReplicatedStorage.ClickCoin
+
+local COIN_PER_CLICK = 1
+
+clickEvent.OnServerEvent:Connect(function(player)
+    local coins = player.leaderstats.Coins
+    if coins then
+        coins.Value = coins.Value + COIN_PER_CLICK
+    end
+end)
+```
+
+Nothing new here — you've written all of this. It verifies the player has real stats, adds one coin, done. The `COIN_PER_CLICK` constant is your first balancing knob.
+
+<FillBlank
+  prompt="The server adds coins to the player inside the OnServerEvent handler, after the ____ check that they have leaderstats."
+  answer="if coins then"
+  explanation="if coins then guards against a player without stats before touching their data."
+/>
+
+</Step>
+
+<Step>
+
+## The client (a LocalScript in StarterPlayerScripts)
+
+This is the new part: the client both **sends** clicks and **receives** totals.
+
+```luau
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local clickEvent = ReplicatedStorage.ClickCoin
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 0, 60)
+label.Text = "Coins: 0"
+label.TextSize = 28
+label.BackgroundTransparency = 1
+label.Parent = screenGui
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 200, 0, 120)
+button.Position = UDim2.new(0.5, 0, 0.5, 0)
+button.AnchorPoint = Vector2.new(0.5, 0.5)
+button.Text = "Click for coins!"
+button.TextSize = 22
+button.Parent = screenGui
+
+button.Activated:Connect(function()
+    clickEvent:FireServer()
+end)
+
+clickEvent.OnClientEvent:Connect(function(total)
+    label.Text = "Coins: " .. total
+end)
+```
+
+The button reports clicks; `OnClientEvent` receives the server's totals and writes them to the label.
+
+<WriteCode
+  instruction="The client should update its coin label whenever the server sends a new total. Write the receive line that connects OnClientEvent."
+  answer={["clickEvent.OnClientEvent:Connect(function(total)", "label.Text = \"Coins: \" .. total", "end)"]}
+  starterCode="-- receive totals from the server
+"
+  explanation="Connect OnClientEvent, then write the received total into the label's Text."
+/>
+
+</Step>
+
+<Step>
+
+## Closing the loop: the server sends back
+
+The server currently doesn't send totals back. Add the sending half:
+
+```luau
+clickEvent.OnServerEvent:Connect(function(player)
+    local coins = player.leaderstats.Coins
+    if coins then
+        coins.Value = coins.Value + COIN_PER_CLICK
+        clickEvent:FireClient(player, coins.Value)
+    end
+end)
+```
+
+Now the loop is complete: click → server awards → server sends the new total → client's label updates. One coin per click, verified end to end.
+
+<Note>
+Why not just read coins from leaderstats on the client? Because the client's view isn't trustworthy. The server sending the total keeps the display fed by the source of truth.
+</Note>
+
+<Mcq
+  question="Why does the server FireClient the new total back?"
+  options={[
+    "To brag",
+    "The client's display must come from the server's data",
+    "To slow the game down",
+    "FireClient is required or the button stops working",
+  ]}
+  answer={1}
+  explanation="The displayed number is fed by the server's records — the trustworthy count — not by anything the client invented."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Skipping the FireClient half.** If the label never updates, check the server sends `FireClient` — and that both scripts use the *same* RemoteEvent name.
+- **Letting the client read and display leaderstats directly.** Same bug as security, now at display level. Feed the label from the server.
+- **Firing per-frame.** A loop that awards coins with no wait is a coins fountain.
+- **Mismatched RemoteEvent names.** `ClickCoin` vs `CoinClick` — a silent, frustrating bug. Name once, use the exact same name both sides.
+
+Next: coins without clicking — the idle bonus loop.
+
+</Step>

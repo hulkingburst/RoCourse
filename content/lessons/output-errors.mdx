@@ -1,0 +1,80 @@
+---
+slug: output-errors
+title: The Output window and errors
+description: Read error messages like a pro — which script, which line, and what went wrong.
+sectionId: getting-started
+order: 5
+difficulty: beginner
+estimatedMinutes: 4
+tags: [output, error, debugging]
+objectives:
+  - Read an error message's three parts: script, line, problem
+  - Create an error on purpose and understand it
+  - Adopt the habit of checking Output first
+prerequisites: [play-testing]
+keywords: [output, error, print, debugging]
+---
+
+When your code has a problem, the Output window gets red lines. That scary-looking line is actually a gift: it tells you exactly where the problem is and what it is.
+
+<Step>
+
+## The anatomy of an error
+
+Say you run a script and Output shows this:
+
+```text
+Workspace.Script:3: attempt to call a nil value
+```
+
+Read it left to right:
+
+- **Workspace.Script** — which script has the problem
+- **:3** — the line number in that script
+- **attempt to call a nil value** — the actual problem, in plain English
+
+You won't understand every error yet. But notice how much information is there.
+
+<Mcq
+  question="What does an error message like 'Workspace.Script:3' tell you?"
+  options={[
+    "Your game has exactly three scripts",
+    "The problem is in the script named Script, around line 3",
+    "The Output window is broken",
+    "Your place is three studs too big",
+  ]}
+  answer={1}
+  explanation="The format is always the same: which script, then the line number, then the problem itself."
+/>
+
+</Step>
+
+<Step>
+
+## Make an error on purpose
+
+Open your script from the last lesson and break it on purpose — change the print to:
+
+```luau
+print()
+```
+
+Press Play. `print()` needs something between the parentheses, so Output reports an error about a missing argument.
+
+That's success. You just created your first real error on purpose, on your terms, in a safe empty place. An error doesn't mean you broke your game — it means that one line stopped. Read the message, fix the line, try again.
+
+</Step>
+
+<Step>
+
+## The habit that separates developers
+
+When something doesn't work, look at the **Output window before you look anywhere else**. Not the 3D view, not your script's spelling — Output. The message names the script and the line, so you can go straight there.
+
+<FillBlank
+  prompt="An error message names the script, the ____, and the problem."
+  answer={["line", "line number"]}
+  explanation="The format is script:line:problem — all three pieces are right there in the message."
+/>
+
+</Step>

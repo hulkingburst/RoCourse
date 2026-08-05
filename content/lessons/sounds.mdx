@@ -1,0 +1,118 @@
+---
+slug: sounds
+title: Sounds — giving the world a voice
+description: Add Sound objects, load audio with a SoundId, and play effects where the player can actually hear them.
+sectionId: objects
+order: 4
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [sounds, soundid, audio, effect]
+objectives:
+  - Create a Sound object and set its SoundId
+  - Play and stop sounds from a script
+  - Play feel-effects on the client
+prerequisites: [instances]
+keywords: [sound, soundid, play, audio]
+---
+
+A game with no sound feels like a movie with the volume off. Sounds are objects — you create them, give them audio to play, and trigger them at exactly the right moment.
+
+<Step>
+
+## Creating a sound
+
+A Sound object needs a `SoundId` (the audio file) before it can play:
+
+```luau
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://123456789" -- a real sound ID
+sound.Volume = 0.5
+sound.Parent = part
+sound:Play()
+```
+
+- `SoundId` — which audio file. Sound IDs look like `rbxassetid://123456`. Upload your own audio to your account (or use free ones from the toolbox), copy its ID, and paste it. The placeholder number above won't play anything — swap in a real ID.
+- `Volume` — how loud (0 to 1).
+- `:Play()` — start it.
+
+<Note>
+Or, if you placed a Sound object in Studio, just grab it and play: `workspace.Coin:WaitForChild("CoinSound"):Play()`.
+</Note>
+
+<FillBlank
+  prompt="The property that points a Sound object at its audio file is ____."
+  answer="SoundId"
+  explanation="SoundId holds the rbxassetid:// reference to the audio."
+/>
+
+</Step>
+
+<Step>
+
+## Playing where it's heard
+
+Here's the catch: **sounds are heard per-player.** A `:Play()` on the server is silent to clients unless it's replicated — and that's a mess you don't need.
+
+For feel-effects — a coin pop, a button click, a jump — play them on the client:
+
+```luau
+-- LocalScript
+coin.ClickDetector.MouseClick:Connect(function()
+    coin.Sound:Play() -- you'll hear it on your own client
+    clickEvent:FireServer()
+end)
+```
+
+The coin *sound* is feel, and feel is per-player. So it fires client-side, while the coin *reward* stays server-side. One click, two layers.
+
+<Mcq
+  question="Where should a coin-pickup sound play?"
+  options={[
+    "On the server, so everyone hears it",
+    "On the client, so the clicking player hears it",
+    "Nowhere — sounds can't be scripted",
+    "In the leaderboard",
+  ]}
+  answer={1}
+  explanation="Feel-effects are per-player. Play them client-side; keep rewards server-side."
+/>
+
+</Step>
+
+<Step>
+
+## Stopping and controlling
+
+Sounds have the usual controls:
+
+```luau
+sound:Stop()          -- stop playing
+sound:SetAttribute("Playing", false) -- your own flag, if you like
+```
+
+For looping ambient audio — wind, waves, a busy street — set `sound.Looped = true` before `:Play()`. One sound object can loop forever until you `:Stop()` it.
+
+<WriteCode
+  instruction="A player collects a coin. Play the coin's sound on their client right before firing the reward. Write the play line."
+  answer={["coin.Sound:Play()"]}
+  starterCode="coin.ClickDetector.MouseClick:Connect(function()
+    -- play the pickup sound
+    clickEvent:FireServer()
+end)"
+  explanation="Play the sound on the client so the clicking player hears the pickup."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Using a fake SoundId.** `rbxassetid://123456` plays nothing. Use a real ID from the toolbox or your own upload.
+- **Playing on the server.** Per-player feel-effects belong in LocalScripts, or they're silent to the player who triggered them.
+- **Forgetting the Parent.** A Sound with no parent plays nowhere. Parent it to the part or the GUI.
+- **Expecting sounds to loop by default.** Set `Looped = true` for ambient audio.
+
+Next: smooth movement and polish — tweens.
+
+</Step>

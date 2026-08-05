@@ -1,0 +1,125 @@
+---
+slug: shop-ui
+title: The shop panel — a frame full of buttons
+description: Build the upgrade shop's interface — a panel frame, a buy button, and a label that mirrors the server's data.
+sectionId: gameplay
+order: 6
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [shop, gui, panel, frame, ui]
+objectives:
+  - Lay out a shop with a Frame, labels, and a button
+  - Position children inside a frame
+  - Reflect server state in the UI
+prerequisites: [upgrades, gui-styling]
+keywords: [shop, panel, frame, textbutton, layout]
+---
+
+The purchase logic is secure. Now give it a face: a **shop panel** — a Frame that holds the price label, a buy button, and the player's balance, all of it reflecting what the server actually recorded.
+
+<Step>
+
+## The panel frame
+
+A Frame groups elements together and gives them a visual home:
+
+```luau
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0, 260, 0, 160)
+panel.Position = UDim2.new(1, -20, 0.5, 0)
+panel.AnchorPoint = Vector2.new(1, 0.5)
+panel.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+panel.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = panel
+```
+
+`AnchorPoint = (1, 0.5)` pins the panel's *right edge* to the right side of the screen — `Position = UDim2.new(1, -20, 0.5, 0)` sits it 20 pixels in from the edge.
+
+<Mcq
+  question="What does AnchorPoint = Vector2.new(1, 0.5) do to the panel?"
+  options={[
+    "Makes it twice as wide",
+    "Pins its right edge to the Position point",
+    "Moves it to the top of the screen",
+    "Nothing at all",
+  ]}
+  answer={1}
+  explanation="AnchorPoint (1, 0.5) treats the right-center of the panel as the point that sticks to Position."
+/>
+
+</Step>
+
+<Step>
+
+## Children position inside the frame
+
+A child's `Position` is measured *from the top-left of its parent frame*, not the screen:
+
+```luau
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 8)
+title.Text = "Upgrades"
+title.Font = Enum.Font.GothamBold
+title.Parent = panel
+
+local buyButton = Instance.new("TextButton")
+buyButton.Size = UDim2.new(0, 160, 0, 40)
+buyButton.Position = UDim2.new(0.5, 0, 1, -50)
+buyButton.AnchorPoint = Vector2.new(0.5, 0)
+buyButton.Text = "Buy multiplier"
+buyButton.Parent = panel
+```
+
+The buy button sits at `Y = 1, -50` — the frame's height minus 50 — so it hugs the bottom of the panel. Anchoring relative to the *parent* keeps the whole panel moveable as one unit.
+
+<FillBlank
+  prompt="A child's Position is measured from the top-left corner of its ____, not the screen."
+  answer="parent"
+  explanation="Children position relative to their parent frame, so moving the frame moves everything inside it."
+/>
+
+</Step>
+
+<Step>
+
+## The buy button and the mirror
+
+```luau
+buyButton.Activated:Connect(function()
+    purchaseEvent:FireServer("multiplier")
+end)
+
+purchaseEvent.OnClientEvent:Connect(function(coins, multiplier)
+    balanceLabel.Text = "Coins: " .. coins
+    buyButton.Text = "Multiplier x" .. multiplier
+end)
+```
+
+One handler for both outcomes — success or refusal — it just reflects whatever the server *actually* recorded. That's the beauty of the design: the client's UI is always a mirror of the server's data, so it can't drift out of sync.
+
+<WriteCode
+  instruction="After a purchase, the shop should show the new multiplier level on the buy button. Write the line that sets its text."
+  answer={["buyButton.Text = \"Multiplier x\" .. multiplier"]}
+  starterCode="-- inside the OnClientEvent handler
+"
+  explanation="Reflect the server-sent multiplier in the button label."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Positioning children from the screen.** Child Positions are relative to the parent frame — mixing that up scatters the panel.
+- **Forgetting the parent.** Every label, button, and corner needs its `Parent` set to the panel or it never renders.
+- **Hardcoding the balance in the UI.** The label must be fed by OnClientEvent, or it lies after the first purchase.
+- **Building the shop on the server.** GUI is client-side — build it in a LocalScript into PlayerGui.
+
+Next: your scripts are getting big — time to organize with ModuleScripts.
+
+</Step>
