@@ -18,7 +18,7 @@ export default function HomePage() {
     <div className="mx-auto max-w-3xl px-6 py-14">
       <section className="mb-14">
         <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
-          A hands-on Roblox development course
+          A free, hands-on Roblox development course
         </p>
         <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           Build real Roblox games with Luau.

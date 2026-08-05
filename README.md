@@ -1,6 +1,8 @@
 # RoCourse
 
-**RoCourse** is an interactive course for learning Luau by building real Roblox games — not by copying tutorials. It turns a full ~52-lesson curriculum into Mimo-style micro-lessons: one short step at a time, one activity per step, solved-activity gating, and auto-saved progress with locked lessons that unlock in order.
+> **Free forever.** No accounts, no paywall, no sign-up — all 52 lessons are open and free to use.
+
+**RoCourse** is a free, interactive course for learning Luau by building real Roblox games — not by copying tutorials. It turns a full ~52-lesson curriculum into Mimo-style micro-lessons: one short step at a time, one activity per step, solved-activity gating, and auto-saved progress with locked lessons that unlock in order.
 
 Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, and `next-mdx-remote-client`. Lessons are plain MDX files compiled at build time into static pages.
 
