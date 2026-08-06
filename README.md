@@ -1,6 +1,8 @@
 # RoCourse
 
 > **Free forever.** No accounts, no paywall, no sign-up — all 52 lessons are open and free to use.
+>
+> **Built with AI, reviewed by a human.** This site is developed with AI assistance to keep it free and open source — every lesson, activity, and feature is then reviewed and managed by a human before it ships.
 
 **RoCourse** is a free, interactive course for learning Luau by building real Roblox games — not by copying tutorials. It turns a full ~52-lesson curriculum into Mimo-style micro-lessons: one short step at a time, one activity per step, solved-activity gating, and auto-saved progress with locked lessons that unlock in order.
 
