@@ -1,13 +1,14 @@
 ---
 slug: final-project
 title: The final project — one complete game
-description: Build a full clicker with a working shop, persistent saves, and polish — every system in this course in one place.
+description: Build one complete game — a clicker or a pet-collecting game — with a shop, persistent saves, and polish. Every system in this course in one place.
 sectionId: final-project
 order: 0
 difficulty: advanced
-estimatedMinutes: 10
+estimatedMinutes: 12
 tags: [project, capstone, game]
 objectives:
+  - Choose which game to build as your capstone
   - Assemble every system from the course into one complete game
   - Organize the code with ModuleScripts
   - Playtest the full loop: earn, spend, save, reload, recover
@@ -15,71 +16,87 @@ prerequisites: [datastore-testing, upgrades, clicker, debugging]
 keywords: [project, capstone, full game, assemble]
 ---
 
-This is it: the whole course in one build. You're going to assemble a complete game — a clicker with a shop, per-player upgrades, real saving, and polish — using *every* system you've built. If you can finish this, you can build anything in Roblox.
+This is it: the whole course in one build. You're going to assemble a complete game using *every* system you've built. First, pick which one you want to build. If you can finish this, you can build anything in Roblox.
 
 <Step>
 
-## The game and the plan
+## Choose your build
 
-**"Coin Tycoon."** Click a coin to earn coins. Buy upgrades that multiply your clicks. Your progress saves between visits. Same loop as the clicker — but now it's a *product*: organized, polished, and persistent.
+Two games, same engine: a server that owns the money, remotes that carry the messages, a module that does the math, a data store that remembers, and a client that only reports and shows.
 
 ```
 CLIENT                          SERVER
-ClickButton ──FireServer──▶    ClickHandler: award coins × multiplier
-BuyButton  ──FireServer──▶    BuyHandler: check wallet, raise level
-labels ◀───FireClient────    every change pushes updated totals
-                              SaveService: autosave + save on leave
-                              LoadService: restore on join
+your action ──FireServer──▶    Handler: verify, decide, apply
+UI labels  ◀──FireClient───    every change pushes updated totals
+                               SaveSystem: load on join, save on leave
 ```
 
-Everything flows one direction: **player → client → server → data → back to screen.**
+Pick the game you want to build — you can switch later from the sidebar, and the rest of this lesson will only show your game.
 
-<Mcq
-  question="In the final project, who decides what a click is worth?"
-  options={[
-    "The client button",
-    "The server's ClickHandler",
-    "The player's screen",
-    "The label text",
-  ]}
-  answer={1}
-  explanation="Same as every lesson: the client reports, the server decides."
-/>
+<ChooseBuild />
 
 </Step>
 
 <Step>
 
-## Step 0-1 — folder layout and GameConfig
+## Step 0 — folder layout and GameConfig
 
-In ReplicatedStorage, create:
+Every game starts as a folder tree. In ReplicatedStorage, create the folder structure for the game you chose:
+
+<Variant name="tycoon">
 
 ```
 ReplicatedStorage
   Shared
     GameConfig (ModuleScript)
-    CoinMath   (ModuleScript)
+    GameMath   (ModuleScript)
   RemoteEvents
     ClickCoin
     BuyUpgrade
 ```
 
-ServerScriptService gets two scripts: `Economy` (clicks + purchases) and `SaveSystem` (load/save). StarterPlayer > StarterPlayerScripts gets one LocalScript: `ClientUI`.
+ServerScriptService gets one script: `Economy` (clicks + purchases). StarterPlayer > StarterPlayerScripts gets one LocalScript: `ClientUI`.
 
-**GameConfig** is the single source of truth for every number:
+</Variant>
+
+<Variant name="collector">
+
+```
+ReplicatedStorage
+  Shared
+    GameConfig (ModuleScript)
+    GameMath   (ModuleScript)
+  RemoteEvents
+    BuyPet
+    UpdateCoins
+```
+
+ServerScriptService gets one script: `Economy` (pickups + purchases). StarterPlayer > StarterPlayerScripts gets one LocalScript: `ClientUI`. In Workspace, create a folder called `Pickups` and drop a few anchored coin Parts into it — those are the coins your character will walk into.
+
+</Variant>
+
+**GameConfig** is the single source of truth for every number in both games:
 
 ```luau
 local config = {
+    -- Coin Tycoon
     coinsPerClick = 1,
     upgradeBaseCost = 25,
+
+    -- The Collector
+    coinsPerPickup = 1,
+    petBonusPerLevel = 1,
+    petBaseCost = 30,
+
+    -- shared
     coinsKey = "Coins",
-    multiplierKey = "Multiplier",
+    levelKey = "Level",
 }
 
 return config
 ```
 
-Change `upgradeBaseCost` here and the whole economy reprices.
+In Coin Tycoon, `Level` is your click multiplier. In The Collector, `Level` is how many pets you own. Change one number here and the whole economy reprices.
 
 <FillBlank
   prompt="The RemoteEvents live in a folder named ____ so server and client both reach them."
@@ -91,36 +108,39 @@ Change `upgradeBaseCost` here and the whole economy reprices.
 
 <Step>
 
-## Step 2 — CoinMath module
+## Step 1 — the math module
 
-All the money math in one testable module:
+Both games run on the same module — it just serves two economies. All the money math in one testable place:
 
 ```luau
-local CoinMath = {}
+local GameMath = {}
 
-function CoinMath.rewardForClick(multiplier)
+-- Coin Tycoon: what one click is worth
+function GameMath.rewardForClick(multiplier)
     return 1 * multiplier
 end
 
-function CoinMath.upgradeCost(baseCost, currentLevel)
+-- The Collector: what one pickup is worth
+function GameMath.coinsPerPickup(petLevel)
+    return 1 + petLevel
+end
+
+-- shared: how prices climb
+function GameMath.upgradeCost(baseCost, currentLevel)
     return baseCost * (currentLevel + 1)
 end
 
-function CoinMath.passiveIncome(multiplier)
-    return multiplier * 1
-end
-
-return CoinMath
+return GameMath
 ```
 
-Every script that needs a price or a reward calls these functions — no duplicated formulas.
+Every script that needs a price or a reward calls these functions — no duplicated formulas. If the economy feels wrong, you change *one* file.
 
 <WriteCode
-  instruction="Finish the CoinMath module so require hands back the table of functions."
-  answer={["return CoinMath"]}
-  starterCode="local CoinMath = {}
+  instruction="Finish the GameMath module so require hands back the table of functions."
+  answer={["return GameMath"]}
+  starterCode="local GameMath = {}
 
-function CoinMath.rewardForClick(multiplier)
+function GameMath.rewardForClick(multiplier)
     return 1 * multiplier
 end
 
@@ -133,9 +153,9 @@ end
 
 <Step>
 
-## Step 3 — SaveSystem
+## Step 2 — SaveSystem
 
-The persistence layer, using your datastores knowledge — it saves *two* values as one table:
+The persistence layer, using your datastores knowledge. It saves *two* values as one table — and it's identical for both games, because both games track `Coins` and `Level`:
 
 ```luau
 local Players = game:GetService("Players")
@@ -143,9 +163,9 @@ local DataStoreService = game:GetService("DataStoreService")
 local Shared = game:GetService("ReplicatedStorage").Shared
 local GameConfig = require(Shared.GameConfig)
 
-local saveStore = DataStoreService:GetDataStore("CoinTycoonSaves")
+local saveStore = DataStoreService:GetDataStore("FinalProjectSaves")
 
-function createStats(player, coins, multiplier)
+function createStats(player, coins, level)
     local stats = Instance.new("Folder")
     stats.Name = "leaderstats"
     stats.Parent = player
@@ -155,24 +175,24 @@ function createStats(player, coins, multiplier)
     coinsValue.Value = coins
     coinsValue.Parent = stats
 
-    local multValue = Instance.new("NumberValue")
-    multValue.Name = GameConfig.multiplierKey
-    multValue.Value = multiplier
-    multValue.Parent = stats
+    local levelValue = Instance.new("NumberValue")
+    levelValue.Name = GameConfig.levelKey
+    levelValue.Value = level
+    levelValue.Parent = stats
 end
 
 Players.PlayerAdded:Connect(function(player)
     local data = saveStore:GetAsync(player.UserId)
     if data == nil then
-        data = { coins = 0, multiplier = 1 }
+        data = { coins = 0, level = 1 }
     end
-    createStats(player, data.coins, data.multiplier)
+    createStats(player, data.coins, data.level)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
     local coins = player.leaderstats[GameConfig.coinsKey].Value
-    local multiplier = player.leaderstats[GameConfig.multiplierKey].Value
-    saveStore:SetAsync(player.UserId, { coins = coins, multiplier = multiplier })
+    local level = player.leaderstats[GameConfig.levelKey].Value
+    saveStore:SetAsync(player.UserId, { coins = coins, level = level })
 end)
 ```
 
@@ -194,15 +214,17 @@ Load on join, save on leave, default for new players — the datastores lesson, 
 
 <Step>
 
-## Step 4 — Economy
+## Step 3 — Economy
 
-Clicks and purchases, both through remotes, both server-decided:
+Clicks or pickups and purchases, all through the server. Each handler is tiny: **verify, decide, apply, report.** All the noise lives in the modules.
+
+<Variant name="tycoon">
 
 ```luau
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage.Shared
 local GameConfig = require(Shared.GameConfig)
-local CoinMath = require(Shared.CoinMath)
+local GameMath = require(Shared.GameMath)
 
 local clickEvent = ReplicatedStorage.RemoteEvents.ClickCoin
 local buyEvent = ReplicatedStorage.RemoteEvents.BuyUpgrade
@@ -210,44 +232,103 @@ local buyEvent = ReplicatedStorage.RemoteEvents.BuyUpgrade
 function getStats(player)
     local stats = player.leaderstats
     if not stats then return nil, nil end
-    return stats[GameConfig.coinsKey], stats[GameConfig.multiplierKey]
+    return stats[GameConfig.coinsKey], stats[GameConfig.levelKey]
 end
 
 function pushUpdate(player)
-    local coins, multiplier = getStats(player)
-    if coins and multiplier then
-        clickEvent:FireClient(player, coins.Value, multiplier.Value)
+    local coins, level = getStats(player)
+    if coins and level then
+        clickEvent:FireClient(player, coins.Value, level.Value)
     end
 end
 
 clickEvent.OnServerEvent:Connect(function(player)
-    local coins, multiplier = getStats(player)
-    if coins and multiplier then
-        local reward = CoinMath.rewardForClick(multiplier.Value)
-        coins.Value = coins.Value + reward
-        pushUpdate(player)
-    end
+    local coins, level = getStats(player)
+    if not (coins and level) then return end
+    coins.Value = coins.Value + GameMath.rewardForClick(level.Value)
+    pushUpdate(player)
 end)
 
 buyEvent.OnServerEvent:Connect(function(player, upgradeId)
     if upgradeId ~= "multiplier" then return end
 
-    local coins, multiplier = getStats(player)
-    if not (coins and multiplier) then return end
+    local coins, level = getStats(player)
+    if not (coins and level) then return end
 
-    local nextLevel = multiplier.Value + 1
-    local cost = CoinMath.upgradeCost(GameConfig.upgradeBaseCost, multiplier.Value)
-
+    local cost = GameMath.upgradeCost(GameConfig.upgradeBaseCost, level.Value)
     if coins.Value >= cost then
         coins.Value = coins.Value - cost
-        multiplier.Value = nextLevel
+        level.Value = level.Value + 1
     end
 
     pushUpdate(player)
 end)
 ```
 
-Each handler is tiny: **verify, decide, apply, report.** All the noise lives in the modules.
+The click reports, the multiplier grows, the server owns the wallet.
+
+</Variant>
+
+<Variant name="collector">
+
+```luau
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Shared = ReplicatedStorage.Shared
+local GameConfig = require(Shared.GameConfig)
+local GameMath = require(Shared.GameMath)
+
+local buyEvent = ReplicatedStorage.RemoteEvents.BuyPet
+local updateEvent = ReplicatedStorage.RemoteEvents.UpdateCoins
+
+function getStats(player)
+    local stats = player.leaderstats
+    if not stats then return nil, nil end
+    return stats[GameConfig.coinsKey], stats[GameConfig.levelKey]
+end
+
+function grant(player, amount)
+    local coins, level = getStats(player)
+    if not (coins and level) then return end
+    coins.Value = coins.Value + amount
+    updateEvent:FireClient(player, coins.Value, level.Value)
+end
+
+for _, pickup in ipairs(workspace.Pickups:GetChildren()) do
+    pickup.Touched:Connect(function(other)
+        local character = other.Parent
+        local player = Players:GetPlayerFromCharacter(character)
+        if not player then return end
+
+        local coins, level = getStats(player)
+        if not (coins and level) then return end
+
+        pickup:Destroy()
+        grant(player, GameMath.coinsPerPickup(level.Value))
+    end)
+end
+
+buyEvent.OnServerEvent:Connect(function(player, petId)
+    if petId ~= "slime" then return end
+
+    local coins, level = getStats(player)
+    if not (coins and level) then return end
+
+    local cost = GameMath.upgradeCost(GameConfig.petBaseCost, level.Value)
+    if coins.Value >= cost then
+        coins.Value = coins.Value - cost
+        level.Value = level.Value + 1
+    end
+
+    updateEvent:FireClient(player, coins.Value, level.Value)
+end)
+```
+
+No remote needed for picking up a coin — the server owns physics too, so `Touched` fires where the truth lives. The pet purchase still goes through a remote.
+
+</Variant>
+
+<Variant name="tycoon">
 
 <FillBlank
   prompt="In the buy handler, the server refuses a purchase it doesn't recognize with the line: if upgradeId ~= ____ then return end"
@@ -255,13 +336,27 @@ Each handler is tiny: **verify, decide, apply, report.** All the noise lives in 
   explanation="The server rejects any upgradeId it doesn't understand — no free store."
 />
 
+</Variant>
+
+<Variant name="collector">
+
+<FillBlank
+  prompt="In the buy handler, the server refuses a purchase it doesn't recognize with the line: if petId ~= ____ then return end"
+  answer='"slime"'
+  explanation="The server rejects any petId it doesn't understand — no free store."
+/>
+
+</Variant>
+
 </Step>
 
 <Step>
 
-## Step 5 — ClientUI
+## Step 4 — ClientUI
 
-The whole client: build the UI, send clicks, send purchases, receive updates:
+The whole client: build the UI, send actions, receive updates.
+
+<Variant name="tycoon">
 
 ```luau
 local Players = game:GetService("Players")
@@ -312,7 +407,54 @@ end
 clickEvent.OnClientEvent:Connect(updateUI)
 ```
 
-The button label even prices the next upgrade — but notice it's only *display*. The real price check lives on the server. The UI can claim anything; the server's wallet is the truth.
+The button label even prices the next upgrade — but notice it's only *display*. The real price check lives on the server.
+
+</Variant>
+
+<Variant name="collector">
+
+```luau
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+local buyEvent = ReplicatedStorage.RemoteEvents.BuyPet
+local updateEvent = ReplicatedStorage.RemoteEvents.UpdateCoins
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+local coinsLabel = Instance.new("TextLabel")
+coinsLabel.Size = UDim2.new(1, 0, 0, 60)
+coinsLabel.Text = "Coins: 0"
+coinsLabel.TextSize = 30
+coinsLabel.BackgroundTransparency = 1
+coinsLabel.Parent = screenGui
+
+local buyButton = Instance.new("TextButton")
+buyButton.Size = UDim2.new(0, 240, 0, 60)
+buyButton.Position = UDim2.new(0.5, 0, 0.7, 0)
+buyButton.AnchorPoint = Vector2.new(0.5, 0.5)
+buyButton.Text = "Buy a slime (30 coins)"
+buyButton.Parent = screenGui
+
+buyButton.Activated:Connect(function()
+    buyEvent:FireServer("slime")
+end)
+
+local function updateUI(coins, pets)
+    coinsLabel.Text = "Coins: " .. coins
+    buyButton.Text = "Buy a slime (" .. 30 * (pets + 1) .. " coins)"
+end
+
+updateEvent.OnClientEvent:Connect(updateUI)
+```
+
+The coin grabs themselves happen with your feet — the UI just reports the server's totals.
+
+</Variant>
+
+<Variant name="tycoon">
 
 <WriteCode
   instruction="The client must send a purchase request when the buy button is clicked. Write the line inside the Activated callback."
@@ -323,13 +465,32 @@ end)"
   explanation="The button reports intent; the server prices and verifies it."
 />
 
+</Variant>
+
+<Variant name="collector">
+
+<WriteCode
+  instruction="The client must send a pet request when the buy button is clicked. Write the line inside the Activated callback."
+  answer={["buyEvent:FireServer(\"slime\")"]}
+  starterCode="buyButton.Activated:Connect(function()
+    -- request the purchase
+end)"
+  explanation="The button reports intent; the server prices and verifies it."
+/>
+
+</Variant>
+
 </Step>
 
 <Step>
 
-## Step 6 — polish
+## Step 5 — polish
 
-A game you just assembled still feels flat. Add feel with a tween — a button that pops on every click:
+A game you just assembled still feels flat. Add feel with a tween — something that responds the instant the player does something.
+
+<Variant name="tycoon">
+
+A button that pops on every click is the difference between "a screen" and "a game":
 
 ```luau
 coinButton.Activated:Connect(function()
@@ -347,10 +508,39 @@ coinButton.Activated:Connect(function()
 end)
 ```
 
-A button that pops on every click is the difference between "a screen" and "a game."
+</Variant>
+
+<Variant name="collector">
+
+A coin counter that pops every time a coin lands is the difference between "a HUD" and "a game":
+
+```luau
+local TweenService = game:GetService("TweenService")
+
+local function popLabel()
+    local pop = TweenService:Create(coinsLabel, TweenInfo.new(0.1), {
+        TextSize = 36,
+    })
+    pop:Play()
+    pop.Completed:Wait()
+    TweenService:Create(coinsLabel, TweenInfo.new(0.1), {
+        TextSize = 30,
+    }):Play()
+end
+
+local function updateUI(coins, pets)
+    coinsLabel.Text = "Coins: " .. coins
+    buyButton.Text = "Buy a slime (" .. 30 * (pets + 1) .. " coins)"
+    popLabel()
+end
+
+updateEvent.OnClientEvent:Connect(updateUI)
+```
+
+</Variant>
 
 <Mcq
-  question="Why does the polish step tween the button on the client?"
+  question="Why does the polish step tween on the client?"
   options={[
     "The server requires it",
     "Feel-effects are per-player and client-side",
@@ -367,18 +557,31 @@ A button that pops on every click is the difference between "a screen" and "a ga
 
 ## Playtest and ship
 
-Run this as your final test — the exact loop every game must pass:
+Run this as your final test — the exact loop every game must pass: **earn, spend, verify, save, reload.**
+
+<Variant name="tycoon">
 
 1. **Earn:** click until you have 30 coins. Multiplier starts at x1.
 2. **Spend:** buy the first upgrade. Coins drop by 25, multiplier becomes x2.
 3. **Verify:** clicks now pay 2.
 4. **Save:** stop the game.
 5. **Reload:** play again. Coins *and* multiplier are back.
-6. **Recover:** if anything didn't survive, debug in this order: `GetAsync` default → `PlayerRemoving` save → table key names match → Studio data store access enabled.
 
-**The course is complete when step 5 shows your exact coins and multiplier.**
+</Variant>
 
-- **Stretch goals** — an auto-income loop using `CoinMath.passiveIncome`, a "power click" upgrade, a coin tween that flies to the corner, a third NumberValue for the leaderboard. Every one is a variation of the pipeline you've mastered.
+<Variant name="collector">
+
+1. **Earn:** walk into coins until you have 40. Level starts at 1 pet.
+2. **Spend:** buy a slime for 30. Level becomes 2.
+3. **Verify:** each pickup now pays 2.
+4. **Save:** stop the game.
+5. **Reload:** play again. Coins *and* pets are back.
+
+</Variant>
+
+**The course is complete when step 5 shows your exact coins and level.**
+
+- **Stretch goals** — in Coin Tycoon, an auto-income loop using `GameMath.rewardForClick`; in The Collector, different pets with different costs; in both, a "power" boost, a coin tween that flies to the corner, a third NumberValue for the leaderboard. Every one is a variation of the pipeline you've mastered.
 
 - **Common mistakes, final edition** — skipping modules (the split *is* the debuggability); renaming a stat and missing the saves; testing saves without Studio access enabled; letting the client label decide anything (it's a mirror, not a bank).
 

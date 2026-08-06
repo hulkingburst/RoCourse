@@ -5,10 +5,12 @@ import { Prediction } from "@/components/lessons/prediction";
 import { Solution } from "@/components/lessons/solution";
 import { Step } from "@/components/lessons/step";
 import { ArrangeCode } from "@/components/activities/arrange-code";
+import { ChooseBuild } from "@/components/activities/choose-build";
 import { FillBlank } from "@/components/activities/fill-blank";
 import { FixBug } from "@/components/activities/fix-bug";
 import { Mcq } from "@/components/activities/mcq";
 import { PredictOutput } from "@/components/activities/predict-output";
+import { Variant } from "@/components/activities/variant";
 import { WriteCode } from "@/components/activities/write-code";
 import {
   Callout,
@@ -49,4 +51,6 @@ export const mdxComponents: MDXComponents = {
   PredictOutput,
   FixBug,
   ArrangeCode,
+  ChooseBuild,
+  Variant,
 };

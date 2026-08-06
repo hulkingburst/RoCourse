@@ -23,6 +23,7 @@ const ACTIVITY_TAGS = [
   "FixBug",
   "ArrangeCode",
   "Mcq",
+  "ChooseBuild",
 ];
 
 const ACTIVITY_TAG_RE = new RegExp(`<(${ACTIVITY_TAGS.join("|")})\\b`);

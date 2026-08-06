@@ -22,6 +22,11 @@ export interface LessonRecord {
   activitiesAttempted: number;
 }
 
+/** Which final-project game the learner chose to build as their capstone. */
+export type FinishedPath = "tycoon" | "collector";
+
+export const FINISHED_PATHS: FinishedPath[] = ["tycoon", "collector"];
+
 interface ProgressState {
   /** hydrated flag: prevents SSR/client mismatch on first render */
   hydrated: boolean;
@@ -29,6 +34,8 @@ interface ProgressState {
   bookmarks: string[];
   recentlyViewed: string[];
   lastLesson: string | null;
+  /** The learner's chosen final-project path, null until they pick one. */
+  finishedPath: FinishedPath | null;
 
   setHydrated: (value: boolean) => void;
   markLessonComplete: (slug: string) => void;
@@ -38,6 +45,7 @@ interface ProgressState {
   recordQuizResult: (slug: string, correct: boolean) => void;
   recordChallengeResult: (slug: string, solved: boolean) => void;
   recordActivityResult: (slug: string, correct: boolean) => void;
+  setFinishedPath: (path: FinishedPath | null) => void;
   resetProgress: () => void;
 }
 
@@ -64,6 +72,7 @@ export const useProgressStore = create<ProgressState>()(
       bookmarks: [],
       recentlyViewed: [],
       lastLesson: null,
+      finishedPath: null,
 
       setHydrated: (value) => set({ hydrated: value }),
 
@@ -165,6 +174,8 @@ export const useProgressStore = create<ProgressState>()(
           };
         }),
 
+      setFinishedPath: (finishedPath) => set({ finishedPath }),
+
       resetProgress: () =>
         set({
           lessons: {},
@@ -181,6 +192,7 @@ export const useProgressStore = create<ProgressState>()(
         bookmarks: state.bookmarks,
         recentlyViewed: state.recentlyViewed,
         lastLesson: state.lastLesson,
+        finishedPath: state.finishedPath,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

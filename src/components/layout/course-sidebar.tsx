@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Bookmark,
   CheckCircle2,
   ChevronDown,
   Circle,
+  Gamepad2,
   LockKeyhole,
   PlayCircle,
   RotateCcw,
@@ -122,11 +123,15 @@ function SidebarSection({
 
 export function SidebarNav({ sections }: { sections: CourseSection[] }) {
   const pathname = usePathname();
+  const router = useRouter();
   const hydrated = useProgressStore((state) => state.hydrated);
   const lessonsRecord = useProgressStore((state) => state.lessons);
   const bookmarks = useProgressStore((state) => state.bookmarks);
   const lastLesson = useProgressStore((state) => state.lastLesson);
+  const finishedPath = useProgressStore((state) => state.finishedPath);
   const resetProgress = useProgressStore((state) => state.resetProgress);
+  const setFinishedPath = useProgressStore((state) => state.setFinishedPath);
+  const toggleLessonComplete = useProgressStore((state) => state.toggleLessonComplete);
 
   const currentSlug = pathname?.startsWith("/lessons/")
     ? pathname.split("/")[2] ?? null
@@ -156,6 +161,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
     if (window.confirm("Reset all progress? This cannot be undone.")) {
       resetProgress();
     }
+  };
+
+  const handleSwitchProject = () => {
+    const state = useProgressStore.getState();
+    if (isLessonComplete(state.lessons, "final-project")) {
+      toggleLessonComplete("final-project");
+    }
+    if (state.finishedPath != null) {
+      setFinishedPath(null);
+    }
+    router.push("/lessons/final-project");
   };
 
   return (
@@ -231,15 +247,28 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
       </div>
 
       <div className="border-t px-4 py-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start text-muted-foreground"
-          onClick={handleReset}
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-          Reset progress
-        </Button>
+        <div className="space-y-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-muted-foreground"
+            onClick={handleSwitchProject}
+          >
+            <Gamepad2 className="h-3.5 w-3.5" />
+            {finishedPath
+              ? `Switch final project (${finishedPath === "tycoon" ? "Coin Tycoon" : "The Collector"})`
+              : "Choose final project"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-muted-foreground"
+            onClick={handleReset}
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            Reset progress
+          </Button>
+        </div>
       </div>
     </div>
   );

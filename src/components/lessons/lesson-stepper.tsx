@@ -16,7 +16,6 @@ import { StepCompletion } from "@/components/lessons/step-completion";
 interface StepMeta {
   hasActivity: boolean;
 }
-
 interface LessonStepperProps {
   title: string;
   description: string;
@@ -53,6 +52,7 @@ export function LessonStepper({
   const recordActivityResult = useProgressStore((state) => state.recordActivityResult);
   const markLessonComplete = useProgressStore((state) => state.markLessonComplete);
   const toggleBookmark = useProgressStore((state) => state.toggleBookmark);
+  const finishedPath = useProgressStore((state) => state.finishedPath);
 
   const mounted = React.useSyncExternalStore(
     () => () => {},
@@ -106,13 +106,27 @@ export function LessonStepper({
 
   const back = () => goTo(active - 1);
 
-  const replay = () => {
+  const replay = React.useCallback(() => {
     setActive(0);
     setMaxActive(0);
     setSolvedSteps({});
     setPhase("steps");
     topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  }, []);
+
+  /**
+   * When the learner switches their final-project build (finishedPath goes
+   * from a value back to null), restart the lesson from the choose step so the
+   * new build is tackled fresh.
+   */
+  const prevFinishedPath = React.useRef(finishedPath);
+  React.useEffect(() => {
+    const prev = prevFinishedPath.current;
+    prevFinishedPath.current = finishedPath;
+    if (prev != null && finishedPath == null) {
+      replay();
+    }
+  }, [finishedPath, replay]);
 
   const contextValue = React.useMemo<React.ComponentProps<typeof StepperContext.Provider>["value"]>(
     () => ({
