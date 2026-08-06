@@ -123,19 +123,9 @@ npx prisma migrate dev
 | `DATABASE_URL_UNPOOLED` | Migrations | Direct connection when `DATABASE_URL` uses a pooler (Neon `-pooler`) |
 | `AUTH_SECRET` | Auth.js sessions | Used to sign JWT session tokens |
 | `AUTH_TRUST_HOST` | Hosted deployments | Set `true` on Vercel/Netlify |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | "Sign in with Google" | Optional — omit to disable |
-| `GITHUB_ID` / `GITHUB_SECRET` | "Sign in with GitHub" | Optional — omit to disable |
-| `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` | "Sign in with Discord" | Optional — omit to disable |
 
 Everything else (lessons, activities, search, static pages) ignores these
-variables, and `next build` succeeds without them. OAuth sign-in buttons only
-appear for providers you configure.
-
-**OAuth setup:** create an app in each provider's developer console and add the
-callback URL `https://<your-site>/api/auth/callback/{provider}` (e.g.
-`.../api/auth/callback/google`; for local dev, `http://localhost:3000/api/auth/callback/google`).
-A provider email matching an existing email+password account adopts that account,
-so signing in with Google later keeps the same progress.
+variables, and `next build` succeeds without them.
 
 ## Deploying
 
