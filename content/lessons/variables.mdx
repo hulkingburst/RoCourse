@@ -123,7 +123,12 @@ Put the lines in the order they should run:
     "coins = coins + 1",
     "print(coins)",
   ]}
-  explanation="First create the box, then count a coin, then look inside."
+  distractors={[
+    "coins = 0",
+    "print coins",
+    "coins == 0",
+  ]}
+  explanation="First create the box, then count a coin, then look inside. The imposter lines use the wrong assignment or a missing local."
 />
 
 </Step>

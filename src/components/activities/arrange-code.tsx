@@ -16,11 +16,15 @@ import type { ActivityStatus } from "@/components/activities/activity-shell";
 interface ArrangeCodeProps {
   /** The lines in the correct order (top to bottom). They are shown shuffled. */
   lines: string[];
+  /** Wrong tokens mixed into the pool — the learner must leave them out. */
+  distractors?: string[];
   instruction?: string;
   explanation?: string;
   label?: string;
   alreadySolved?: boolean;
 }
+
+type Token = { kind: "line" | "distractor"; id: number };
 
 function shuffle<T>(input: T[]): T[] {
   const array = [...input];
@@ -31,13 +35,30 @@ function shuffle<T>(input: T[]): T[] {
   return array;
 }
 
+function buildPool(lineCount: number, distractorCount: number): Token[] {
+  const tokens: Token[] = [
+    ...Array.from({ length: lineCount }, (_, id) => ({ kind: "line" as const, id })),
+    ...Array.from({ length: distractorCount }, (_, id) => ({
+      kind: "distractor" as const,
+      id,
+    })),
+  ];
+  return shuffle(tokens);
+}
+
+function tokenText(token: Token, lines: string[], distractors: string[]): string {
+  return token.kind === "line" ? lines[token.id] : distractors[token.id];
+}
+
 /**
- * Arrange the code. Shuffled lines are tapped in the order they should run;
- * the learner then checks the sequence.
+ * Arrange the code. Shuffled tokens (correct lines plus any distractors) are
+ * tapped in the order they should run; the learner must use exactly the right
+ * lines and leave the wrong ones out.
  */
 export function ArrangeCode({
   lines,
-  instruction = "Tap the lines in the order they should run.",
+  distractors = [],
+  instruction,
   explanation,
   label = "Arrange the code",
   alreadySolved = false,
@@ -52,34 +73,38 @@ export function ArrangeCode({
     () => true,
     () => false
   );
-  const [pool, setPool] = React.useState<number[]>(() =>
-    shuffle(lines.map((_, index) => index))
+  const [pool, setPool] = React.useState<Token[]>(() =>
+    buildPool(lines.length, distractors.length)
   );
-  const [order, setOrder] = React.useState<number[]>([]);
+  const [order, setOrder] = React.useState<Token[]>([]);
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
   );
 
   const correct = status === "correct";
 
-  const takeLine = (index: number) => {
+  const takeToken = (poolIndex: number) => {
     if (correct) return;
-    setPool((current) => current.filter((i) => i !== index));
-    setOrder((current) => [...current, index]);
+    const token = pool[poolIndex];
+    if (!token) return;
+    setPool((current) => current.filter((_, i) => i !== poolIndex));
+    setOrder((current) => [...current, token]);
   };
 
-  const removeLine = (position: number) => {
+  const removeToken = (position: number) => {
     if (correct) return;
-    const index = order[position];
-    if (index === undefined) return;
+    const token = order[position];
+    if (!token) return;
     setOrder((current) => current.filter((_, p) => p !== position));
-    setPool((current) => [...current, index]);
+    setPool((current) => [...current, token]);
   };
 
   const check = () => {
     const isRight =
       order.length === lines.length &&
-      order.every((lineIndex, position) => lineIndex === position);
+      order.every(
+        (token, position) => token.kind === "line" && token.id === position
+      );
     setStatus(isRight ? "correct" : "wrong");
     onResult(isRight);
     recordActivityResult(slug, isRight);
@@ -87,7 +112,7 @@ export function ArrangeCode({
 
   const reset = () => {
     setOrder([]);
-    setPool(shuffle(lines.map((_, index) => index)));
+    setPool(buildPool(lines.length, distractors.length));
     setStatus("idle");
   };
 
@@ -99,9 +124,15 @@ export function ArrangeCode({
     );
   }
 
+  const instructionText =
+    instruction ??
+    (distractors.length > 0
+      ? "Tap the correct lines in the order they should run — leave the wrong ones out."
+      : "Tap the lines in the order they should run.");
+
   return (
     <ActivityCard label={label} icon={ListOrdered} status={correct ? "correct" : status}>
-      <p className="font-medium">{instruction}</p>
+      <p className="font-medium">{instructionText}</p>
 
       <ol className="mt-4 space-y-1.5">
         {order.length === 0 && (
@@ -109,19 +140,21 @@ export function ArrangeCode({
             {correct ? "All lines arranged." : "Your order will appear here."}
           </li>
         )}
-        {order.map((lineIndex, position) => (
+        {order.map((token, position) => (
           <li
-            key={`${lineIndex}-${position}`}
+            key={`${token.kind}-${token.id}-${position}`}
             className="flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 font-mono text-[13.5px]"
           >
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/15 text-xs font-bold text-primary">
               {position + 1}
             </span>
-            <code className="min-w-0 flex-1 leading-relaxed">{lines[lineIndex]}</code>
+            <code className="min-w-0 flex-1 leading-relaxed">
+              {tokenText(token, lines, distractors)}
+            </code>
             {!correct && (
               <button
                 type="button"
-                onClick={() => removeLine(position)}
+                onClick={() => removeToken(position)}
                 aria-label="Remove line"
                 className="shrink-0 rounded px-1.5 text-muted-foreground transition-colors hover:text-destructive"
               >
@@ -133,18 +166,18 @@ export function ArrangeCode({
       </ol>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {pool.map((lineIndex) => (
+        {pool.map((token, poolIndex) => (
           <button
-            key={lineIndex}
+            key={`${token.kind}-${token.id}`}
             type="button"
-            onClick={() => takeLine(lineIndex)}
+            onClick={() => takeToken(poolIndex)}
             disabled={correct}
             className={cn(
               "rounded-lg border px-3 py-1.5 font-mono text-[13.5px] transition-colors",
               "cursor-pointer hover:border-primary/50 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             )}
           >
-            {lines[lineIndex]}
+            {tokenText(token, lines, distractors)}
           </button>
         ))}
       </div>
@@ -155,7 +188,11 @@ export function ArrangeCode({
         onReset={status === "wrong" || order.length > 0 ? reset : undefined}
         checkLabel="Check order"
       />
-      <Feedback status={status} explanation={explanation} />
+      <Feedback
+        status={status}
+        explanation={explanation}
+        correctAnswer={!correct ? lines.join("\n") : undefined}
+      />
     </ActivityCard>
   );
 }

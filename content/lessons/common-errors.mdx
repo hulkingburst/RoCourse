@@ -66,6 +66,24 @@ The error names the exact line. Go read that line, name the nil thing, and pick 
 
 <Step>
 
+## Syntax slips — type the fix
+
+The fastest bugs are the ones you typed without noticing: a missing `local`, a single `=` where you meant `==`, a string where you meant a number. Luau is forgiving about layout, but strict about the words.
+
+<FixBug
+  instruction="Type the fixed line."
+  fix="local coins = 0"
+  explanation="local declares the variable, coins is the name, and 0 is the number value — not a string."
+>
+```luau
+Local=coins "0"
+```
+</FixBug>
+
+</Step>
+
+<Step>
+
 ## String arithmetic and wrong-side changes
 
 `attempt to perform arithmetic on a string` means a number landed where a string sat — usually player input straight from a TextBox. Fix: `tonumber()`.
