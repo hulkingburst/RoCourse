@@ -2,6 +2,22 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import {
+  clearAttempts,
+  clientIp,
+  isRateLimited,
+  LOGIN_MAX_FAILURES,
+  pruneAttempts,
+  recordAttempt,
+} from "@/lib/auth-limiter";
+
+/**
+ * Precomputed cost-12 bcrypt hash used to equalize response timing for unknown
+ * emails. Without this, a missing account returns instantly while an existing
+ * one waits ~300ms for the compare — a usable email-enumeration oracle.
+ */
+const DUMMY_HASH =
+  "$2b$12$4ZfVaQj0KDbj2o2Cw1GPZOB9JD3SVEEeA0kegsd9fqdfVrC4KhWFC";
 
 /**
  * Auth.js (next-auth v5) configuration.
@@ -24,18 +40,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         const email = credentials?.email as string | undefined;
         const password = credentials?.password as string | undefined;
         if (!email || !password) return null;
 
         const normalized = email.trim().toLowerCase();
+        const key = `${normalized}|${clientIp(request)}`;
+
+        // Brute-force / credential-stuffing protection (per account + IP).
+        if (await isRateLimited(key, LOGIN_MAX_FAILURES)) return null;
+
         const user = await prisma.user.findUnique({ where: { email: normalized } });
-        if (!user) return null;
+
+        if (!user) {
+          // Equalize timing so the endpoint can't enumerate registered emails.
+          await compare(password, DUMMY_HASH);
+          await recordAttempt(key);
+          await pruneAttempts();
+          return null;
+        }
 
         const valid = await compare(password, user.passwordHash);
-        if (!valid) return null;
+        if (!valid) {
+          await recordAttempt(key);
+          await pruneAttempts();
+          return null;
+        }
 
+        await clearAttempts(key);
         return { id: user.id, email: user.email, name: user.name };
       },
     }),

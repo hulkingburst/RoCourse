@@ -1,7 +1,14 @@
 "use server";
 
+import { headers } from "next/headers";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import {
+  isRateLimited,
+  pruneAttempts,
+  recordAttempt,
+  SIGNUP_MAX_ATTEMPTS,
+} from "@/lib/auth-limiter";
 
 export interface CreateAccountResult {
   error?: string;
@@ -21,6 +28,18 @@ export async function createAccount(
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
+
+  // Rate-limit sign-ups per IP before doing any bcrypt work, so the endpoint
+  // can't be used to exhaust CPU with cost-12 hashes or to spam accounts.
+  const headerList = await headers();
+  const forwarded = headerList.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() ?? headerList.get("x-real-ip") ?? "unknown";
+  const key = `signup:${ip}`;
+  if (await isRateLimited(key, SIGNUP_MAX_ATTEMPTS)) {
+    return { error: "Too many sign-up attempts. Please try again later." };
+  }
+  await recordAttempt(key);
+  await pruneAttempts();
 
   if (!name || !email || !password) {
     return { error: "All fields are required." };

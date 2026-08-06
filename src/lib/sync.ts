@@ -1,5 +1,6 @@
 "use client";
 
+import type { FinishedPath, LessonRecord } from "@/lib/progress-store";
 import { useProgressStore } from "@/lib/progress-store";
 import { CONFLICT_TOLERANCE_MS } from "@/lib/sync-types";
 import type {
@@ -56,14 +57,83 @@ export function applySnapshot(
   snapshot: ProgressSnapshot,
   lastUpdated?: string | null
 ): void {
+  const clean = sanitizeSnapshot(snapshot);
   useProgressStore.setState({
-    lessons: snapshot.lessons,
-    bookmarks: snapshot.bookmarks,
-    recentlyViewed: snapshot.recentlyViewed,
-    lastLesson: snapshot.lastLesson,
-    finishedPath: snapshot.finishedPath,
-    lastUpdated: lastUpdated ?? snapshot.lastUpdated,
+    lessons: clean.lessons,
+    bookmarks: clean.bookmarks,
+    recentlyViewed: clean.recentlyViewed,
+    lastLesson: clean.lastLesson,
+    finishedPath: clean.finishedPath,
+    lastUpdated: lastUpdated ?? clean.lastUpdated,
   });
+}
+
+/**
+ * Coerces an untrusted progress object (e.g. stored cloud data) into a safe
+ * snapshot. Fields that are missing, wrong-typed, or out of range fall back to
+ * defaults so a malformed record can never crash a page or poison the store.
+ */
+export function sanitizeSnapshot(
+  snapshot: Partial<ProgressSnapshot> | null | undefined
+): ProgressSnapshot {
+  const rawLessons =
+    snapshot?.lessons &&
+    typeof snapshot.lessons === "object" &&
+    !Array.isArray(snapshot.lessons)
+      ? snapshot.lessons
+      : {};
+
+  const lessons: Record<string, LessonRecord> = {};
+  for (const [slug, record] of Object.entries(rawLessons)) {
+    lessons[slug] = sanitizeLessonRecord(record);
+  }
+
+  return {
+    lessons,
+    bookmarks: sanitizeStringArray(snapshot?.bookmarks),
+    recentlyViewed: sanitizeStringArray(snapshot?.recentlyViewed),
+    lastLesson:
+      typeof snapshot?.lastLesson === "string" ? snapshot.lastLesson : null,
+    finishedPath: sanitizeFinishedPath(snapshot?.finishedPath),
+    lastUpdated:
+      typeof snapshot?.lastUpdated === "string" ? snapshot.lastUpdated : null,
+  };
+}
+
+function sanitizeLessonRecord(record: unknown): LessonRecord {
+  const raw =
+    record && typeof record === "object"
+      ? (record as Record<string, unknown>)
+      : {};
+  const num = (value: unknown, fallback = 0): number =>
+    typeof value === "number" && Number.isFinite(value) && value >= 0
+      ? Math.floor(value)
+      : fallback;
+  const strOrNull = (value: unknown): string | null =>
+    typeof value === "string" ? value : null;
+
+  return {
+    completedAt: strOrNull(raw.completedAt),
+    lastVisitedAt:
+      typeof raw.lastVisitedAt === "string"
+        ? raw.lastVisitedAt
+        : new Date(0).toISOString(),
+    quizCorrect: num(raw.quizCorrect),
+    quizAttempted: num(raw.quizAttempted),
+    challengesSolved: num(raw.challengesSolved),
+    challengesAttempted: num(raw.challengesAttempted),
+    activitiesSolved: num(raw.activitiesSolved),
+    activitiesAttempted: num(raw.activitiesAttempted),
+  };
+}
+
+function sanitizeStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === "string");
+}
+
+function sanitizeFinishedPath(value: unknown): FinishedPath | null {
+  return value === "tycoon" || value === "collector" ? value : null;
 }
 
 export async function pullCloud(): Promise<CloudState | null> {
