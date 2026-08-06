@@ -1,12 +1,13 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { getProviders, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import { createAccount } from "@/lib/auth-actions";
 import { useAuthUiStore } from "@/lib/auth-ui";
 import { Button } from "@/components/ui/button";
+import { DiscordIcon, GitHubIcon, GoogleIcon } from "@/components/auth/provider-icons";
 import {
   Dialog,
   DialogContent,
@@ -18,11 +19,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 
+const OAUTH_PROVIDER_IDS = ["google", "github", "discord"] as const;
+const OAUTH_ICONS: Record<(typeof OAUTH_PROVIDER_IDS)[number], React.ComponentType<{ className?: string }>> = {
+  google: GoogleIcon,
+  github: GitHubIcon,
+  discord: DiscordIcon,
+};
+
 export function AuthDialog() {
   const { open, mode, closeDialog } = useAuthUiStore();
   const router = useRouter();
   const [error, setError] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [oauthButtons, setOauthButtons] = React.useState<{ id: string; name: string }[]>([]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void getProviders().then((providers) => {
+      if (cancelled || !providers) return;
+      setOauthButtons(
+        OAUTH_PROVIDER_IDS.filter((id) => providers[id]).map((id) => ({
+          id,
+          name: providers[id].name,
+        })),
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const reset = () => {
     setError(null);
@@ -90,6 +115,33 @@ export function AuthDialog() {
             across devices — everything else works the same with or without one.
           </DialogDescription>
         </DialogHeader>
+
+        {oauthButtons.length > 0 ? (
+          <div className="space-y-2">
+            {oauthButtons.map((button) => {
+              const Icon = OAUTH_ICONS[button.id as (typeof OAUTH_PROVIDER_IDS)[number]];
+              return (
+                <Button
+                  key={button.id}
+                  type="button"
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={() => signIn(button.id)}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  Continue with {button.name}
+                </Button>
+              );
+            })}
+            <div className="flex items-center gap-3 py-1">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">
+                or continue with email
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          </div>
+        ) : null}
 
         {isSignup ? (
           <form onSubmit={handleSignup} className="space-y-4">

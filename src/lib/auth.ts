@@ -1,5 +1,8 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Discord from "next-auth/providers/discord";
+import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import {
@@ -20,20 +23,88 @@ const DUMMY_HASH =
   "$2b$12$4ZfVaQj0KDbj2o2Cw1GPZOB9JD3SVEEeA0kegsd9fqdfVrC4KhWFC";
 
 /**
+ * Finds or creates the User row backing an OAuth sign-in. Auth.js runs without
+ * a database adapter here (JWT sessions only), so the provider profile is not
+ * persisted automatically — this links it to our `User` table by email.
+ *
+ * A verified provider email matching an existing credentials account adopts
+ * that account (so Google sign-in "just works" for someone who already signed
+ * up with email+password). Returns null when the provider gives no email.
+ */
+async function resolveOauthUser(profile: {
+  email?: string | null;
+  name?: string | null;
+  image?: string | null;
+}) {
+  const email = profile.email?.trim().toLowerCase();
+  if (!email) return null;
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) return existing;
+
+  const data = {
+    email,
+    name: profile.name?.trim().slice(0, 40) || email.split("@")[0],
+    passwordHash: null,
+    image: profile.image ?? null,
+  };
+
+  try {
+    return await prisma.user.create({ data });
+  } catch (error) {
+    // Two simultaneous sign-ins for a brand-new email can race on the unique
+    // constraint — treat the loser as an already-existing user.
+    if ((error as { code?: string }).code === "P2002") {
+      return prisma.user.findUnique({ where: { email } });
+    }
+    throw error;
+  }
+}
+
+/**
+ * OAuth providers are only enabled when their credentials are configured, so
+ * local dev and deployments without them keep working (email+password only).
+ * Create apps and register the callback URL `<site>/api/auth/callback/{provider}`
+ * (e.g. https://yoursite.vercel.app/api/auth/callback/google).
+ */
+const oauthProviders = [
+  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+    ? Google({
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      })
+    : null,
+  process.env.GITHUB_ID && process.env.GITHUB_SECRET
+    ? GitHub({
+        clientId: process.env.GITHUB_ID,
+        clientSecret: process.env.GITHUB_SECRET,
+      })
+    : null,
+  process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET
+    ? Discord({
+        clientId: process.env.DISCORD_CLIENT_ID,
+        clientSecret: process.env.DISCORD_CLIENT_SECRET,
+      })
+    : null,
+].filter((provider): provider is NonNullable<typeof provider> => provider != null);
+
+/**
  * Auth.js (next-auth v5) configuration.
  *
- * Credentials-only, JWT sessions — no OAuth, no adapter tables. Sign-in
- * records and sessions live in the DB; everything else is JWT.
+ * Email+password plus optional OAuth (Google, GitHub, Discord). JWT sessions,
+ * no adapter tables — OAuth identities are resolved into `User` rows by email.
+ * Sign-in rate limiting covers the credentials provider only.
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
-  // Required for credentials sign-in on hosted platforms (Vercel). We only use
-  // our own host and credentials (no OAuth redirect flows), so this is safe.
+  // Required for sign-in on hosted platforms (Vercel). We only ever sign in to
+  // our own host via credentials or configured OAuth redirects, so this is safe.
   trustHost: true,
   pages: {
     signIn: "/",
   },
   providers: [
+    ...oauthProviders,
     Credentials({
       name: "Email and password",
       credentials: {
@@ -61,7 +132,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const valid = await compare(password, user.passwordHash);
+        // OAuth-only accounts have no password — credentials sign-in must fail
+        // for them (they authenticate through their provider instead).
+        const valid = user.passwordHash && (await compare(password, user.passwordHash));
         if (!valid) {
           await recordAttempt(key);
           await pruneAttempts();
@@ -74,8 +147,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
+    async signIn({ account, user }) {
+      // Credentials users are already validated by `authorize`. OAuth sign-ins
+      // without an email can't be linked to a progress profile, so reject them.
+      if (account?.type === "oauth") return Boolean(user.email);
+      return true;
+    },
+    async jwt({ token, user, account }) {
+      if (user) {
+        if (account?.provider === "credentials") {
+          // `user.id` is already our DB id (returned by `authorize`).
+          token.id = user.id;
+        } else {
+          // OAuth: `user.id` is the provider's id — resolve to our DB user.
+          const dbUser = await resolveOauthUser(user);
+          token.id = dbUser?.id;
+        }
+      }
       return token;
     },
     async session({ session, token }) {
