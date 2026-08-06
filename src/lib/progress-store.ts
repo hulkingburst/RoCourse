@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import type { ProgressSnapshot } from "@/lib/sync-types";
 
 /**
  * Per-lesson progress record.
@@ -27,6 +28,8 @@ export type FinishedPath = "tycoon" | "collector";
 
 export const FINISHED_PATHS: FinishedPath[] = ["tycoon", "collector"];
 
+const nowIso = () => new Date().toISOString();
+
 interface ProgressState {
   /** hydrated flag: prevents SSR/client mismatch on first render */
   hydrated: boolean;
@@ -36,6 +39,11 @@ interface ProgressState {
   lastLesson: string | null;
   /** The learner's chosen final-project path, null until they pick one. */
   finishedPath: FinishedPath | null;
+  /**
+   * ISO timestamp of the last local mutation. Drives cloud conflict
+   * resolution: whichever side (device or cloud) is newest wins.
+   */
+  lastUpdated: string | null;
 
   setHydrated: (value: boolean) => void;
   markLessonComplete: (slug: string) => void;
@@ -46,6 +54,7 @@ interface ProgressState {
   recordChallengeResult: (slug: string, solved: boolean) => void;
   recordActivityResult: (slug: string, correct: boolean) => void;
   setFinishedPath: (path: FinishedPath | null) => void;
+  restoreProgress: (snapshot: ProgressSnapshot) => void;
   resetProgress: () => void;
 }
 
@@ -66,13 +75,14 @@ function ensureRecord(lessons: ProgressState["lessons"], slug: string): LessonRe
 
 export const useProgressStore = create<ProgressState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       hydrated: false,
       lessons: {},
       bookmarks: [],
       recentlyViewed: [],
       lastLesson: null,
       finishedPath: null,
+      lastUpdated: null,
 
       setHydrated: (value) => set({ hydrated: value }),
 
@@ -87,6 +97,7 @@ export const useProgressStore = create<ProgressState>()(
                 completedAt: existing.completedAt ?? new Date().toISOString(),
               },
             },
+            lastUpdated: nowIso(),
           };
         }),
 
@@ -103,6 +114,7 @@ export const useProgressStore = create<ProgressState>()(
                   : new Date().toISOString(),
               },
             },
+            lastUpdated: nowIso(),
           };
         }),
 
@@ -119,6 +131,7 @@ export const useProgressStore = create<ProgressState>()(
               ...state.recentlyViewed.filter((s) => s !== slug),
             ].slice(0, 20),
             lastLesson: slug,
+            lastUpdated: nowIso(),
           };
         }),
 
@@ -127,6 +140,7 @@ export const useProgressStore = create<ProgressState>()(
           bookmarks: state.bookmarks.includes(slug)
             ? state.bookmarks.filter((s) => s !== slug)
             : [...state.bookmarks, slug],
+          lastUpdated: nowIso(),
         })),
 
       recordQuizResult: (slug, correct) =>
@@ -141,6 +155,7 @@ export const useProgressStore = create<ProgressState>()(
                 quizCorrect: existing.quizCorrect + (correct ? 1 : 0),
               },
             },
+            lastUpdated: nowIso(),
           };
         }),
 
@@ -156,6 +171,7 @@ export const useProgressStore = create<ProgressState>()(
                 challengesSolved: existing.challengesSolved + (solved ? 1 : 0),
               },
             },
+            lastUpdated: nowIso(),
           };
         }),
 
@@ -171,10 +187,13 @@ export const useProgressStore = create<ProgressState>()(
                 activitiesSolved: existing.activitiesSolved + (correct ? 1 : 0),
               },
             },
+            lastUpdated: nowIso(),
           };
         }),
 
-      setFinishedPath: (finishedPath) => set({ finishedPath }),
+      setFinishedPath: (finishedPath) => set({ finishedPath, lastUpdated: nowIso() }),
+
+      restoreProgress: (snapshot) => set({ ...snapshot }),
 
       resetProgress: () =>
         set({
@@ -182,6 +201,8 @@ export const useProgressStore = create<ProgressState>()(
           bookmarks: [],
           recentlyViewed: [],
           lastLesson: null,
+          finishedPath: null,
+          lastUpdated: null,
         }),
     }),
     {
@@ -193,6 +214,7 @@ export const useProgressStore = create<ProgressState>()(
         recentlyViewed: state.recentlyViewed,
         lastLesson: state.lastLesson,
         finishedPath: state.finishedPath,
+        lastUpdated: state.lastUpdated,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

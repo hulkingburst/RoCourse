@@ -1,6 +1,6 @@
 # RoCourse
 
-> **Free forever.** No accounts, no paywall, no sign-up — all 52 lessons are open and free to use.
+> **Free forever.** No paywall, no sign-up required — all 52 lessons are open and free to use. Accounts are 100% optional and exist only to sync your progress across devices.
 >
 > **Built with AI, reviewed by a human.** This site is developed with AI assistance to keep it free and open source — every lesson, activity, and feature is then reviewed and managed by a human before it ships.
 
@@ -25,8 +25,12 @@ npm run start
 Quality checks:
 
 ```bash
-npm run lint
+npx eslint
 ```
+
+The site runs fully without any accounts. To enable optional account sync you
+need a Postgres database and a couple of environment variables (see
+[Accounts & progress sync](#accounts--progress-sync) and `.env.example`).
 
 ## How lessons work
 
@@ -35,6 +39,7 @@ npm run lint
 - The course map and section order live in `content/course.ts`; `getCourseStructure()` in `src/lib/lessons.ts` merges the map with the lesson files.
 - Because MDX compile-tree walking can't see `<Step>` boundaries, `src/lib/steps.ts` splits the raw MDX source by regex (`splitLessonSource` + `detectActivity` + `maskFences`) and the lesson page compiles each step chunk separately.
 - Progress (solved activities per lesson) is stored in localStorage via `src/lib/progress-store.ts`. Lessons are locked unless the previous lesson in reading order is complete.
+- Guests keep working exactly as before — progress is stored locally, never blocked, never gated.
 
 ### Authoring rule
 
@@ -56,24 +61,71 @@ All custom components are registered in `src/content/mdx-components.tsx`:
 content/
   course.ts                 course map, section order, branding constants
   lessons/*.mdx             one MDX lesson per file
+prisma/
+  schema.prisma             User, ProgressProfile, CourseCompletion models
 src/
-  app/                      Next.js App Router pages (home, lesson, search)
+  app/                      Next.js App Router pages (home, lesson, search, profile)
+    api/auth/[...nextauth]  Auth.js credentials handlers
+    api/sync/               progress sync API (GET pull, POST push)
   components/
     activities/             the six activity components
+    auth/                   sign-in dialog, account menu, sync host
     layout/                 site header, course sidebar, app shell
     lessons/                step, quiz, prediction, code block, MDX extras
     home/                   lesson list, course overview
+    profile/                profile page UI
   content/mdx-components.tsx  MDX component registry
   lib/
     steps.ts                source-level step splitter for MDX
     lessons.ts              course structure + lesson loading
     progress-store.ts       solved-activity progress (localStorage, zustand)
+    sync.ts / sync-api.ts   client sync engine / server data access
+    auth.ts, auth-actions.ts  Auth.js config + account creation action
+    prisma.ts               Prisma client singleton
 ```
 
 ## Configuration
 
 The visible site name defaults to `RoCourse`. Override it without editing code via the `NEXT_PUBLIC_COURSE_NAME` environment variable (used by the header, sidebar, and footer).
 
+## Accounts & progress sync
+
+Accounts are an optional convenience layer. Guests get the full course with local
+progress; signing in lets you continue on another device.
+
+- **No sign-up wall** — every lesson, activity, and feature works without an account.
+- **Cloud sync** — when you sign in, local progress is offered for upload (or the
+  cloud copy is pulled down). If both sides changed, you choose which to keep.
+- **No social features** — no profiles to follow, no leaderboards, no public stats,
+  no paywalls, and no donation advantages. This is a learning site, not a social one.
+- **Future resource library** — a community-reviewed library of curated Roblox/Luau
+  resources (tutorials, tools, free assets) is planned but not yet implemented.
+
+### Local setup
+
+Create a Postgres database and a `.env` file based on `.env.example`:
+
+```
+DATABASE_URL="postgresql://..."
+AUTH_SECRET="<random hex, e.g. openssl rand -base64 32>"
+AUTH_TRUST_HOST=true
+```
+
+Then apply the schema:
+
+```bash
+npx prisma migrate dev
+```
+
+| Variable | Required for | Notes |
+| --- | --- | --- |
+| `DATABASE_URL` | Accounts & sync | Postgres connection string (Vercel Postgres / Neon / etc.) |
+| `AUTH_SECRET` | Auth.js sessions | Used to sign JWT session tokens |
+| `AUTH_TRUST_HOST` | Hosted deployments | Set `true` on Vercel/Netlify |
+
+Everything else (lessons, activities, search, static pages) ignores these
+variables, and `next build` succeeds without them.
+
 ## Deploying
 
-This is a standard static-friendly Next.js app. `next build` prerenders every lesson as static HTML. Deploy the `.next` output on Vercel, Netlify, or any Node host that supports Next.js.
+This is a standard static-friendly Next.js app. `next build` prerenders every lesson as static HTML. Deploy the `.next` output on Vercel, Netlify, or any Node host that supports Next.js. The `api/*` routes and account sync need the env vars above and a reachable database.

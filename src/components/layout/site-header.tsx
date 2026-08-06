@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { SidebarNav } from "@/components/layout/course-sidebar";
+import { AccountMenu } from "@/components/auth/account-menu";
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -136,6 +137,7 @@ export function SiteHeader({
       </Button>
 
       <SearchDialog entries={searchEntries} />
+      <AccountMenu />
       <ThemeToggle />
     </header>
   );
