@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   Menu,
@@ -106,8 +107,14 @@ export function SiteHeader({
         href="/"
         className="flex items-center gap-2 text-sm font-bold lg:hidden"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-xs font-black text-primary-foreground">
-          R
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md">
+          <Image
+            src="/rocourse-icon.png"
+            alt="RoCourse"
+            width={28}
+            height={28}
+            className="h-full w-full object-contain"
+          />
         </span>
         RoCourse
       </Link>
