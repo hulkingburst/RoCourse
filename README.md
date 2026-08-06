@@ -120,6 +120,7 @@ npx prisma migrate dev
 | Variable | Required for | Notes |
 | --- | --- | --- |
 | `DATABASE_URL` | Accounts & sync | Postgres connection string (Vercel Postgres / Neon / etc.) |
+| `DATABASE_URL_UNPOOLED` | Migrations | Direct connection when `DATABASE_URL` uses a pooler (Neon `-pooler`) |
 | `AUTH_SECRET` | Auth.js sessions | Used to sign JWT session tokens |
 | `AUTH_TRUST_HOST` | Hosted deployments | Set `true` on Vercel/Netlify |
 
