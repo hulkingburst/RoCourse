@@ -7,6 +7,7 @@ import {
   Award,
   Bookmark,
   BookOpen,
+  CalendarDays,
   CheckCircle2,
   Flame,
   ListChecks,
@@ -30,6 +31,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { ActivityCalendar } from "@/components/profile/activity-calendar";
 
 interface ProfileClientProps {
   totalLessons: number;
@@ -49,6 +51,10 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
   const streak = useProgressStore((state) => state.streak);
   const longestStreak = useProgressStore((state) => state.longestStreak);
   const lastStreakDate = useProgressStore((state) => state.lastStreakDate);
+  const dailyChallengesCompleted = useProgressStore(
+    (state) => state.dailyChallengesCompleted
+  );
+  const activityDays = useProgressStore((state) => state.activityDays);
   const [cloud, setCloud] = React.useState<CloudState | null>(null);
   const [loadingSync, setLoadingSync] = React.useState(true);
 
@@ -165,8 +171,8 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
           </CardTitle>
           <CardDescription>
             {streakActive
-              ? "Keep the momentum — a lesson or quick quiz a day."
-              : "Complete a lesson or beat a quick quiz to start a streak."}
+              ? "Keep the momentum — a lesson, quick quiz, or daily challenge a day."
+              : "Complete a lesson, beat a quick quiz, or take the daily challenge to start a streak."}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -196,6 +202,21 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 text-primary" />
+            Activity
+          </CardTitle>
+          <CardDescription>
+            Your last 16 weeks — lessons, quizzes, and daily challenges.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ActivityCalendar activityDays={activityDays} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" />
             Course progress
           </CardTitle>
@@ -205,7 +226,7 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <Progress value={pct} />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             <Stat icon={<CheckCircle2 className="h-4 w-4" />} label="Lessons" value={String(completedCount)} />
             <Stat icon={<Bookmark className="h-4 w-4" />} label="Bookmarks" value={String(bookmarks.length)} />
             <Stat
@@ -222,6 +243,11 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
               icon={<ListChecks className="h-4 w-4" />}
               label="Mini quizzes"
               value={String(quickQuizzesCompleted)}
+            />
+            <Stat
+              icon={<CalendarDays className="h-4 w-4" />}
+              label="Daily challenges"
+              value={String(dailyChallengesCompleted)}
             />
           </div>
         </CardContent>

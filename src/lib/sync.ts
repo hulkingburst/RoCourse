@@ -19,6 +19,8 @@ export function getSnapshot(): ProgressSnapshot {
     lastLesson: state.lastLesson,
     finishedPath: state.finishedPath,
     quickQuizzesCompleted: state.quickQuizzesCompleted,
+    dailyChallengesCompleted: state.dailyChallengesCompleted,
+    activityDays: state.activityDays,
     streak: state.streak,
     longestStreak: state.longestStreak,
     lastStreakDate: state.lastStreakDate,
@@ -35,6 +37,8 @@ export function hasAnyProgress(snapshot: ProgressSnapshot): boolean {
     snapshot.lastLesson != null ||
     snapshot.finishedPath != null ||
     snapshot.quickQuizzesCompleted > 0 ||
+    snapshot.dailyChallengesCompleted > 0 ||
+    Object.keys(snapshot.activityDays).length > 0 ||
     snapshot.streak > 0
   );
 }
@@ -71,6 +75,8 @@ export function applySnapshot(
     lastLesson: clean.lastLesson,
     finishedPath: clean.finishedPath,
     quickQuizzesCompleted: clean.quickQuizzesCompleted,
+    dailyChallengesCompleted: clean.dailyChallengesCompleted,
+    activityDays: clean.activityDays,
     streak: clean.streak,
     longestStreak: clean.longestStreak,
     lastStreakDate: clean.lastStreakDate,
@@ -106,6 +112,8 @@ export function sanitizeSnapshot(
       typeof snapshot?.lastLesson === "string" ? snapshot.lastLesson : null,
     finishedPath: sanitizeFinishedPath(snapshot?.finishedPath),
     quickQuizzesCompleted: sanitizeCount(snapshot?.quickQuizzesCompleted),
+    dailyChallengesCompleted: sanitizeCount(snapshot?.dailyChallengesCompleted),
+    activityDays: sanitizeActivityDays(snapshot?.activityDays),
     streak: sanitizeCount(snapshot?.streak),
     longestStreak: sanitizeCount(snapshot?.longestStreak),
     lastStreakDate: sanitizeDayKey(snapshot?.lastStreakDate),
@@ -124,6 +132,19 @@ function sanitizeDayKey(value: unknown): string | null {
   return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
     ? value
     : null;
+}
+
+/** Bounds a day-keyed activity map: valid keys, non-negative ints, newest 400. */
+function sanitizeActivityDays(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const entries: [string, number][] = [];
+  for (const [key, count] of Object.entries(value)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) continue;
+    if (typeof count !== "number" || !Number.isFinite(count) || count < 0) continue;
+    entries.push([key, Math.floor(count)]);
+  }
+  entries.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  return Object.fromEntries(entries.slice(-400));
 }
 
 function sanitizeLessonRecord(record: unknown): LessonRecord {
@@ -150,6 +171,7 @@ function sanitizeLessonRecord(record: unknown): LessonRecord {
     challengesAttempted: num(raw.challengesAttempted),
     activitiesSolved: num(raw.activitiesSolved),
     activitiesAttempted: num(raw.activitiesAttempted),
+    firstTrySolvedSteps: sanitizeStringArray(raw.firstTrySolvedSteps),
   };
 }
 

@@ -46,13 +46,14 @@ export function Mcq({
   const pick = (index: number) => {
     if (isCorrect) return;
     if (selected === index && status === "wrong") return;
+    const firstTry = status === "idle";
     setSelected(index);
     if (index === answer) {
       setStatus("correct");
-      onResult(true);
+      onResult(true, firstTry);
     } else {
       setStatus("wrong");
-      onResult(false);
+      onResult(false, firstTry);
     }
   };
 

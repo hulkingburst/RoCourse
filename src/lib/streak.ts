@@ -14,6 +14,8 @@ export interface StreakState {
   longestStreak: number;
   /** Local calendar day (YYYY-MM-DD) of the last streak-building action. */
   lastStreakDate: string | null;
+  /** Local day (YYYY-MM-DD) → number of qualifying actions that day. */
+  activityDays: Record<string, number>;
 }
 
 export function dayKey(date: Date): string {
@@ -52,6 +54,7 @@ export function streakAfterAction(state: StreakState): StreakState {
       streak: state.streak,
       longestStreak: state.longestStreak,
       lastStreakDate: today,
+      activityDays: state.activityDays,
     };
   }
   const streak =
@@ -62,5 +65,22 @@ export function streakAfterAction(state: StreakState): StreakState {
     streak,
     longestStreak: Math.max(state.longestStreak, streak),
     lastStreakDate: today,
+    activityDays: state.activityDays,
+  };
+}
+
+/**
+ * Combines the streak rules with the per-day activity tally used by the
+ * activity calendar. Every qualifying action bumps today's activity count even
+ * when the streak itself is unchanged (multiple actions on one day).
+ */
+export function recordActivity(state: StreakState): StreakState {
+  const today = dayKey(new Date());
+  return {
+    ...streakAfterAction(state),
+    activityDays: {
+      ...state.activityDays,
+      [today]: (state.activityDays[today] ?? 0) + 1,
+    },
   };
 }

@@ -12,6 +12,10 @@ export interface ProgressSnapshot {
   finishedPath: FinishedPath | null;
   /** Lifetime count of completed quick quizzes. */
   quickQuizzesCompleted: number;
+  /** Lifetime count of completed daily challenges. */
+  dailyChallengesCompleted: number;
+  /** Local day (YYYY-MM-DD) → qualifying-action count (activity calendar). */
+  activityDays: Record<string, number>;
   /** Current consecutive-day learning streak. */
   streak: number;
   /** Longest streak ever recorded. */

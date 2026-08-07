@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  CalendarDays,
   Flame,
   ListChecks,
   Menu,
@@ -163,6 +164,12 @@ export function SiteHeader({
           {streak}
         </Link>
       )}
+      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
+        <Link href="/quiz/daily">
+          <CalendarDays className="h-4 w-4" />
+          Daily
+        </Link>
+      </Button>
       <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
         <Link href="/quiz">
           <ListChecks className="h-4 w-4" />

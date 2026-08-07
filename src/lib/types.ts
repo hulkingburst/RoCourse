@@ -24,6 +24,8 @@ export interface CourseSectionConfig {
 export interface LessonMeta extends LessonFrontmatter {
   sectionTitle: string;
   sectionOrder: number;
+  /** Number of multiple-choice quick-check questions in the lesson. */
+  quizCount: number;
 }
 
 export interface CourseSection {

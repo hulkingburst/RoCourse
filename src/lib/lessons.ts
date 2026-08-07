@@ -70,6 +70,13 @@ function stripFencedBlocks(source: string): string {
   return source.replace(/```[\s\S]*?```/g, "");
 }
 
+/** Counts the multiple-choice quick-check questions in a lesson's source. */
+export function countMcqQuestions(source: string): number {
+  const masked = stripFencedBlocks(source);
+  const matches = masked.match(/<Mcq\b/g);
+  return matches ? matches.length : 0;
+}
+
 export function extractHeadings(source: string): Heading[] {
   const stripped = stripFencedBlocks(source);
   const headings: Heading[] = [];
@@ -96,7 +103,8 @@ export function extractHeadings(source: string): Heading[] {
 
 function toMeta(
   data: Record<string, unknown>,
-  fileName: string
+  fileName: string,
+  source: string
 ): LessonMeta {
   const base = normalizeMeta(data, fileName);
   const section = courseSections.find((s) => s.id === base.sectionId)!;
@@ -104,6 +112,7 @@ function toMeta(
     ...base,
     sectionTitle: section.title,
     sectionOrder: section.order,
+    quizCount: countMcqQuestions(source),
   };
 }
 
@@ -116,7 +125,7 @@ export function getLessonMeta(slug: string): LessonMeta | null {
     cache.set(`meta:${slug}`, null);
     return null;
   }
-  const meta = toMeta(parseFrontmatter(file.raw), file.fileName);
+  const meta = toMeta(parseFrontmatter(file.raw), file.fileName, file.raw);
   cache.set(`meta:${slug}`, meta);
   return meta;
 }
@@ -128,7 +137,7 @@ export function getAllLessonMetas(): LessonMeta[] {
   const metas = listLessonFiles()
     .map((fileName) => {
       const raw = fs.readFileSync(path.join(CONTENT_DIR, fileName), "utf8");
-      return toMeta(parseFrontmatter(raw), fileName);
+      return toMeta(parseFrontmatter(raw), fileName, raw);
     })
     .sort((a, b) =>
       a.sectionOrder === b.sectionOrder ? a.order - b.order : a.sectionOrder - b.sectionOrder
@@ -167,7 +176,7 @@ export function getLesson(slug: string): Lesson | null {
   }
 
   const { content } = matter(file.raw);
-  const meta = toMeta(parseFrontmatter(file.raw), file.fileName);
+  const meta = toMeta(parseFrontmatter(file.raw), file.fileName, file.raw);
   const lesson: Lesson = {
     meta,
     content,
@@ -195,7 +204,7 @@ export function getSearchIndex(): SearchEntry[] {
 
   const entries = listLessonFiles().map((fileName) => {
     const raw = fs.readFileSync(path.join(CONTENT_DIR, fileName), "utf8");
-    const meta = toMeta(parseFrontmatter(raw), fileName);
+    const meta = toMeta(parseFrontmatter(raw), fileName, raw);
     return {
       slug: meta.slug,
       title: meta.title,

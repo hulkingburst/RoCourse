@@ -15,7 +15,7 @@ export interface StepperContextValue {
   /** True when the currently visible step has been solved. */
   solved: boolean;
   /** Report a graded attempt from the currently visible step. */
-  onResult: (correct: boolean) => void;
+  onResult: (correct: boolean, firstTry?: boolean) => void;
 }
 
 export const StepperContext = React.createContext<StepperContextValue>({

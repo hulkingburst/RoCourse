@@ -12,6 +12,7 @@ import {
 } from "@/lib/progress-store";
 import { LockedLesson } from "@/components/lessons/locked-lesson";
 import { StepCompletion } from "@/components/lessons/step-completion";
+import { LessonMedalBadge } from "@/components/lessons/lesson-medal";
 
 interface StepMeta {
   hasActivity: boolean;
@@ -20,6 +21,7 @@ interface LessonStepperProps {
   title: string;
   description: string;
   stepMetas: StepMeta[];
+  quizCount: number;
   isFirstLesson: boolean;
   prevSlug: string | null;
   prevTitle: string | null;
@@ -38,6 +40,7 @@ export function LessonStepper({
   title,
   description,
   stepMetas,
+  quizCount,
   isFirstLesson,
   prevSlug,
   prevTitle,
@@ -79,8 +82,8 @@ export function LessonStepper({
   const isLast = active === total - 1;
 
   const onResult = React.useCallback(
-    (correct: boolean) => {
-      recordActivityResult(slug, correct);
+    (correct: boolean, firstTry?: boolean) => {
+      recordActivityResult(slug, correct, correct && firstTry ? String(active) : null);
       if (correct) {
         setSolvedSteps((current) => ({ ...current, [active]: true }));
       }
@@ -153,21 +156,24 @@ export function LessonStepper({
               <p className="mt-1 text-sm text-muted-foreground">{description}</p>
             )}
           </div>
-          {mounted && (
-            <button
-              type="button"
-              onClick={() => toggleBookmark(slug)}
-              aria-label={bookmarked ? "Remove bookmark" : "Bookmark lesson"}
-              className={cn(
-                "shrink-0 rounded-lg border p-2 transition-colors",
-                bookmarked
-                  ? "border-primary/40 bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-accent"
-              )}
-            >
-              <Bookmark className={cn("h-4 w-4", bookmarked && "fill-current")} />
-            </button>
-          )}
+          <div className="flex shrink-0 items-center gap-2">
+            <LessonMedalBadge slug={slug} quizCount={quizCount} className="h-5 w-5" />
+            {mounted && (
+              <button
+                type="button"
+                onClick={() => toggleBookmark(slug)}
+                aria-label={bookmarked ? "Remove bookmark" : "Bookmark lesson"}
+                className={cn(
+                  "shrink-0 rounded-lg border p-2 transition-colors",
+                  bookmarked
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-accent"
+                )}
+              >
+                <Bookmark className={cn("h-4 w-4", bookmarked && "fill-current")} />
+              </button>
+            )}
+          </div>
         </div>
 
         {total > 1 && (

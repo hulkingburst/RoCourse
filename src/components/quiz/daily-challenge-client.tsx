@@ -9,137 +9,98 @@ import {
   Flame,
   HelpCircle,
   ListChecks,
-  RotateCcw,
-  Target,
   XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { QUIZ_QUESTIONS, QUIZ_SIZE } from "@/lib/quiz-data";
-import type { QuizQuestion } from "@/lib/quiz-data";
+import { dailyQuestion } from "@/lib/daily";
+import { dayKey } from "@/lib/streak";
 import { useProgressStore } from "@/lib/progress-store";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 
 const OPTION_LETTERS = ["A", "B", "C", "D"];
 
-function shuffle<T>(items: readonly T[]): T[] {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-/** Draws a fresh quiz: random questions with shuffled option positions. */
-function drawQuestions(): QuizQuestion[] {
-  const picked = shuffle(QUIZ_QUESTIONS).slice(
-    0,
-    Math.min(QUIZ_SIZE, QUIZ_QUESTIONS.length)
-  );
-  return picked.map((question) => {
-    const order = shuffle([0, 1, 2, 3]);
-    return {
-      ...question,
-      options: order.map((i) => question.options[i]) as QuizQuestion["options"],
-      answer: order.indexOf(question.answer),
-    };
-  });
-}
-
 type Phase = "intro" | "active" | "done";
 
-export function QuizClient() {
-  const quickQuizzesCompleted = useProgressStore(
-    (state) => state.quickQuizzesCompleted
+export function DailyChallengeClient() {
+  const recordDailyChallengeCompleted = useProgressStore(
+    (state) => state.recordDailyChallengeCompleted
   );
-  const recordQuickQuizCompleted = useProgressStore(
-    (state) => state.recordQuickQuizCompleted
+  const dailyChallengesCompleted = useProgressStore(
+    (state) => state.dailyChallengesCompleted
   );
   const streak = useProgressStore((state) => state.streak);
 
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
   const [phase, setPhase] = React.useState<Phase>("intro");
-  const [questions, setQuestions] = React.useState<QuizQuestion[]>([]);
-  const [index, setIndex] = React.useState(0);
   const [selected, setSelected] = React.useState<number | null>(null);
-  const [answered, setAnswered] = React.useState(false);
-  const [correctCount, setCorrectCount] = React.useState(0);
   const reportedRef = React.useRef(false);
+
+  // The question is fixed per local day; compute lazily so it survives renders.
+  const question = React.useMemo(() => dailyQuestion(dayKey(new Date())), []);
 
   React.useEffect(() => {
     if (phase === "done" && !reportedRef.current) {
       reportedRef.current = true;
-      recordQuickQuizCompleted();
+      recordDailyChallengeCompleted();
     }
-  }, [phase, recordQuickQuizCompleted]);
+  }, [phase, recordDailyChallengeCompleted]);
 
-  const startQuiz = () => {
-    setQuestions(drawQuestions());
-    setIndex(0);
-    setSelected(null);
-    setAnswered(false);
-    setCorrectCount(0);
-    reportedRef.current = false;
-    setPhase("active");
-  };
+  if (!mounted) {
+    return (
+      <div className="rounded-xl border bg-card p-8 text-center text-sm text-muted-foreground">
+        Loading today&apos;s challenge…
+      </div>
+    );
+  }
 
   const pick = (optionIndex: number) => {
-    if (answered) return;
+    if (selected !== null) return;
     setSelected(optionIndex);
-    setAnswered(true);
-    if (optionIndex === questions[index]?.answer) {
-      setCorrectCount((count) => count + 1);
-    }
-  };
-
-  const next = () => {
-    if (index + 1 >= questions.length) {
-      setPhase("done");
-    } else {
-      setIndex((value) => value + 1);
-      setSelected(null);
-      setAnswered(false);
-    }
   };
 
   if (phase === "intro") {
     return (
       <div className="rounded-xl border bg-card p-8">
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-          <Target className="h-6 w-6 text-primary" />
+          <CalendarDays className="h-6 w-6 text-primary" />
         </div>
-        <h2 className="text-center text-xl font-bold">Quick quiz</h2>
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          {QUIZ_QUESTIONS.length} questions in the bank — each quiz draws{" "}
-          {Math.min(QUIZ_SIZE, QUIZ_QUESTIONS.length)} random ones.
+        <h1 className="text-center text-2xl font-bold">Daily challenge</h1>
+        <p className="mx-auto mt-2 max-w-sm text-center text-sm text-muted-foreground">
+          One question, once a day. Answer it to count a day toward your streak
+          — every day you keep it alive.
         </p>
         <ul className="mx-auto mt-6 max-w-sm space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            One question at a time, one answer — A, B, C or D.
+            A fresh question every day, same for everyone.
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            See the right answer instantly, with a quick explanation.
+            Beating it feeds your streak even without a lesson.
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            Every finished quiz counts toward your profile total.
+            Daily challenges completed:{" "}
+            <span className="font-semibold text-foreground">
+              {dailyChallengesCompleted}
+            </span>
           </li>
         </ul>
-        <div className="mt-8 flex justify-center">
-          <Button size="lg" onClick={startQuiz}>
-            Start quiz
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <Button size="lg" onClick={() => setPhase("active")}>
+            Take today&apos;s challenge
             <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
-        <div className="mt-4 flex justify-center">
           <Link
-            href="/quiz/daily"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            href="/quiz"
+            className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
-            <CalendarDays className="h-4 w-4" />
-            Or try today&apos;s daily challenge
+            Back to the quick quiz
           </Link>
         </div>
       </div>
@@ -147,77 +108,54 @@ export function QuizClient() {
   }
 
   if (phase === "done") {
-    const total = questions.length;
-    const percent =
-      total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    const message =
-      percent === 100
-        ? "Perfect score — you know your Luau."
-        : percent >= 70
-          ? "Great work! A couple of gaps to polish."
-          : percent >= 40
-            ? "Decent start — review the lessons you missed."
-            : "Keep practicing — the lessons will fill these gaps.";
-
+    const isCorrect = selected === question.answer;
     return (
       <div className="rounded-xl border bg-card p-8">
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <ListChecks className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-center text-2xl font-bold">
-          {correctCount} / {total} correct
+          {isCorrect ? "Correct!" : "Not quite."}
         </h2>
         <p className="mt-1 text-center text-sm text-muted-foreground">
-          {percent}% · {message}
+          {isCorrect
+            ? "Nice — today's challenge is done."
+            : `The answer was ${OPTION_LETTERS[question.answer]} — come back tomorrow.`}
         </p>
-        <div className="mt-6 flex justify-center">
-          <Button variant="outline" onClick={startQuiz}>
-            <RotateCcw className="h-4 w-4" />
-            Play again
+        {question.explanation && (
+          <p className="mx-auto mt-3 max-w-md text-center text-sm text-muted-foreground">
+            {question.explanation}
+          </p>
+        )}
+        <p className="mt-6 text-center text-sm font-semibold text-orange-500">
+          <Flame className="mr-1 inline h-4 w-4 fill-current" />
+          {streak} {streak === 1 ? "day" : "days"} streak
+        </p>
+        <div className="mt-6 flex justify-center gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/quiz">Quick quiz</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/lessons">Back to lessons</Link>
           </Button>
         </div>
-        <p className="mt-8 text-center text-xs text-muted-foreground">
-          Mini quizzes completed:{" "}
-          <span className="font-semibold text-foreground">
-            {quickQuizzesCompleted}
-          </span>
-        </p>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          <Flame className="mr-1 inline h-3.5 w-3.5 text-orange-500" />
-          Day streak:{" "}
-          <span className="font-semibold text-foreground">
-            {streak} {streak === 1 ? "day" : "days"}
-          </span>
-        </p>
       </div>
     );
   }
 
-  const question = questions[index];
-  if (!question) return null;
-
-  const isCorrect = selected === question.answer;
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          Question {index + 1} of {questions.length}
-        </span>
-        <span className="font-medium text-primary">
-          {correctCount} correct
-        </span>
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <CalendarDays className="h-4 w-4 text-primary" />
+        <span>Today&apos;s challenge</span>
       </div>
-      <Progress value={(index / questions.length) * 100} />
-
       <div className="rounded-xl border bg-card p-6">
-        <p className="text-base font-medium leading-relaxed">
-          {question.question}
-        </p>
+        <p className="text-base font-medium leading-relaxed">{question.question}</p>
         <div className="mt-4 grid gap-2">
           {question.options.map((option, optionIndex) => {
             const isAnswer = optionIndex === question.answer;
             const isSelected = optionIndex === selected;
+            const answered = selected !== null;
             return (
               <button
                 key={optionIndex}
@@ -264,17 +202,17 @@ export function QuizClient() {
           })}
         </div>
 
-        {answered && (
+        {selected !== null && (
           <div
             className={cn(
               "mt-4 rounded-lg border p-3 text-sm",
-              isCorrect
+              selected === question.answer
                 ? "border-success/40 bg-success/5"
                 : "border-destructive/40 bg-destructive/5"
             )}
           >
             <div className="flex items-center gap-1.5 font-medium">
-              {isCorrect ? (
+              {selected === question.answer ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-success" />
                   Correct!
@@ -287,19 +225,14 @@ export function QuizClient() {
               )}
             </div>
             {question.explanation && (
-              <p className="mt-1 text-muted-foreground">
-                {question.explanation}
-              </p>
+              <p className="mt-1 text-muted-foreground">{question.explanation}</p>
             )}
           </div>
         )}
 
-        {answered && (
+        {selected !== null && (
           <div className="mt-4 flex justify-end">
-            <Button onClick={next}>
-              {index + 1 >= questions.length ? "See results" : "Next question"}
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            <Button onClick={() => setPhase("done")}>Finish</Button>
           </div>
         )}
       </div>

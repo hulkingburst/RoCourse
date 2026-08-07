@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Bookmark,
+  CalendarDays,
   CheckCircle2,
   ChevronDown,
   Circle,
@@ -249,6 +250,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
 
       <div className="border-t px-4 py-3">
         <div className="space-y-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="w-full justify-start text-muted-foreground"
+          >
+            <Link href="/quiz/daily">
+              <CalendarDays className="h-3.5 w-3.5" />
+              Daily challenge
+            </Link>
+          </Button>
           <Button
             variant="ghost"
             size="sm"

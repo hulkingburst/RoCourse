@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { streakAfterAction } from "@/lib/streak";
+import { recordActivity } from "@/lib/streak";
 import type { ProgressSnapshot } from "@/lib/sync-types";
 
 /**
@@ -22,6 +22,8 @@ export interface LessonRecord {
   challengesAttempted: number;
   activitiesSolved: number;
   activitiesAttempted: number;
+  /** Step indices whose question was solved on the first pick (medal basis). */
+  firstTrySolvedSteps: string[];
 }
 
 /** Which final-project game the learner chose to build as their capstone. */
@@ -42,6 +44,10 @@ interface ProgressState {
   finishedPath: FinishedPath | null;
   /** Lifetime count of completed quick quizzes. */
   quickQuizzesCompleted: number;
+  /** Lifetime count of completed daily challenges. */
+  dailyChallengesCompleted: number;
+  /** Local day (YYYY-MM-DD) → qualifying-action count (activity calendar). */
+  activityDays: Record<string, number>;
   /**
    * ISO timestamp of the last local mutation. Drives cloud conflict
    * resolution: whichever side (device or cloud) is newest wins.
@@ -53,13 +59,18 @@ interface ProgressState {
 
   setHydrated: (value: boolean) => void;
   recordQuickQuizCompleted: () => void;
+  recordDailyChallengeCompleted: () => void;
   markLessonComplete: (slug: string) => void;
   toggleLessonComplete: (slug: string) => void;
   recordView: (slug: string) => void;
   toggleBookmark: (slug: string) => void;
   recordQuizResult: (slug: string, correct: boolean) => void;
   recordChallengeResult: (slug: string, solved: boolean) => void;
-  recordActivityResult: (slug: string, correct: boolean) => void;
+  recordActivityResult: (
+    slug: string,
+    correct: boolean,
+    firstTryStep?: string | null
+  ) => void;
   setFinishedPath: (path: FinishedPath | null) => void;
   restoreProgress: (snapshot: ProgressSnapshot) => void;
   resetProgress: () => void;
@@ -76,6 +87,7 @@ function ensureRecord(lessons: ProgressState["lessons"], slug: string): LessonRe
       challengesAttempted: 0,
       activitiesSolved: 0,
       activitiesAttempted: 0,
+      firstTrySolvedSteps: [],
     }
   );
 }
@@ -90,6 +102,8 @@ export const useProgressStore = create<ProgressState>()(
       lastLesson: null,
       finishedPath: null,
       quickQuizzesCompleted: 0,
+      dailyChallengesCompleted: 0,
+      activityDays: {},
       lastUpdated: null,
       streak: 0,
       longestStreak: 0,
@@ -100,7 +114,14 @@ export const useProgressStore = create<ProgressState>()(
       recordQuickQuizCompleted: () =>
         set((state) => ({
           quickQuizzesCompleted: state.quickQuizzesCompleted + 1,
-          ...streakAfterAction(state),
+          ...recordActivity(state),
+          lastUpdated: nowIso(),
+        })),
+
+      recordDailyChallengeCompleted: () =>
+        set((state) => ({
+          dailyChallengesCompleted: state.dailyChallengesCompleted + 1,
+          ...recordActivity(state),
           lastUpdated: nowIso(),
         })),
 
@@ -116,7 +137,7 @@ export const useProgressStore = create<ProgressState>()(
                 completedAt: existing.completedAt ?? new Date().toISOString(),
               },
             },
-            ...(completing ? streakAfterAction(state) : {}),
+            ...(completing ? recordActivity(state) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -135,7 +156,7 @@ export const useProgressStore = create<ProgressState>()(
                   : new Date().toISOString(),
               },
             },
-            ...(completing ? streakAfterAction(state) : {}),
+            ...(completing ? recordActivity(state) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -197,9 +218,14 @@ export const useProgressStore = create<ProgressState>()(
           };
         }),
 
-      recordActivityResult: (slug, correct) =>
+      recordActivityResult: (slug, correct, firstTryStep) =>
         set((state) => {
           const existing = ensureRecord(state.lessons, slug);
+          const solvedSteps = existing.firstTrySolvedSteps ?? [];
+          const firstTrySolvedSteps =
+            correct && firstTryStep && !solvedSteps.includes(firstTryStep)
+              ? [...solvedSteps, firstTryStep]
+              : solvedSteps;
           return {
             lessons: {
               ...state.lessons,
@@ -207,6 +233,7 @@ export const useProgressStore = create<ProgressState>()(
                 ...existing,
                 activitiesAttempted: existing.activitiesAttempted + 1,
                 activitiesSolved: existing.activitiesSolved + (correct ? 1 : 0),
+                firstTrySolvedSteps,
               },
             },
             lastUpdated: nowIso(),
@@ -219,6 +246,9 @@ export const useProgressStore = create<ProgressState>()(
         set((state) => ({
           ...snapshot,
           quickQuizzesCompleted: snapshot.quickQuizzesCompleted ?? state.quickQuizzesCompleted,
+          dailyChallengesCompleted:
+            snapshot.dailyChallengesCompleted ?? state.dailyChallengesCompleted,
+          activityDays: snapshot.activityDays ?? state.activityDays,
           streak: snapshot.streak ?? state.streak,
           longestStreak: snapshot.longestStreak ?? state.longestStreak,
           lastStreakDate: snapshot.lastStreakDate ?? state.lastStreakDate,
@@ -232,6 +262,8 @@ export const useProgressStore = create<ProgressState>()(
           lastLesson: null,
           finishedPath: null,
           quickQuizzesCompleted: 0,
+          dailyChallengesCompleted: 0,
+          activityDays: {},
           lastUpdated: null,
           streak: 0,
           longestStreak: 0,
@@ -248,6 +280,8 @@ export const useProgressStore = create<ProgressState>()(
         lastLesson: state.lastLesson,
         finishedPath: state.finishedPath,
         quickQuizzesCompleted: state.quickQuizzesCompleted,
+        dailyChallengesCompleted: state.dailyChallengesCompleted,
+        activityDays: state.activityDays,
         lastUpdated: state.lastUpdated,
         streak: state.streak,
         longestStreak: state.longestStreak,

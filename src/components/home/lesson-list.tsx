@@ -10,6 +10,7 @@ import {
   useProgressStore,
 } from "@/lib/progress-store";
 import { DifficultyBadge } from "@/components/lessons/difficulty-badge";
+import { LessonMedalBadge } from "@/components/lessons/lesson-medal";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
@@ -75,6 +76,7 @@ export function LessonList({ sections }: { sections: CourseSection[] }) {
                         {bookmarked && (
                           <Bookmark className="h-3.5 w-3.5 fill-primary text-primary" />
                         )}
+                        <LessonMedalBadge slug={lesson.slug} quizCount={lesson.quizCount} />
                       </div>
                       <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
                         {lesson.description}
