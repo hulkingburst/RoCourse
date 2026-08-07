@@ -206,7 +206,7 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
             Activity
           </CardTitle>
           <CardDescription>
-            Your last 16 weeks — lessons, quizzes, and daily challenges.
+            Your last week of lessons, quizzes, and daily challenges.
           </CardDescription>
         </CardHeader>
         <CardContent>

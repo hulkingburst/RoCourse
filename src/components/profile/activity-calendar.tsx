@@ -4,8 +4,7 @@ import * as React from "react";
 import { dayKey } from "@/lib/streak";
 import { cn } from "@/lib/utils";
 
-const WEEK_DAYS = ["M", "", "W", "", "F", "", ""];
-const WEEKS = 16;
+const WEEK_ABBREV = ["S", "M", "T", "W", "T", "F", "S"];
 
 function level(count: number): number {
   if (count <= 0) return 0;
@@ -23,37 +22,19 @@ const CELL_COLORS = [
   "bg-orange-500",
 ];
 
-interface DayCell {
-  date: Date;
-  key: string;
-}
-
-/** Builds trailing weeks as Monday-aligned columns, ending on/around today. */
-function buildWeeks(): DayCell[][] {
-  const today = new Date();
-  today.setHours(12, 0, 0, 0);
-
-  const start = new Date(today);
-  start.setDate(start.getDate() - (WEEKS * 7 - 1));
-  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
-
-  const weeks: DayCell[][] = [];
-  const cursor = new Date(start);
-  while (cursor <= today) {
-    const week: DayCell[] = [];
-    for (let day = 0; day < 7; day++) {
-      week.push({ date: new Date(cursor), key: dayKey(cursor) });
-      cursor.setDate(cursor.getDate() + 1);
-    }
-    weeks.push(week);
+/** The last 7 days, oldest first. */
+function buildWeek(): { date: Date; key: string }[] {
+  const days: { date: Date; key: string }[] = [];
+  for (let offset = 6; offset >= 0; offset--) {
+    const date = new Date();
+    date.setHours(12, 0, 0, 0);
+    date.setDate(date.getDate() - offset);
+    days.push({ date, key: dayKey(date) });
   }
-  return weeks;
+  return days;
 }
 
-/**
- * GitHub-style activity heatmap for the trailing 16 weeks: one cell per day,
- * shaded by how many lessons/quizzes/challenges were finished that day.
- */
+/** A compact strip of the last week, shaded by activity per day. */
 export function ActivityCalendar({
   activityDays,
 }: {
@@ -65,7 +46,7 @@ export function ActivityCalendar({
     () => false
   );
 
-  const weeks = React.useMemo(() => buildWeeks(), []);
+  const week = React.useMemo(() => buildWeek(), []);
   const lookup = React.useMemo(() => {
     const map = new Map<string, number>();
     for (const [key, count] of Object.entries(activityDays)) {
@@ -80,41 +61,33 @@ export function ActivityCalendar({
 
   return (
     <div>
-      <div className="flex gap-1.5">
-        <div className="mr-0.5 flex flex-col gap-[3px] pr-1">
-          {WEEK_DAYS.map((label, index) => (
-            <span
-              key={index}
-              className="flex h-[10px] w-2 items-center text-[9px] text-muted-foreground"
+      <div className="flex items-end justify-between">
+        {week.map((cell) => {
+          const count = lookup.get(cell.key) ?? 0;
+          const isToday = cell.key === todayKey;
+          return (
+            <div
+              key={cell.key}
+              className="flex w-10 flex-col items-center gap-1.5"
+              title={`${cell.date.toLocaleDateString(undefined, {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}${count > 0 ? ` — ${count} ${count === 1 ? "activity" : "activities"}` : " — no activity"}`}
             >
-              {label}
-            </span>
-          ))}
-        </div>
-        <div className="flex gap-[3px]">
-          {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="flex flex-col gap-[3px]">
-              {week.map((cell) => {
-                const count = lookup.get(cell.key) ?? 0;
-                const isToday = cell.key === todayKey;
-                return (
-                  <span
-                    key={cell.key}
-                    title={`${cell.date.toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                    })}${count > 0 ? ` — ${count} ${count === 1 ? "activity" : "activities"}` : " — no activity"}`}
-                    className={cn(
-                      "h-[10px] w-[10px] rounded-[2px]",
-                      CELL_COLORS[level(count)],
-                      isToday && "ring-1 ring-ring"
-                    )}
-                  />
-                );
-              })}
+              <span className="text-xs text-muted-foreground">
+                {WEEK_ABBREV[cell.date.getDay()]}
+              </span>
+              <span
+                className={cn(
+                  "h-8 w-8 rounded-lg",
+                  CELL_COLORS[level(count)],
+                  isToday && "ring-1 ring-ring"
+                )}
+              />
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
       <div className="mt-2 flex items-center justify-end gap-1 text-[10px] text-muted-foreground">
         <span>Less</span>
