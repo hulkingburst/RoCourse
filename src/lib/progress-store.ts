@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { streakAfterAction } from "@/lib/streak";
 import type { ProgressSnapshot } from "@/lib/sync-types";
 
 /**
@@ -46,6 +47,9 @@ interface ProgressState {
    * resolution: whichever side (device or cloud) is newest wins.
    */
   lastUpdated: string | null;
+  streak: number;
+  longestStreak: number;
+  lastStreakDate: string | null;
 
   setHydrated: (value: boolean) => void;
   recordQuickQuizCompleted: () => void;
@@ -87,18 +91,23 @@ export const useProgressStore = create<ProgressState>()(
       finishedPath: null,
       quickQuizzesCompleted: 0,
       lastUpdated: null,
+      streak: 0,
+      longestStreak: 0,
+      lastStreakDate: null,
 
       setHydrated: (value) => set({ hydrated: value }),
 
       recordQuickQuizCompleted: () =>
         set((state) => ({
           quickQuizzesCompleted: state.quickQuizzesCompleted + 1,
+          ...streakAfterAction(state),
           lastUpdated: nowIso(),
         })),
 
       markLessonComplete: (slug) =>
         set((state) => {
           const existing = ensureRecord(state.lessons, slug);
+          const completing = existing.completedAt == null;
           return {
             lessons: {
               ...state.lessons,
@@ -107,6 +116,7 @@ export const useProgressStore = create<ProgressState>()(
                 completedAt: existing.completedAt ?? new Date().toISOString(),
               },
             },
+            ...(completing ? streakAfterAction(state) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -114,6 +124,7 @@ export const useProgressStore = create<ProgressState>()(
       toggleLessonComplete: (slug) =>
         set((state) => {
           const existing = ensureRecord(state.lessons, slug);
+          const completing = existing.completedAt == null;
           return {
             lessons: {
               ...state.lessons,
@@ -124,6 +135,7 @@ export const useProgressStore = create<ProgressState>()(
                   : new Date().toISOString(),
               },
             },
+            ...(completing ? streakAfterAction(state) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -207,6 +219,9 @@ export const useProgressStore = create<ProgressState>()(
         set((state) => ({
           ...snapshot,
           quickQuizzesCompleted: snapshot.quickQuizzesCompleted ?? state.quickQuizzesCompleted,
+          streak: snapshot.streak ?? state.streak,
+          longestStreak: snapshot.longestStreak ?? state.longestStreak,
+          lastStreakDate: snapshot.lastStreakDate ?? state.lastStreakDate,
         })),
 
       resetProgress: () =>
@@ -218,6 +233,9 @@ export const useProgressStore = create<ProgressState>()(
           finishedPath: null,
           quickQuizzesCompleted: 0,
           lastUpdated: null,
+          streak: 0,
+          longestStreak: 0,
+          lastStreakDate: null,
         }),
     }),
     {
@@ -231,6 +249,9 @@ export const useProgressStore = create<ProgressState>()(
         finishedPath: state.finishedPath,
         quickQuizzesCompleted: state.quickQuizzesCompleted,
         lastUpdated: state.lastUpdated,
+        streak: state.streak,
+        longestStreak: state.longestStreak,
+        lastStreakDate: state.lastStreakDate,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

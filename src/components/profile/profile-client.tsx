@@ -18,6 +18,8 @@ import {
 
 import { useAuthUiStore } from "@/lib/auth-ui";
 import { useProgressStore } from "@/lib/progress-store";
+import { isStreakActive } from "@/lib/streak";
+import { cn } from "@/lib/utils";
 import type { CloudState } from "@/lib/sync-types";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +46,9 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
   const quickQuizzesCompleted = useProgressStore(
     (state) => state.quickQuizzesCompleted
   );
+  const streak = useProgressStore((state) => state.streak);
+  const longestStreak = useProgressStore((state) => state.longestStreak);
+  const lastStreakDate = useProgressStore((state) => state.lastStreakDate);
   const [cloud, setCloud] = React.useState<CloudState | null>(null);
   const [loadingSync, setLoadingSync] = React.useState(true);
 
@@ -127,6 +132,7 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
         : null;
 
   const completions = cloud?.completions ?? [];
+  const streakActive = isStreakActive(lastStreakDate);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-6 py-10">
@@ -145,6 +151,47 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
             : "recently"}
         </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Flame
+              className={cn(
+                "h-5 w-5",
+                streakActive ? "text-orange-500" : "text-muted-foreground"
+              )}
+            />
+            Day streak
+          </CardTitle>
+          <CardDescription>
+            {streakActive
+              ? "Keep the momentum — a lesson or quick quiz a day."
+              : "Complete a lesson or beat a quick quiz to start a streak."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="flex items-center gap-3">
+            <Flame
+              className={cn(
+                "h-9 w-9",
+                streakActive ? "fill-orange-500 text-orange-500" : "text-muted-foreground"
+              )}
+            />
+            <div>
+              <div className="text-3xl font-bold leading-none">{streak}</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {streak === 1 ? "day" : "days"} in a row
+              </div>
+            </div>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Best:{" "}
+            <span className="font-semibold text-foreground">
+              {longestStreak} {longestStreak === 1 ? "day" : "days"}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

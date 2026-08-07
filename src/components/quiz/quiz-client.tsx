@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   CheckCircle2,
   ChevronRight,
+  Flame,
   HelpCircle,
   ListChecks,
   RotateCcw,
@@ -53,6 +54,7 @@ export function QuizClient() {
   const recordQuickQuizCompleted = useProgressStore(
     (state) => state.recordQuickQuizCompleted
   );
+  const streak = useProgressStore((state) => state.streak);
 
   const [phase, setPhase] = React.useState<Phase>("intro");
   const [questions, setQuestions] = React.useState<QuizQuestion[]>([]);
@@ -167,6 +169,13 @@ export function QuizClient() {
           Mini quizzes completed:{" "}
           <span className="font-semibold text-foreground">
             {quickQuizzesCompleted}
+          </span>
+        </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          <Flame className="mr-1 inline h-3.5 w-3.5 text-orange-500" />
+          Day streak:{" "}
+          <span className="font-semibold text-foreground">
+            {streak} {streak === 1 ? "day" : "days"}
           </span>
         </p>
       </div>

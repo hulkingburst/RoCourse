@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  Flame,
   ListChecks,
   Menu,
   Monitor,
@@ -13,6 +14,9 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
+import { useProgressStore } from "@/lib/progress-store";
+import { isStreakActive } from "@/lib/streak";
+import { cn } from "@/lib/utils";
 import { useUiStore } from "@/lib/ui-store";
 import type { CourseSection, SearchEntry } from "@/lib/types";
 import {
@@ -81,6 +85,14 @@ export function SiteHeader({
 }) {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
+  const streak = useProgressStore((state) => state.streak);
+  const lastStreakDate = useProgressStore((state) => state.lastStreakDate);
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const streakActive = isStreakActive(lastStreakDate);
 
   return (
     <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
@@ -138,6 +150,19 @@ export function SiteHeader({
       </Button>
 
       <SearchDialog entries={searchEntries} />
+      {mounted && (
+        <Link
+          href="/profile"
+          aria-label="Day streak"
+          className={cn(
+            "hidden items-center gap-1.5 rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-accent sm:inline-flex",
+            streakActive ? "text-orange-500" : "text-muted-foreground"
+          )}
+        >
+          <Flame className={cn("h-4 w-4", streakActive && "fill-current")} />
+          {streak}
+        </Link>
+      )}
       <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
         <Link href="/quiz">
           <ListChecks className="h-4 w-4" />

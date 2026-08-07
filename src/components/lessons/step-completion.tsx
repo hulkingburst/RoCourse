@@ -7,8 +7,10 @@ import {
   Award,
   BookOpen,
   CheckCircle2,
+  Flame,
   RotateCcw,
 } from "lucide-react";
+import { useProgressStore } from "@/lib/progress-store";
 
 /**
  * Next.js maintains scroll position across client-side navigations, so a
@@ -97,6 +99,7 @@ export function StepCompletion({
   nextTitle,
   onReplay,
 }: StepCompletionProps) {
+  const streak = useProgressStore((state) => state.streak);
   return (
     <div className="relative overflow-hidden rounded-2xl border bg-card px-6 py-14 text-center shadow-sm">
       <Confetti seed={slug} />
@@ -108,6 +111,10 @@ export function StepCompletion({
         <p className="pop-in mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
           Nice work finishing <span className="font-medium text-foreground">{title}</span>.
           Your progress was saved automatically.
+        </p>
+        <p className="pop-in mt-3 text-sm font-semibold text-orange-500">
+          <Flame className="mr-1 inline h-4 w-4 fill-current" />
+          {streak} {streak === 1 ? "day" : "days"} in a row
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row">

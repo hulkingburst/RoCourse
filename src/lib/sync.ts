@@ -19,6 +19,9 @@ export function getSnapshot(): ProgressSnapshot {
     lastLesson: state.lastLesson,
     finishedPath: state.finishedPath,
     quickQuizzesCompleted: state.quickQuizzesCompleted,
+    streak: state.streak,
+    longestStreak: state.longestStreak,
+    lastStreakDate: state.lastStreakDate,
     lastUpdated: state.lastUpdated,
   };
 }
@@ -31,7 +34,8 @@ export function hasAnyProgress(snapshot: ProgressSnapshot): boolean {
     snapshot.recentlyViewed.length > 0 ||
     snapshot.lastLesson != null ||
     snapshot.finishedPath != null ||
-    snapshot.quickQuizzesCompleted > 0
+    snapshot.quickQuizzesCompleted > 0 ||
+    snapshot.streak > 0
   );
 }
 
@@ -67,6 +71,9 @@ export function applySnapshot(
     lastLesson: clean.lastLesson,
     finishedPath: clean.finishedPath,
     quickQuizzesCompleted: clean.quickQuizzesCompleted,
+    streak: clean.streak,
+    longestStreak: clean.longestStreak,
+    lastStreakDate: clean.lastStreakDate,
     lastUpdated: lastUpdated ?? clean.lastUpdated,
   });
 }
@@ -99,6 +106,9 @@ export function sanitizeSnapshot(
       typeof snapshot?.lastLesson === "string" ? snapshot.lastLesson : null,
     finishedPath: sanitizeFinishedPath(snapshot?.finishedPath),
     quickQuizzesCompleted: sanitizeCount(snapshot?.quickQuizzesCompleted),
+    streak: sanitizeCount(snapshot?.streak),
+    longestStreak: sanitizeCount(snapshot?.longestStreak),
+    lastStreakDate: sanitizeDayKey(snapshot?.lastStreakDate),
     lastUpdated:
       typeof snapshot?.lastUpdated === "string" ? snapshot.lastUpdated : null,
   };
@@ -108,6 +118,12 @@ function sanitizeCount(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0
     ? Math.floor(value)
     : 0;
+}
+
+function sanitizeDayKey(value: unknown): string | null {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? value
+    : null;
 }
 
 function sanitizeLessonRecord(record: unknown): LessonRecord {
