@@ -1,7 +1,5 @@
 import type { MDXComponents } from "mdx/types";
 import { CodeBlock } from "@/components/lessons/code-block";
-import { Quiz } from "@/components/lessons/quiz";
-import { Prediction } from "@/components/lessons/prediction";
 import { Solution } from "@/components/lessons/solution";
 import { Step } from "@/components/lessons/step";
 import { ArrangeCode } from "@/components/activities/arrange-code";
@@ -41,8 +39,6 @@ export const mdxComponents: MDXComponents = {
   Tip,
   Warning,
   Mistake,
-  Quiz,
-  Prediction,
   Solution,
   Step,
   Mcq,

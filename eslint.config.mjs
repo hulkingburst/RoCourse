@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Plain Node scripts run outside the Next.js/TypeScript toolchain.
+    "scripts/**",
   ]),
 ]);
 
