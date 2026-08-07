@@ -167,6 +167,7 @@ function emptySnapshot(): ProgressSnapshot {
     recentlyViewed: [],
     lastLesson: null,
     finishedPath: null,
+    quickQuizzesCompleted: 0,
     lastUpdated: null,
   };
 }

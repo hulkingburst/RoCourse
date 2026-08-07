@@ -18,6 +18,7 @@ export function getSnapshot(): ProgressSnapshot {
     recentlyViewed: state.recentlyViewed,
     lastLesson: state.lastLesson,
     finishedPath: state.finishedPath,
+    quickQuizzesCompleted: state.quickQuizzesCompleted,
     lastUpdated: state.lastUpdated,
   };
 }
@@ -29,7 +30,8 @@ export function hasAnyProgress(snapshot: ProgressSnapshot): boolean {
     snapshot.bookmarks.length > 0 ||
     snapshot.recentlyViewed.length > 0 ||
     snapshot.lastLesson != null ||
-    snapshot.finishedPath != null
+    snapshot.finishedPath != null ||
+    snapshot.quickQuizzesCompleted > 0
   );
 }
 
@@ -64,6 +66,7 @@ export function applySnapshot(
     recentlyViewed: clean.recentlyViewed,
     lastLesson: clean.lastLesson,
     finishedPath: clean.finishedPath,
+    quickQuizzesCompleted: clean.quickQuizzesCompleted,
     lastUpdated: lastUpdated ?? clean.lastUpdated,
   });
 }
@@ -95,9 +98,16 @@ export function sanitizeSnapshot(
     lastLesson:
       typeof snapshot?.lastLesson === "string" ? snapshot.lastLesson : null,
     finishedPath: sanitizeFinishedPath(snapshot?.finishedPath),
+    quickQuizzesCompleted: sanitizeCount(snapshot?.quickQuizzesCompleted),
     lastUpdated:
       typeof snapshot?.lastUpdated === "string" ? snapshot.lastUpdated : null,
   };
+}
+
+function sanitizeCount(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? Math.floor(value)
+    : 0;
 }
 
 function sanitizeLessonRecord(record: unknown): LessonRecord {

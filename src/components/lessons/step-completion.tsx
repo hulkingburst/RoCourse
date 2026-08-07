@@ -4,6 +4,15 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, CheckCircle2, RotateCcw } from "lucide-react";
 
+/**
+ * Next.js maintains scroll position across client-side navigations, so a
+ * "Next lesson" click from the bottom of a long lesson would land readers at
+ * the bottom of the new one. Scroll to the top before the navigation starts.
+ */
+function scrollToTop() {
+  window.scrollTo({ top: 0, left: 0 });
+}
+
 function seededRandom(seed: string) {
   let h = 2166136261;
   for (let i = 0; i < seed.length; i++) {
@@ -99,6 +108,7 @@ export function StepCompletion({
           {nextSlug && nextTitle ? (
             <Link
               href={`/lessons/${nextSlug}`}
+              onClick={scrollToTop}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Next lesson: {nextTitle}
@@ -107,6 +117,7 @@ export function StepCompletion({
           ) : (
             <Link
               href="/lessons"
+              onClick={scrollToTop}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               You finished the course!

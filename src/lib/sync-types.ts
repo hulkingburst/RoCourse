@@ -10,6 +10,8 @@ export interface ProgressSnapshot {
   recentlyViewed: string[];
   lastLesson: string | null;
   finishedPath: FinishedPath | null;
+  /** Lifetime count of completed quick quizzes. */
+  quickQuizzesCompleted: number;
   lastUpdated: string | null;
 }
 

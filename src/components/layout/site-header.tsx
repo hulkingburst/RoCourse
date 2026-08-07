@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  ListChecks,
   Menu,
   Monitor,
   Moon,
@@ -137,6 +138,12 @@ export function SiteHeader({
       </Button>
 
       <SearchDialog entries={searchEntries} />
+      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
+        <Link href="/quiz">
+          <ListChecks className="h-4 w-4" />
+          Quiz
+        </Link>
+      </Button>
       <AccountMenu />
       <ThemeToggle />
     </header>

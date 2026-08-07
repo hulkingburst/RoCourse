@@ -39,6 +39,8 @@ interface ProgressState {
   lastLesson: string | null;
   /** The learner's chosen final-project path, null until they pick one. */
   finishedPath: FinishedPath | null;
+  /** Lifetime count of completed quick quizzes. */
+  quickQuizzesCompleted: number;
   /**
    * ISO timestamp of the last local mutation. Drives cloud conflict
    * resolution: whichever side (device or cloud) is newest wins.
@@ -46,6 +48,7 @@ interface ProgressState {
   lastUpdated: string | null;
 
   setHydrated: (value: boolean) => void;
+  recordQuickQuizCompleted: () => void;
   markLessonComplete: (slug: string) => void;
   toggleLessonComplete: (slug: string) => void;
   recordView: (slug: string) => void;
@@ -82,9 +85,16 @@ export const useProgressStore = create<ProgressState>()(
       recentlyViewed: [],
       lastLesson: null,
       finishedPath: null,
+      quickQuizzesCompleted: 0,
       lastUpdated: null,
 
       setHydrated: (value) => set({ hydrated: value }),
+
+      recordQuickQuizCompleted: () =>
+        set((state) => ({
+          quickQuizzesCompleted: state.quickQuizzesCompleted + 1,
+          lastUpdated: nowIso(),
+        })),
 
       markLessonComplete: (slug) =>
         set((state) => {
@@ -193,7 +203,11 @@ export const useProgressStore = create<ProgressState>()(
 
       setFinishedPath: (finishedPath) => set({ finishedPath, lastUpdated: nowIso() }),
 
-      restoreProgress: (snapshot) => set({ ...snapshot }),
+      restoreProgress: (snapshot) =>
+        set((state) => ({
+          ...snapshot,
+          quickQuizzesCompleted: snapshot.quickQuizzesCompleted ?? state.quickQuizzesCompleted,
+        })),
 
       resetProgress: () =>
         set({
@@ -202,6 +216,7 @@ export const useProgressStore = create<ProgressState>()(
           recentlyViewed: [],
           lastLesson: null,
           finishedPath: null,
+          quickQuizzesCompleted: 0,
           lastUpdated: null,
         }),
     }),
@@ -214,6 +229,7 @@ export const useProgressStore = create<ProgressState>()(
         recentlyViewed: state.recentlyViewed,
         lastLesson: state.lastLesson,
         finishedPath: state.finishedPath,
+        quickQuizzesCompleted: state.quickQuizzesCompleted,
         lastUpdated: state.lastUpdated,
       }),
       onRehydrateStorage: () => (state) => {

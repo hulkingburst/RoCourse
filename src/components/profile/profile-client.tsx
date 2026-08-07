@@ -9,6 +9,7 @@ import {
   BookOpen,
   CheckCircle2,
   Flame,
+  ListChecks,
   Loader2,
   Target,
   Trophy,
@@ -40,6 +41,9 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
   const bookmarks = useProgressStore((state) => state.bookmarks);
   const lastLesson = useProgressStore((state) => state.lastLesson);
   const finishedPath = useProgressStore((state) => state.finishedPath);
+  const quickQuizzesCompleted = useProgressStore(
+    (state) => state.quickQuizzesCompleted
+  );
   const [cloud, setCloud] = React.useState<CloudState | null>(null);
   const [loadingSync, setLoadingSync] = React.useState(true);
 
@@ -154,7 +158,7 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <Progress value={pct} />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
             <Stat icon={<CheckCircle2 className="h-4 w-4" />} label="Lessons" value={String(completedCount)} />
             <Stat icon={<Bookmark className="h-4 w-4" />} label="Bookmarks" value={String(bookmarks.length)} />
             <Stat
@@ -166,6 +170,11 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
               icon={<Award className="h-4 w-4" />}
               label="Quiz accuracy"
               value={quizAccuracy == null ? "—" : `${quizAccuracy}%`}
+            />
+            <Stat
+              icon={<ListChecks className="h-4 w-4" />}
+              label="Mini quizzes"
+              value={String(quickQuizzesCompleted)}
             />
           </div>
         </CardContent>
