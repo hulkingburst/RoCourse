@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen, CheckCircle2, RotateCcw } from "lucide-react";
+import {
+  ArrowRight,
+  Award,
+  BookOpen,
+  CheckCircle2,
+  RotateCcw,
+} from "lucide-react";
 
 /**
  * Next.js maintains scroll position across client-side navigations, so a
@@ -122,6 +128,15 @@ export function StepCompletion({
             >
               You finished the course!
               <BookOpen className="h-4 w-4" />
+            </Link>
+          )}
+          {!nextSlug && (
+            <Link
+              href="/certificate"
+              className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
+            >
+              <Award className="h-4 w-4" />
+              View your certificate
             </Link>
           )}
           <Link

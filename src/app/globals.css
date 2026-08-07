@@ -227,3 +227,28 @@
 .prose :where(li)::marker {
   color: var(--muted-foreground);
 }
+
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 0.4in;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #certificate-print,
+  #certificate-print * {
+    visibility: visible;
+  }
+
+  #certificate-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+  }
+}

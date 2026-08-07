@@ -227,9 +227,17 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
                   className="flex items-center justify-between gap-2"
                 >
                   <span className="font-medium">{completion.title}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(completion.completedAt).toLocaleDateString()}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href={`/certificate?course=${completion.courseId}`}
+                      className="text-xs font-medium text-primary underline underline-offset-4"
+                    >
+                      Certificate
+                    </Link>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(completion.completedAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
               ))
             ) : (
