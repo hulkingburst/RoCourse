@@ -266,6 +266,47 @@ export function localIsNewer(cloud: CloudState, local: ProgressSnapshot): boolea
 }
 
 /**
+ * Merges two snapshots when both sides have progress. The newer (cloud) side
+ * is authoritative for counters and timestamps — every prior local change was
+ * already pushed into it — while anything present only on the local side
+ * (lessons, bookmarks, recently viewed, activity days) is kept so no progress
+ * is lost. Replaces the old "pick local or cloud" prompt.
+ */
+export function mergeSnapshots(
+  cloud: ProgressSnapshot,
+  local: ProgressSnapshot
+): ProgressSnapshot {
+  return {
+    lessons: { ...local.lessons, ...cloud.lessons },
+    bookmarks: unionStrings(cloud.bookmarks, local.bookmarks),
+    recentlyViewed: unionStrings(cloud.recentlyViewed, local.recentlyViewed).slice(0, 10),
+    lastLesson: cloud.lastLesson ?? local.lastLesson,
+    finishedPath: cloud.finishedPath ?? local.finishedPath,
+    quickQuizzesCompleted: cloud.quickQuizzesCompleted,
+    dailyChallengesCompleted: cloud.dailyChallengesCompleted,
+    activityDays: { ...local.activityDays, ...cloud.activityDays },
+    streak: cloud.streak,
+    longestStreak: cloud.longestStreak,
+    lastStreakDate: cloud.lastStreakDate,
+    lastUpdated: cloud.lastUpdated,
+  };
+}
+
+function unionStrings(...arrays: string[][]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const array of arrays) {
+    for (const item of array) {
+      if (!seen.has(item)) {
+        seen.add(item);
+        out.push(item);
+      }
+    }
+  }
+  return out;
+}
+
+/**
  * Best-effort push of the current local state. Used before sign-out so the
  * cloud stays up to date with the device's latest progress.
  */

@@ -10,37 +10,23 @@ import {
   getCompletions,
   getSnapshot,
   hasAnyProgress,
+  mergeSnapshots,
   pullCloud,
   pushCloud,
   waitForHydration,
 } from "@/lib/sync";
-import type { CloudState, ProgressSnapshot } from "@/lib/sync-types";
+import type { ProgressSnapshot } from "@/lib/sync-types";
 import { AuthDialog } from "@/components/auth/auth-dialog";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-interface ConflictState {
-  cloud: CloudState;
-  local: ProgressSnapshot;
-}
 
 /**
  * Owns the lifecycle of cloud sync: pull on sign-in, debounced push on every
- * local change, a full flush before sign-out, and a conflict dialog when both
- * sides changed.
+ * local change, and a full flush before sign-out. When both the device and the
+ * cloud changed, the newer (cloud) snapshot is merged in automatically instead
+ * of asking the user to pick one.
  */
 export function SyncHost() {
   const { status } = useSession();
   const resolvedRef = React.useRef(false);
-  const [conflict, setConflict] = React.useState<ConflictState | null>(null);
-  const [resolving, setResolving] = React.useState(false);
 
   const resolveOnLogin = async () => {
     await waitForHydration();
@@ -50,9 +36,17 @@ export function SyncHost() {
     const local = getSnapshot();
     const localHasProgress = hasAnyProgress(local);
 
-    // Both sides changed → let the user pick.
-    if (cloudIsNewer(cloud, local) && localHasProgress) {
-      setConflict({ cloud, local });
+    // Both sides changed: merge instead of prompting. The cloud is newer, so
+    // its counters win while local-only entries are preserved.
+    if (
+      cloudIsNewer(cloud, local) &&
+      localHasProgress &&
+      hasAnyProgress(cloud.progress ?? emptySnapshot())
+    ) {
+      applySnapshot(
+        mergeSnapshots(cloud.progress ?? emptySnapshot(), local),
+        cloud.lastUpdated
+      );
       return;
     }
 
@@ -101,63 +95,7 @@ export function SyncHost() {
     };
   }, [status]);
 
-  const handleConflict = async (useCloud: boolean) => {
-    if (!conflict) return;
-    setResolving(true);
-    try {
-      if (useCloud) {
-        applySnapshot(conflict.cloud.progress ?? emptySnapshot(), conflict.cloud.lastUpdated);
-      } else {
-        const result = await pushCloud(conflict.local, getCompletions(conflict.local), true);
-        // Align the local timestamp with the server so future pushes don't
-        // trip the conflict check again (cloud just advanced past us).
-        if (result.status === "ok") {
-          applySnapshot(conflict.local, result.cloud.lastUpdated);
-        }
-      }
-    } finally {
-      setConflict(null);
-      setResolving(false);
-    }
-  };
-
-  return (
-    <>
-      <Dialog
-        open={conflict !== null}
-        onOpenChange={(open) => {
-          if (!open) setConflict(null);
-        }}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Progress conflict</DialogTitle>
-            <DialogDescription>
-              Your progress on this device and your account&apos;s saved progress
-              both changed recently. Choose which one to keep — the other is
-              replaced.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button
-              variant="outline"
-              disabled={resolving}
-              onClick={() => handleConflict(true)}
-            >
-              Use account progress
-            </Button>
-            <Button
-              disabled={resolving}
-              onClick={() => handleConflict(false)}
-            >
-              Use this device
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <AuthDialog />
-    </>
-  );
+  return <AuthDialog />;
 }
 
 function emptySnapshot(): ProgressSnapshot {
