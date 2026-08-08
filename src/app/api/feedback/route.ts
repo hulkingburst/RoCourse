@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { trustedIp } from "@/lib/auth-limiter";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -12,15 +13,8 @@ const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 // against spam rather than a hard guarantee.
 const submissions = new Map<string, number[]>();
 
-function trimIp(ip: string | null): string {
-  return ip ?? "unknown";
-}
-
 export async function POST(request: Request) {
-  const ip = trimIp(
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      request.headers.get("x-real-ip")
-  );
+  const ip = trustedIp(request.headers);
 
   // Soft rate limit: keep the private inbox usable.
   const now = Date.now();

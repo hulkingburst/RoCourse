@@ -6,14 +6,30 @@ export const SIGNUP_MAX_ATTEMPTS = 10;
 
 let lastPruneAt = 0;
 
-/** Best-effort client IP from the web request (Vercel sets x-forwarded-for). */
-export function clientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
+/**
+ * Trusted client IP. Prefer x-real-ip (set by the edge proxy, so not spoofable
+ * by the client), then fall back to the rightmost x-forwarded-for entry, which
+ * is the one appended by the nearest trusted proxy. The leftmost entry is
+ * client-supplied and must never be trusted for rate limiting.
+ */
+export function trustedIp(headers: { get(name: string): string | null }): string {
+  const real = headers.get("x-real-ip")?.trim();
+  if (real) return real;
+  const forwarded = headers.get("x-forwarded-for");
   if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) return first;
+    const parts = forwarded
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean);
+    const last = parts[parts.length - 1];
+    if (last) return last;
   }
-  return request.headers.get("x-real-ip") ?? "unknown";
+  return "unknown";
+}
+
+/** Best-effort client IP from a web Request. */
+export function clientIp(request: Request): string {
+  return trustedIp(request.headers);
 }
 
 /** True when the key has already reached its attempt cap within the window. */
