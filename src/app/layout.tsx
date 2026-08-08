@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/react";
@@ -17,7 +18,12 @@ export const metadata: Metadata = {
   keywords: ["Roblox", "Luau", "Lua", "Roblox Studio", "learn to code", "game development", "free course"],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // The proxy (src/proxy.ts) stamps a fresh nonce onto every page view. It is
+  // forwarded to next-themes so its inline theme script carries the same
+  // nonce and passes the strict Content-Security-Policy.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html
       lang="en"
@@ -30,6 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          nonce={nonce}
         >
           <AuthProvider>
             {children}

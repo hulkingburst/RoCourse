@@ -8,7 +8,17 @@ export interface CompiledLesson {
   frontmatter: LessonFrontmatter;
 }
 
+// Lessons are read from disk and recompiled on every request now that the
+// proxy makes all routes dynamic. Memoize the expensive compile step so a
+// file is only ever parsed once per server process.
+const lessonCache = new Map<string, CompiledLesson>();
+
 export async function compileLesson(source: string): Promise<CompiledLesson> {
+  const cached = lessonCache.get(source);
+  if (cached) {
+    return cached;
+  }
+
   const { content, frontmatter, error } = await evaluate({
     source,
     components: mdxComponents,
@@ -24,5 +34,10 @@ export async function compileLesson(source: string): Promise<CompiledLesson> {
     throw error;
   }
 
-  return { content, frontmatter: frontmatter as unknown as LessonFrontmatter };
+  const compiled: CompiledLesson = {
+    content,
+    frontmatter: frontmatter as unknown as LessonFrontmatter,
+  };
+  lessonCache.set(source, compiled);
+  return compiled;
 }
