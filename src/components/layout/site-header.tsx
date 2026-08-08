@@ -12,6 +12,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Sun,
+  Terminal,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
@@ -174,6 +175,12 @@ export function SiteHeader({
         <Link href="/quiz">
           <ListChecks className="h-4 w-4" />
           Quiz
+        </Link>
+      </Button>
+      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
+        <Link href="/playground">
+          <Terminal className="h-4 w-4" />
+          Playground
         </Link>
       </Button>
       <AccountMenu />

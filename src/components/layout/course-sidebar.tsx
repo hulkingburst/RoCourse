@@ -15,6 +15,7 @@ import {
   PlayCircle,
   RotateCcw,
   Search,
+  Terminal,
 } from "lucide-react";
 import * as React from "react";
 import type { CourseSection, LessonMeta } from "@/lib/types";
@@ -270,6 +271,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
             <Link href="/quiz">
               <ListChecks className="h-3.5 w-3.5" />
               Quick quiz
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="w-full justify-start text-muted-foreground"
+          >
+            <Link href="/playground">
+              <Terminal className="h-3.5 w-3.5" />
+              Playground
             </Link>
           </Button>
           <Button

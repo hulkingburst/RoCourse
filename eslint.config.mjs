@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Static assets served as-is (including the vendored Luau WASM glue).
+    "public/**",
     // Plain Node scripts run outside the Next.js/TypeScript toolchain.
     "scripts/**",
   ]),

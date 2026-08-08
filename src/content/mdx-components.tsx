@@ -8,6 +8,7 @@ import { FillBlank } from "@/components/activities/fill-blank";
 import { FixBug } from "@/components/activities/fix-bug";
 import { Mcq } from "@/components/activities/mcq";
 import { PredictOutput } from "@/components/activities/predict-output";
+import { RunCode } from "@/components/activities/run-code";
 import { Variant } from "@/components/activities/variant";
 import { WriteCode } from "@/components/activities/write-code";
 import {
@@ -45,6 +46,7 @@ export const mdxComponents: MDXComponents = {
   FillBlank,
   WriteCode,
   PredictOutput,
+  RunCode,
   FixBug,
   ArrangeCode,
   ChooseBuild,

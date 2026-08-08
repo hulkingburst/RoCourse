@@ -103,12 +103,17 @@ tonumber("10")       -- takes a string, returns a number
 
 You've been calling functions since the second lesson. `print(...)` is a function with a variable number of inputs.
 
-<WriteCode
-  instruction="Define a function named cheer that prints 'Go!' whenever it's called."
-  answer={["function cheer()", "print(\"Go!\")", "end"]}
-  starterCode="-- define your function here
-"
-  explanation="function, a name, empty parentheses (no inputs needed), the job, then end."
+<RunCode
+  instruction="Define a function named cheer that prints 'Go!' whenever it's called, then call it once."
+  starterCode='local function cheer()
+    -- make cheer print "Go!" here
+end
+
+-- call cheer() once below'
+  checks='
+check(#__log >= 1, "you need to call cheer() so it runs")
+check(__log[1] == "Go!", "calling cheer() should print Go!")'
+  explanation="function cheer() defines the job, and the call cheer() runs the body, which prints Go!."
 />
 
 </Step>

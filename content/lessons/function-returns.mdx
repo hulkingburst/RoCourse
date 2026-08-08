@@ -114,13 +114,16 @@ A function can also return nothing at all — then its result is `nil`. That's f
 - **Expecting print and return to be the same.** `print` shows you something. `return` hands a value back to the caller. A function can do one, the other, both, or neither.
 - **Putting work after return.** It never runs.
 
-<WriteCode
-  instruction="A player has 30 coins and an item costs 10. Write a function salePrice that returns half the item's price, then print the result."
-  answer={["function salePrice(price)", "return price / 2", "end", "print(salePrice(10))"]}
-  starterCode="local coins = 30
--- define salePrice, then use it
-"
-  explanation="Define the function, return half of its input, then print the call so the result is used."
+<RunCode
+  instruction="A player has 30 coins and an item costs 10. Write a function salePrice that returns half the item's price, then print the result of salePrice(10)."
+  starterCode='local coins = 30
+
+-- define salePrice here, then print salePrice(10)'
+  checks='
+check(salePrice(10) == 5, "salePrice(10) should return 5")
+check(salePrice(2) == 1, "salePrice(2) should return 1")
+check(#__log >= 1 and __log[1] == "5", "you should print the result of salePrice(10)")'
+  explanation="salePrice returns price / 2, so salePrice(10) becomes 5. The print line uses the call so the result is shown."
 />
 
 Next: making decisions with `if`.

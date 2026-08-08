@@ -20,6 +20,7 @@ const ACTIVITY_TAGS = [
   "FillBlank",
   "WriteCode",
   "PredictOutput",
+  "RunCode",
   "FixBug",
   "ArrangeCode",
   "Mcq",
