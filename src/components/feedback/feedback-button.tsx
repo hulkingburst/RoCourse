@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { CheckCircle2, Loader2, MessageSquareText, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,19 +46,20 @@ export function FeedbackButton({ className }: { className?: string }) {
 
   return (
     <>
-      <Button
+      <button
         type="button"
-        variant="ghost"
-        size="sm"
         onClick={() => {
           reset();
           setOpen(true);
         }}
-        className={className}
+        className={cn(
+          "flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline",
+          className
+        )}
       >
         <MessageSquareText className="h-3 w-3" />
         Feedback
-      </Button>
+      </button>
       <Dialog
         open={open}
         onOpenChange={(next) => {

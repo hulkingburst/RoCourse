@@ -145,6 +145,16 @@
     @apply bg-primary/25;
   }
 
+  /* Tailwind v4 preflight leaves buttons on cursor:default; restore the
+     pointer for anything a user can click. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="menuitem"],
+  summary {
+    cursor: pointer;
+  }
+
+
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--muted) transparent;
