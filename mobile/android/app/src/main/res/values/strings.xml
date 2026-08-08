@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RoCourse</string>
+    <string name="title_activity_main">RoCourse</string>
+    <string name="package_name">com.hulkingburst.rocourse</string>
+    <string name="custom_url_scheme">com.hulkingburst.rocourse</string>
+</resources>

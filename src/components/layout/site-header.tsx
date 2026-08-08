@@ -167,19 +167,19 @@ export function SiteHeader({
           {streak}
         </Link>
       )}
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
+      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
         <Link href="/quiz/daily">
           <CalendarDays className="h-4 w-4" />
           Daily
         </Link>
       </Button>
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
+      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
         <Link href="/quiz">
           <ListChecks className="h-4 w-4" />
           Quiz
         </Link>
       </Button>
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 sm:inline-flex">
+      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
         <Link href="/playground">
           <Terminal className="h-4 w-4" />
           Playground

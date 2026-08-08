@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "public/**",
     // Plain Node scripts run outside the Next.js/TypeScript toolchain.
     "scripts/**",
+    // Capacitor/Android wrapper: generated project + build artifacts.
+    "mobile/**",
   ]),
 ]);
 
