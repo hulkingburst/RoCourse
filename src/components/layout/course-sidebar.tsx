@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Bookmark,
+  BookOpenCheck,
   CalendarDays,
   CheckCircle2,
   ChevronDown,
@@ -16,6 +17,7 @@ import {
   RotateCcw,
   Search,
   Terminal,
+  Users,
 } from "lucide-react";
 import * as React from "react";
 import type { CourseSection, LessonMeta } from "@/lib/types";
@@ -282,6 +284,28 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
             <Link href="/playground">
               <Terminal className="h-3.5 w-3.5" />
               Playground
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="w-full justify-start text-muted-foreground"
+          >
+            <Link href="/reference">
+              <BookOpenCheck className="h-3.5 w-3.5" />
+              Reference
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="w-full justify-start text-muted-foreground"
+          >
+            <Link href="/users">
+              <Users className="h-3.5 w-3.5" />
+              Learners
             </Link>
           </Button>
           <Button

@@ -9,6 +9,7 @@ import {
   recordAttempt,
   SIGNUP_MAX_ATTEMPTS,
 } from "@/lib/auth-limiter";
+import { generateUniqueHandle } from "@/lib/users";
 
 export interface CreateAccountResult {
   error?: string;
@@ -63,8 +64,9 @@ export async function createAccount(
   }
 
   const passwordHash = await hash(password, 12);
+  const handle = await generateUniqueHandle(name);
   await prisma.user.create({
-    data: { name, email, passwordHash },
+    data: { name, email, passwordHash, handle },
   });
 
   return {};

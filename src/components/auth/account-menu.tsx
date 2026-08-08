@@ -2,10 +2,11 @@
 
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { UserCircle2, LogOut, Loader2 } from "lucide-react";
+import { LinkIcon, UserCircle2, LogOut, Loader2 } from "lucide-react";
 import * as React from "react";
 
 import { useAuthUiStore } from "@/lib/auth-ui";
+import { maskEmail } from "@/lib/privacy";
 import { flushSync } from "@/lib/sync";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,13 +58,19 @@ export function AccountMenu() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel className="truncate">
-            {session.user.email}
+            {session.user.email ? maskEmail(session.user.email) : session.user.name}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => router.push("/profile")}>
             <UserCircle2 className="h-4 w-4" />
             Profile
           </DropdownMenuItem>
+          {session.user.handle ? (
+            <DropdownMenuItem onSelect={() => router.push(`/u/${session.user.handle}`)}>
+              <LinkIcon className="h-4 w-4" />
+              Public profile
+            </DropdownMenuItem>
+          ) : null}
           <DropdownMenuItem onSelect={handleSignOut}>
             <LogOut className="h-4 w-4" />
             Sign out

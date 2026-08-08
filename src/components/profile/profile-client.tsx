@@ -9,15 +9,19 @@ import {
   BookOpen,
   CalendarDays,
   CheckCircle2,
+  Eye,
+  EyeOff,
   Flame,
   ListChecks,
   Loader2,
+  ShieldCheck,
   Target,
   Trophy,
   UserCircle2,
 } from "lucide-react";
 
 import { useAuthUiStore } from "@/lib/auth-ui";
+import { maskEmail } from "@/lib/privacy";
 import { useProgressStore } from "@/lib/progress-store";
 import { isStreakActive } from "@/lib/streak";
 import { cn } from "@/lib/utils";
@@ -36,10 +40,16 @@ import { ActivityCalendar } from "@/components/profile/activity-calendar";
 interface ProfileClientProps {
   totalLessons: number;
   lessonMap: { slug: string; title: string }[];
+  handle: string | null;
 }
 
-export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
+export function ProfileClient({
+  totalLessons,
+  lessonMap,
+  handle,
+}: ProfileClientProps) {
   const { data: session, status } = useSession();
+  const [revealEmail, setRevealEmail] = React.useState(false);
   const { openDialog } = useAuthUiStore();
   const lessons = useProgressStore((state) => state.lessons);
   const bookmarks = useProgressStore((state) => state.bookmarks);
@@ -146,7 +156,37 @@ export function ProfileClient({ totalLessons, lessonMap }: ProfileClientProps) {
         <h1 className="text-3xl font-bold tracking-tight">
           {session.user.name || "Learner"}
         </h1>
-        <p className="mt-1 text-muted-foreground">{session.user.email}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            <span className="font-mono">
+              {revealEmail ? session.user.email : maskEmail(session.user.email ?? "")}
+            </span>
+            <button
+              type="button"
+              onClick={() => setRevealEmail((value) => !value)}
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {revealEmail ? (
+                <>
+                  <EyeOff className="h-3 w-3" /> Hide
+                </>
+              ) : (
+                <>
+                  <Eye className="h-3 w-3" /> Reveal
+                </>
+              )}
+            </button>
+          </span>
+          {handle ? (
+            <Link
+              href={`/u/${handle}`}
+              className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+            >
+              @{handle}
+            </Link>
+          ) : null}
+        </div>
         <p className="mt-1 text-xs text-muted-foreground">
           Joined{" "}
           {cloud?.account?.createdAt
