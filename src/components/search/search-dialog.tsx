@@ -37,9 +37,6 @@ export function SearchDialog({ entries }: { entries: SearchEntry[] }) {
       >
         <Search className="h-3.5 w-3.5" />
         Search lessons…
-        <kbd className="pointer-events-none ml-auto rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
-          ⌘K
-        </kbd>
       </Button>
       <Button
         variant="ghost"
