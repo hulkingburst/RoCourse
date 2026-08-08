@@ -28,6 +28,9 @@ export function DailyChallengeClient() {
   const dailyChallengesCompleted = useProgressStore(
     (state) => state.dailyChallengesCompleted
   );
+  const lastDailyChallengeDate = useProgressStore(
+    (state) => state.lastDailyChallengeDate
+  );
   const streak = useProgressStore((state) => state.streak);
 
   const mounted = React.useSyncExternalStore(
@@ -62,6 +65,35 @@ export function DailyChallengeClient() {
     if (selected !== null) return;
     setSelected(optionIndex);
   };
+
+  const completedToday = lastDailyChallengeDate === dayKey(new Date());
+
+  if (phase !== "done" && completedToday) {
+    return (
+      <div className="rounded-xl border bg-card p-8">
+        <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+          <CheckCircle2 className="h-6 w-6 text-primary" />
+        </div>
+        <h2 className="text-center text-2xl font-bold">Already done today</h2>
+        <p className="mx-auto mt-2 max-w-sm text-center text-sm text-muted-foreground">
+          You&apos;ve completed today&apos;s challenge. Come back tomorrow for a
+          fresh question — same one for everyone, once a day.
+        </p>
+        <p className="mt-6 text-center text-sm font-semibold text-orange-500">
+          <Flame className="mr-1 inline h-4 w-4 fill-current" />
+          {streak} {streak === 1 ? "day" : "days"} streak
+        </p>
+        <div className="mt-6 flex justify-center gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/quiz">Quick quiz</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/lessons">Back to lessons</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (phase === "intro") {
     return (

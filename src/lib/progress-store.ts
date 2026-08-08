@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { recordActivity } from "@/lib/streak";
+import { dayKey, recordActivity } from "@/lib/streak";
 import type { ProgressSnapshot } from "@/lib/sync-types";
 
 /**
@@ -46,6 +46,8 @@ interface ProgressState {
   quickQuizzesCompleted: number;
   /** Lifetime count of completed daily challenges. */
   dailyChallengesCompleted: number;
+  /** Local day (YYYY-MM-DD) of the most recently completed daily challenge. */
+  lastDailyChallengeDate: string | null;
   /** Local day (YYYY-MM-DD) → qualifying-action count (activity calendar). */
   activityDays: Record<string, number>;
   /**
@@ -103,6 +105,7 @@ export const useProgressStore = create<ProgressState>()(
       finishedPath: null,
       quickQuizzesCompleted: 0,
       dailyChallengesCompleted: 0,
+      lastDailyChallengeDate: null,
       activityDays: {},
       lastUpdated: null,
       streak: 0,
@@ -119,11 +122,16 @@ export const useProgressStore = create<ProgressState>()(
         })),
 
       recordDailyChallengeCompleted: () =>
-        set((state) => ({
-          dailyChallengesCompleted: state.dailyChallengesCompleted + 1,
-          ...recordActivity(state),
-          lastUpdated: nowIso(),
-        })),
+        set((state) => {
+          const today = dayKey(new Date());
+          if (state.lastDailyChallengeDate === today) return state;
+          return {
+            dailyChallengesCompleted: state.dailyChallengesCompleted + 1,
+            lastDailyChallengeDate: today,
+            ...recordActivity(state),
+            lastUpdated: nowIso(),
+          };
+        }),
 
       markLessonComplete: (slug) =>
         set((state) => {
@@ -248,6 +256,8 @@ export const useProgressStore = create<ProgressState>()(
           quickQuizzesCompleted: snapshot.quickQuizzesCompleted ?? state.quickQuizzesCompleted,
           dailyChallengesCompleted:
             snapshot.dailyChallengesCompleted ?? state.dailyChallengesCompleted,
+          lastDailyChallengeDate:
+            snapshot.lastDailyChallengeDate ?? state.lastDailyChallengeDate,
           activityDays: snapshot.activityDays ?? state.activityDays,
           streak: snapshot.streak ?? state.streak,
           longestStreak: snapshot.longestStreak ?? state.longestStreak,
@@ -263,6 +273,7 @@ export const useProgressStore = create<ProgressState>()(
           finishedPath: null,
           quickQuizzesCompleted: 0,
           dailyChallengesCompleted: 0,
+          lastDailyChallengeDate: null,
           activityDays: {},
           lastUpdated: null,
           streak: 0,
@@ -281,6 +292,7 @@ export const useProgressStore = create<ProgressState>()(
         finishedPath: state.finishedPath,
         quickQuizzesCompleted: state.quickQuizzesCompleted,
         dailyChallengesCompleted: state.dailyChallengesCompleted,
+        lastDailyChallengeDate: state.lastDailyChallengeDate,
         activityDays: state.activityDays,
         lastUpdated: state.lastUpdated,
         streak: state.streak,

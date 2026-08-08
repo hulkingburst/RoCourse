@@ -14,6 +14,8 @@ export interface ProgressSnapshot {
   quickQuizzesCompleted: number;
   /** Lifetime count of completed daily challenges. */
   dailyChallengesCompleted: number;
+  /** Local day (YYYY-MM-DD) of the most recently completed daily challenge. */
+  lastDailyChallengeDate: string | null;
   /** Local day (YYYY-MM-DD) → qualifying-action count (activity calendar). */
   activityDays: Record<string, number>;
   /** Current consecutive-day learning streak. */
