@@ -50,7 +50,7 @@ export function SearchDialog({ entries }: { entries: SearchEntry[] }) {
       >
         <Search className="h-4 w-4" />
       </Button>
-      <DialogContent className="top-[18%] max-w-xl">
+      <DialogContent className="max-h-[85dvh] max-w-xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="sr-only">Search lessons</DialogTitle>
           <DialogDescription className="sr-only">
