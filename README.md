@@ -172,9 +172,9 @@ local progress; signing in lets you continue on another device.
   reveal it).
 - **Learner directory** — `/users` lists public profiles (`/u/<handle>`) with
   progress stats and completions, so learners can show what they've built.
-- **Future resource library** — a community-reviewed library of curated
-  Roblox/Luau resources (tutorials, tools, free assets) is planned but not yet
-  implemented.
+- **Community resources** — a hand-vetted library of Roblox/Luau development
+  assets on `/resources`, built from submissions the course author personally
+  reviews (see the section below).
 
 ### Local setup
 
@@ -184,6 +184,7 @@ Create a Postgres database and a `.env` file based on `.env.example`:
 DATABASE_URL="postgresql://..."
 AUTH_SECRET="<random hex, e.g. openssl rand -base64 32>"
 AUTH_TRUST_HOST=true
+BLOB_READ_WRITE_TOKEN="<paste from your Vercel Blob store>"  # required for /submit
 ```
 
 Then apply the schema:
@@ -198,9 +199,46 @@ npx prisma migrate dev
 | `DATABASE_URL_UNPOOLED` | Migrations | Direct connection when `DATABASE_URL` uses a pooler (Neon `-pooler`) |
 | `AUTH_SECRET` | Auth.js sessions | Used to sign JWT session tokens |
 | `AUTH_TRUST_HOST` | Hosted deployments | Set `true` on Vercel/Netlify |
+| `BLOB_READ_WRITE_TOKEN` | Resources | Vercel Blob store token; auto-added when you create a store, paste locally for dev |
+| `FEEDBACK_GITHUB_TOKEN` | Feedback & resources | Fine-grained PAT with Issues read/write on the feedback repo |
+| `RESOURCES_GITHUB_REPO` | Resources | Optional; defaults to `hulkingburst/rocourse-feedback` |
 
 Everything else (lessons, activities, search, static pages) ignores these
 variables, and `next build` succeeds without them.
+
+## Community resources
+
+The `/resources` page is a small, hand-vetted library of Roblox/Luau
+development assets — scripts, asset packs, UI modules, and models. Everything
+listed there has been reviewed by the course author first. It exists because
+the Roblox Toolbox is uncurated; this is the opposite.
+
+How submissions flow:
+
+1. A learner fills in `/submit` on the site: type, name, description, optional
+   credit, and either a `.zip` asset pack or pasted code.
+2. Zips are inspected in the browser before upload — only image and 3D/model
+   file types are allowed inside (`png`, `jpg`, `fbx`, `obj`, and similar),
+   with caps on entry count and unpacked size. Code is stored as plain text
+   and never executed.
+3. The submission lands as a GitHub issue in the private feedback repo,
+   labeled `needs-review` (only you can see it).
+4. You review it. Close the issue with the `accepted` label to publish it —
+   it shows up on `/resources` within about a minute. Close with `rejected`
+   to turn it down.
+
+Implementation notes:
+
+- Storage is a Vercel Blob store; zips upload straight from the browser (no
+  server-side size limits). Create the store in the Vercel dashboard — the
+  `BLOB_READ_WRITE_TOKEN` environment variable is added to the project
+  automatically.
+- The Resources page reads accepted issues back through the existing
+  `FEEDBACK_GITHUB_TOKEN` (same private repo, labels keep feedback and
+  resources apart), so no extra token, repo, or webhook is needed. Override
+  the destination repo with `RESOURCES_GITHUB_REPO`.
+- Submissions are soft rate-limited per IP on both `/api/resources/submit` and
+  `/api/resources/upload`.
 
 ## Deploying
 

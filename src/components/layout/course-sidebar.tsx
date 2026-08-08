@@ -18,6 +18,7 @@ import {
   Search,
   Terminal,
   Users,
+  Package,
 } from "lucide-react";
 import * as React from "react";
 import type { CourseSection, LessonMeta } from "@/lib/types";
@@ -295,6 +296,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
             <Link href="/reference">
               <BookOpenCheck className="h-3.5 w-3.5" />
               Reference
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="w-full justify-start text-muted-foreground"
+          >
+            <Link href="/resources">
+              <Package className="h-3.5 w-3.5" />
+              Resources
             </Link>
           </Button>
           <Button
