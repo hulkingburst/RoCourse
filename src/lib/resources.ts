@@ -108,6 +108,28 @@ function parseResource(issue: {
     codeLang = codeLangMatch?.[1] ?? "";
   }
 
+  // Re-validate links at read time, so an edited issue body or a compromised
+  // token can never slip a non-http(s) URL or a foreign file URL into the
+  // catalog.
+  if (fileUrl) {
+    let hostname: string;
+    try {
+      hostname = new URL(fileUrl).hostname;
+    } catch {
+      return null;
+    }
+    if (!/(^|\.)public\.blob\.vercel-storage\.com$/.test(hostname)) return null;
+  }
+  if (url) {
+    let protocol: string;
+    try {
+      protocol = new URL(url).protocol;
+    } catch {
+      return null;
+    }
+    if (protocol !== "http:" && protocol !== "https:") return null;
+  }
+
   const authorMatch = body.match(AUTHOR_RE);
   const author = authorMatch ? authorMatch[1].trim() || null : null;
 
