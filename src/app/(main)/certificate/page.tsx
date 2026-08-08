@@ -7,7 +7,7 @@ import { CertificateEmptyState } from "@/components/certificate/certificate-empt
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Your certificate",
+  title: "RoCourse Certificate of Completion",
   description:
     "Download your RoCourse certificate of completion as a PNG or PDF.",
 };

@@ -3,8 +3,9 @@ import { REFERENCE_CATEGORIES, referenceEntries } from "@/lib/reference";
 import { ReferenceClient } from "@/components/reference/reference-client";
 
 export const metadata: Metadata = {
-  title: "Luau reference",
-  description: "A searchable cheat sheet of Luau syntax and common patterns.",
+  title: "Luau Cheat Sheet & Roblox Reference",
+  description:
+    "A searchable Luau cheat sheet: syntax, functions, loops, tables, and Roblox scripting patterns.",
 };
 
 export default function ReferencePage() {

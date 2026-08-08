@@ -3,9 +3,9 @@ import { getCourseStructure } from "@/lib/lessons";
 import { LessonList } from "@/components/home/lesson-list";
 
 export const metadata: Metadata = {
-  title: "All lessons",
+  title: "Luau Lessons & Roblox Scripting Tutorials",
   description:
-    "Every lesson in the RoCourse course, organized by section.",
+    "Free Luau lessons and Roblox scripting tutorials, from your first script to publishing a complete game.",
 };
 
 export default function LessonsPage() {

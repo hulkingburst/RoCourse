@@ -3,7 +3,7 @@ import { QuizClient } from "@/components/quiz/quiz-client";
 import { QUIZ_QUESTIONS, QUIZ_SIZE } from "@/lib/quiz-data";
 
 export const metadata: Metadata = {
-  title: "Quick quiz",
+  title: "Roblox Luau Quiz — Test Your Skills",
   description:
     "Test your Luau and Roblox knowledge with a quick multiple-choice quiz.",
 };

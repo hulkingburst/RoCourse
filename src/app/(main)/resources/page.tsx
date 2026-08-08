@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Resources",
+  title: "Free Roblox Scripts, Assets & Tools",
   description:
     "Hand-picked community resources for Roblox development: scripts, asset packs, UI modules and more. Every item is reviewed before it's listed.",
 };

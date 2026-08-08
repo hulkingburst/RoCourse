@@ -3,8 +3,8 @@ import { getSearchIndex } from "@/lib/lessons";
 import { SearchExperience } from "@/components/search/search-experience";
 
 export const metadata: Metadata = {
-  title: "Search",
-  description: "Search every lesson in the course.",
+  title: "Search Luau Lessons & Tutorials",
+  description: "Search every Luau lesson and Roblox tutorial in the course.",
 };
 
 export default function SearchPage() {

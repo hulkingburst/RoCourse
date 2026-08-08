@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { DailyChallengeClient } from "@/components/quiz/daily-challenge-client";
 
 export const metadata: Metadata = {
-  title: "Daily challenge",
-  description:
-    "One question a day. Beat it to keep your streak alive.",
+  title: "Daily Luau Quiz — One Question a Day",
+  description: "A new Luau question every day. Beat it to keep your streak alive.",
 };
 
 export default function DailyChallengePage() {
