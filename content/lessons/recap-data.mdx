@@ -1,0 +1,109 @@
+---
+slug: recap-data
+title: Recap — player data and trust
+description: Refresh leaderstats, saving with DataStores, and the rule that the server decides — before you build your first real game systems.
+sectionId: gameplay
+order: 0
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [recap, review, data, security]
+objectives:
+  - Remember how the leaderboard is built
+  - Remember the load / save loop with DataStores
+  - Remember why the server must decide
+prerequisites: [remotes]
+keywords: [recap, review, leaderstats, datastore, remotes]
+---
+
+The data section gave your game a memory and a spine: a leaderboard that shows stats, DataStores that remember between visits, and a security rule that keeps the economy honest. That last one — *the server decides* — is what everything you build next stands on. Quick lap:
+
+<Step>
+
+## The leaderboard
+
+A folder literally named `leaderstats` inside each player is the recipe. Children like `Coins` (a NumberValue) show up at the top-right, and changing `Value` updates the board live. It's created inside `PlayerAdded`, when the player object exists.
+
+<Mcq
+  question="Where is the leaderstats folder created?"
+  options={[
+    "In the Workspace",
+    "Inside each player, in PlayerAdded",
+    "In ServerScriptService",
+    "On the client's screen",
+  ]}
+  answer={1}
+  explanation="PlayerAdded gives you the player object — that's when leaderstats (and its NumberValues) are created."
+/>
+
+</Step>
+
+<Step>
+
+## The save loop
+
+Saving is a dance: on join, `GetAsync(player.UserId)` pulls the saved value — defaulting brand-new players with `or 0`. On leave, `SetAsync(player.UserId, coins)` writes it back. And an autosave loop backs it up so a crash can't wipe progress.
+
+<ArrangeCode
+  lines={[
+    "Players.PlayerRemoving:Connect(function(player)",
+    "    local coins = player.leaderstats.Coins.Value",
+    "    coinsStore:SetAsync(player.UserId, coins)",
+    "end)",
+  ]}
+  distractors={[
+    "coinsStore:SetAsync(coins, player.UserId)",
+    "player.leaderstats.Coins.Value = 0",
+    "coinsStore:GetAsync(player.UserId)",
+  ]}
+  explanation="On leave, read the current value, write it under the player's key. The distractors swap the arguments or load instead of save."
+/>
+
+</Step>
+
+<Step>
+
+## The security rule
+
+LocalScripts run on the player's own computer — so anything they can do, an exploiter can do. The rule that fixes it: **the server is the only thing that changes real data. Clients can only request.**
+
+<Mcq
+  question="A client fires a RemoteEvent asking for coins. What decides whether they get them?"
+  options={[
+    "The client's screen",
+    "The server, in the OnServerEvent handler",
+    "The number of clicks",
+    "The RemoteEvent's name",
+  ]}
+  answer={1}
+  explanation="The client asks; the server verifies and decides. That's the whole trust model."
+/>
+
+</Step>
+
+<Step>
+
+## The bridge
+
+RemoteEvents are the phone line: the client reports with `:FireServer()`, the server decides in `OnServerEvent`, and sends updates back with `:FireClient(player, ...)`. The client never hands itself rewards — it reports, and the server decides what the action was worth.
+
+<Mcq
+  question="What does the first argument of an OnServerEvent callback give you?"
+  options={[
+    "The clicked part",
+    "The player who fired",
+    "The client's screen",
+    "Nothing",
+  ]}
+  answer={1}
+  explanation="Roblox hands you the firing player automatically — identity comes from the connection, not from data."
+/>
+
+</Step>
+
+<Step>
+
+## Ready to build
+
+Data, memory, and trust are in place. Next section, you build your first actual game on top of them — the clicker, the shop, and the systems that tie it together.
+
+</Step>

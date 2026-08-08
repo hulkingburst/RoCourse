@@ -1,0 +1,130 @@
+---
+slug: arrange-code-basics
+title: Drag and drop — arrange the code
+description: Assemble working scripts from shuffled lines — functions, choices, loops, and events — without typing a thing.
+sectionId: luau-basics
+order: 18
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [arrange, drag-and-drop, review, luau]
+objectives:
+  - Assemble a function and its call in the right order
+  - Order a conditional's branches correctly
+  - Arrange a loop and an event connect
+prerequisites: [bug-hunt-basics]
+keywords: [arrange, order, drag, drop, review]
+---
+
+Reading code and writing code are different skills — and this lesson drills the one in between: **ordering**. Each activity shows the lines of a working script shuffled up, with a few imposters mixed in. Tap the right lines in the right order, leave the fakes out, and you've built the script. No typing, just judgment.
+
+<Step>
+
+## The rule
+
+Code runs **top to bottom**. So ask yourself at every line: *does this need something that only comes later?* A variable must be declared before it's used. A function must be defined before it's called. An `end` must close what a `function` or `if` opened.
+
+Let's warm up with a function:
+
+<ArrangeCode
+  lines={[
+    "local function greet(name)",
+    "    print(\"Hello, \" .. name)",
+    "end",
+    "greet(\"Sam\")",
+  ]}
+  distractors={[
+    "greet()",
+    "print(\"Hello, \" .. \"name\")",
+  ]}
+  explanation="Define the function first, then call it with a real argument. The imposters call with no argument or print the literal word 'name'."
+/>
+
+</Step>
+
+<Step>
+
+## Order the branches
+
+A conditional checks top to bottom. Decide the order so the right branch wins for a score of 75.
+
+<ArrangeCode
+  lines={[
+    "local score = 75",
+    "if score >= 100 then",
+    "    print(\"Whale!\")",
+    "elseif score >= 50 then",
+    "    print(\"Decent!\")",
+    "else",
+    "    print(\"Keep grinding\")",
+    "end",
+  ]}
+  distractors={[
+    "if score = 100 then",
+    "print(\"Decent!\")",
+  ]}
+  explanation="Check the biggest threshold first, then the middle one, then else. Only one branch runs — 75 hits the elseif."
+/>
+
+</Step>
+
+<Step>
+
+## Count with style
+
+A for loop knows exactly how many laps it runs. Arrange it.
+
+<ArrangeCode
+  lines={[
+    "for i = 1, 10 do",
+    "    print(i)",
+    "end",
+  ]}
+  distractors={[
+    "for i = 1 then",
+    "end)",
+  ]}
+  explanation="for i = 1, 10 do starts the count, the body prints each number, and end closes it. The imposters use wrong syntax."
+/>
+
+</Step>
+
+<Step>
+
+## Listen to the world
+
+Events don't run now — they register for later. Order the connect correctly, passing the function itself, not a call to it.
+
+<ArrangeCode
+  lines={[
+    "part.Touched:Connect(function(hit)",
+    "    print(hit.Name .. \" touched the part!\")",
+    "end)",
+  ]}
+  distractors={[
+    "part.Touched:Connect(myFunction())",
+    "part.Touched:Connect()",
+  ]}
+  explanation="Connect takes a function. The imposters call a function immediately (connecting its nil result) or connect nothing at all."
+/>
+
+</Step>
+
+<Step>
+
+## The judgment call
+
+You just arranged four scripts — a function, a choice, a loop, and an event. Notice the skill you used: you read a script *as a sequence*, in your head, and checked every line against the ones around it. That's exactly how you'll read real code when something breaks.
+
+<Mcq
+  question="You're arranging lines and one uses coins before declaring it. Where should the declaration go?"
+  options={[
+    "After the line that uses it",
+    "Before the line that uses it",
+    "In a comment",
+    "It doesn't matter",
+  ]}
+  answer={1}
+  explanation="Code runs top to bottom. A variable must exist before a line reads it — declare first, use after."
+/>
+
+</Step>

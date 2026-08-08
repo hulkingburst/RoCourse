@@ -1,0 +1,142 @@
+---
+slug: arrange-save-loop
+title: Drag and drop — the save loop
+description: Assemble load-on-join, save-on-leave, autosave, and the secure click flow from shuffled lines.
+sectionId: data
+order: 10
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [arrange, drag-and-drop, data, review]
+objectives:
+  - Order the load-on-join handler
+  - Order the save-on-leave handler
+  - Assemble the autosave loop and secure click flow
+prerequisites: [bug-hunt-data]
+keywords: [arrange, order, save, load, datastore]
+---
+
+Saving looks simple in a code block, but the *order* is where the meaning lives — and where bugs hide. This lesson has you assemble each piece of the save system from shuffled lines. Same rule as ever: code runs top to bottom, and an object must exist before anything uses it.
+
+<Step>
+
+## Load on join
+
+Put a returning player's coins into their new leaderboard. Order matters: the player must exist, the value must load, and the NumberValue must be parented before it can show.
+
+<ArrangeCode
+  lines={[
+    "Players.PlayerAdded:Connect(function(player)",
+    "    local coins = coinsStore:GetAsync(player.UserId) or 0",
+    "    local stats = Instance.new(\"Folder\")",
+    "    stats.Name = \"leaderstats\"",
+    "    stats.Parent = player",
+    "    local coinsValue = Instance.new(\"NumberValue\")",
+    "    coinsValue.Name = \"Coins\"",
+    "    coinsValue.Value = coins",
+    "    coinsValue.Parent = stats",
+    "end)",
+  ]}
+  distractors={[
+    "coinsStore:SetAsync(player.UserId, coins)",
+    "stats.Parent = workspace",
+    "coinsValue.Value = 999999",
+  ]}
+  explanation="On join, load the saved number (defaulting to 0), build the folder, and put the loaded value into the stat. The imposters save on join, parent to the wrong place, or fake the value."
+/>
+
+</Step>
+
+<Step>
+
+## Save on leave
+
+The moment a player leaves, write their real progress back. The key and value must go in the right slots.
+
+<ArrangeCode
+  lines={[
+    "Players.PlayerRemoving:Connect(function(player)",
+    "    local coins = player.leaderstats.Coins.Value",
+    "    coinsStore:SetAsync(player.UserId, coins)",
+    "end)",
+  ]}
+  distractors={[
+    "coinsStore:SetAsync(coins, player.UserId)",
+    "coinsStore:GetAsync(player.UserId)",
+  ]}
+  explanation="Read the player's coins first, then write them under their UserId. The imposters swap the arguments or load instead of saving."
+/>
+
+</Step>
+
+<Step>
+
+## The autosave loop
+
+Back up everyone's data every minute — wrapped so it never blocks the rest of the script.
+
+<ArrangeCode
+  lines={[
+    "task.spawn(function()",
+    "    while true do",
+    "        task.wait(60)",
+    "        for _, player in ipairs(Players:GetPlayers()) do",
+    "            if player.leaderstats then",
+    "                coinsStore:SetAsync(player.UserId, player.leaderstats.Coins.Value)",
+    "            end",
+    "        end",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "task.wait(0)",
+    "if player.leaderstats == false then",
+  ]}
+  explanation="task.spawn starts it, the while loop waits a minute, and the guard skips players without stats. task.wait(0) would hammer the store every frame."
+/>
+
+</Step>
+
+<Step>
+
+## The secure click flow
+
+The client reports the click; the server verifies, awards, and tells the client the new total. Order the server side.
+
+<ArrangeCode
+  lines={[
+    "clickEvent.OnServerEvent:Connect(function(player)",
+    "    local coins = player.leaderstats.Coins",
+    "    if coins then",
+    "        coins.Value = coins.Value + 10",
+    "        clickEvent:FireClient(player, coins.Value)",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "player.leaderstats.Coins.Value = 10",
+    "clickEvent:FireServer()",
+  ]}
+  explanation="Verify the player has stats, award, then push the new total down to that player. The imposters set coins directly or fire the wrong direction."
+/>
+
+</Step>
+
+<Step>
+
+## The loop in one picture
+
+Put together, those four scripts are the entire data system: **load on join, save on leave, autosave in between, and a server that owns every change.** If you can order them from memory, you understand persistence.
+
+<Mcq
+  question="Why does the autosave loop run inside task.spawn?"
+  options={[
+    "So it can run alongside the rest of the script without blocking it",
+    "So it runs only once",
+    "task.spawn makes it faster",
+    "So it can access the store",
+  ]}
+  answer={0}
+  explanation="A plain while loop at the top of the script would block everything after it. task.spawn runs it as a separate track."
+/>
+
+</Step>

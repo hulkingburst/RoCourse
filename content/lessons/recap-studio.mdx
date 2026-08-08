@@ -1,0 +1,82 @@
+---
+slug: recap-studio
+title: Recap — a quick tour of the start
+description: A short refresher over Studio, parts, playtesting, and reading errors before the real coding begins.
+sectionId: luau-basics
+order: 0
+difficulty: beginner
+estimatedMinutes: 4
+tags: [recap, review, getting-started, studio]
+objectives:
+  - Remember the Explorer, Properties, and Output panels
+  - Remember how Play and Stop work
+  - Remember how to read an error message
+prerequisites: [output-errors]
+keywords: [recap, review, explorer, play, output]
+---
+
+You made it through the whole warm-up: Studio installed, your first parts placed, your first script run, and your first error read like a sentence. Before we start writing real code, a two-minute lap of everything you just learned — so it's warm when we use it.
+
+<Step>
+
+## The three panels you live in
+
+The Explorer is the tree of everything in your game. The Properties panel is the settings of whatever you select. The Output window is where scripts print — and where errors appear in red. When something's wrong, Output names the script and the line first.
+
+<Mcq
+  question="You want to know which objects are inside the Workspace. Where do you look?"
+  options={[
+    "The Output window",
+    "The Explorer",
+    "The Properties panel",
+    "The Play button",
+  ]}
+  answer={1}
+  explanation="The Explorer is the tree — it shows what exists and what's inside what."
+/>
+
+</Step>
+
+<Step>
+
+## Play, test, throw away
+
+Play starts a test of your game; Stop ends it. Anything you change **while playing** — colors, sizes, positions — is thrown away on Stop. That's on purpose: it lets you experiment without wrecking your real work.
+
+<Mcq
+  question="You test your game and press Stop. What happens to changes you made during the test?"
+  options={[
+    "They stay forever",
+    "They are thrown away",
+    "Roblox keeps a copy",
+    "The game saves automatically",
+  ]}
+  answer={1}
+  explanation="Test-time changes don't stick. Stop first, then edit the real game."
+/>
+
+</Step>
+
+<Step>
+
+## Red text is a map, not a verdict
+
+An error like `Workspace.Script:3` tells you exactly where to look: the script named Script, around line 3. The words after it say what went wrong. When something doesn't work, check **Output before anything else**.
+
+<FillBlank
+  prompt="When your script breaks, the first place you look is the ____ window."
+  answer="Output"
+  explanation="Output always comes first — it names the script, the line, and the problem."
+/>
+
+</Step>
+
+<Step>
+
+## Ready for the real thing
+
+That warm-up is everything you need for the next section: how to make things (parts), how to make things run (scripts), and how to find your own mistakes (Output). From here, the lessons assume you're comfortable with all three — and if you ever forget, the previous section is one click back.
+
+Next up: scripts, variables, and the language every Roblox game is written in.
+
+</Step>

@@ -1,0 +1,111 @@
+---
+slug: recap-gameplay
+title: Recap — your first game systems
+description: Refresh GUIs, the clicker loop, idle income, upgrades, and modules before you start building the world around them.
+sectionId: objects
+order: 0
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [recap, review, gameplay, gui, modules]
+objectives:
+  - Remember how GUIs are built in code
+  - Remember the clicker's client-server loop
+  - Remember how modules organize code
+prerequisites: [modules]
+keywords: [recap, review, gui, clicker, modules]
+---
+
+You built a real game — a clicker with a GUI, idle income, an upgrades shop, and organized modules. That's a complete economy running on the secure pipeline from the data section. One lap around it before we build the world it lives in:
+
+<Step>
+
+## GUIs built in code
+
+Everything on screen hangs from a **ScreenGui** in the player's PlayerGui. The recipe is always the same: **create it with `Instance.new`, set its properties, parent it.** Frames hold children, TextButtons get clicked, and positions are UDim2.
+
+<Mcq
+  question="Where must a GUI live for the player to see it?"
+  options={[
+    "In the Workspace",
+    "In the player's PlayerGui",
+    "In ServerScriptService",
+    "On the baseplate",
+  ]}
+  answer={1}
+  explanation="GUIs render from PlayerGui (per player) or StarterGui (shared starting GUIs)."
+/>
+
+</Step>
+
+<Step>
+
+## The clicker loop
+
+The clicker is the whole course in miniature: the button reports clicks with `FireServer`, the server verifies and awards coins, then sends the new total back with `FireClient` — and the client's label just mirrors what the server said. Clicks are never trusted; rewards never come from the client.
+
+<ArrangeCode
+  lines={[
+    "button.Activated:Connect(function()",
+    "    clickEvent:FireServer()",
+    "end)",
+    "clickEvent.OnClientEvent:Connect(function(total)",
+    "    label.Text = \"Coins: \" .. total",
+    "end)",
+  ]}
+  distractors={[
+    "coins.Value = coins.Value + 1",
+    "clickEvent:FireClient()",
+    "label.Text = \"Coins: 999999\"",
+  ]}
+  explanation="The button reports the click, and OnClientEvent receives the server's total. Awarding coins and fake totals are the distractors."
+/>
+
+</Step>
+
+<Step>
+
+## Idle income and the shop
+
+Idle income is the same loop minus the click: a `while true` loop with `task.wait(1)` pays every player, guarded by `if coins then`. The upgrades shop follows one rule — the **server checks the bill**. The client sends an intent like `"multiplier"`, the server prices it, verifies the wallet, and only then spends.
+
+<Mcq
+  question="Where does the price check happen when a player buys an upgrade?"
+  options={[
+    "In the client's button handler",
+    "On the server, in the buy handler",
+    "In the leaderboard",
+    "Nowhere — players always can afford it",
+  ]}
+  answer={1}
+  explanation="The client may claim a purchase, but only the server knows if they can afford it."
+/>
+
+</Step>
+
+<Step>
+
+## Modules
+
+One giant script gets hard to read fast. **ModuleScripts** split it up: a file that ends in `return`, loaded anywhere with `require`. Every script that requires a module shares the same copy — so config and math live in one obvious place.
+
+<Mcq
+  question="Two scripts require the same ModuleScript. What do they get?"
+  options={[
+    "Two separate copies",
+    "One shared instance",
+    "An error",
+    "A random value",
+  ]}
+  answer={1}
+  explanation="Modules run once and the result is shared — that's why config belongs in modules."
+/>
+
+</Step>
+
+<Step>
+
+## Ready for the world
+
+Interfaces, economies, and organization are built. Next section, you'll fill the world around them — players, characters, parts, sounds, and smooth movement.
+
+</Step>

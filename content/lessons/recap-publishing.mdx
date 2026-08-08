@@ -1,0 +1,80 @@
+---
+slug: recap-publishing
+title: Recap — taking your game live
+description: Refresh publishing, permissions, and data store testing before the final stretch.
+sectionId: leveling-up
+order: 0
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [recap, review, publishing, testing]
+objectives:
+  - Remember how to publish an experience
+  - Remember how permissions control who plays
+  - Remember how to verify saves live
+prerequisites: [datastore-testing]
+keywords: [recap, review, publish, permissions, testing]
+---
+
+Your game went from a Studio sandbox to a live experience — with settings, permissions, and proof that the saves actually survive. Before the leveling-up section, a quick lap over what changed when it went live:
+
+<Step>
+
+## Studio vs live
+
+Publishing (`File → Publish to Roblox As…`) turns your place into an **experience**. Almost everything runs the same — except the things that matter: DataStores actually persist live, latency is real, and real players are connecting. The Experience ID is your game's permanent license plate; write it down.
+
+<Mcq
+  question="What's the biggest difference between Studio and a published game for saves?"
+  options={[
+    "There's no difference",
+    "Saves don't persist in Studio, but they do live",
+    "Published games can't save",
+    "Saves are faster in Studio",
+  ]}
+  answer={1}
+  explanation="DataStores are real in production. Studio testing doesn't persist — the classic 'why isn't it saving' trap."
+/>
+
+</Step>
+
+<Step>
+
+## Who gets in
+
+Permissions control the door: **Public** is anyone, **Friends** is safe testing, **Private** is invite-only. The safe order is build → test with friends → widen when it's solid. You share the experience link to get testers in.
+
+<Mcq
+  question="A friend wants to test your new game before strangers. What do you set first?"
+  options={[
+    "Permissions: Public",
+    "Permissions: Friends",
+    "Delete the game",
+    "Private servers",
+  ]}
+  answer={1}
+  explanation="Friends-only is the safe testing choice. Widen to Public only when the game is solid."
+/>
+
+</Step>
+
+<Step>
+
+## Proving the saves
+
+Studio refuses to touch real data stores until you tick **"Enable Studio Access to API Services"** in Game Settings → Security. With it on, the full loop runs: earn, Stop (which fires `PlayerRemoving` → `SetAsync`), Play again, and the leaderboard shows the exact coins you left with.
+
+<FillBlank
+  prompt="In Game Settings, the checkbox that lets Studio tests use real data stores is 'Enable Studio Access to ____ Services.'"
+  answer="API"
+  explanation="Without that checkbox, saves silently never happen during tests."
+/>
+
+</Step>
+
+<Step>
+
+## Ready to level up
+
+Your game is published, shareable, and its saves are proven. Next section: turning the debugging habits you've been using all course into an actual skill set.
+
+</Step>

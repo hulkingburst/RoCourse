@@ -1,0 +1,110 @@
+---
+slug: recap-basics
+title: Recap — the Luau toolbox
+description: Refresh variables, functions, conditionals, loops, tables, and events — the parts of the language you'll use all course long.
+sectionId: data
+order: 0
+difficulty: beginner
+estimatedMinutes: 5
+tags: [recap, review, luau, basics]
+objectives:
+  - Remember how to store and change values with variables
+  - Remember how functions and conditionals work
+  - Remember how loops, tables, and events fit together
+prerequisites: [events]
+keywords: [recap, review, variables, functions, events]
+---
+
+You've now got the whole Luau toolbox: variables that remember, functions that repeat jobs, conditionals that decide, loops that repeat, tables that hold many things, timing, and events that answer the world. This lesson packs it all into one quick lap — because the next section, player data, leans on every single piece.
+
+<Step>
+
+## Boxes that remember
+
+A variable is a named box. Declare it with `local`, read it, and change it — `coins = coins + 1` reads the box, adds one, and stores the result back.
+
+<Mcq
+  question="What is wrong with this line:  if coins = 5 then"
+  options={[
+    "coins should use capitals",
+    "A single = assigns; comparing uses ==",
+    "if needs an else",
+    "Nothing — it's fine",
+  ]}
+  answer={1}
+  explanation="One = stores a value. Two == asks whether two things are equal. In an if, you're asking."
+/>
+
+</Step>
+
+<Step>
+
+## Jobs and choices
+
+A function wraps a job: `function addCoins(amount) ... end`, then you call it with `addCoins(5)`. Defining does nothing until you call. A conditional makes a choice — Luau checks the `if`, then each `elseif`, and only if none matched does `else` run.
+
+<Mcq
+  question="What does defining a function do by itself?"
+  options={[
+    "Runs it immediately",
+    "Nothing until you call it",
+    "Errors",
+    "Prints its name",
+  ]}
+  answer={1}
+  explanation="Defining sets up the job. The call — addCoins(5) — is what runs it."
+/>
+
+</Step>
+
+<Step>
+
+## Loops, tables, and timing
+
+`while true do ... task.wait(1) end` repeats forever with a beat. A `for` loop counts for a known number of times. Tables are boxes that hold many values, and you pull them out by position. `task.wait` pauses; `task.delay` schedules and moves on.
+
+<ArrangeCode
+  lines={[
+    "local coins = 0",
+    "while true do",
+    "    task.wait(1)",
+    "    coins = coins + 1",
+    "end",
+  ]}
+  distractors={[
+    "task.delay(1, coins)",
+    "end)",
+    "coins == coins + 1",
+  ]}
+  explanation="Create the box, start the loop, breathe, count, close the loop. The imposters misuse delay and comparison."
+/>
+
+</Step>
+
+<Step>
+
+## Events — let Roblox call you
+
+You don't watch for things; you listen. `part.Touched:Connect(function(hit) ... end)` signs up a callback that the engine runs whenever the event fires. `:Connect` runs nothing now — it registers the function for later.
+
+<Mcq
+  question="What does :Connect do?"
+  options={[
+    "Runs the function immediately",
+    "Registers the function to run when the event fires",
+    "Deletes the event",
+    "Stops the script",
+  ]}
+  answer={1}
+  explanation="Connect signs up the callback. The engine calls it on each event — not now."
+/>
+
+</Step>
+
+<Step>
+
+## All wired up
+
+Variables, functions, conditionals, loops, tables, timing, events — that's the whole language core. The next section plugs it into the real world: the player, their data, and the trust rules around it.
+
+</Step>

@@ -1,0 +1,141 @@
+---
+slug: bug-hunt-first
+title: Bug hunt — your first fixes
+description: A calm first hunt — read the red text, spot the typo, fix the line, and press Play again.
+sectionId: getting-started
+order: 6
+difficulty: beginner
+estimatedMinutes: 6
+tags: [bug-hunt, debugging, errors, review]
+objectives:
+  - Read an error and find its line
+  - Spot typos in a script
+  - Fix a broken line and retest
+prerequisites: [output-errors]
+keywords: [bug-hunt, fix, error, output]
+---
+
+Every developer spends a chunk of their day fixing bugs. The good news: you already have the tool — the Output window names the script, the line, and the problem. This lesson is a gentle first hunt: a few broken scripts, a few red errors, and the small fixes that make them work. No prizes for being fast — the habit is the point.
+
+<Step>
+
+## Hunt one — a misspelled function
+
+You meant to print a message, but the Output shows an error on line 1. Read the message, then look at the line:
+
+<FixBug
+  question="Output says the error is on line 1. What's wrong?"
+  options={[
+    "prnit isn't a function — it's a typo for print",
+    "The message needs numbers, not text",
+    "The script is in the wrong folder",
+    "Nothing — it should work",
+  ]}
+  answer={0}
+  explanation="prnit isn't a function. Roblox doesn't know it, so it errors. Change it to print and Play again."
+  label="Hunt one"
+>
+
+```luau
+prnit("Hello")
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt two — a missing piece
+
+This one is almost right. The Output points at line 1 again — Luau is saying it expected something and never got it:
+
+<FixBug
+  question="Luau says it expected ')' at the end of the line. What's missing?"
+  options={[
+    "The closing parenthesis",
+    "A comma",
+    "The word print",
+    "Nothing — it's complete",
+  ]}
+  answer={0}
+  explanation="print( needs its closing ) to close the call. The message '(' expected' or ')' expected' usually means a missing or extra bracket."
+  label="Hunt two"
+>
+
+```luau
+print("Hello"
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt three — the script ran, but did nothing
+
+Here's the tricky one: no red error at all, but nothing appeared in Output. That's a different smell — the script ran and did what it said, which wasn't what you wanted.
+
+<FixBug
+  question="Output stayed empty after you pressed Play. The script is in the Workspace. What should you check first?"
+  options={[
+    "That you actually pressed Play",
+    "That the baseplate is anchored",
+    "That the script's name has no spaces",
+    "That your account is online",
+  ]}
+  answer={0}
+  explanation="A Script runs when the game starts. If you didn't press Play, nothing ran. The script can be perfect and still do nothing until you test it."
+  label="Hunt three"
+>
+
+```luau
+print("Hello from the Workspace")
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt four — type the fix yourself
+
+This last one is a broken line with a real typo. Type the corrected line in the box.
+
+<FixBug
+  instruction="Type the fixed line so it prints the message correctly."
+  fix={["print(\"Hello\")", "print('Hello')"]}
+  explanation="print needs parentheses around the text it prints. The line is print, an open paren, the quoted message, and a close paren."
+  placeholder="print(...)"
+  label="Hunt four"
+>
+
+```luau
+print "Hello"
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## The hunt is a loop
+
+Notice what you just did, four times: **read the red line, open the script, spot the small thing, fix it, press Play again.** That's the entire skill. Errors aren't failures — they're the game telling you exactly where to look.
+
+<Mcq
+  question="What's the first thing you do when an error appears?"
+  options={[
+    "Rewrite the whole script",
+    "Read the error in the Output window",
+    "Close Studio",
+    "Ask a friend to read it",
+  ]}
+  answer={1}
+  explanation="Output names the script, line, and problem. Read it first — it usually points straight at the fix."
+/>
+
+</Step>

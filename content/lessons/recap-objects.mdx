@@ -1,0 +1,109 @@
+---
+slug: recap-objects
+title: Recap — the world and the players in it
+description: Refresh players, characters, instances, attributes, sounds, and tweens before you take your game live.
+sectionId: publishing
+order: 0
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [recap, review, objects, players, tweens]
+objectives:
+  - Remember the Player vs character split
+  - Remember how parts, attributes, and sounds work
+  - Remember the tween recipe
+prerequisites: [tweens]
+keywords: [recap, review, players, instances, tweens]
+---
+
+The game now has a world and people in it: Player objects, characters that spawn and heal, parts built in code, attributes that tag them, sounds that give them voice, and tweens that make it all feel good. Quick lap before you ship:
+
+<Step>
+
+## The Player and the character
+
+The **Player** is the account — the name, the UserId, the leaderstats. The **character** is the temporary body in the world, and it's rebuilt on every respawn. Account-level things (data, bans) target the player; world things (health, position) target the character.
+
+<Mcq
+  question="A player respawns. What happens to their character?"
+  options={[
+    "Nothing",
+    "The old one is removed and a new one is created",
+    "It gets more health",
+    "It becomes a Player",
+  ]}
+  answer={1}
+  explanation="Respawn means a new body. The Player — the account — persists the whole session."
+/>
+
+</Step>
+
+<Step>
+
+## Grab the body safely
+
+The character isn't there at join time — it appears a moment later. So you listen to `CharacterAdded`, and you grab children with `character:WaitForChild("Humanoid")` so a not-yet-loaded part can't error.
+
+<ArrangeCode
+  lines={[
+    "player.CharacterAdded:Connect(function(character)",
+    "    local humanoid = character:WaitForChild(\"Humanoid\")",
+    "    humanoid.Health = humanoid.MaxHealth",
+    "end)",
+  ]}
+  distractors={[
+    "local humanoid = player.Character.Humanoid",
+    "humanoid.Health = 0",
+    "local character = player.Character",
+  ]}
+  explanation="Wait for the event, grab the Humanoid safely, then heal. Grabbing the character before it exists is the distractor."
+/>
+
+</Step>
+
+<Step>
+
+## Building and tagging the world
+
+`Instance.new("Part")` builds parts at runtime — set `Anchored = true` for static platforms, `Enum.Material.Grass` for looks. **Attributes** tag any object with your own data: `part:SetAttribute("Health", 100)` and `part:GetAttribute("Health")`.
+
+<Mcq
+  question="Why do static platforms need Anchored = true?"
+  options={[
+    "To make them invisible",
+    "To stop physics from making them fall",
+    "To make them play sounds",
+    "To save memory",
+  ]}
+  answer={1}
+  explanation="Unanchored parts obey gravity. Anchored pins them in place."
+/>
+
+</Step>
+
+<Step>
+
+## Sound and motion
+
+A Sound object needs a `SoundId`, a parent, and `:Play()`. Feel-effects — a coin pop, a click — play on the client, where the player can hear them. And tweens animate values smoothly: `TweenInfo.new(0.5)` says how long, a goals table says where, `TweenService:Create` builds it, and `:Play()` runs it.
+
+<Mcq
+  question="A coin tween is created but nothing moves. What's the most likely missing step?"
+  options={[
+    "The goals table is wrong",
+    "Nobody called :Play()",
+    "The part has no color",
+    "Tweens need a TweenInfo.new(0)",
+  ]}
+  answer={1}
+  explanation="Create builds the animation; Play runs it. Forgetting Play is the classic silent no-op."
+/>
+
+</Step>
+
+<Step>
+
+## Ready to ship
+
+The world is built, the systems run, and the data is safe. Next section: taking it live — publishing, permissions, and proving the saves survive for real.
+
+</Step>

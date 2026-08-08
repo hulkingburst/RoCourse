@@ -1,0 +1,179 @@
+---
+slug: bug-hunt-data
+title: Bug hunt — player data
+description: Hunt down the classic save-and-load bugs — swapped keys, missing defaults, and a leaderboard that never appears.
+sectionId: data
+order: 9
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [bug-hunt, debugging, data, review]
+objectives:
+  - Spot swapped key/value arguments in SetAsync
+  - Remember the or 0 default for new players
+  - Recognize misspelled leaderstats and wrong save timing
+prerequisites: [remotes]
+keywords: [bug-hunt, fix, datastore, leaderstats, save]
+---
+
+Data bugs are sneaky because they don't always error — a save can write garbage, a new player can crash, and a leaderboard can silently never appear. The good news: each one has a smell. Match the smell to the cause, and the fix is usually one line.
+
+<Step>
+
+## Hunt one — the swapped arguments
+
+Your game saves, but every player loads someone else's coins. The code runs with no error — the arguments are just in the wrong order.
+
+<FixBug
+  question="What's wrong with this save line?"
+  options={[
+    "The key is UserId and the value is coins — they're swapped",
+    "SetAsync needs three arguments",
+    "Coins must be a string to save",
+    "Nothing — it's correct",
+  ]}
+  answer={0}
+  explanation="The store is keyed by who (UserId) and holds what (coins). GetAsync(coins) reads the wrong file."
+  label="Hunt one"
+>
+
+```luau
+coinsStore:SetAsync(coins, player.UserId)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt two — the crashing new player
+
+The first time a brand-new player joins, the game errors on the line that reads their coins.
+
+<FixBug
+  question="Why does a brand-new player crash here?"
+  options={[
+    "GetAsync returns nil for a player with no save, and nil breaks the math",
+    "New players aren't allowed",
+    "GetAsync needs a number, not an ID",
+    "The store is full",
+  ]}
+  answer={0}
+  explanation="No save yet means nil. Default it with or 0: local coins = coinsStore:GetAsync(player.UserId) or 0"
+  label="Hunt two"
+>
+
+```luau
+local coins = coinsStore:GetAsync(player.UserId)
+print(player.Name .. " has " .. coins .. " coins")
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt three — the invisible leaderboard
+
+Your game runs with no errors, but the leaderboard at the top-right never shows up.
+
+<FixBug
+  question="The folder is created inside each player. What's the likely bug?"
+  options={[
+    "The name isn't exactly leaderstats — the contract is case-sensitive",
+    "NumberValues can't show on a leaderboard",
+    "The folder should be in the Workspace",
+    "The player needs more than one stat",
+  ]}
+  answer={0}
+  explanation="Roblox looks for a folder with the exact name leaderstats. Leaderstats or leaderStats silently shows nothing."
+  label="Hunt three"
+>
+
+```luau
+local stats = Instance.new("Folder")
+stats.Name = "Leaderstats"
+stats.Parent = player
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt four — the wrong save moment
+
+The game saves, but every returning player starts at zero. No errors — the save just ran too early to be useful.
+
+<FixBug
+  question="Why does saving inside PlayerAdded store the wrong number?"
+  options={[
+    "The player hasn't earned anything yet, so you save the starter value",
+    "PlayerAdded fires too late",
+    "SetAsync needs the server to be live",
+    "Saving on join is impossible",
+  ]}
+  answer={0}
+  explanation="At join time the player's coins are still the starting 0. Save on PlayerRemoving — the moment they leave with real progress."
+  label="Hunt four"
+>
+
+```luau
+Players.PlayerAdded:Connect(function(player)
+    coinsStore:SetAsync(player.UserId, player.leaderstats.Coins.Value)
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt five — type the fix
+
+A returning player should get their saved coins back. Spot the missing piece and type the corrected load line.
+
+<FixBug
+  instruction="Write the line that loads the player's coins, defaulting a missing save to 0."
+  fix={["local coins = coinsStore:GetAsync(player.UserId) or 0"]}
+  explanation="GetAsync pulls the save, and or 0 turns a nil (new player) into zero."
+  placeholder="local coins = ..."
+  label="Hunt five"
+>
+
+```luau
+local coins = coinsStore:GetAsync(player.UserId)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt six — arrange the secure flow
+
+Assemble the trusted click: the client reports, the server verifies and awards. Put the lines in order.
+
+<ArrangeCode
+  lines={[
+    "coinEvent:FireServer()",
+    "coinEvent.OnServerEvent:Connect(function(player)",
+    "    local coins = player.leaderstats.Coins",
+    "    if coins then",
+    "        coins.Value = coins.Value + 10",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "player.leaderstats.Coins.Value = 999999",
+    "coinsStore:GetAsync(player.UserId)",
+    "coinEvent:FireClient(player, 10)",
+  ]}
+  explanation="The client reports the click, then the server verifies the player has stats before awarding. Trust stays on the server."
+/>
+
+</Step>

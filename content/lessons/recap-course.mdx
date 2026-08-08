@@ -1,0 +1,100 @@
+---
+slug: recap-course
+title: Recap — everything you've built
+description: One lap around the whole journey — the pipeline, the pillars, and the debugging habits — before the final project.
+sectionId: final-project
+order: 0
+difficulty: advanced
+estimatedMinutes: 5
+tags: [recap, review, full course]
+objectives:
+  - Remember the full game pipeline you've built
+  - Remember the three pillars of a trustworthy game
+  - Remember the debugging reading order
+prerequisites: [next-steps]
+keywords: [recap, review, pipeline, pillars, debugging]
+---
+
+This is the last review before the big build. In one line, you went from "what is the Explorer?" to a published game with a secure economy that saves across sessions. Let's name exactly what you assembled — because the final project asks you to rebuild it, on purpose, bigger.
+
+<Step>
+
+## The pipeline
+
+Every system you built is one connected flow:
+
+> **a player does something, the server decides what it means, the data changes, and the player sees it.**
+
+Click → RemoteEvent → server verifies → leaderstats changes → FireClient → screen updates. That loop is 90% of every Roblox game ever made.
+
+<ArrangeCode
+  lines={[
+    "button.Activated:Connect(function()",
+    "    clickEvent:FireServer()",
+    "end)",
+    "clickEvent.OnServerEvent:Connect(function(player)",
+    "    player.leaderstats.Coins.Value += 1",
+    "    clickEvent:FireClient(player, player.leaderstats.Coins.Value)",
+    "end)",
+  ]}
+  distractors={[
+    "player.leaderstats.Coins.Value = 999999",
+    "clickEvent:FireClient(999)",
+    "coinsStore:SetAsync(player.UserId, coins)",
+  ]}
+  explanation="The full secure flow: client reports, server decides, server tells the client the new total. The distractors fake rewards or save out of place."
+/>
+
+</Step>
+
+<Step>
+
+## The three pillars
+
+Check any game you can trust against these:
+
+1. **Server authority** — rewards, money, and purchases are decided by the server.
+2. **Client polish** — what the player sees and feels (GUIs, tweens, sound) is client-side.
+3. **Persistent data** — progress outlives the session, keyed per player.
+
+<Mcq
+  question="Which is NOT one of the three pillars?"
+  options={[
+    "Server authority",
+    "Client polish",
+    "Persistent data",
+    "Bigger maps",
+  ]}
+  answer={3}
+  explanation="Map size is scale, not trust. The pillars are who decides, how it feels, and whether it survives."
+/>
+
+</Step>
+
+<Step>
+
+## The debugging habit
+
+When something breaks: **read the error** (which script, which line), **open that line**, **name the suspicious thing** (nil? a string where a number belongs?), **add a print** above it to see the real values, then **change one thing and retest the same way**.
+
+<Mcq
+  question="Your script errors on player.leaderstats.Coins.Value. First move?"
+  options={[
+    "Rewrite the whole script",
+    "Read the error, open that line, and name the nil thing",
+    "Delete the player's data",
+    "Ignore it and keep going",
+  ]}
+  answer={1}
+  explanation="Errors are maps: script, line, problem. Go read that line and work outward — one change at a time."
+/>
+
+</Step>
+
+<Step>
+
+## The big build
+
+Everything is warm. Now the final project asks you to assemble it all — server, remotes, modules, data store, client UI, and polish — into one complete game. You've already built every piece. This time you just put them together.
+
+</Step>

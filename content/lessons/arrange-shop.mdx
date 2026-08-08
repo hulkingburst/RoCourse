@@ -1,0 +1,136 @@
+---
+slug: arrange-shop
+title: Drag and drop — the shop
+description: Assemble the buy button, the server's checkout counter, idle income, and the live UI updates from shuffled lines.
+sectionId: gameplay
+order: 10
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [arrange, drag-and-drop, shop, review]
+objectives:
+  - Order the client's buy request
+  - Order the server's checkout counter
+  - Assemble idle income and the live UI updates
+prerequisites: [bug-hunt-systems]
+keywords: [arrange, order, shop, purchase, remote]
+---
+
+The shop is the whole security lesson in four scripts: the client asks, the server checks the bill, income flows on a timer, and the UI mirrors whatever the server recorded. Assemble each from shuffled lines — and keep the imposters out.
+
+<Step>
+
+## The buy button (client)
+
+The button reports *intent* — never a price. Assemble its click handler.
+
+<ArrangeCode
+  lines={[
+    "buyButton.Activated:Connect(function()",
+    "    purchaseEvent:FireServer(\"multiplier\")",
+    "end)",
+  ]}
+  distractors={[
+    "purchaseEvent:FireServer(25)",
+    "purchaseEvent.FireServer(\"multiplier\")",
+  ]}
+  explanation="The click connects a function that fires the intent 'multiplier'. Sending a price (25) is the exploiter's dream — the server owns pricing."
+/>
+
+</Step>
+
+<Step>
+
+## The checkout counter (server)
+
+The server rejects what it doesn't know, prices the upgrade, and checks the wallet before spending. Order matters.
+
+<ArrangeCode
+  lines={[
+    "purchaseEvent.OnServerEvent:Connect(function(player, upgradeId)",
+    "    if upgradeId ~= \"multiplier\" then return end",
+    "    local cost = 25 * (player.leaderstats.Multiplier.Value + 1)",
+    "    if player.leaderstats.Coins.Value >= cost then",
+    "        player.leaderstats.Coins.Value -= cost",
+    "        player.leaderstats.Multiplier.Value += 1",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "if player.leaderstats.Coins.Value <= cost then",
+    "player.leaderstats.Coins.Value = 0",
+  ]}
+  explanation="Recognize the request, price it, verify the wallet (>= cost), then spend and level. The imposters check the wrong direction or empty the wallet."
+/>
+
+</Step>
+
+<Step>
+
+## Idle income
+
+Coins without clicking: a loop that pays everyone each second, guarded so new players don't crash it.
+
+<ArrangeCode
+  lines={[
+    "task.spawn(function()",
+    "    while true do",
+    "        task.wait(1)",
+    "        for _, player in ipairs(Players:GetPlayers()) do",
+    "            local coins = player.leaderstats.Coins",
+    "            if coins then",
+    "                coins.Value += 1",
+    "            end",
+    "        end",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "coins.Value = 0",
+    "task.wait(0)",
+  ]}
+  explanation="spawn the loop, breathe each second, loop the players, and guard with if coins then. The imposters reset coins or spin without a pause."
+/>
+
+</Step>
+
+<Step>
+
+## The live UI
+
+The shop panel is a mirror — it reflects whatever the server actually recorded. Assemble the receive handler.
+
+<ArrangeCode
+  lines={[
+    "purchaseEvent.OnClientEvent:Connect(function(coins, multiplier)",
+    "    balanceLabel.Text = \"Coins: \" .. coins",
+    "    buyButton.Text = \"Multiplier x\" .. multiplier",
+    "end)",
+  ]}
+  distractors={[
+    "balanceLabel.Text = \"Coins: 999999\"",
+    "purchaseEvent:FireServer(\"multiplier\")",
+  ]}
+  explanation="The client receives the server's numbers and writes them to the labels. Fake totals and extra FireServer calls are the imposters."
+/>
+
+</Step>
+
+<Step>
+
+## The whole loop
+
+Buy button → intent up → server checks the bill → spends → server sends the truth down → UI reflects it. Idle income feeds the same wallet, and the same UI shows it. If you can order these four pieces, you've got a complete, secure economy.
+
+<Mcq
+  question="Why does the client never send a price to the server?"
+  options={[
+    "The server decides prices and verifies the wallet",
+    "Prices are secret",
+    "FireServer can't send numbers",
+    "The client doesn't know the price",
+  ]}
+  answer={0}
+  explanation="The client sends intent; the server owns pricing and the affordability check. That's the security model."
+/>
+
+</Step>

@@ -1,0 +1,173 @@
+---
+slug: bug-hunt-basics
+title: Bug hunt — the language core
+description: Hunt down real bugs in variables, conditionals, loops, and functions — and type the one-line fixes.
+sectionId: luau-basics
+order: 17
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [bug-hunt, debugging, luau, review]
+objectives:
+  - Spot missing locals and wrong comparisons
+  - Explain why an infinite loop freezes a game
+  - Type one-line fixes for the classic core bugs
+prerequisites: [events]
+keywords: [bug-hunt, fix, variable, loop, function]
+---
+
+You know the tools now — variables, functions, conditionals, loops, events. Bugs in this section are rarely big. They're one character: a missing `local`, a single `=` where you meant `==`, a `task.wait` that never got written. This lesson is a training ground for exactly those.
+
+<Step>
+
+## Hunt one — the missing local
+
+<FixBug
+  question="The script works, but coins leaks into other scripts. What's the bug?"
+  options={[
+    "coins has no local, so it's a global anyone can see",
+    "The name coins is reserved",
+    "0 should be a string",
+    "There's no bug",
+  ]}
+  answer={0}
+  explanation="Without local, Luau makes a global variable — visible to every script. Every variable you own gets local."
+  label="Hunt one"
+>
+
+```luau
+coins = 0
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt two — the wrong equals
+
+<FixBug
+  question="This line errors. What's wrong with it?"
+  options={[
+    "A single = assigns, but an if needs ==",
+    "coins should be uppercase",
+    "5 should be quoted",
+    "Nothing — it's fine",
+  ]}
+  answer={0}
+  explanation="One = stores a value. An if is a question, and questions use == to compare."
+  label="Hunt two"
+>
+
+```luau
+if coins = 5 then
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt three — the frozen game
+
+Press Play and your game freezes instantly. Output shows no error — the game is stuck inside a loop that never ends and never breathes.
+
+<FixBug
+  question="Why does this loop freeze the game?"
+  options={[
+    "There's no task.wait, so it spins forever with no pause",
+    "print is the wrong function",
+    "true should be false",
+    "Loops can't print",
+  ]}
+  answer={0}
+  explanation="while true never ends. Without task.wait to pause each lap, the game can't do anything else — a hard freeze."
+  label="Hunt three"
+>
+
+```luau
+while true do
+    print("tick")
+end
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt four — the nil argument
+
+<FixBug
+  question="addCoins() is called, but the game errors with arithmetic on a nil value. Why?"
+  options={[
+    "addCoins() passed no argument, so amount is nil",
+    "The function name has a typo",
+    "coins is not a number",
+    "Functions can't add",
+  ]}
+  answer={0}
+  explanation="The function expects amount. Called with empty parentheses, amount is nil — and nil + 1 errors. Call it with a number: addCoins(5)."
+  label="Hunt four"
+>
+
+```luau
+function addCoins(amount)
+    coins = coins + amount
+end
+
+addCoins()
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt five — type the fix
+
+A coin counter never changes. Spot the bug in the snippet and type the fixed line.
+
+<FixBug
+  instruction="Type the corrected line so the counter actually counts."
+  fix={["coins = coins + 1"]}
+  explanation="coins == coins + 1 compares instead of assigning. A single = stores the new value."
+  placeholder="coins = ..."
+  label="Hunt five"
+>
+
+```luau
+local coins = 0
+
+coins == coins + 1
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt six — put the loop together
+
+One last hunt, but this time you assemble it. Arrange the lines so a part's click gives the player a coin each time — no imposters.
+
+<ArrangeCode
+  lines={[
+    "button.ClickDetector.MouseClick:Connect(function(player)",
+    "    local coins = player.leaderstats.Coins",
+    "    coins.Value = coins.Value + 1",
+    "end)",
+  ]}
+  distractors={[
+    "while true do",
+    "coins.Value == coins.Value + 1",
+    "player.leaderstats.Coins = 1",
+  ]}
+  explanation="Connect the event, grab the player's Coins, count one up, and close the callback. The distractors loop forever or compare instead of assigning."
+/>
+
+</Step>

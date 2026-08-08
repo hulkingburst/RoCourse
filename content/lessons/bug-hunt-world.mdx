@@ -1,0 +1,181 @@
+---
+slug: bug-hunt-world
+title: Bug hunt — the world around you
+description: Hunt down the nil characters, the silent tweens, and the sounds nobody hears.
+sectionId: objects
+order: 7
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [bug-hunt, debugging, objects, review]
+objectives:
+  - Fix the grab-the-character-too-early bug
+  - Remember :Play() for tweens and sounds
+  - Type one-line fixes for world-object bugs
+prerequisites: [tweens]
+keywords: [bug-hunt, fix, character, tween, sound]
+---
+
+The world's bugs are mostly about *timing* and *who runs what*: grabbing a character before it spawns, building a tween and never playing it, and playing sounds on the wrong computer. Three smells, five hunts.
+
+<Step>
+
+## Hunt one — the too-early character
+
+A player joins and your script instantly errors on `player.Character.Humanoid` — nil.
+
+<FixBug
+  question="Why is player.Character nil at join time?"
+  options={[
+    "The character spawns a moment after the player joins — you must listen for CharacterAdded",
+    "Characters can't have Humanoids",
+    "The player is invisible",
+    "player.Character is a string",
+  ]}
+  answer={0}
+  explanation="At join time the body doesn't exist yet. Listen for CharacterAdded and grab the character in its callback."
+  label="Hunt one"
+>
+
+```luau
+Players.PlayerAdded:Connect(function(player)
+    local humanoid = player.Character.Humanoid
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt two — type the fix
+
+Even inside CharacterAdded, the character's parts load over a few frames. Make the grab safe so it can't error on an unloaded part.
+
+<FixBug
+  instruction="Write the line that grabs the Humanoid safely."
+  fix={["local humanoid = character:WaitForChild(\"Humanoid\")"]}
+  explanation="WaitForChild blocks until the child exists, then returns it. character.Humanoid can error if it hasn't loaded."
+  placeholder="local humanoid = ..."
+  label="Hunt two"
+>
+
+```luau
+local humanoid = character.Humanoid
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt three — the statue tween
+
+You built the tween perfectly — TweenInfo, goals, Create — and the part sits there. No error, no motion.
+
+<FixBug
+  question="What's the missing step?"
+  options={[
+    "Nobody called :Play() — Create builds the animation but doesn't run it",
+    "The goals are backwards",
+    "The part needs to be anchored",
+    "Tweens need a TweenInfo.new(0)",
+  ]}
+  answer={0}
+  explanation="TweenService:Create makes the animation; :Play() runs it. Forgetting Play is the classic silent no-op."
+  label="Hunt three"
+>
+
+```luau
+local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local goals = { CFrame = coin.CFrame + Vector3.new(0, 5, 0) }
+
+local tween = TweenService:Create(coin, info, goals)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt four — the silent coin
+
+You click the coin, the coins go up, but there's no sound — on anyone's computer.
+
+<FixBug
+  question="The pickup sound plays nowhere. What's the likely cause?"
+  options={[
+    "The sound is played on the server — feel-effects belong on the client, per player",
+    "The SoundId is too short",
+    "Sounds need Looped = true",
+    "Volume can't be set",
+  ]}
+  answer={0}
+  explanation="A server :Play() is silent to the player who triggered it. Play feel-effects in a LocalScript where the player can hear them."
+  label="Hunt four"
+>
+
+```luau
+-- Script (server)
+coin.ClickDetector.MouseClick:Connect(function(player)
+    coin.Sound:Play()
+    clickEvent:FireServer()
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt five — type the fix
+
+You want the pickup sound to play for the clicking player, right before the reward is reported. Write the line that plays it.
+
+<FixBug
+  instruction="Write the line that plays the coin's sound on the client."
+  fix={["coin.Sound:Play()"]}
+  explanation="coin.Sound:Play() starts the sound where the player will actually hear it."
+  placeholder="coin...:Play()"
+  label="Hunt five"
+>
+
+```luau
+coin.ClickDetector.MouseClick:Connect(function()
+    -- play the pickup sound here
+    clickEvent:FireServer()
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt six — arrange the pickup
+
+Assemble a coin pickup: a touch, a character, a player, a reward.
+
+<ArrangeCode
+  lines={[
+    "coin.Touched:Connect(function(other)",
+    "    local character = other.Parent",
+    "    local player = Players:GetPlayerFromCharacter(character)",
+    "    if player then",
+    "        player.leaderstats.Coins.Value += 1",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "player.leaderstats.Coins.Value = 999999",
+    "character:WaitForChild(\"Humanoid\").Health = 0",
+    "coin.Sound:Play()",
+  ]}
+  explanation="Touched gives the thing that hit; walk up to the player, verify it's real, then award. The distractors fake coins or hurt the character."
+/>
+
+</Step>

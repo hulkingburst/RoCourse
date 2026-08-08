@@ -1,0 +1,128 @@
+---
+slug: arrange-tween
+title: Drag and drop — polish and objects
+description: Assemble a tween, a safe character grab, a sound, and a coin pickup from shuffled lines.
+sectionId: objects
+order: 8
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [arrange, drag-and-drop, objects, review]
+objectives:
+  - Order the tween recipe correctly
+  - Assemble a safe character grab
+  - Arrange a sound and a coin pickup
+prerequisites: [bug-hunt-world]
+keywords: [arrange, order, tween, character, sound]
+---
+
+The world-objects patterns are short — three or four lines each — but the order is everything. A tween is built before it plays, a character is grabbed before it's used, a sound is parented before it plays. Assemble each from the shuffled pile.
+
+<Step>
+
+## The tween recipe
+
+TweenInfo says how, goals say where, Create builds it, Play runs it. In that order.
+
+<ArrangeCode
+  lines={[
+    "local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)",
+    "local goals = { Size = Vector3.new(2, 2, 2) }",
+    "local tween = TweenService:Create(coin, info, goals)",
+    "tween:Play()",
+  ]}
+  distractors={[
+    "tween:Stop()",
+    "local goals = { Position = 5 }",
+  ]}
+  explanation="Create needs info and goals, so they come first — then Create, then Play. Stop never runs the animation, and Position needs a Vector3."
+/>
+
+</Step>
+
+<Step>
+
+## Grab the body safely
+
+A character appears, its parts load, and the Humanoid gets grabbed without racing the load order.
+
+<ArrangeCode
+  lines={[
+    "player.CharacterAdded:Connect(function(character)",
+    "    local humanoid = character:WaitForChild(\"Humanoid\")",
+    "    humanoid.Health = humanoid.MaxHealth",
+    "end)",
+  ]}
+  distractors={[
+    "local humanoid = player.Character.Humanoid",
+    "humanoid.Health = 0",
+  ]}
+  explanation="Wait for the event, wait for the child, then heal to full. Grabbing the character before it exists or zeroing health are the imposters."
+/>
+
+</Step>
+
+<Step>
+
+## Give the coin a voice
+
+A Sound object gets its audio, a parent, and a play call.
+
+<ArrangeCode
+  lines={[
+    "local sound = Instance.new(\"Sound\")",
+    "sound.SoundId = \"rbxassetid://123456789\"",
+    "sound.Parent = coin",
+    "sound:Play()",
+  ]}
+  distractors={[
+    "sound:Stop()",
+    "sound.SoundId = \"123456789\"",
+  ]}
+  explanation="Create the sound, point it at real audio, parent it so it can be heard, then play. The imposters stop it or use a fake ID."
+/>
+
+</Step>
+
+<Step>
+
+## The coin pickup
+
+A touch, a character, a player, a reward. The guard keeps the coins honest.
+
+<ArrangeCode
+  lines={[
+    "coin.Touched:Connect(function(other)",
+    "    local player = Players:GetPlayerFromCharacter(other.Parent)",
+    "    if player then",
+    "        player.leaderstats.Coins.Value += 1",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "player.leaderstats.Coins.Value = 999999",
+    "other.Parent.Humanoid.Health = 0",
+  ]}
+  explanation="Touched hands you what hit; walk up to its player, verify they're real, and award one coin. The imposters fake the reward or hurt the character."
+/>
+
+</Step>
+
+<Step>
+
+## The polish pattern
+
+Every object you've arranged follows one rhythm: **create it, set it up, parent it, trigger it.** Tweens, sounds, and pickups are all the same shape — the details are just different properties. That rhythm is why ordering these is so natural now.
+
+<Mcq
+  question="What does the goals table in a tween do?"
+  options={[
+    "Says how long the tween takes",
+    "Lists the properties to change and their target values",
+    "Names the object to animate",
+    "Runs the tween",
+  ]}
+  answer={1}
+  explanation="Goals map 'property → target' — like Size or CFrame. The engine animates toward them."
+/>
+
+</Step>

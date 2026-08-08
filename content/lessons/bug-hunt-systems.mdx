@@ -1,0 +1,191 @@
+---
+slug: bug-hunt-systems
+title: Bug hunt — game systems
+description: Find the security slips, the runaway loops, and the silent failures in your clicker, idle income, and shop.
+sectionId: gameplay
+order: 9
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [bug-hunt, debugging, gameplay, review]
+objectives:
+  - Spot client-side checks that belong on the server
+  - Recognize runaway loops and mistimed connects
+  - Fix mismatched remote names and missing calls
+prerequisites: [modules]
+keywords: [bug-hunt, fix, clicker, shop, remote]
+---
+
+Your game systems work — until one of them quietly doesn't. The classic system bugs are less about syntax and more about *who decides* and *when things run*. A price checked on the wrong computer, a loop without a breath, a function connected with parentheses. Hunt them:
+
+<Step>
+
+## Hunt one — the check on the wrong computer
+
+The shop button dims when you can't afford something, and an exploiter just bought everything for free.
+
+<FixBug
+  question="What's the bug?"
+  options={[
+    "The price check is on the client, where an exploiter can edit it — it belongs on the server",
+    "The button is too small",
+    "coins isn't a NumberValue",
+    "There's no bug",
+  ]}
+  answer={0}
+  explanation="A price check in a LocalScript runs on the player's machine. The server must verify the wallet before spending."
+  label="Hunt one"
+>
+
+```luau
+-- LocalScript — on the player's computer
+if player.leaderstats.Coins.Value >= 25 then
+    purchaseEvent:FireServer("multiplier")
+end
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt two — the function that ran too soon
+
+The button does nothing. No error, no click, nothing — and the log shows the handler fired the moment the script loaded.
+
+<FixBug
+  question="Why did the handler run at load time instead of on click?"
+  options={[
+    "myFunction() is called immediately; Connect needs the function without parentheses",
+    "Activated fires on load",
+    "The button has no text",
+    "Nothing — this is correct",
+  ]}
+  answer={0}
+  explanation="button.Activated:Connect(myFunction()) calls myFunction now and connects its result (nil). Write :Connect(myFunction) to pass the function itself."
+  label="Hunt two"
+>
+
+```luau
+button.Activated:Connect(myFunction())
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt three — the coins fountain
+
+Idle income is paying out thousands of coins a second, and the game crawls.
+
+<FixBug
+  question="What's wrong with this idle loop?"
+  options={[
+    "There's no task.wait — it spins and awards coins endlessly",
+    "GetPlayers returns a number",
+    "FireClient is the wrong method",
+    "Nothing — this is fine",
+  ]}
+  answer={0}
+  explanation="while true needs a breath. task.wait(1) makes it pay once a second instead of thousands of times a second."
+  label="Hunt three"
+>
+
+```luau
+while true do
+    for _, player in ipairs(Players:GetPlayers()) do
+        player.leaderstats.Coins.Value += 1
+    end
+end
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt four — the silent mismatch
+
+Clicks still give coins — the leaderboard climbs — but the on-screen label never moves.
+
+<FixBug
+  question="The economy works, only the display is frozen. Likely cause?"
+  options={[
+    "The two scripts use different RemoteEvent names, so the client never hears the update",
+    "Coins are invisible",
+    "The label has no TextSize",
+    "FireClient can't send numbers",
+  ]}
+  answer={0}
+  explanation="ClickCoin on one side and CoinClick on the other is a silent, frustrating bug. Name the event once and use the exact same name everywhere."
+  label="Hunt four"
+>
+
+```luau
+-- server script
+clickEvent.OnServerEvent:Connect(function(player)
+    ...
+end)
+
+-- client script
+clickEvent.OnClientEvent:Connect(function(total)
+    label.Text = "Coins: " .. total
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt five — type the fix
+
+The idle loop should pay every player one coin each second. Type the corrected loop header so it doesn't freeze the game.
+
+<FixBug
+  instruction="Type the fixed line so the loop pauses each second."
+  fix={["while true do", "task.wait(1)"]}
+  placeholder="while / task.wait(...)"
+  label="Hunt five"
+  explanation="while true starts the loop, and task.wait(1) is the breath that keeps it from freezing and from paying too fast."
+>
+
+```luau
+while true do
+end
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Hunt six — arrange the purchase
+
+Put the server's checkout counter in order: reject unknowns, check the wallet, spend, tell the client.
+
+<ArrangeCode
+  lines={[
+    "purchaseEvent.OnServerEvent:Connect(function(player, upgradeId)",
+    "    if upgradeId ~= \"multiplier\" then return end",
+    "    local cost = UPGRADE_BASE_COST * (player.leaderstats.Multiplier.Value + 1)",
+    "    if player.leaderstats.Coins.Value >= cost then",
+    "        player.leaderstats.Coins.Value -= cost",
+    "        player.leaderstats.Multiplier.Value += 1",
+    "    end",
+    "end)",
+  ]}
+  distractors={[
+    "player.leaderstats.Coins.Value = 999999",
+    "purchaseEvent:FireServer(\"multiplier\")",
+    "if player.leaderstats.Coins.Value <= cost then",
+  ]}
+  explanation="Reject what you don't recognize, price it, verify the wallet, spend and level. The distractors give free money or check the wrong direction."
+/>
+
+</Step>
