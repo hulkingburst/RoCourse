@@ -30,6 +30,7 @@ export async function createAccount(
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
+  const agree = formData.get("agree");
 
   // Rate-limit sign-ups per IP before doing any bcrypt work, so the endpoint
   // can't be used to exhaust CPU with cost-12 hashes or to spam accounts.
@@ -55,6 +56,12 @@ export async function createAccount(
   }
   if (password !== confirm) {
     return { error: "Passwords do not match." };
+  }
+  if (!agree) {
+    return {
+      error:
+        "You must be at least 13 years old and agree to the Terms and Privacy Policy to create an account.",
+    };
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });

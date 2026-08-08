@@ -312,6 +312,10 @@ export function PlaygroundClient() {
         capped at a few seconds so an accidental infinite loop can&apos;t hang
         the page.
       </p>
+      <p className="text-xs text-muted-foreground">
+        Luau is MIT-licensed (Roblox Corporation; Lua.org, PUC-Rio) — see the
+        attribution in the site README.
+      </p>
     </div>
   );
 }

@@ -258,3 +258,12 @@ run it, and learn from it for any noncommercial purpose. What the license
 protects is the work itself — you may **not** redistribute the code or build
 derivative versions of it (including the course content) as your own, and
 commercial use requires permission. It's open eyes, not open season.
+
+### Third-party components
+
+The in-browser Luau playground ships an Emscripten/WASM build of
+[Luau](https://luau.org), the scripting language used by Roblox. Luau is
+distributed under the [MIT License](./public/luau/LICENSE) (Copyright
+(c) 2019-2025 Roblox Corporation; Copyright (c) 1994-2019 Lua.org, PUC-Rio),
+and Roblox asks that integrations include Luau attribution in their
+user-facing product documentation — the README and the playground page do.

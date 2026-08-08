@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Heart } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,18 @@ export function AppShell({
             </p>
             <p className="font-mono">Learn by building, not by copying.</p>
             <div className="flex items-center gap-3">
+              <Link
+                href="/privacy"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/terms"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Terms
+              </Link>
               <FeedbackButton />
               <a
                 href="https://throne.com/hulkingburst"

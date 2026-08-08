@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import * as React from "react";
 
 import { createAccount } from "@/lib/auth-actions";
@@ -109,6 +110,20 @@ export function AuthDialog() {
               <Label htmlFor="signup-confirm">Confirm password</Label>
               <Input id="signup-confirm" name="confirm" type="password" required placeholder="Repeat your password" />
             </div>
+            <label className="flex items-start gap-2 text-xs text-muted-foreground">
+              <input type="checkbox" name="agree" required className="mt-0.5 h-4 w-4" />
+              <span>
+                I&apos;m at least 13 years old and agree to the{" "}
+                <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
+                  Privacy Policy
+                </Link>
+                .
+              </span>
+            </label>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
