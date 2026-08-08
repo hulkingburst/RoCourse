@@ -11,6 +11,7 @@ import {
   MAX_CODE,
   MAX_DESCRIPTION,
   MAX_RESOURCE_NAME,
+  MAX_URL,
   MAX_ZIP_BYTES,
   MAX_ZIP_ENTRIES,
   MAX_UNCOMPRESSED_TOTAL,
@@ -22,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-type Mode = "file" | "code";
+type Mode = "file" | "code" | "url";
 type Status = "idle" | "uploading" | "submitting" | "success" | "error";
 
 const inputClass =
@@ -76,6 +77,7 @@ export function SubmitForm() {
   const [fileError, setFileError] = React.useState<string | null>(null);
   const [code, setCode] = React.useState("");
   const [codeLang, setCodeLang] = React.useState<string>("luau");
+  const [url, setUrl] = React.useState("");
   const [status, setStatus] = React.useState<Status>("idle");
   const [error, setError] = React.useState<string | null>(null);
 
@@ -113,6 +115,23 @@ export function SubmitForm() {
         setStatus("error");
         setError("Uploading the file failed. Try again in a moment.");
       }
+    } else if (mode === "url") {
+      const trimmed = url.trim();
+      let parsed: URL;
+      try {
+        parsed = new URL(trimmed);
+      } catch {
+        setStatus("error");
+        setError("Enter a valid website link (e.g. https://example.com).");
+        return;
+      }
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        setStatus("error");
+        setError("Only http and https links are allowed.");
+        return;
+      }
+      setStatus("submitting");
+      await post({ url: trimmed });
     } else {
       if (code.trim().length === 0) {
         setError("Paste some code to submit.");
@@ -123,7 +142,12 @@ export function SubmitForm() {
     }
   };
 
-  const post = async (extra: { fileUrl?: string; code?: string; codeLang?: string }) => {
+  const post = async (extra: {
+    fileUrl?: string;
+    code?: string;
+    codeLang?: string;
+    url?: string;
+  }) => {
     try {
       const response = await fetch("/api/resources/submit", {
         method: "POST",
@@ -137,6 +161,7 @@ export function SubmitForm() {
           fileUrl: extra.fileUrl ?? "",
           code: extra.code ?? "",
           codeLang: extra.codeLang ?? "",
+          url: extra.url ?? "",
         }),
       });
       if (response.ok) {
@@ -171,7 +196,11 @@ export function SubmitForm() {
     rights &&
     name.trim().length > 0 &&
     description.trim().length > 0 &&
-    (mode === "file" ? file !== null : code.trim().length > 0) &&
+    (mode === "file"
+      ? file !== null
+      : mode === "code"
+        ? code.trim().length > 0
+        : url.trim().length > 0) &&
     (status === "idle" || status === "error");
 
   return (
@@ -233,7 +262,7 @@ export function SubmitForm() {
       <div className="space-y-2">
         <Label>Content</Label>
         <div className="inline-flex rounded-md border bg-muted/40 p-1">
-          {(["file", "code"] as Mode[]).map((option) => (
+          {(["file", "code", "url"] as Mode[]).map((option) => (
             <button
               key={option}
               type="button"
@@ -245,7 +274,11 @@ export function SubmitForm() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {option === "file" ? "Upload a .zip" : "Paste code"}
+              {option === "file"
+                ? "Upload a .zip"
+                : option === "code"
+                  ? "Paste code"
+                  : "Website link"}
             </button>
           ))}
         </div>
@@ -288,6 +321,21 @@ export function SubmitForm() {
                 {fileError}
               </p>
             )}
+          </div>
+        ) : mode === "url" ? (
+          <div className="space-y-2">
+            <Input
+              type="url"
+              inputMode="url"
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+              maxLength={MAX_URL}
+              placeholder="https://example.com/your-tool"
+            />
+            <p className="text-xs text-muted-foreground">
+              A website that helps people build — a tool, docs page, or
+              resource hub.
+            </p>
           </div>
         ) : (
           <div className="space-y-2">

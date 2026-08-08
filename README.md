@@ -216,11 +216,12 @@ the Roblox Toolbox is uncurated; this is the opposite.
 How submissions flow:
 
 1. A learner fills in `/submit` on the site: type, name, description, optional
-   credit, and either a `.zip` asset pack or pasted code.
+   credit, and one of a `.zip` asset pack, pasted code, or a website link.
 2. Zips are inspected in the browser before upload — only image and 3D/model
    file types are allowed inside (`png`, `jpg`, `fbx`, `obj`, and similar),
    with caps on entry count and unpacked size. Code is stored as plain text
-   and never executed.
+   and never executed. Website links must be `http`/`https` and are rendered
+   as external links on the catalog.
 3. The submission lands as a GitHub issue in the private feedback repo,
    labeled `needs-review` (only you can see it).
 4. You review it. Close the issue with the `accepted` label to publish it —

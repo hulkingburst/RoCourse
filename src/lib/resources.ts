@@ -51,6 +51,7 @@ export async function ensureResourceLabels(): Promise<boolean> {
 const TYPE_RE = /<!--\s*RC:TYPE:([a-z-]+)\s*-->/;
 const AUTHOR_RE = /<!--\s*RC:AUTHOR:([^\n]*)\s*-->/;
 const FILE_RE = /<!--\s*RC:FILE:(\S+)\s*-->/;
+const URL_RE = /<!--\s*RC:URL:(\S+)\s*-->/;
 const CODE_LANG_RE = /<!--\s*RC:CODE:([a-z]+)\s*-->/;
 const DESC_START_RE = /<!--\s*RC:DESC_START\s*-->/;
 const DESC_END_RE = /<!--\s*RC:DESC_END\s*-->/;
@@ -77,7 +78,9 @@ function parseResource(issue: {
   const typeMatch = body.match(TYPE_RE);
   if (!typeMatch) return null;
   const kind = typeMatch[1] as ResourceKind;
-  if (!["plugin", "script", "asset-pack", "ui-module", "model", "other"].includes(kind)) {
+  if (
+    !["plugin", "script", "asset-pack", "ui-module", "model", "website", "other"].includes(kind)
+  ) {
     return null;
   }
 
@@ -86,14 +89,19 @@ function parseResource(issue: {
 
   const fileMatch = body.match(FILE_RE);
   const codeLangMatch = body.match(CODE_LANG_RE);
-  if (!fileMatch && !codeLangMatch) return null;
-  if (fileMatch && codeLangMatch) return null;
+  const urlMatch = body.match(URL_RE);
+  const contentCount =
+    (fileMatch ? 1 : 0) + (codeLangMatch ? 1 : 0) + (urlMatch ? 1 : 0);
+  if (contentCount !== 1) return null;
 
   let fileUrl: string | null = null;
+  let url: string | null = null;
   let code: string | null = null;
   let codeLang = "";
   if (fileMatch) {
     fileUrl = fileMatch[1];
+  } else if (urlMatch) {
+    url = urlMatch[1];
   } else {
     code = between(body, CODE_START_RE, CODE_END_RE);
     if (!code) return null;
@@ -109,6 +117,7 @@ function parseResource(issue: {
     author,
     description,
     fileUrl,
+    url,
     code,
     codeLang,
     acceptedAt: issue.closed_at ?? "",
@@ -133,7 +142,7 @@ export async function getAcceptedResources(): Promise<Resource[]> {
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
       },
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!response.ok) return [];
     const issues = (await response.json()) as {

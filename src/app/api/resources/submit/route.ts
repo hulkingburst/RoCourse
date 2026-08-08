@@ -7,6 +7,7 @@ import {
   MAX_CODE,
   MAX_DESCRIPTION,
   MAX_RESOURCE_NAME,
+  MAX_URL,
   RESOURCE_KINDS,
   type ResourceKind,
 } from "@/lib/resources-shared";
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
     fileUrl?: unknown;
     code?: unknown;
     codeLang?: unknown;
+    url?: unknown;
   };
 
   const name = cleanLine(fields.name);
@@ -65,6 +67,7 @@ export async function POST(request: Request) {
   const description = clean(fields.description);
   const author = cleanLine(fields.author);
   const fileUrl = clean(fields.fileUrl);
+  const url = clean(fields.url);
   const code = fields.code === undefined ? "" : clean(fields.code);
   const codeLang = clean(fields.codeLang) || "luau";
 
@@ -83,8 +86,10 @@ export async function POST(request: Request) {
 
   const hasFile = fileUrl.length > 0;
   const hasCode = code.length > 0;
-  if (hasFile === hasCode) {
-    // Exactly one of file / code is required.
+  const hasUrl = url.length > 0;
+  const contentCount = (hasFile ? 1 : 0) + (hasCode ? 1 : 0) + (hasUrl ? 1 : 0);
+  if (contentCount !== 1) {
+    // Exactly one of file / code / website is required.
     return NextResponse.json({ ok: false }, { status: 400 });
   }
   if (!langOk) return NextResponse.json({ ok: false }, { status: 400 });
@@ -99,6 +104,17 @@ export async function POST(request: Request) {
     if (!BLOB_HOST_RE.test(hostname)) {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
+  } else if (hasUrl) {
+    if (url.length > MAX_URL) return NextResponse.json({ ok: false }, { status: 400 });
+    let protocol: string;
+    try {
+      protocol = new URL(url).protocol;
+    } catch {
+      return NextResponse.json({ ok: false }, { status: 400 });
+    }
+    if (protocol !== "http:" && protocol !== "https:") {
+      return NextResponse.json({ ok: false }, { status: 400 });
+    }
   } else if (code.length > MAX_CODE) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
@@ -109,6 +125,8 @@ export async function POST(request: Request) {
   lines.push("<!-- RC:DESC_START -->", description, "<!-- RC:DESC_END -->");
   if (hasFile) {
     lines.push(`<!-- RC:FILE:${fileUrl} -->`);
+  } else if (hasUrl) {
+    lines.push(`<!-- RC:URL:${url} -->`);
   } else {
     lines.push(`<!-- RC:CODE:${codeLang} -->`, "<!-- RC:CODE_START -->", code, "<!-- RC:CODE_END -->");
   }

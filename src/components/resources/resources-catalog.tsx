@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Download,
+  ExternalLink,
   Package,
   ShieldCheck,
   User,
@@ -55,6 +56,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
   const downloadUrl = resource.fileUrl
     ? `${resource.fileUrl}?download=1`
     : null;
+  const visitUrl = resource.url ?? null;
 
   return (
     <article className="rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
@@ -76,6 +78,17 @@ function ResourceCard({ resource }: { resource: Resource }) {
             {resource.description}
           </p>
         </div>
+        {visitUrl && (
+          <a
+            href={visitUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Visit website
+          </a>
+        )}
         {downloadUrl && (
           <a
             href={downloadUrl}

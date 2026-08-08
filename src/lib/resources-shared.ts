@@ -4,6 +4,7 @@ export type ResourceKind =
   | "asset-pack"
   | "ui-module"
   | "model"
+  | "website"
   | "other";
 
 export interface Resource {
@@ -12,6 +13,7 @@ export interface Resource {
   author: string | null;
   description: string;
   fileUrl: string | null;
+  url: string | null;
   code: string | null;
   codeLang: string;
   acceptedAt: string;
@@ -23,6 +25,7 @@ export const RESOURCE_KINDS: { value: ResourceKind; label: string }[] = [
   { value: "asset-pack", label: "Asset pack" },
   { value: "ui-module", label: "UI module" },
   { value: "model", label: "Model" },
+  { value: "website", label: "Website" },
   { value: "other", label: "Other" },
 ];
 
@@ -32,6 +35,7 @@ export const MAX_RESOURCE_NAME = 100;
 export const MAX_DESCRIPTION = 2000;
 export const MAX_AUTHOR = 80;
 export const MAX_CODE = 48_000;
+export const MAX_URL = 2048;
 
 // Client-side zip upload limits.
 export const MAX_ZIP_BYTES = 50 * 1024 * 1024;
