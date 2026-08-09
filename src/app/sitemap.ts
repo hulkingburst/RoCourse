@@ -1,0 +1,26 @@
+import type { MetadataRoute } from "next";
+import { getCourseStructure } from "@/lib/lessons";
+import { SITE_URL } from "@/lib/site";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const lessonUrls: MetadataRoute.Sitemap = getCourseStructure()
+    .flatMap((section) => section.lessons)
+    .map((lesson) => ({
+      url: `${SITE_URL}/lessons/${lesson.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+
+  return [
+    { url: SITE_URL, changeFrequency: "weekly" as const, priority: 1 },
+    { url: `${SITE_URL}/lessons`, changeFrequency: "weekly" as const, priority: 0.9 },
+    { url: `${SITE_URL}/playground`, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${SITE_URL}/reference`, changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${SITE_URL}/resources`, changeFrequency: "weekly" as const, priority: 0.6 },
+    { url: `${SITE_URL}/quiz`, changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${SITE_URL}/quiz/daily`, changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${SITE_URL}/privacy`, priority: 0.2 },
+    { url: `${SITE_URL}/terms`, priority: 0.2 },
+    ...lessonUrls,
+  ];
+}

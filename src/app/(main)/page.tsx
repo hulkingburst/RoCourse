@@ -4,6 +4,28 @@ import { courseTagline } from "@content/course";
 import { getCourseStructure } from "@/lib/lessons";
 import { CourseOverview } from "@/components/home/course-overview";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/seo/json-ld";
+import { SITE_URL } from "@/lib/site";
+
+const courseJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Course",
+  name: "RoCourse — Learn Luau & Roblox for Free",
+  description:
+    "A free, interactive course for learning Luau and Roblox game development from absolute zero — through hands-on lessons, real game code, and a complete final project. No paywall, no sign-up.",
+  provider: {
+    "@type": "Organization",
+    name: "RoCourse",
+    sameAs: SITE_URL,
+  },
+  isAccessibleForFree: true,
+  inLanguage: "en",
+  hasCourseInstance: {
+    "@type": "CourseInstance",
+    courseMode: "Online",
+    isAccessibleForFree: true,
+  },
+};
 
 export default function HomePage() {
   const sections = getCourseStructure();
@@ -16,6 +38,7 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-14">
+      <JsonLd data={courseJsonLd} />
       <section className="mb-14">
         <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
           A free, hands-on Roblox development course
