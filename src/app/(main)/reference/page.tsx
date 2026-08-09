@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Luau Cheat Sheet & Roblox Reference",
   description:
     "A searchable Luau cheat sheet: syntax, functions, loops, tables, and Roblox scripting patterns.",
+  alternates: { canonical: "/reference" },
 };
 
 export default function ReferencePage() {

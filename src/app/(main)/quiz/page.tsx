@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Roblox Luau Quiz — Test Your Skills",
   description:
     "Test your Luau and Roblox knowledge with a quick multiple-choice quiz.",
+  alternates: { canonical: "/quiz" },
 };
 
 export default function QuizPage() {

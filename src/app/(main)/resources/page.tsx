@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "Free Roblox Scripts, Assets & Tools",
   description:
     "Hand-picked community resources for Roblox development: scripts, asset packs, UI modules and more. Every item is reviewed before it's listed.",
+  alternates: { canonical: "/resources" },
 };
 
 export default async function ResourcesPage() {

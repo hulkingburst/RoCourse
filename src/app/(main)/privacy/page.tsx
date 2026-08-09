@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "How RoCourse handles your data: what we collect, why, and the choices you have.",
+  alternates: { canonical: "/privacy" },
 };
 
 const LAST_UPDATED = "August 8, 2026";

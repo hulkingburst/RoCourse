@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "The terms for using RoCourse, including accounts, user submissions, and intellectual property.",
+  alternates: { canonical: "/terms" },
 };
 
 const LAST_UPDATED = "August 8, 2026";

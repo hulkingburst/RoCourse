@@ -18,6 +18,7 @@ export async function generateMetadata({
   return {
     title: `${profile.name}'s progress`,
     description: `${profile.name} has completed ${profile.stats.lessonsCompleted} of ${profile.totalLessons} lessons on RoCourse.`,
+    alternates: { canonical: `/u/${handle}` },
   };
 }
 

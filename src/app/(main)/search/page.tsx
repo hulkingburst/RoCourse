@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Search Luau Lessons & Tutorials",
   description: "Search every Luau lesson and Roblox tutorial in the course.",
   robots: { index: false, follow: true },
+  alternates: { canonical: "/search" },
 };
 
 export default function SearchPage() {

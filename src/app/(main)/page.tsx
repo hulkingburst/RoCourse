@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Cpu, Gamepad2 } from "lucide-react";
 import { courseTagline } from "@content/course";
@@ -6,6 +7,10 @@ import { CourseOverview } from "@/components/home/course-overview";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const courseJsonLd = {
   "@context": "https://schema.org",

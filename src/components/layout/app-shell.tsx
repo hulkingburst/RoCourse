@@ -57,6 +57,18 @@ export function AppShell({
               >
                 Terms
               </Link>
+              <Link
+                href="/faq"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                FAQ
+              </Link>
+              <Link
+                href="/guides"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Guides
+              </Link>
               <FeedbackButton />
               <a
                 href="https://throne.com/hulkingburst"

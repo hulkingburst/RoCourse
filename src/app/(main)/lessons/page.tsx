@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Luau Lessons & Roblox Scripting Tutorials",
   description:
     "Free Luau lessons and Roblox scripting tutorials, from your first script to publishing a complete game.",
+  alternates: { canonical: "/lessons" },
 };
 
 export default function LessonsPage() {

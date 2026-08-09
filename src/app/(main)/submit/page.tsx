@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description:
     "Share a script, asset pack, UI module or model for the RoCourse community. The course author reviews every submission before it's published.",
   robots: { index: false, follow: true },
+  alternates: { canonical: "/submit" },
 };
 
 export default function SubmitPage() {

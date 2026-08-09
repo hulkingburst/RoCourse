@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description:
     "Download your RoCourse certificate of completion as a PNG or PDF.",
   robots: { index: false, follow: true },
+  alternates: { canonical: "/certificate" },
 };
 
 export default async function CertificatePage({

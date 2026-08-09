@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Luau Learners Directory",
   description: "Find other people learning Luau on RoCourse.",
+  alternates: { canonical: "/users" },
 };
 
 export default async function UsersPage() {

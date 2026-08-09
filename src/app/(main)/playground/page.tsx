@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Luau Playground — Run Luau Code Online",
   description:
     "Write and run Luau code in your browser. Experiment with Roblox scripting, functions, loops, tables and more — no Studio install needed.",
+  alternates: { canonical: "/playground" },
 };
 
 export default function PlaygroundPage() {

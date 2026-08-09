@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Your profile",
   description: "Your RoCourse progress, completions, and account details.",
   robots: { index: false, follow: true },
+  alternates: { canonical: "/profile" },
 };
 
 export default async function ProfilePage() {
