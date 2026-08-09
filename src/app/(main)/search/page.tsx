@@ -5,6 +5,7 @@ import { SearchExperience } from "@/components/search/search-experience";
 export const metadata: Metadata = {
   title: "Search Luau Lessons & Tutorials",
   description: "Search every Luau lesson and Roblox tutorial in the course.",
+  robots: { index: false, follow: true },
 };
 
 export default function SearchPage() {

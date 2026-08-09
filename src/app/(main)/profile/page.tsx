@@ -7,6 +7,7 @@ import { ProfileClient } from "@/components/profile/profile-client";
 export const metadata: Metadata = {
   title: "Your profile",
   description: "Your RoCourse progress, completions, and account details.",
+  robots: { index: false, follow: true },
 };
 
 export default async function ProfilePage() {

@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Submit a Roblox Resource",
   description:
     "Share a script, asset pack, UI module or model for the RoCourse community. The course author reviews every submission before it's published.",
+  robots: { index: false, follow: true },
 };
 
 export default function SubmitPage() {
