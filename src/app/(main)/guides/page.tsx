@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, ExternalLink, Gamepad2, GraduationCap } from "lucide-react";
+import {
+  BookOpen,
+  Bug,
+  CalendarDays,
+  ExternalLink,
+  Gamepad2,
+  GraduationCap,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Guides — Learn Luau & Roblox Development",
@@ -30,6 +37,20 @@ const guides = [
     title: "What Is Luau?",
     description:
       "The scripting language behind every Roblox game, explained: where it came from, how it works, and how to start.",
+  },
+  {
+    href: "/guides/fix-common-luau-errors",
+    icon: Bug,
+    title: "Fix Common Luau Errors",
+    description:
+      "The eight error messages every Roblox scripter meets — what they mean and the exact fix, with code examples.",
+  },
+  {
+    href: "/guides/learn-roblox-scripting-in-a-week",
+    icon: CalendarDays,
+    title: "Learn Roblox Scripting in a Week",
+    description:
+      "A 7-day schedule that takes you through the whole free course to a published game, about an hour a day.",
   },
 ];
 
