@@ -15,7 +15,6 @@ import {
   LockKeyhole,
   PlayCircle,
   RotateCcw,
-  Search,
   Terminal,
   Users,
   Package,
@@ -30,7 +29,6 @@ import {
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 function LessonRow({
   lesson,
@@ -194,17 +192,6 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
         </div>
         <Link href="/" className="text-sm font-bold leading-tight">
           {process.env.NEXT_PUBLIC_COURSE_NAME ?? "RoCourse"}
-        </Link>
-      </div>
-
-      <div className="px-4 pb-3">
-        <Link href="/search" className="relative block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search lessons…"
-            className="cursor-pointer pl-9"
-            readOnly
-          />
         </Link>
       </div>
 

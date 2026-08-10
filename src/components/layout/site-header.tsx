@@ -3,19 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  CalendarDays,
   Flame,
-  ListChecks,
   Menu,
   Monitor,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
   Sun,
-  Terminal,
-  Users,
-  BookOpenCheck,
-  Package,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
@@ -168,42 +162,6 @@ export function SiteHeader({
           {streak}
         </Link>
       )}
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
-        <Link href="/quiz/daily">
-          <CalendarDays className="h-4 w-4" />
-          Daily
-        </Link>
-      </Button>
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
-        <Link href="/quiz">
-          <ListChecks className="h-4 w-4" />
-          Quiz
-        </Link>
-      </Button>
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
-        <Link href="/playground">
-          <Terminal className="h-4 w-4" />
-          Playground
-        </Link>
-      </Button>
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
-        <Link href="/reference">
-          <BookOpenCheck className="h-4 w-4" />
-          Reference
-        </Link>
-      </Button>
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 lg:inline-flex">
-        <Link href="/resources">
-          <Package className="h-4 w-4" />
-          Resources
-        </Link>
-      </Button>
-      <Button variant="ghost" size="sm" asChild className="hidden gap-1.5 xl:inline-flex">
-        <Link href="/users">
-          <Users className="h-4 w-4" />
-          Learners
-        </Link>
-      </Button>
       <AccountMenu />
       <ThemeToggle />
     </header>
