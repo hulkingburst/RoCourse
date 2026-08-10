@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { GitBranch, Heart } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
 import { FeedbackButton } from "@/components/feedback/feedback-button";
@@ -70,6 +70,16 @@ export function AppShell({
                 Guides
               </Link>
               <FeedbackButton />
+              <a
+                href="https://github.com/hulkingburst/RoCourse"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View RoCourse on GitHub"
+                className="flex items-center gap-1 rounded-md border px-2 py-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <GitBranch className="h-3 w-3" />
+                GitHub
+              </a>
               <a
                 href="https://throne.com/hulkingburst"
                 target="_blank"
