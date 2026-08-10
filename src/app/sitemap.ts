@@ -24,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/guides/fix-common-luau-errors`, changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${SITE_URL}/guides/learn-roblox-scripting-in-a-week`, changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${SITE_URL}/faq`, changeFrequency: "monthly" as const, priority: 0.4 },
+    { url: `${SITE_URL}/questions`, changeFrequency: "daily" as const, priority: 0.6 },
     { url: `${SITE_URL}/quiz`, changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${SITE_URL}/quiz/daily`, changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${SITE_URL}/privacy`, priority: 0.2 },

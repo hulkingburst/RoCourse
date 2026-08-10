@@ -75,6 +75,12 @@ export function AppShell({
               >
                 Showcase
               </Link>
+              <Link
+                href="/questions"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Questions
+              </Link>
               <FeedbackButton />
               <a
                 href="https://github.com/hulkingburst/RoCourse"

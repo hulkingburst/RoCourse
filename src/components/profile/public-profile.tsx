@@ -11,6 +11,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { ActivityCalendar } from "@/components/profile/activity-calendar";
+import { BadgesSection } from "@/components/profile/badges";
 import {
   Card,
   CardContent,
@@ -104,6 +105,12 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
           value={String(profile.completions.length)}
         />
       </div>
+
+      <Card>
+        <CardContent className="pt-6">
+          <BadgesSection stats={profile.badgeStats} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

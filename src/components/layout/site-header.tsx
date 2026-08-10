@@ -89,16 +89,17 @@ export function SiteHeader({
   const lastStreakDate = useProgressStore((state) => state.lastStreakDate);
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [previousPathname, setPreviousPathname] = React.useState(pathname);
+  if (pathname !== previousPathname) {
+    setPreviousPathname(pathname);
+    setMobileMenuOpen(false);
+  }
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
     () => false
   );
   const streakActive = isStreakActive(lastStreakDate);
-
-  React.useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">

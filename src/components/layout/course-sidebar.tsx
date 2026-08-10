@@ -13,6 +13,7 @@ import {
   Gamepad2,
   ListChecks,
   LockKeyhole,
+  MessageCircleQuestion,
   PlayCircle,
   RotateCcw,
   Terminal,
@@ -224,7 +225,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
         <Progress value={percent} />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-1 pb-4">
+      <div className="flex-1 overflow-y-auto px-1 pb-4 [scrollbar-gutter:stable]">
         {sections.map((section) => (
           <SidebarSection
             key={section.id}
@@ -242,7 +243,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
       </div>
 
       <div className="border-t px-4 py-3">
-        <div className="space-y-1">
+        <div className="max-h-[42vh] space-y-1 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
           <Button
             variant="ghost"
             size="sm"
@@ -263,6 +264,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
             <Link href="/quiz">
               <ListChecks className="h-3.5 w-3.5" />
               Quick quiz
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="w-full justify-start text-muted-foreground"
+          >
+            <Link href="/questions">
+              <MessageCircleQuestion className="h-3.5 w-3.5" />
+              Questions
             </Link>
           </Button>
           <Button

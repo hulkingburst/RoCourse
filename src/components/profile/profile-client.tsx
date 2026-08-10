@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { useAuthUiStore } from "@/lib/auth-ui";
+import { extractBadgeStats } from "@/lib/badges";
 import { maskEmail } from "@/lib/privacy";
 import { useProgressStore } from "@/lib/progress-store";
 import { isStreakActive } from "@/lib/streak";
@@ -36,6 +37,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ActivityCalendar } from "@/components/profile/activity-calendar";
+import { BadgesSection } from "@/components/profile/badges";
 
 interface ProfileClientProps {
   totalLessons: number;
@@ -149,6 +151,19 @@ export function ProfileClient({
 
   const completions = cloud?.completions ?? [];
   const streakActive = isStreakActive(lastStreakDate);
+
+  const badgeStats = extractBadgeStats(
+    {
+      lessons,
+      bookmarks,
+      streak,
+      longestStreak,
+      dailyChallengesCompleted,
+      quickQuizzesCompleted,
+      finishedPath,
+    },
+    totalLessons
+  );
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-6 py-10">
@@ -290,6 +305,12 @@ export function ProfileClient({
               value={String(dailyChallengesCompleted)}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
+          <BadgesSection stats={badgeStats} />
         </CardContent>
       </Card>
 

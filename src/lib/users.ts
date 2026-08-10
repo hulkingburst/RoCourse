@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { countLessons } from "@/lib/lessons";
+import { extractBadgeStats, type BadgeStats } from "@/lib/badges";
 
 /** Public stats that are safe to show about any user, derived from the JSON
  * progress blob. Never includes email or any identifying detail. */
@@ -27,6 +28,7 @@ export interface PublicProfile {
   createdAt: string;
   totalLessons: number;
   stats: PublicStats;
+  badgeStats: BadgeStats;
   completions: PublicCompletion[];
 }
 
@@ -172,12 +174,15 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
   });
   if (!user) return null;
 
+  const totalLessons = countLessons();
+
   return {
     handle: user.handle ?? handle,
     name: user.name,
     createdAt: user.createdAt.toISOString(),
-    totalLessons: countLessons(),
+    totalLessons,
     stats: extractPublicStats(user.progress?.data),
+    badgeStats: extractBadgeStats(user.progress?.data, totalLessons),
     completions: user.completions.map((completion) => ({
       courseId: completion.courseId,
       title: completion.title,
