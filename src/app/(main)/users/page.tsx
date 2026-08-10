@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Trophy } from "lucide-react";
 import { getPublicUserSummaries } from "@/lib/users";
 import { UsersClient } from "@/components/users/users-client";
 
@@ -20,6 +22,13 @@ export default async function UsersPage() {
           Public profiles of people learning Luau here. Tap one to see their
           progress, streaks, and completed courses.
         </p>
+        <Link
+          href="/showcase"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+        >
+          <Trophy className="h-3.5 w-3.5" />
+          See who finished the course
+        </Link>
       </div>
       <UsersClient users={users} />
     </div>
