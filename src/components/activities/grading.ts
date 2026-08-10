@@ -15,11 +15,35 @@ export function normalizeAnswer(input: string): string {
     .trim();
 }
 
-export function isAnswerCorrect(input: string, answer: string | string[]): boolean {
+/** Drops a leading `local ` keyword at the start of each line. */
+function stripLocalKeywords(input: string): string {
+  return input.replace(/^\s*local\s+/gm, "");
+}
+
+/** Lenient normalization: a `local` keyword is treated as optional. */
+function normalizeAnswerLenient(input: string): string {
+  return normalizeAnswer(stripLocalKeywords(input));
+}
+
+export interface AnswerOptions {
+  /** When true, a `local` keyword is required — omitting it is not accepted. */
+  strictLocal?: boolean;
+}
+
+export function isAnswerCorrect(
+  input: string,
+  answer: string | string[],
+  options?: AnswerOptions
+): boolean {
   const normalized = normalizeAnswer(input);
   if (!normalized) return false;
   const accepted = Array.isArray(answer) ? answer : [answer];
-  return accepted.some((a) => a && normalizeAnswer(a) === normalized);
+  const exact = accepted.some((a) => a && normalizeAnswer(a) === normalized);
+  if (exact) return true;
+  if (options?.strictLocal) return false;
+
+  const lenient = normalizeAnswerLenient(input);
+  return accepted.some((a) => a && normalizeAnswerLenient(a) === lenient);
 }
 
 /** True when the input parses as a number equal to `expected`. */
@@ -31,8 +55,12 @@ export function isNumericAnswer(input: string, expected: number): boolean {
 }
 
 /** Given free-text answers that may be numbers or short strings, accept any match. */
-export function isAnswerMatch(input: string, answer: string | string[]): boolean {
-  if (isAnswerCorrect(input, answer)) return true;
+export function isAnswerMatch(
+  input: string,
+  answer: string | string[],
+  options?: AnswerOptions
+): boolean {
+  if (isAnswerCorrect(input, answer, options)) return true;
   const accepted = Array.isArray(answer) ? answer : [answer];
   return accepted.some((a) => {
     const n = Number(a.trim());

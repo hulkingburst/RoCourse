@@ -27,6 +27,11 @@ interface FixBugProps {
   fix?: string | string[];
   /** Type mode: the prompt shown above the editor. */
   instruction?: string;
+  /**
+   * Type mode: when true, a leading `local` keyword is required. Use for bugs
+   * where the missing local IS the bug (otherwise local is treated as optional).
+   */
+  requireLocal?: boolean;
   placeholder?: string;
   explanation?: string;
   label?: string;
@@ -44,6 +49,7 @@ export function FixBug({
   answer,
   fix,
   instruction = "Type the fixed line.",
+  requireLocal = false,
   placeholder = "local …",
   explanation,
   label = "Fix the bug",
@@ -58,7 +64,7 @@ export function FixBug({
   const isTypeMode = fix !== undefined;
 
   const check = () => {
-    const correct = isAnswerMatch(value, fix!);
+    const correct = isAnswerMatch(value, fix!, { strictLocal: requireLocal });
     const firstTry = status === "idle";
     setStatus(correct ? "correct" : "wrong");
     onResult(correct, firstTry);

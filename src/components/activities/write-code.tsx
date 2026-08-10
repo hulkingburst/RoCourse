@@ -16,6 +16,11 @@ interface WriteCodeProps {
   answer: string | string[];
   /** Read-only context shown above the editor (e.g. the rest of the script). */
   starterCode?: string;
+  /**
+   * When true, a leading `local` keyword is required. Use when the exercise
+   * specifically asks for a declaration (otherwise local is treated as optional).
+   */
+  requireLocal?: boolean;
   placeholder?: string;
   explanation?: string;
   label?: string;
@@ -31,6 +36,7 @@ export function WriteCode({
   instruction,
   answer,
   starterCode,
+  requireLocal = false,
   placeholder = "local …",
   explanation,
   label = "Write the code",
@@ -43,7 +49,7 @@ export function WriteCode({
   );
 
   const check = () => {
-    const correct = isAnswerCorrect(value, answer);
+    const correct = isAnswerCorrect(value, answer, { strictLocal: requireLocal });
     const firstTry = status === "idle";
     setStatus(correct ? "correct" : "wrong");
     onResult(correct, firstTry);
