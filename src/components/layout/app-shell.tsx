@@ -80,8 +80,7 @@ export function AppShell({
                 href="https://github.com/hulkingburst/RoCourse"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="View RoCourse on GitHub"
-                className="flex items-center gap-1 rounded-md border px-2 py-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 <GitBranch className="h-3 w-3" />
                 GitHub
