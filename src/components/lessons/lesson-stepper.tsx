@@ -21,7 +21,7 @@ interface LessonStepperProps {
   title: string;
   description: string;
   stepMetas: StepMeta[];
-  quizCount: number;
+  activityCount: number;
   isFirstLesson: boolean;
   prevSlug: string | null;
   prevTitle: string | null;
@@ -40,7 +40,7 @@ export function LessonStepper({
   title,
   description,
   stepMetas,
-  quizCount,
+  activityCount,
   isFirstLesson,
   prevSlug,
   prevTitle,
@@ -157,7 +157,7 @@ export function LessonStepper({
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <LessonMedalBadge slug={slug} quizCount={quizCount} className="h-5 w-5" />
+            <LessonMedalBadge slug={slug} activityCount={activityCount} className="h-5 w-5" />
             {mounted && (
               <button
                 type="button"

@@ -17,18 +17,18 @@ export function medalLabel(medal: LessonMedal): string {
 }
 
 /**
- * A lesson's medal reflects how many of its quick-check questions were solved
- * on the first pick: all of them is gold, most is silver, any is bronze.
+ * A lesson's medal reflects how many of its graded activity steps were solved
+ * on the first attempt: all of them is gold, most is silver, any is bronze.
  */
-export function lessonMedal(correctFirstTry: number, totalQuestions: number): MedalResult {
-  if (totalQuestions <= 0 || correctFirstTry <= 0) {
-    return { medal: null, correct: correctFirstTry, total: totalQuestions };
+export function lessonMedal(correctFirstTry: number, totalActivities: number): MedalResult {
+  if (totalActivities <= 0 || correctFirstTry <= 0) {
+    return { medal: null, correct: correctFirstTry, total: totalActivities };
   }
-  if (correctFirstTry >= totalQuestions) {
-    return { medal: "gold", correct: correctFirstTry, total: totalQuestions };
+  if (correctFirstTry >= totalActivities) {
+    return { medal: "gold", correct: correctFirstTry, total: totalActivities };
   }
-  if (correctFirstTry >= Math.ceil(totalQuestions * 0.6)) {
-    return { medal: "silver", correct: correctFirstTry, total: totalQuestions };
+  if (correctFirstTry >= Math.ceil(totalActivities * 0.6)) {
+    return { medal: "silver", correct: correctFirstTry, total: totalActivities };
   }
-  return { medal: "bronze", correct: correctFirstTry, total: totalQuestions };
+  return { medal: "bronze", correct: correctFirstTry, total: totalActivities };
 }

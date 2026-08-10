@@ -24,14 +24,9 @@ Every developer spends a chunk of their day fixing bugs. The good news: you alre
 You meant to print a message, but the Output shows an error on line 1. Read the message, then look at the line:
 
 <FixBug
-  question="Output says the error is on line 1. What's wrong?"
-  options={[
-    "prnit isn't a function — it's a typo for print",
-    "The message needs numbers, not text",
-    "The script is in the wrong folder",
-    "Nothing — it should work",
-  ]}
-  answer={0}
+  instruction="Type the corrected line so the message prints."
+  fix={["print(\"Hello\")", "print('Hello')"]}
+  placeholder="print(...)"
   explanation="prnit isn't a function. Roblox doesn't know it, so it errors. Change it to print and Play again."
   label="Hunt one"
 >
@@ -51,14 +46,9 @@ prnit("Hello")
 This one is almost right. The Output points at line 1 again — Luau is saying it expected something and never got it:
 
 <FixBug
-  question="Luau says it expected ')' at the end of the line. What's missing?"
-  options={[
-    "The closing parenthesis",
-    "A comma",
-    "The word print",
-    "Nothing — it's complete",
-  ]}
-  answer={0}
+  instruction="Close the call so the line runs without an error."
+  fix={["print(\"Hello\")", "print('Hello')"]}
+  placeholder="print(...)"
   explanation="print( needs its closing ) to close the call. The message '(' expected' or ')' expected' usually means a missing or extra bracket."
   label="Hunt two"
 >
@@ -77,7 +67,11 @@ print("Hello"
 
 Here's the tricky one: no red error at all, but nothing appeared in Output. That's a different smell — the script ran and did what it said, which wasn't what you wanted.
 
-<FixBug
+```luau
+print("Hello from the Workspace")
+```
+
+<Mcq
   question="Output stayed empty after you pressed Play. The script is in the Workspace. What should you check first?"
   options={[
     "That you actually pressed Play",
@@ -88,13 +82,7 @@ Here's the tricky one: no red error at all, but nothing appeared in Output. That
   answer={0}
   explanation="A Script runs when the game starts. If you didn't press Play, nothing ran. The script can be perfect and still do nothing until you test it."
   label="Hunt three"
->
-
-```luau
-print("Hello from the Workspace")
-```
-
-</FixBug>
+/>
 
 </Step>
 

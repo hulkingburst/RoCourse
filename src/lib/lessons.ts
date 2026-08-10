@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { courseSections } from "@content/course";
 import { slugify } from "@/lib/utils";
+import { countActivitySteps } from "@/lib/steps";
 import type {
   CourseSection,
   Heading,
@@ -70,13 +71,6 @@ function stripFencedBlocks(source: string): string {
   return source.replace(/```[\s\S]*?```/g, "");
 }
 
-/** Counts the multiple-choice quick-check questions in a lesson's source. */
-export function countMcqQuestions(source: string): number {
-  const masked = stripFencedBlocks(source);
-  const matches = masked.match(/<Mcq\b/g);
-  return matches ? matches.length : 0;
-}
-
 export function extractHeadings(source: string): Heading[] {
   const stripped = stripFencedBlocks(source);
   const headings: Heading[] = [];
@@ -112,7 +106,7 @@ function toMeta(
     ...base,
     sectionTitle: section.title,
     sectionOrder: section.order,
-    quizCount: countMcqQuestions(source),
+    activityCount: countActivitySteps(source),
   };
 }
 

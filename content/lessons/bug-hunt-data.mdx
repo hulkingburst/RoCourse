@@ -24,14 +24,9 @@ Data bugs are sneaky because they don't always error — a save can write garbag
 Your game saves, but every player loads someone else's coins. The code runs with no error — the arguments are just in the wrong order.
 
 <FixBug
-  question="What's wrong with this save line?"
-  options={[
-    "The key is UserId and the value is coins — they're swapped",
-    "SetAsync needs three arguments",
-    "Coins must be a string to save",
-    "Nothing — it's correct",
-  ]}
-  answer={0}
+  instruction="Write the corrected line with the arguments in the right order."
+  fix={["coinsStore:SetAsync(player.UserId, coins)"]}
+  placeholder="coinsStore:SetAsync(...)"
   explanation="The store is keyed by who (UserId) and holds what (coins). GetAsync(coins) reads the wrong file."
   label="Hunt one"
 >
@@ -51,14 +46,9 @@ coinsStore:SetAsync(coins, player.UserId)
 The first time a brand-new player joins, the game errors on the line that reads their coins.
 
 <FixBug
-  question="Why does a brand-new player crash here?"
-  options={[
-    "GetAsync returns nil for a player with no save, and nil breaks the math",
-    "New players aren't allowed",
-    "GetAsync needs a number, not an ID",
-    "The store is full",
-  ]}
-  answer={0}
+  instruction="Write the corrected load line so a brand-new player gets 0, not nil."
+  fix={["local coins = coinsStore:GetAsync(player.UserId) or 0"]}
+  placeholder="local coins = ..."
   explanation="No save yet means nil. Default it with or 0: local coins = coinsStore:GetAsync(player.UserId) or 0"
   label="Hunt two"
 >
@@ -79,14 +69,9 @@ print(player.Name .. " has " .. coins .. " coins")
 Your game runs with no errors, but the leaderboard at the top-right never shows up.
 
 <FixBug
-  question="The folder is created inside each player. What's the likely bug?"
-  options={[
-    "The name isn't exactly leaderstats — the contract is case-sensitive",
-    "NumberValues can't show on a leaderboard",
-    "The folder should be in the Workspace",
-    "The player needs more than one stat",
-  ]}
-  answer={0}
+  instruction="Write the corrected line — the folder must use the exact name Roblox looks for."
+  fix={["stats.Name = \"leaderstats\"", "stats.Name = 'leaderstats'"]}
+  placeholder="stats.Name = ..."
   explanation="Roblox looks for a folder with the exact name leaderstats. Leaderstats or leaderStats silently shows nothing."
   label="Hunt three"
 >
@@ -108,14 +93,9 @@ stats.Parent = player
 The game saves, but every returning player starts at zero. No errors — the save just ran too early to be useful.
 
 <FixBug
-  question="Why does saving inside PlayerAdded store the wrong number?"
-  options={[
-    "The player hasn't earned anything yet, so you save the starter value",
-    "PlayerAdded fires too late",
-    "SetAsync needs the server to be live",
-    "Saving on join is impossible",
-  ]}
-  answer={0}
+  instruction="Write the corrected event header so the save runs as the player leaves."
+  fix={["Players.PlayerRemoving:Connect(function(player)"]}
+  placeholder="Players.PlayerRemoving:Connect(...)"
   explanation="At join time the player's coins are still the starting 0. Save on PlayerRemoving — the moment they leave with real progress."
   label="Hunt four"
 >

@@ -23,7 +23,14 @@ Your game systems work — until one of them quietly doesn't. The classic system
 
 The shop button dims when you can't afford something, and an exploiter just bought everything for free.
 
-<FixBug
+```luau
+-- LocalScript — on the player's computer
+if player.leaderstats.Coins.Value >= 25 then
+    purchaseEvent:FireServer("multiplier")
+end
+```
+
+<Mcq
   question="What's the bug?"
   options={[
     "The price check is on the client, where an exploiter can edit it — it belongs on the server",
@@ -34,16 +41,7 @@ The shop button dims when you can't afford something, and an exploiter just boug
   answer={0}
   explanation="A price check in a LocalScript runs on the player's machine. The server must verify the wallet before spending."
   label="Hunt one"
->
-
-```luau
--- LocalScript — on the player's computer
-if player.leaderstats.Coins.Value >= 25 then
-    purchaseEvent:FireServer("multiplier")
-end
-```
-
-</FixBug>
+/>
 
 </Step>
 
@@ -54,14 +52,9 @@ end
 The button does nothing. No error, no click, nothing — and the log shows the handler fired the moment the script loaded.
 
 <FixBug
-  question="Why did the handler run at load time instead of on click?"
-  options={[
-    "myFunction() is called immediately; Connect needs the function without parentheses",
-    "Activated fires on load",
-    "The button has no text",
-    "Nothing — this is correct",
-  ]}
-  answer={0}
+  instruction="Write the corrected line so the handler connects instead of running now."
+  fix={["button.Activated:Connect(myFunction)"]}
+  placeholder="button.Activated:Connect(...)"
   explanation="button.Activated:Connect(myFunction()) calls myFunction now and connects its result (nil). Write :Connect(myFunction) to pass the function itself."
   label="Hunt two"
 >
@@ -81,14 +74,9 @@ button.Activated:Connect(myFunction())
 Idle income is paying out thousands of coins a second, and the game crawls.
 
 <FixBug
-  question="What's wrong with this idle loop?"
-  options={[
-    "There's no task.wait — it spins and awards coins endlessly",
-    "GetPlayers returns a number",
-    "FireClient is the wrong method",
-    "Nothing — this is fine",
-  ]}
-  answer={0}
+  instruction="Write the line that pauses the loop so it pays once a second."
+  fix={["task.wait(1)", "task.wait()"]}
+  placeholder="task.wait(...)"
   explanation="while true needs a breath. task.wait(1) makes it pay once a second instead of thousands of times a second."
   label="Hunt three"
 >
@@ -111,19 +99,6 @@ end
 
 Clicks still give coins — the leaderboard climbs — but the on-screen label never moves.
 
-<FixBug
-  question="The economy works, only the display is frozen. Likely cause?"
-  options={[
-    "The two scripts use different RemoteEvent names, so the client never hears the update",
-    "Coins are invisible",
-    "The label has no TextSize",
-    "FireClient can't send numbers",
-  ]}
-  answer={0}
-  explanation="ClickCoin on one side and CoinClick on the other is a silent, frustrating bug. Name the event once and use the exact same name everywhere."
-  label="Hunt four"
->
-
 ```luau
 -- server script
 clickEvent.OnServerEvent:Connect(function(player)
@@ -136,7 +111,18 @@ clickEvent.OnClientEvent:Connect(function(total)
 end)
 ```
 
-</FixBug>
+<Mcq
+  question="The economy works, only the display is frozen. Likely cause?"
+  options={[
+    "The two scripts use different RemoteEvent names, so the client never hears the update",
+    "Coins are invisible",
+    "The label has no TextSize",
+    "FireClient can't send numbers",
+  ]}
+  answer={0}
+  explanation="ClickCoin on one side and CoinClick on the other is a silent, frustrating bug. Name the event once and use the exact same name everywhere."
+  label="Hunt four"
+/>
 
 </Step>
 

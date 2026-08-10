@@ -23,7 +23,13 @@ The world's bugs are mostly about *timing* and *who runs what*: grabbing a chara
 
 A player joins and your script instantly errors on `player.Character.Humanoid` — nil.
 
-<FixBug
+```luau
+Players.PlayerAdded:Connect(function(player)
+    local humanoid = player.Character.Humanoid
+end)
+```
+
+<Mcq
   question="Why is player.Character nil at join time?"
   options={[
     "The character spawns a moment after the player joins — you must listen for CharacterAdded",
@@ -34,15 +40,7 @@ A player joins and your script instantly errors on `player.Character.Humanoid` �
   answer={0}
   explanation="At join time the body doesn't exist yet. Listen for CharacterAdded and grab the character in its callback."
   label="Hunt one"
->
-
-```luau
-Players.PlayerAdded:Connect(function(player)
-    local humanoid = player.Character.Humanoid
-end)
-```
-
-</FixBug>
+/>
 
 </Step>
 
@@ -75,14 +73,9 @@ local humanoid = character.Humanoid
 You built the tween perfectly — TweenInfo, goals, Create — and the part sits there. No error, no motion.
 
 <FixBug
-  question="What's the missing step?"
-  options={[
-    "Nobody called :Play() — Create builds the animation but doesn't run it",
-    "The goals are backwards",
-    "The part needs to be anchored",
-    "Tweens need a TweenInfo.new(0)",
-  ]}
-  answer={0}
+  instruction="Write the missing line that starts the tween."
+  fix={["tween:Play()"]}
+  placeholder="tween:Play()"
   explanation="TweenService:Create makes the animation; :Play() runs it. Forgetting Play is the classic silent no-op."
   label="Hunt three"
 >
@@ -104,7 +97,15 @@ local tween = TweenService:Create(coin, info, goals)
 
 You click the coin, the coins go up, but there's no sound — on anyone's computer.
 
-<FixBug
+```luau
+-- Script (server)
+coin.ClickDetector.MouseClick:Connect(function(player)
+    coin.Sound:Play()
+    clickEvent:FireServer()
+end)
+```
+
+<Mcq
   question="The pickup sound plays nowhere. What's the likely cause?"
   options={[
     "The sound is played on the server — feel-effects belong on the client, per player",
@@ -115,17 +116,7 @@ You click the coin, the coins go up, but there's no sound — on anyone's comput
   answer={0}
   explanation="A server :Play() is silent to the player who triggered it. Play feel-effects in a LocalScript where the player can hear them."
   label="Hunt four"
->
-
-```luau
--- Script (server)
-coin.ClickDetector.MouseClick:Connect(function(player)
-    coin.Sound:Play()
-    clickEvent:FireServer()
-end)
-```
-
-</FixBug>
+/>
 
 </Step>
 

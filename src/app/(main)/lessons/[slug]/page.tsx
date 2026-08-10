@@ -103,7 +103,7 @@ export default async function LessonPage({ params }: PageProps<"/lessons/[slug]"
           title={lesson.meta.title}
           description={lesson.meta.description}
           stepMetas={compiledSteps.map((step) => ({ hasActivity: step.hasActivity }))}
-          quizCount={lesson.meta.quizCount}
+          activityCount={lesson.meta.activityCount}
           isFirstLesson={isFirstLesson}
           prevSlug={prev?.slug ?? null}
           prevTitle={prev?.title ?? null}

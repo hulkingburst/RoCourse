@@ -29,6 +29,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { LessonMedalBadge } from "@/components/lessons/lesson-medal";
 
 function LessonRow({
   lesson,
@@ -63,6 +64,7 @@ function LessonRow({
         <Circle className="h-4 w-4 shrink-0 text-muted-foreground/30" />
       )}
       <span className="flex-1">{lesson.title}</span>
+      <LessonMedalBadge slug={lesson.slug} activityCount={lesson.activityCount} className="h-3.5 w-3.5 shrink-0" />
       {bookmarked && <Bookmark className="h-3 w-3 shrink-0 fill-primary text-primary" />}
     </Link>
   );

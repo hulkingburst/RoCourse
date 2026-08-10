@@ -3,8 +3,6 @@
 import * as React from "react";
 import { Brain } from "lucide-react";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
-import { useLesson } from "@/components/lessons/lesson-context";
-import { useProgressStore } from "@/lib/progress-store";
 import {
   ActivityCard,
   ActionButtons,
@@ -78,10 +76,6 @@ function FreeTextPredict({
   children,
 }: Omit<PredictOutputProps, "options" | "answerIndex">) {
   const { solved: stepSolved, onResult } = useStepper();
-  const { slug } = useLesson();
-  const recordActivityResult = useProgressStore(
-    (state) => state.recordActivityResult
-  );
   const [value, setValue] = React.useState("");
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -89,9 +83,9 @@ function FreeTextPredict({
 
   const check = () => {
     const correct = isAnswerMatch(value, answer);
+    const firstTry = status === "idle";
     setStatus(correct ? "correct" : "wrong");
-    onResult(correct);
-    recordActivityResult(slug, correct);
+    onResult(correct, firstTry);
   };
 
   const reset = () => {

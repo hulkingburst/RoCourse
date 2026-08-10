@@ -4,8 +4,6 @@ import * as React from "react";
 import { ListOrdered } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
-import { useLesson } from "@/components/lessons/lesson-context";
-import { useProgressStore } from "@/lib/progress-store";
 import {
   ActivityCard,
   ActionButtons,
@@ -64,10 +62,6 @@ export function ArrangeCode({
   alreadySolved = false,
 }: ArrangeCodeProps) {
   const { solved: stepSolved, onResult } = useStepper();
-  const { slug } = useLesson();
-  const recordActivityResult = useProgressStore(
-    (state) => state.recordActivityResult
-  );
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -105,9 +99,9 @@ export function ArrangeCode({
       order.every(
         (token, position) => token.kind === "line" && token.id === position
       );
+    const firstTry = status === "idle";
     setStatus(isRight ? "correct" : "wrong");
-    onResult(isRight);
-    recordActivityResult(slug, isRight);
+    onResult(isRight, firstTry);
   };
 
   const reset = () => {

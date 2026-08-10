@@ -3,8 +3,6 @@
 import * as React from "react";
 import { Code2 } from "lucide-react";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
-import { useLesson } from "@/components/lessons/lesson-context";
-import { useProgressStore } from "@/lib/progress-store";
 import {
   ActivityCard,
   ActionButtons,
@@ -39,10 +37,6 @@ export function WriteCode({
   alreadySolved = false,
 }: WriteCodeProps) {
   const { solved: stepSolved, onResult } = useStepper();
-  const { slug } = useLesson();
-  const recordActivityResult = useProgressStore(
-    (state) => state.recordActivityResult
-  );
   const [value, setValue] = React.useState("");
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -50,9 +44,9 @@ export function WriteCode({
 
   const check = () => {
     const correct = isAnswerCorrect(value, answer);
+    const firstTry = status === "idle";
     setStatus(correct ? "correct" : "wrong");
-    onResult(correct);
-    recordActivityResult(slug, correct);
+    onResult(correct, firstTry);
   };
 
   const reset = () => {

@@ -76,7 +76,7 @@ export function LessonList({ sections }: { sections: CourseSection[] }) {
                         {bookmarked && (
                           <Bookmark className="h-3.5 w-3.5 fill-primary text-primary" />
                         )}
-                        <LessonMedalBadge slug={lesson.slug} quizCount={lesson.quizCount} />
+                        <LessonMedalBadge slug={lesson.slug} activityCount={lesson.activityCount} />
                       </div>
                       <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
                         {lesson.description}

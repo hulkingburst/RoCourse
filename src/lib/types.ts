@@ -24,8 +24,8 @@ export interface CourseSectionConfig {
 export interface LessonMeta extends LessonFrontmatter {
   sectionTitle: string;
   sectionOrder: number;
-  /** Number of multiple-choice quick-check questions in the lesson. */
-  quizCount: number;
+  /** Number of graded activity steps in the lesson — the medal's total. */
+  activityCount: number;
 }
 
 export interface CourseSection {

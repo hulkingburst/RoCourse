@@ -29,6 +29,10 @@ const ACTIVITY_TAGS = [
 
 const ACTIVITY_TAG_RE = new RegExp(`<(${ACTIVITY_TAGS.join("|")})\\b`);
 
+/** Activities whose result is graded — these count toward the lesson medal. */
+const GRADED_ACTIVITY_TAGS = ACTIVITY_TAGS.filter((tag) => tag !== "ChooseBuild");
+const GRADED_ACTIVITY_TAG_RE = new RegExp(`<(${GRADED_ACTIVITY_TAGS.join("|")})\\b`);
+
 function maskFences(source: string): string {
   return source.replace(/```[\s\S]*?```/g, (block) => " ".repeat(block.length));
 }
@@ -36,6 +40,16 @@ function maskFences(source: string): string {
 /** True when the source contains a gated activity tag outside code fences. */
 export function detectActivity(source: string): boolean {
   return ACTIVITY_TAG_RE.test(maskFences(source));
+}
+
+/** True when the source contains a graded activity (ChooseBuild is not graded). */
+export function detectGradedActivity(source: string): boolean {
+  return GRADED_ACTIVITY_TAG_RE.test(maskFences(source));
+}
+
+/** Number of steps containing at least one graded activity — the medal total. */
+export function countActivitySteps(source: string): number {
+  return splitLessonSource(source).filter((step) => detectGradedActivity(step.source)).length;
 }
 
 export function splitLessonSource(source: string): StepSource[] {
