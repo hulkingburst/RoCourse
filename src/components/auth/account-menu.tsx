@@ -2,7 +2,7 @@
 
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { LinkIcon, UserCircle2, LogOut, Loader2 } from "lucide-react";
+import { LinkIcon, UserCircle2, LogOut, Loader2, UserPlus } from "lucide-react";
 import * as React from "react";
 
 import { useAuthUiStore } from "@/lib/auth-ui";
@@ -51,7 +51,7 @@ export function AccountMenu() {
             ) : (
               <UserCircle2 className="h-4 w-4" />
             )}
-            <span className="max-w-[120px] truncate">
+            <span className="hidden max-w-[120px] truncate sm:block">
               {session.user.name || "Account"}
             </span>
           </Button>
@@ -85,8 +85,17 @@ export function AccountMenu() {
       <Button variant="ghost" size="sm" onClick={() => openDialog("signin")}>
         Sign in
       </Button>
-      <Button size="sm" onClick={() => openDialog("signup")}>
+      <Button size="sm" onClick={() => openDialog("signup")} className="hidden sm:inline-flex">
         Create account
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="sm:hidden"
+        onClick={() => openDialog("signup")}
+        aria-label="Create account"
+      >
+        <UserPlus className="h-4 w-4" />
       </Button>
     </div>
   );

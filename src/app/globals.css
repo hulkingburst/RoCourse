@@ -155,6 +155,16 @@
     cursor: pointer;
   }
 
+  /* iOS Safari auto-zooms on focus for fields under 16px and keeps the zoom
+     after typing. A 16px floor on small screens prevents the zoom entirely. */
+  @media (max-width: 640px) {
+    input:not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+
 
   * {
     scrollbar-width: thin;

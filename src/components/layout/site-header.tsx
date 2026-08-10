@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Flame,
   Menu,
@@ -86,6 +87,8 @@ export function SiteHeader({
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const streak = useProgressStore((state) => state.streak);
   const lastStreakDate = useProgressStore((state) => state.lastStreakDate);
+  const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -93,9 +96,13 @@ export function SiteHeader({
   );
   const streakActive = isStreakActive(lastStreakDate);
 
+  React.useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   return (
     <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
-      <Sheet>
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
             <Menu className="h-5 w-5" />

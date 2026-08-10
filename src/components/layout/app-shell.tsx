@@ -44,7 +44,7 @@ export function AppShell({
               hands-on course for building your first Roblox games.
             </p>
             <p className="font-mono">Learn by building, not by copying.</p>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               <Link
                 href="/privacy"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
