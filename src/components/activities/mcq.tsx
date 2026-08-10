@@ -91,9 +91,9 @@ export function Mcq({
                 )}
               >
                 {showState && isAnswer ? (
-                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <CheckCircle2 className="h-3.5 w-3.5 -translate-y-px" />
                 ) : showState && isSelected && !isAnswer ? (
-                  <XCircle className="h-3.5 w-3.5" />
+                  <XCircle className="h-3.5 w-3.5 -translate-y-px" />
                 ) : (
                   OPTION_LETTERS[index]
                 )}
