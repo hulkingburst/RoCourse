@@ -66,7 +66,10 @@ export async function createAccount(
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return { error: "An account with this email already exists. Try signing in." };
+    return {
+      error:
+        "Could not create an account with those details. If you already have an account, sign in instead.",
+    };
   }
 
   const passwordHash = await hash(password, 12);
@@ -92,7 +95,10 @@ export async function createAccount(
       // If the email collided, the existence check above lost a race.
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing) {
-        return { error: "An account with this email already exists. Try signing in." };
+        return {
+          error:
+            "Could not create an account with those details. If you already have an account, sign in instead.",
+        };
       }
       // Otherwise the handle collided; loop and regenerate it.
     }

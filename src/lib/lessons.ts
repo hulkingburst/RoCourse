@@ -61,6 +61,9 @@ function normalizeMeta(data: Record<string, unknown>, fileName: string): LessonF
 }
 
 function readLessonFile(slug: string): { raw: string; fileName: string } | null {
+  // Slugs come from the URL; keep them strictly safe so a crafted value can
+  // never escape CONTENT_DIR (defense-in-depth beyond dynamicParams = false).
+  if (!/^[a-z0-9-]+$/i.test(slug)) return null;
   const fileName = `${slug}.mdx`;
   const filePath = path.join(CONTENT_DIR, fileName);
   if (!fs.existsSync(filePath)) return null;
