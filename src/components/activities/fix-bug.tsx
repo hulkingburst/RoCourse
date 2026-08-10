@@ -9,7 +9,7 @@ import {
   Feedback,
 } from "@/components/activities/activity-shell";
 import type { ActivityStatus } from "@/components/activities/activity-shell";
-import { isAnswerMatch } from "@/components/activities/grading";
+import { isAnswerMatch, generateHint } from "@/components/activities/grading";
 import { Mcq } from "@/components/activities/mcq";
 
 interface FixBugProps {
@@ -60,6 +60,7 @@ export function FixBug({
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
   );
+  const [wrongAttempts, setWrongAttempts] = React.useState(0);
 
   const isTypeMode = fix !== undefined;
 
@@ -67,16 +68,22 @@ export function FixBug({
     const correct = isAnswerMatch(value, fix!, { strictLocal: requireLocal });
     const firstTry = status === "idle";
     setStatus(correct ? "correct" : "wrong");
+    if (!correct) setWrongAttempts((count) => count + 1);
     onResult(correct, firstTry);
   };
 
   const reset = () => {
     setValue("");
     setStatus("idle");
+    setWrongAttempts(0);
   };
 
   const correct = status === "correct";
   const acceptedFirst = Array.isArray(fix) ? fix[0] : fix;
+  const hint =
+    status === "wrong" && isTypeMode
+      ? generateHint(value, fix!, { strictLocal: requireLocal })
+      : undefined;
 
   if (!isTypeMode) {
     return (
@@ -123,6 +130,8 @@ export function FixBug({
         status={status}
         explanation={explanation}
         correctAnswer={!correct ? acceptedFirst : undefined}
+        hint={hint}
+        wrongAttempts={wrongAttempts}
       />
     </ActivityCard>
   );

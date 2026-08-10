@@ -9,7 +9,7 @@ import {
   Feedback,
 } from "@/components/activities/activity-shell";
 import type { ActivityStatus } from "@/components/activities/activity-shell";
-import { isAnswerCorrect } from "@/components/activities/grading";
+import { isAnswerCorrect, generateHint } from "@/components/activities/grading";
 
 interface WriteCodeProps {
   instruction: string;
@@ -47,21 +47,28 @@ export function WriteCode({
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
   );
+  const [wrongAttempts, setWrongAttempts] = React.useState(0);
 
   const check = () => {
     const correct = isAnswerCorrect(value, answer, { strictLocal: requireLocal });
     const firstTry = status === "idle";
     setStatus(correct ? "correct" : "wrong");
+    if (!correct) setWrongAttempts((count) => count + 1);
     onResult(correct, firstTry);
   };
 
   const reset = () => {
     setValue("");
     setStatus("idle");
+    setWrongAttempts(0);
   };
 
   const correct = status === "correct";
   const acceptedFirst = (Array.isArray(answer) ? answer : [answer])[0];
+  const hint =
+    status === "wrong"
+      ? generateHint(value, answer, { strictLocal: requireLocal })
+      : undefined;
 
   return (
     <ActivityCard label={label} icon={Code2} status={correct ? "correct" : status}>
@@ -96,6 +103,8 @@ export function WriteCode({
         status={status}
         explanation={explanation}
         correctAnswer={!correct ? acceptedFirst : undefined}
+        hint={hint}
+        wrongAttempts={wrongAttempts}
       />
     </ActivityCard>
   );
