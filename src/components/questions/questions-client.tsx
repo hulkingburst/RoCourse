@@ -291,9 +291,11 @@ function AskQuestionDialog({
               onChange={(event) => setLessonSlug(event.target.value)}
               className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <option value="">No specific lesson</option>
+              <option value="" className="bg-white text-black">
+                No specific lesson
+              </option>
               {lessons.map((lesson) => (
-                <option key={lesson.slug} value={lesson.slug}>
+                <option key={lesson.slug} value={lesson.slug} className="bg-white text-black">
                   {lesson.title}
                 </option>
               ))}

@@ -214,7 +214,7 @@ export function SubmitForm() {
           className={cn(inputClass, "h-9")}
         >
           {RESOURCE_KINDS.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} value={option.value} className="bg-white text-black">
               {option.label}
             </option>
           ))}
@@ -345,7 +345,7 @@ export function SubmitForm() {
               className={cn(inputClass, "h-9")}
             >
               {CODE_LANGS.map((language) => (
-                <option key={language} value={language}>
+                <option key={language} value={language} className="bg-white text-black">
                   {language}
                 </option>
               ))}
