@@ -1,0 +1,182 @@
+---
+slug: optimization
+title: Optimization — speed without guessing
+description: Make your game smooth — measure first, then attack the three biggest costs — parts, loops, and events.
+sectionId: leveling-up
+order: 4
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [optimization, performance, fps]
+objectives:
+  - Measure before changing anything
+  - Fix the three biggest beginner costs: parts, loops, and events
+  - Throttle non-critical loops with task.wait
+  - Clean up instances and disconnect listeners
+prerequisites: [debugging]
+keywords: [optimization, performance, fps, throttle, cleanup]
+---
+
+Your game works. Now make it smooth. Performance is a budget, and this lesson shows you where beginner games spend it wastefully — and how to measure before you fix anything.
+
+<Step>
+
+## Smooth is a budget
+
+A game running at 60 FPS has about **16 milliseconds** per frame to do everything — physics, scripts, rendering. Cross the budget and frames drop:
+
+- If the **server** scripts lag, the game feels slow for every player.
+- If the **client** lags, the player's game drops frames.
+
+Optimization is spending that budget on things the player actually notices.
+
+<Mcq
+  question="At 60 FPS, how long does each frame have to do all its work?"
+  options={[
+    "1 millisecond",
+    "16 milliseconds",
+    "60 milliseconds",
+    "1 second",
+  ]}
+  answer={1}
+  explanation="1000 ms ÷ 60 frames ≈ 16 ms per frame. Everything — physics, scripts, rendering — must fit inside it."
+/>
+
+</Step>
+
+<Step>
+
+## Measure before you change
+
+The #1 optimization rule: **don't guess what's slow.** Guessing wastes hours and often fixes nothing.
+
+Open **View → Stats** in Studio and watch three numbers while you play:
+
+- **Physics** — part count, and how often parts move or collide.
+- **Script** — how much time your Lua code spends per frame.
+- **Render** — how many things are being drawn.
+
+<Note>
+Roblox ships a deeper tool, the **MicroProfiler**, that breaks down every task per frame. You don't need it yet — the Stats window is enough to find beginner problems.
+</Note>
+
+The same three costs eat beginner games over and over: **parts, loops, and events.** Fix those and you've fixed most of it.
+
+<Mcq
+  question="Your game is laggy. What's the correct first step?"
+  options={[
+    "Rewrite the biggest script",
+    "Watch Studio Stats and find what's actually expensive",
+    "Lower the game resolution",
+    "Ask Roblox for a bigger server",
+  ]}
+  answer={1}
+  explanation="Measure first. Stats shows whether physics, scripts, or rendering is the problem — then you fix the right thing."
+/>
+
+</Step>
+
+<Step>
+
+## Parts: every part is a bill
+
+Each part costs memory, physics, and rendering time — even if it never moves. A field of 500 tiny coins is 500 bills.
+
+Ways the cost grows fast:
+
+- Hundreds of small **unanchored** parts (each one is simulated by the physics engine).
+- Parts created every second and never destroyed (explosions, projectiles, effects).
+- Scripts calling `Instance.new("Part")` inside loops.
+
+The fix is rarely "no parts." It's **fewer, smarter parts**:
+
+- Anchor anything that never moves.
+- **Reuse** a pool of projectiles and effects instead of creating fresh ones.
+- `part:Destroy()` parts when they're done — don't just hide them.
+
+<FillBlank
+  prompt="A part that never moves should be ____ so the physics engine stops simulating it."
+  answer="anchored"
+  explanation="Anchored parts are still rendered, but the physics engine stops tracking them — a huge save on part-heavy games."
+/>
+
+</Step>
+
+<Step>
+
+## Loops: throttle or spin
+
+A bare `while true do` body runs as fast as Luau can — often hundreds of times per second. If that body does anything at all, you're burning the frame budget on work nobody sees.
+
+```luau
+-- ❌ spins flat-out, burning CPU
+while true do
+    print("still here")
+end
+
+-- ✅ does the same job, twice a second
+while true do
+    print("still here")
+    task.wait(0.5)
+end
+```
+
+Rule of thumb: put a `task.wait` in **every** loop, and make the delay as large as the job allows. Decorative loops and UI tweens can wait 0.1–0.5 s; player-facing logic can be snappier.
+
+<FixBug
+  instruction="Add the missing line that stops this loop from spinning flat-out."
+  fix={["task.wait(0.1)", "task.wait(1)", "task.wait(0.5)"]}
+  explanation="A while loop with no wait runs hundreds of times a second. Adding task.wait throttles it to the delay you choose."
+>
+```luau
+while true do
+    local players = game.Players.NumPlayers
+    -- runs every frame: nothing to see, everything to waste
+end
+```
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Events: disconnect what you don't need
+
+Connections are cheap to make and cheap to leave — which is exactly how they pile up:
+
+- A listener created every time a player's character spawns, and never disconnected.
+- A RemoteEvent fired every frame so the client can watch a number update.
+
+The pattern to learn: **connect once, disconnect when done.**
+
+```luau
+local connection = part.Touched:Connect(onTouch)
+-- when the part is gone, so is the connection:
+connection:Disconnect()
+```
+
+<ArrangeCode
+  lines={[
+    "local connection = coin.Touched:Connect(onTouch)",
+    "-- coin collected",
+    "connection:Disconnect()",
+    "coin:Destroy()",
+  ]}
+  distractors={["local connection = coin.Touched:Connect(onTouch) -- skipped"]}
+  instruction="Order the cleanup: connect the listener, then what happens when the coin is collected?"
+  explanation="The connection is stored, then disconnected when the coin is gone — so the listener can't fire again against a destroyed part."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Optimizing before measuring.** Change nothing until Studio Stats shows the problem.
+- **Waiting 0.001 out of fear.** Tiny delays still spin; pick a delay that matches the job.
+- **Destroying without disconnecting.** If a part dies but its listeners stay, they fire at nothing forever.
+- **Rewriting everything.** First pass: fix the three costs — parts, loops, events. Only then touch deeper scripts.
+
+Next: the map of everything you've learned — and what comes after.
+
+</Step>
