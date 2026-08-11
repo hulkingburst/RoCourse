@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Check, Copy, Terminal } from "lucide-react";
+import { Check, Copy, Play, Terminal } from "lucide-react";
 import { highlightCode } from "@/lib/highlighter";
 import { cn } from "@/lib/utils";
+import { TryIt } from "@/components/lessons/try-it";
 
 function extractText(node: React.ReactNode): string {
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -50,12 +51,14 @@ export function CodeBlock({
   const rawClassName = codeProps?.className ?? "";
   const language = rawClassName.replace(/^language-/, "").split(/\s+/)[0] ?? "";
   const code = extractText(codeProps?.children);
+  const runnable = language === "luau" || language === "lua";
   const highlightKey = `${language}\u0000${code}`;
   const [highlight, setHighlight] = React.useState<{
     key: string;
     value: string;
   } | null>(null);
   const [copied, setCopied] = React.useState(false);
+  const [trying, setTrying] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -91,22 +94,34 @@ export function CodeBlock({
           <Terminal className="h-3.5 w-3.5" />
           {language ? languageLabel(language) : "Code"}
         </span>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
-          aria-label="Copy code"
-        >
-          {copied ? (
-            <>
-              <Check className="h-3.5 w-3.5 text-emerald-400" /> Copied
-            </>
-          ) : (
-            <>
-              <Copy className="h-3.5 w-3.5" /> Copy
-            </>
+        <div className="flex items-center gap-1">
+          {runnable && (
+            <button
+              type="button"
+              onClick={() => setTrying(true)}
+              className="flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
+              aria-label="Run this code"
+            >
+              <Play className="h-3.5 w-3.5" /> Try it
+            </button>
           )}
-        </button>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
+            aria-label="Copy code"
+          >
+            {copied ? (
+              <>
+                <Check className="h-3.5 w-3.5 text-emerald-400" /> Copied
+              </>
+            ) : (
+              <>
+                <Copy className="h-3.5 w-3.5" /> Copy
+              </>
+            )}
+          </button>
+        </div>
       </div>
       {html ? (
         <div
@@ -118,6 +133,7 @@ export function CodeBlock({
           <code>{code}</code>
         </pre>
       )}
+      {trying && <TryIt code={code} />}
     </div>
   );
 }

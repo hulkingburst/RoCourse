@@ -10,6 +10,11 @@ import {
 } from "@/components/activities/activity-shell";
 import type { ActivityStatus } from "@/components/activities/activity-shell";
 import { runLuau, type LuauRunResult } from "@/lib/luau-runtime";
+import {
+  buildChecksScript,
+  parseCheckResult,
+  stripResultMarker,
+} from "@/lib/luau-checks";
 
 interface RunCodeProps {
   instruction: string;
@@ -66,10 +71,10 @@ export function RunCode({
     setRunning(true);
     setStatus("idle");
     setResultCounts(null);
-    const result = await runLuau(buildScript(value, checks));
+    const result = await runLuau(buildChecksScript(value, checks));
     setRunning(false);
 
-    const parsed = parseResult(result.output);
+    const parsed = parseCheckResult(result.output);
     const correct =
       !result.error && parsed !== null && parsed.total > 0 &&
       parsed.passed === parsed.total;
@@ -139,62 +144,7 @@ export function RunCode({
 
 markActivity(RunCode);
 
-const RESULT_MARKER = "__LUAU_RESULT__";
-
-/**
- * Wraps the learner's code in a harness that captures print output (both for
- * display and for `__log`) and provides the `check(condition, message)` helper
- * used by the hidden test suite.
- */
-function buildScript(userCode: string, checks: string): string {
-  return [
-    "local __realPrint = print",
-    "local __log = {}",
-    "local __passed = 0",
-    "local __total = 0",
-    "local function check(condition, message)",
-    "    __total += 1",
-    "    if condition then",
-    "        __passed += 1",
-    "    else",
-    '        __realPrint("FAIL: " .. tostring(message))',
-    "    end",
-    "end",
-    "print = function(...)",
-    "    local parts = {}",
-    '    for i = 1, select("#", ...) do',
-    "        table.insert(parts, tostring(select(i, ...)))",
-    "    end",
-    "    local line = table.concat(parts, \"\\t\")",
-    "    table.insert(__log, line)",
-    "    __realPrint(line)",
-    "end",
-    "",
-    userCode,
-    "",
-    checks,
-    `__realPrint("${RESULT_MARKER} " .. tostring(__passed) .. "/" .. tostring(__total))`,
-  ].join("\n");
-}
-
-function parseResult(output: string): { passed: number; total: number } | null {
-  const lines = output.split("\n");
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const match = lines[i]
-      .trim()
-      .match(new RegExp(`^${RESULT_MARKER} (\\d+)/(\\d+)$`));
-    if (match) {
-      return { passed: Number(match[1]), total: Number(match[2]) };
-    }
-  }
-  return null;
-}
-
 function displayOutput(result: LuauRunResult): string {
   if (result.error) return result.error;
-  return result.output
-    .split("\n")
-    .filter((line) => !line.trim().startsWith(RESULT_MARKER))
-    .join("\n")
-    .trim();
+  return stripResultMarker(result.output);
 }
