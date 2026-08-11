@@ -54,10 +54,14 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
+     * - _vercel (Vercel Analytics internals)
      * - favicon.ico (favicon file)
+     * - anything containing a dot (static assets in /public, e.g. the
+     *   Luau engine files at /luau/*.js and /luau/*.wasm — these must be
+     *   served verbatim, not passed through the intl middleware, or they 404)
      */
     {
-      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      source: "/((?!api|_next/static|_next/image|_vercel|favicon.ico|.*\\..*).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },
