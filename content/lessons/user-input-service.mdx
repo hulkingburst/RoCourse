@@ -1,0 +1,155 @@
+---
+slug: user-input-service
+title: UserInputService — reading the keyboard and mouse
+description: React to raw input from the keyboard, mouse, touch, and gamepad with UserInputService events.
+sectionId: gameplay
+order: 4
+difficulty: beginner
+estimatedMinutes: 5
+tags: [input, keyboard, mouse, userinputservice]
+objectives:
+  - Get the UserInputService singleton
+  - React to key presses with InputBegan
+  - Read which key with KeyCode and what kind with UserInputType
+  - Ignore inputs the UI already handled
+prerequisites: [events, conditionals]
+keywords: [input, userinputservice, inputbegan, inputended, keycode, userinputtype]
+---
+
+Buttons and ClickDetectors cover *clicking*. But what about movement keys, the Escape menu, or gamepad buttons? For raw input — any key, any button, any device — you reach for **UserInputService**.
+
+<Step>
+
+## The input service
+
+`UserInputService` is a singleton: one object, already there, that reports every input a player makes.
+
+```luau
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    print("Something was pressed!")
+end)
+```
+
+`InputBegan` fires the moment any input starts — a key going down, a mouse button, a tap, a gamepad button. It's an event, just like the ones you connected in the events lesson: you're registering a callback the engine calls for you.
+
+<Warning>
+UserInputService only works on the **client**. It must live in a LocalScript — the server has no idea what keys any player is pressing, and that's on purpose.
+</Warning>
+
+</Step>
+
+<Step>
+
+## The InputObject
+
+The callback receives an **InputObject** — a snapshot of that single input. Its two most useful properties are `KeyCode` and `UserInputType`.
+
+```luau
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if input.KeyCode == Enum.KeyCode.Space then
+        print("Space pressed!")
+    end
+end)
+```
+
+- **`KeyCode`** — *which* button. `Enum.KeyCode.Space`, `Enum.KeyCode.W`, `Enum.KeyCode.Escape`.
+- **`UserInputType`** — *what kind of device*. `Enum.UserInputType.Keyboard`, `MouseButton1`, `Touch`, `Gamepad1`.
+
+Check `KeyCode` when you care which key; check `UserInputType` when you care which kind of device.
+
+<Mcq
+  question="Which property tells you WHICH key was pressed?"
+  options={[
+    "input.UserInputType",
+    "input.KeyCode",
+    "input.Position",
+    "input.Delta",
+  ]}
+  answer={1}
+  explanation="KeyCode is the specific button (Space, W, Escape). UserInputType is the device family (keyboard, mouse, touch, gamepad)."
+/>
+
+</Step>
+
+<Step>
+
+## gameProcessedEvent
+
+The second argument answers one question: *did Roblox already use this input?* When a player clicks a GUI button, the UI "consumes" that click — you usually don't want your movement code firing too.
+
+```luau
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then
+        return
+    end
+
+    if input.KeyCode == Enum.KeyCode.Space then
+        print("Space pressed!")
+    end
+end)
+```
+
+`return` early to skip anything the UI handled. This is the #1 guard in input scripts — skip it and typing in a chat box or clicking a button will also trigger your code.
+
+<Note>
+Mouse movement is a different event, `InputChanged`, which fires every frame the mouse moves. It's for camera control and aiming, not for discrete presses.
+</Note>
+
+<FillBlank
+  prompt="To skip inputs that Roblox already used, check if ____ is true and return early."
+  answer="gameProcessedEvent"
+  explanation="gameProcessedEvent is true when the engine already processed the input — usually a GUI click or touch. Skipping it keeps your code from double-firing."
+/>
+
+</Step>
+
+<Step>
+
+## A complete press handler
+
+Here's the whole pattern, wired up:
+
+```luau
+local UserInputService = game:GetService("UserInputService")
+
+local function onInputBegan(input, gameProcessedEvent)
+    if gameProcessedEvent then
+        return
+    end
+
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        print("Key pressed: " .. input.KeyCode.Name)
+    end
+end
+
+UserInputService.InputBegan:Connect(onInputBegan)
+```
+
+A named function keeps the Connect line tidy, and `.KeyCode.Name` gives you a readable string ("Space", "W") for printing.
+
+<WriteCode
+  instruction="Connect to InputBegan with a callback that ignores processed events and prints 'JUMP' when the Space key is pressed."
+  answer={["UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)", "if gameProcessedEvent then return end", "if input.KeyCode == Enum.KeyCode.Space then", "print(\"JUMP\")", "end", "end)"]}
+  starterCode="local UserInputService = game:GetService(\"UserInputService\")
+-- your connect here
+"
+  explanation="Connect InputBegan, guard against processed events, check for Space, then print."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting the `gameProcessedEvent` guard.** Clicking a button or typing in chat also fires InputBegan. Without the guard, your movement or jump code fires when the player is just using the UI.
+- **Using `input.KeyCode == "Space"`.** KeyCodes are enums, not strings — compare against `Enum.KeyCode.Space`, never a quoted name.
+- **Using UserInputService in a server Script.** It only exists on the client. Input belongs in a LocalScript.
+- **Connecting inside a loop.** Just like every other event, connect once at the top of the script — not inside `while true`.
+- **Hard-coding keyboard keys and forgetting mobile.** A phone has no Space bar. In the next lesson you'll bind actions by name so the same code works on every device.
+
+Next: naming your actions instead of your keys.
+
+</Step>

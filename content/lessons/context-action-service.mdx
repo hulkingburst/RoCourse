@@ -1,0 +1,151 @@
+---
+slug: context-action-service
+title: ContextActionService — one action, every device
+description: Bind game actions to keys with ContextActionService so the same code works on keyboard, touch, and gamepad.
+sectionId: gameplay
+order: 5
+difficulty: beginner
+estimatedMinutes: 5
+tags: [input, keyboard, touch, contextactionservice]
+objectives:
+  - Bind an action to input types with BindAction
+  - Name actions after the game action, not the key
+  - Let the engine handle touch and gamepad automatically
+  - Unbind actions when the context ends
+prerequisites: [user-input-service, conditionals]
+keywords: [contextactionservice, bindaction, unbindaction, action]
+---
+
+In the last lesson you listened for specific keys. That works — until a player on a phone tries to jump and finds there's no Space bar. **ContextActionService** fixes this: you bind a *game action* (Jump, Run, Dance) and Roblox maps it to whatever input that player's device can produce.
+
+<Step>
+
+## The problem with hard-coded keys
+
+This code works on desktop, and nowhere else:
+
+```luau
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        print("jump!")
+    end
+end)
+```
+
+A phone has no keyboard. A gamepad has no Space bar. If you want the same action to work across devices, you don't check `KeyCode` for each device — you hand the mapping job to ContextActionService.
+
+<Note>
+ContextActionService is also client-only. It belongs in a LocalScript, just like UserInputService.
+</Note>
+
+</Step>
+
+<Step>
+
+## BindAction
+
+`ContextActionService:BindAction` tells the engine: *when this input happens, call my function.*
+
+```luau
+local ContextActionService = game:GetService("ContextActionService")
+
+local function onJump(actionName, inputState, inputObject)
+    if inputState == Enum.UserInputState.Begin then
+        print("jump!")
+    end
+end
+
+ContextActionService:BindAction("jump", onJump, true, Enum.KeyCode.Space, Enum.UserInputType.Touch)
+```
+
+The arguments, in order:
+
+- **Action name** — a string naming the *game action* (`"jump"`), not the key.
+- **Handler** — the function called when the input fires.
+- **createTouchButton** — `true` to also create an on-screen button on mobile.
+- **Input types** — `Enum.KeyCode.Space` and/or `Enum.UserInputType.Touch`. The same action, any number of inputs.
+
+<Mcq
+  question="What is the action name for?"
+  options={[
+    "The exact key the player must press",
+    "A name for the game action itself, like jump or sprint",
+    "A display label shown on the button",
+    "The player's username",
+  ]}
+  answer={1}
+  explanation="The action name describes the game action — 'jump', 'sprint', 'dance' — not a specific key. That's what lets Roblox map it across devices."
+/>
+
+</Step>
+
+<Step>
+
+## Input states
+
+Your handler gets called multiple times per press, not once. `inputState` tells you *which part*:
+
+- **`Begin`** — the input started (key went down, finger touched). Fire the action here.
+- **`End`** — the input stopped (key released). For jumping, usually do nothing; for holding-to-charge, start here.
+
+```luau
+local function onJump(actionName, inputState)
+    if inputState == Enum.UserInputState.Begin then
+        print("jump!")
+    end
+end
+```
+
+Guard every handler with `if inputState == Enum.UserInputState.Begin then`. It's the same idea as the `gameProcessedEvent` guard — don't run the action twice.
+
+<FillBlank
+  prompt="The handler's first argument is the ____ — a string naming the game action, not a specific key."
+  answer={["action name", "actionName", "action"]}
+  explanation="The handler signature is (actionName, inputState, inputObject). The first value identifies which game action fired."
+/>
+
+</Step>
+
+<Step>
+
+## UnbindAction
+
+Bindings are *scoped to a context*. When the player sits in a vehicle, you bind `"honk"`. When they stand up, that binding must go away.
+
+```luau
+ContextActionService:UnbindAction("honk")
+```
+
+Or clear them all at once with `ContextActionService:UnbindAllActions()`.
+
+<Warning>
+Forget to unbind and the old action keeps firing forever — you'll have stale bindings stacking up and buttons still on screen. Unbind when the context ends.
+</Warning>
+
+<WriteCode
+  instruction="Bind the action 'sprint' to the LeftShift key. Create a touch button too, and print 'sprint!' only when the input begins."
+  answer={["local function onSprint(actionName, inputState)", "if inputState == Enum.UserInputState.Begin then", "print(\"sprint!\")", "end", "end", "ContextActionService:BindAction(\"sprint\", onSprint, true, Enum.KeyCode.LeftShift)"]}
+  starterCode="local ContextActionService = game:GetService(\"ContextActionService\")
+-- define onSprint and bind it here
+"
+  explanation="Define a handler that prints on Begin, then bind the 'sprint' action to LeftShift with a touch button."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Naming the action after the key.** `BindAction("Space", ...)` breaks the whole point — name it after the game action so the engine can map devices.
+- **Checking `KeyCode` inside the handler.** You already told BindAction which inputs to watch. Let it do the mapping.
+- **Forgetting the `Begin` guard.** The handler fires on Begin and End; without the guard your action runs twice.
+- **Binding every frame.** Bind once at the top of the script, then unbind when the context ends.
+- **Reaching for UserInputService when you want a named action.** If you want the action to work on every device and you don't need raw input details, ContextActionService is the cleaner tool.
+
+Next: let's put input to work — the clicker game.
+
+</Step>
