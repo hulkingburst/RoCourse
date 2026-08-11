@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ArrowRight, Search, SearchX } from "lucide-react";
 import { createSearchFuse } from "@/lib/search";
 import { DIFFICULTY_LABEL, type SearchEntry } from "@/lib/types";

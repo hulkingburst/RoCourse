@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Bug } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
 import {
   ActivityCard,
@@ -55,7 +56,12 @@ export function FixBug({
   label = "Fix the bug",
   alreadySolved = false,
 }: FixBugProps) {
+  const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
+  const resolvedLabel = label ?? t("fixBugLabel");
+  const resolvedQuestion = question === "What's the bug?" ? t("whatsTheBug") : question;
+  const resolvedInstruction =
+    instruction === "Type the fixed line." ? t("typeFixedLine") : instruction;
   const [value, setValue] = React.useState("");
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -90,11 +96,11 @@ export function FixBug({
       <div className="space-y-4">
         <div className="overflow-hidden rounded-lg bg-[#0d1117]/60 p-1">{children}</div>
         <Mcq
-          question={question}
+          question={resolvedQuestion}
           options={options ?? []}
           answer={answer ?? 0}
           explanation={explanation}
-          label={label}
+          label={resolvedLabel}
           alreadySolved={alreadySolved}
         />
       </div>
@@ -102,9 +108,9 @@ export function FixBug({
   }
 
   return (
-    <ActivityCard label={label} icon={Bug} status={correct ? "correct" : status}>
+    <ActivityCard label={resolvedLabel} icon={Bug} status={correct ? "correct" : status}>
       <div className="overflow-hidden rounded-lg bg-[#0d1117]/60 p-1">{children}</div>
-      <p className="mt-4 font-medium">{instruction}</p>
+      <p className="mt-4 font-medium">{resolvedInstruction}</p>
       <textarea
         value={value}
         disabled={correct}
@@ -117,14 +123,14 @@ export function FixBug({
         autoCapitalize="off"
         autoCorrect="off"
         rows={2}
-        aria-label={instruction}
+        aria-label={resolvedInstruction}
         className="mt-3 w-full resize-y rounded-lg border border-input bg-transparent p-3 font-mono text-[14px] leading-relaxed outline-none transition-colors focus:border-primary/60 focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
       />
       <ActionButtons
         onCheck={check}
         canCheck={!correct && value.trim().length > 0}
         onReset={status === "wrong" ? reset : undefined}
-        checkLabel="Check fix"
+        checkLabel={t("checkFix")}
       />
       <Feedback
         status={status}

@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import {
   Bookmark,
   BookOpenCheck,
@@ -131,6 +131,7 @@ function SidebarSection({
 export function SidebarNav({ sections }: { sections: CourseSection[] }) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("nav");
   const hydrated = useProgressStore((state) => state.hydrated);
   const lessonsRecord = useProgressStore((state) => state.lessons);
   const bookmarks = useProgressStore((state) => state.bookmarks);
@@ -165,7 +166,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
     : undefined;
 
   const handleReset = () => {
-    if (window.confirm("Reset all progress? This cannot be undone.")) {
+    if (window.confirm(t("resetConfirm"))) {
       resetProgress();
     }
   };
@@ -207,7 +208,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
             <PlayCircle className="h-4 w-4 shrink-0 text-primary" />
             <div className="min-w-0">
               <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                Continue learning
+                {t("continueLearning")}
               </div>
               <div className="truncate text-[13px] font-medium">{lastLessonMeta.title}</div>
             </div>
@@ -217,7 +218,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
 
       <div className="px-4 pb-3">
         <div className="mb-1.5 flex items-baseline justify-between text-xs">
-          <span className="text-muted-foreground">Overall progress</span>
+          <span className="text-muted-foreground">{t("overallProgress")}</span>
           <span className="font-mono font-medium">
             {hydrated ? `${completed}/${total}` : "–/–"}
           </span>
@@ -252,7 +253,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Link href="/quiz/daily">
               <CalendarDays className="h-3.5 w-3.5" />
-              Daily challenge
+              {t("dailyChallenge")}
             </Link>
           </Button>
           <Button
@@ -263,7 +264,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Link href="/quiz">
               <ListChecks className="h-3.5 w-3.5" />
-              Quick quiz
+              {t("quickQuiz")}
             </Link>
           </Button>
           <Button
@@ -274,7 +275,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Link href="/questions">
               <MessageCircleQuestion className="h-3.5 w-3.5" />
-              Questions
+              {t("questions")}
             </Link>
           </Button>
           <Button
@@ -285,7 +286,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Link href="/playground">
               <Terminal className="h-3.5 w-3.5" />
-              Playground
+              {t("playground")}
             </Link>
           </Button>
           <Button
@@ -296,7 +297,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Link href="/reference">
               <BookOpenCheck className="h-3.5 w-3.5" />
-              Reference
+              {t("reference")}
             </Link>
           </Button>
           <Button
@@ -307,7 +308,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Link href="/resources">
               <Package className="h-3.5 w-3.5" />
-              Resources
+              {t("resources")}
             </Link>
           </Button>
           <Button
@@ -318,7 +319,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Link href="/users">
               <Users className="h-3.5 w-3.5" />
-              Learners
+              {t("learners")}
             </Link>
           </Button>
           <Button
@@ -329,8 +330,8 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Gamepad2 className="h-3.5 w-3.5" />
             {finishedPath
-              ? `Switch final project (${finishedPath === "tycoon" ? "Coin Tycoon" : "The Collector"})`
-              : "Choose final project"}
+              ? `${t("switchFinalProject")} (${finishedPath === "tycoon" ? "Coin Tycoon" : "The Collector"})`
+              : t("chooseFinalProject")}
           </Button>
           <Button
             variant="ghost"
@@ -339,7 +340,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
             onClick={handleReset}
           >
             <RotateCcw className="h-3.5 w-3.5" />
-            Reset progress
+            {t("resetProgress")}
           </Button>
         </div>
       </div>

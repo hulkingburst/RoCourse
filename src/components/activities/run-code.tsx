@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Play } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
 import {
   ActivityCard,
@@ -50,10 +51,12 @@ export function RunCode({
   checks,
   hint,
   explanation,
-  label = "Run the code",
+  label,
   alreadySolved = false,
 }: RunCodeProps) {
+  const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
+  const resolvedLabel = label ?? t("runCodeLabel");
   const [value, setValue] = React.useState(starterCode);
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -95,7 +98,7 @@ export function RunCode({
   const correct = status === "correct";
 
   return (
-    <ActivityCard label={label} icon={Play} status={correct ? "correct" : status}>
+    <ActivityCard label={resolvedLabel} icon={Play} status={correct ? "correct" : status}>
       <p className="font-medium">{instruction}</p>
       {hint && (
         <p className="mt-2 text-sm text-muted-foreground">Hint: {hint}</p>
@@ -111,18 +114,18 @@ export function RunCode({
         autoCapitalize="off"
         autoCorrect="off"
         rows={7}
-        aria-label={label}
+        aria-label={resolvedLabel}
         className="mt-4 w-full resize-y rounded-lg border border-white/10 bg-[#0d1117] p-4 font-mono text-[13.5px] leading-relaxed text-zinc-200 outline-none transition-colors focus:border-primary/60 focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
       />
       <ActionButtons
         onCheck={run}
         canCheck={!running && !correct && value.trim().length > 0}
         onReset={!running && (output !== null || status === "wrong") ? reset : undefined}
-        checkLabel={running ? "Running…" : "Run"}
+        checkLabel={running ? t("running") : t("run")}
       />
       {resultCounts && !correct && (
         <p className="mt-3 text-sm font-medium text-destructive">
-          {resultCounts.passed}/{resultCounts.total} checks passed — keep going.
+          {t("checksPassed", { passed: resultCounts.passed, total: resultCounts.total })}
         </p>
       )}
       {output !== null && (

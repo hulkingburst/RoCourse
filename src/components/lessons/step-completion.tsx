@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import {
   ArrowRight,
   Award,
@@ -100,6 +101,7 @@ export function StepCompletion({
   onReplay,
 }: StepCompletionProps) {
   const streak = useProgressStore((state) => state.streak);
+  const t = useTranslations("lesson");
   return (
     <div className="relative overflow-hidden rounded-2xl border bg-card px-6 py-14 text-center shadow-sm">
       <Confetti seed={slug} />
@@ -107,14 +109,16 @@ export function StepCompletion({
         <div className="check-pop mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-success/15">
           <CheckCircle2 className="check-draw h-12 w-12 text-success" />
         </div>
-        <h2 className="pop-in mt-6 text-2xl font-bold">Lesson complete!</h2>
+        <h2 className="pop-in mt-6 text-2xl font-bold">{t("lessonComplete")}</h2>
         <p className="pop-in mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-          Nice work finishing <span className="font-medium text-foreground">{title}</span>.
-          Your progress was saved automatically.
+          {t.rich("niceWork", {
+            title,
+            b: (chunks) => <span className="font-medium text-foreground">{chunks}</span>,
+          })}
         </p>
         <p className="pop-in mt-3 text-sm font-semibold text-orange-500">
           <Flame className="mr-1 inline h-4 w-4 fill-current" />
-          {streak} {streak === 1 ? "day" : "days"} in a row
+          {t("streakDays", { count: streak })}
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row">
@@ -124,7 +128,7 @@ export function StepCompletion({
               onClick={scrollToTop}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Next lesson: {nextTitle}
+              {t("nextLesson", { title: nextTitle })}
               <ArrowRight className="h-4 w-4" />
             </Link>
           ) : (
@@ -133,7 +137,7 @@ export function StepCompletion({
               onClick={scrollToTop}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              You finished the course!
+              {t("courseFinished")}
               <BookOpen className="h-4 w-4" />
             </Link>
           )}
@@ -143,14 +147,14 @@ export function StepCompletion({
               className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
             >
               <Award className="h-4 w-4" />
-              View your certificate
+              {t("viewCertificate")}
             </Link>
           )}
           <Link
             href="/lessons"
             className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
           >
-            All lessons
+            {t("allLessons")}
           </Link>
           <button
             type="button"
@@ -158,7 +162,7 @@ export function StepCompletion({
             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <RotateCcw className="h-4 w-4" />
-            Replay
+            {t("replay")}
           </button>
         </div>
       </div>

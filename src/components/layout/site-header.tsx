@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import {
   Flame,
   Menu,
@@ -39,8 +39,10 @@ import {
 import { SearchDialog } from "@/components/search/search-dialog";
 import { SidebarNav } from "@/components/layout/course-sidebar";
 import { AccountMenu } from "@/components/auth/account-menu";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 function ThemeToggle() {
+  const t = useTranslations("theme");
   const { resolvedTheme, setTheme } = useTheme();
   const mounted = React.useSyncExternalStore(
     () => () => {},
@@ -51,7 +53,7 @@ function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Toggle theme">
+        <Button variant="ghost" size="icon" aria-label={t("toggleTheme")}>
           {mounted && resolvedTheme === "dark" ? (
             <Moon className="h-4 w-4" />
           ) : (
@@ -60,16 +62,16 @@ function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Theme</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("label")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="h-4 w-4" /> Light
+          <Sun className="h-4 w-4" /> {t("light")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="h-4 w-4" /> Dark
+          <Moon className="h-4 w-4" /> {t("dark")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="h-4 w-4" /> System
+          <Monitor className="h-4 w-4" /> {t("system")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -88,6 +90,7 @@ export function SiteHeader({
   const streak = useProgressStore((state) => state.streak);
   const lastStreakDate = useProgressStore((state) => state.lastStreakDate);
   const pathname = usePathname();
+  const t = useTranslations("nav");
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [previousPathname, setPreviousPathname] = React.useState(pathname);
   if (pathname !== previousPathname) {
@@ -105,7 +108,7 @@ export function SiteHeader({
     <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+          <Button variant="ghost" size="icon" className="lg:hidden" aria-label={t("openMenu")}>
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
@@ -115,7 +118,7 @@ export function SiteHeader({
               {process.env.NEXT_PUBLIC_COURSE_NAME ?? "RoCourse"}
             </SheetTitle>
             <SheetDescription className="sr-only">
-              Course navigation
+              {t("courseNavigation")}
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto">
@@ -147,7 +150,7 @@ export function SiteHeader({
         size="icon"
         className="hidden lg:inline-flex"
         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        aria-label={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+        aria-label={sidebarCollapsed ? t("showSidebar") : t("hideSidebar")}
       >
         {sidebarCollapsed ? (
           <PanelLeftOpen className="h-4 w-4" />
@@ -160,7 +163,7 @@ export function SiteHeader({
       {mounted && (
         <Link
           href="/profile"
-          aria-label="Day streak"
+          aria-label={t("dayStreak")}
           className={cn(
             "hidden items-center gap-1.5 rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-accent sm:inline-flex",
             streakActive ? "text-orange-500" : "text-muted-foreground"
@@ -171,6 +174,7 @@ export function SiteHeader({
         </Link>
       )}
       <AccountMenu />
+      <LanguageSwitcher />
       <ThemeToggle />
     </header>
   );

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Code2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
 import {
   ActivityCard,
@@ -56,10 +57,12 @@ export function WriteCode({
   checks,
   placeholder = "local …",
   explanation,
-  label = "Write the code",
+  label,
   alreadySolved = false,
 }: WriteCodeProps) {
+  const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
+  const resolvedLabel = label ?? t("writeCodeLabel");
   const [value, setValue] = React.useState("");
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -105,7 +108,7 @@ export function WriteCode({
       : undefined;
 
   return (
-    <ActivityCard label={label} icon={Code2} status={correct ? "correct" : status}>
+    <ActivityCard label={resolvedLabel} icon={Code2} status={correct ? "correct" : status}>
       <p className="font-medium">{instruction}</p>
       {starterCode && (
         <pre className="mt-4 overflow-x-auto rounded-lg bg-[#0d1117] p-4 font-mono text-[13.5px] leading-relaxed text-zinc-200">
@@ -130,7 +133,7 @@ export function WriteCode({
       <ActionButtons
         onCheck={check}
         canCheck={!correct && !checking && value.trim().length > 0}
-        checkLabel={checks ? "Run checks" : "Check answer"}
+        checkLabel={checks ? t("runChecks") : t("checkAnswer")}
         onReset={status === "wrong" ? reset : undefined}
       />
       {checks && hiddenOutput !== null && (

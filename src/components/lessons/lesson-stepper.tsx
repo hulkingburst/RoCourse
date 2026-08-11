@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StepperContext } from "@/components/activities/activity-context";
@@ -49,6 +50,7 @@ export function LessonStepper({
   children,
 }: LessonStepperProps) {
   const { slug } = useLesson();
+  const t = useTranslations("lesson");
   const lessons = useProgressStore((state) => state.lessons);
   const bookmarks = useProgressStore((state) => state.bookmarks);
   const recordView = useProgressStore((state) => state.recordView);
@@ -162,7 +164,7 @@ export function LessonStepper({
               <button
                 type="button"
                 onClick={() => toggleBookmark(slug)}
-                aria-label={bookmarked ? "Remove bookmark" : "Bookmark lesson"}
+                aria-label={bookmarked ? t("removeBookmark") : t("bookmarkLesson")}
                 className={cn(
                   "shrink-0 rounded-lg border p-2 transition-colors",
                   bookmarked
@@ -188,7 +190,7 @@ export function LessonStepper({
                   type="button"
                   onClick={() => index <= maxActive && goTo(index)}
                   disabled={index > maxActive}
-                  aria-label={`Go to step ${index + 1}`}
+                  aria-label={t("goToStep", { step: index + 1 })}
                   className={cn(
                     "h-1.5 flex-1 rounded-full transition-colors",
                     stepDone
@@ -204,15 +206,15 @@ export function LessonStepper({
           </div>
         )}
         <div className="mb-5 text-xs font-medium text-muted-foreground">
-          Step {active + 1} of {total}
+          {t("stepOf", { current: active + 1, total })}
           {currentMeta.hasActivity && !complete && !solvedSteps[active] && (
-            <span className="ml-2">• complete the activity to continue</span>
+            <span className="ml-2">• {t("activityHint")}</span>
           )}
         </div>
 
         {complete && (
           <div className="mb-4 rounded-lg border border-success/30 bg-success/10 px-4 py-2 text-sm text-success">
-            You&apos;ve already completed this lesson — review it or jump ahead.
+            {t("alreadyCompleted")}
           </div>
         )}
 
@@ -244,7 +246,7 @@ export function LessonStepper({
                 className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back
+                {t("back")}
               </button>
               <button
                 type="button"
@@ -257,7 +259,7 @@ export function LessonStepper({
                     : "cursor-not-allowed bg-muted text-muted-foreground"
                 )}
               >
-                {isLast ? "Finish lesson" : "Continue"}
+                {isLast ? t("finishLesson") : t("continue")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

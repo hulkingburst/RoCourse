@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { ListOrdered } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
+import { cn } from "@/lib/utils";
 import {
   ActivityCard,
   ActionButtons,
@@ -58,10 +59,12 @@ export function ArrangeCode({
   distractors = [],
   instruction,
   explanation,
-  label = "Arrange the code",
+  label,
   alreadySolved = false,
 }: ArrangeCodeProps) {
+  const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
+  const resolvedLabel = label ?? t("arrangeCodeLabel");
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -112,7 +115,7 @@ export function ArrangeCode({
 
   if (!mounted) {
     return (
-      <ActivityCard label={label} icon={ListOrdered} status={status}>
+      <ActivityCard label={resolvedLabel} icon={ListOrdered} status={status}>
         <div className="h-28 animate-pulse rounded-lg bg-muted/50" />
       </ActivityCard>
     );
@@ -121,17 +124,17 @@ export function ArrangeCode({
   const instructionText =
     instruction ??
     (distractors.length > 0
-      ? "Tap the correct lines in the order they should run — leave the wrong ones out."
-      : "Tap the lines in the order they should run.");
+      ? t("arrangeWithDistractors")
+      : t("arrangeSimple"));
 
   return (
-    <ActivityCard label={label} icon={ListOrdered} status={correct ? "correct" : status}>
+    <ActivityCard label={resolvedLabel} icon={ListOrdered} status={correct ? "correct" : status}>
       <p className="font-medium">{instructionText}</p>
 
       <ol className="mt-4 space-y-1.5">
         {order.length === 0 && (
           <li className="rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground/70">
-            {correct ? "All lines arranged." : "Your order will appear here."}
+            {correct ? t("arrangeAllDone") : t("arrangePlaceholder")}
           </li>
         )}
         {order.map((token, position) => (
@@ -149,7 +152,7 @@ export function ArrangeCode({
               <button
                 type="button"
                 onClick={() => removeToken(position)}
-                aria-label="Remove line"
+                aria-label={t("removeLine")}
                 className="shrink-0 rounded px-1.5 text-muted-foreground transition-colors hover:text-destructive"
               >
                 ✕
@@ -180,7 +183,7 @@ export function ArrangeCode({
         onCheck={check}
         canCheck={!correct && order.length === lines.length}
         onReset={status === "wrong" || order.length > 0 ? reset : undefined}
-        checkLabel="Check order"
+        checkLabel={t("checkOrder")}
       />
       <Feedback
         status={status}

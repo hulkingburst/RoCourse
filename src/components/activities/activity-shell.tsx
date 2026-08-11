@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   CheckCircle2,
   Eye,
@@ -24,6 +25,7 @@ export function ActivityCard({
   status: ActivityStatus;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("activity");
   return (
     <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
       <div className="flex items-center gap-2 border-b px-5 py-3">
@@ -32,12 +34,12 @@ export function ActivityCard({
         <span className="ml-auto">
           {status === "correct" && (
             <span className="flex items-center gap-1 text-sm font-medium text-success">
-              <CheckCircle2 className="h-4 w-4" /> Correct
+              <CheckCircle2 className="h-4 w-4" /> {t("correct")}
             </span>
           )}
           {status === "wrong" && (
             <span className="flex items-center gap-1 text-sm font-medium text-destructive">
-              <XCircle className="h-4 w-4" /> Not quite
+              <XCircle className="h-4 w-4" /> {t("notQuite")}
             </span>
           )}
         </span>
@@ -101,6 +103,7 @@ export function Feedback({
  * learner chooses to reveal it, so the explanation above it stays a hint.
  */
 export function AnswerSpoiler({ answer }: { answer: string }) {
+  const t = useTranslations("activity");
   const [revealed, setRevealed] = React.useState(false);
   return (
     <div className="mt-2.5">
@@ -115,11 +118,11 @@ export function AnswerSpoiler({ answer }: { answer: string }) {
         ) : (
           <Eye className="h-3.5 w-3.5" />
         )}
-        {revealed ? "Hide answer" : "Reveal answer"}
+        {revealed ? t("hideAnswer") : t("revealAnswer")}
       </button>
       {revealed && (
         <div className="mt-2">
-          <p className="text-[13px] text-foreground/80">The correct answer:</p>
+          <p className="text-[13px] text-foreground/80">{t("correctAnswer")}</p>
           <code className="mt-1 block rounded-md bg-muted px-2.5 py-1.5 font-mono text-[13px]">
             {answer}
           </code>
@@ -133,13 +136,14 @@ export function ActionButtons({
   onCheck,
   canCheck,
   onReset,
-  checkLabel = "Check answer",
+  checkLabel,
 }: {
   onCheck: () => void;
   canCheck: boolean;
   onReset?: () => void;
   checkLabel?: string;
 }) {
+  const t = useTranslations("activity");
   return (
     <div className="mt-4 flex items-center gap-2">
       <button
@@ -148,7 +152,7 @@ export function ActionButtons({
         disabled={!canCheck}
         className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {checkLabel}
+        {checkLabel ?? t("checkAnswer")}
       </button>
       {onReset && (
         <button
@@ -156,7 +160,7 @@ export function ActionButtons({
           onClick={onReset}
           className="rounded-lg px-3 py-2 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
         >
-          Reset
+          {t("reset")}
         </button>
       )}
     </div>

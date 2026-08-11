@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Type } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
 import {
   ActivityCard,
@@ -31,10 +32,12 @@ export function FillBlank({
   answer,
   placeholder = "Type here…",
   explanation,
-  label = "Fill in the blank",
+  label,
   alreadySolved = false,
 }: FillBlankProps) {
+  const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
+  const resolvedLabel = label ?? t("fillBlankLabel");
   const [value, setValue] = React.useState("");
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -60,7 +63,7 @@ export function FillBlank({
 
   return (
     <ActivityCard
-      label={label}
+      label={resolvedLabel}
       icon={Type}
       status={correct ? "correct" : status}
     >

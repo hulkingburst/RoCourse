@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import {
   ArrowRight,
   Bookmark,
@@ -17,6 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
 export function CourseOverview({ sections }: { sections: CourseSection[] }) {
+  const t = useTranslations("course");
   const hydrated = useProgressStore((state) => state.hydrated);
   const lessonsRecord = useProgressStore((state) => state.lessons);
   const lastLesson = useProgressStore((state) => state.lastLesson);
@@ -48,9 +50,11 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
       {total > 0 && (
         <section className="rounded-2xl border bg-card p-6">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold">Your progress</h2>
+            <h2 className="text-lg font-semibold">{t("yourProgress")}</h2>
             <span className="font-mono text-sm text-muted-foreground">
-              {hydrated ? `${completed} of ${total} lessons` : "— of " + total + " lessons"}
+              {hydrated
+                ? t("ofLessons", { completed, total })
+                : t("ofLessons", { completed: "—", total })}
             </span>
           </div>
           <Progress value={percent} className="h-2" />
@@ -64,7 +68,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-xs uppercase tracking-wide text-muted-foreground">
-                  Continue learning
+                  {t("continueLearning")}
                 </span>
                 <span className="block truncate font-medium">
                   {continueLesson.title}
@@ -74,16 +78,14 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
             </Link>
           ) : (
             <p className="mt-5 text-sm text-muted-foreground">
-              {hydrated
-                ? "Open a lesson to start tracking your progress."
-                : "Start the first lesson to get going."}
+              {hydrated ? t("noProgress") : t("startFirstLesson")}
             </p>
           )}
         </section>
       )}
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold">Course sections</h2>
+        <h2 className="mb-4 text-lg font-semibold">{t("courseSections")}</h2>
         <div className="grid gap-4">
           {sections.map((section) => {
             const sectionCompleted = section.lessons.filter((lesson) =>
@@ -105,7 +107,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                   </h3>
                   <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />
-                    {section.lessons.length} lessons
+                    {t("lessonsCount", { count: section.lessons.length })}
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -129,7 +131,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
             <div>
               <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                Recently viewed
+                {t("recentlyViewed")}
               </h2>
               <ul className="space-y-1">
                 {recentEntries.map((lesson) => (
@@ -150,7 +152,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
             <div>
               <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <Bookmark className="h-4 w-4 text-muted-foreground" />
-                Bookmarked
+                {t("bookmarked")}
               </h2>
               <ul className="space-y-1">
                 {bookmarkEntries.map((lesson) => (
@@ -173,19 +175,17 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
       <section className="rounded-2xl border-2 border-dashed p-6">
         <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
           <Layers className="h-4 w-4 text-primary" />
-          The final project
+          {t("finalProject")}
         </div>
         <p className="text-[15px] text-muted-foreground">
-          Everything in the course builds toward one goal: building a complete,
-          working Roblox clicker game from scratch — one script at a time, with
-          every line explained before you write it.
+          {t("finalProjectBody")}
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Badge variant="outline">GUI buttons</Badge>
-          <Badge variant="outline">Currency & upgrades</Badge>
-          <Badge variant="outline">Saving data</Badge>
-          <Badge variant="outline">Client & server</Badge>
-          <Badge variant="outline">Leaderstats</Badge>
+          <Badge variant="outline">{t("badgeGui")}</Badge>
+          <Badge variant="outline">{t("badgeCurrency")}</Badge>
+          <Badge variant="outline">{t("badgeSaving")}</Badge>
+          <Badge variant="outline">{t("badgeClientServer")}</Badge>
+          <Badge variant="outline">{t("badgeLeaderstats")}</Badge>
         </div>
       </section>
     </div>

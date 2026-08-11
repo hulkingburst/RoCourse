@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Brain } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { markActivity, useStepper } from "@/components/activities/activity-context";
 import {
   ActivityCard,
@@ -36,20 +37,22 @@ export function PredictOutput({
   options,
   answerIndex,
   explanation,
-  label = "Predict the output",
+  label,
   children,
   alreadySolved = false,
 }: PredictOutputProps) {
+  const t = useTranslations("activity");
+  const resolvedLabel = label ?? t("predictOutputLabel");
   if (options) {
     return (
       <div className="space-y-4">
         <div className="overflow-hidden rounded-lg bg-[#0d1117]/60 p-1">{children}</div>
         <Mcq
-          question="What does this code output?"
+          question={t("whatDoesCodeOutput")}
           options={options}
           answer={answerIndex ?? 0}
           explanation={explanation}
-          label={label}
+          label={resolvedLabel}
           alreadySolved={alreadySolved}
         />
       </div>
@@ -60,7 +63,7 @@ export function PredictOutput({
     <FreeTextPredict
       answer={answer}
       explanation={explanation}
-      label={label}
+      label={resolvedLabel}
       alreadySolved={alreadySolved}
     >
       {children}
@@ -71,11 +74,13 @@ export function PredictOutput({
 function FreeTextPredict({
   answer,
   explanation,
-  label = "Predict the output",
+  label,
   alreadySolved,
   children,
 }: Omit<PredictOutputProps, "options" | "answerIndex">) {
+  const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
+  const resolvedLabel = label ?? t("predictOutputLabel");
   const [value, setValue] = React.useState("");
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -97,7 +102,7 @@ function FreeTextPredict({
   const acceptedFirst = (Array.isArray(answer) ? answer : [answer])[0];
 
   return (
-    <ActivityCard label={label} icon={Brain} status={correct ? "correct" : status}>
+    <ActivityCard label={resolvedLabel} icon={Brain} status={correct ? "correct" : status}>
       <div className="overflow-hidden rounded-lg bg-[#0d1117]/60 p-1">{children}</div>
       <input
         value={value}
@@ -106,18 +111,18 @@ function FreeTextPredict({
         onKeyDown={(event) => {
           if (event.key === "Enter") check();
         }}
-        placeholder="Type the output…"
+        placeholder={t("typeOutputPlaceholder")}
         spellCheck={false}
         autoCapitalize="off"
         autoCorrect="off"
-        aria-label="Type the output"
+        aria-label={t("typeOutput")}
         className="mt-4 w-full rounded-lg border border-input bg-transparent px-3 py-2.5 font-mono text-[14px] outline-none transition-colors focus:border-primary/60 focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
       />
       <ActionButtons
         onCheck={check}
         canCheck={!correct && value.trim().length > 0}
         onReset={status === "wrong" ? reset : undefined}
-        checkLabel="Check"
+        checkLabel={t("check")}
       />
       <Feedback
         status={status}

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
 
 // Content Security Policy applied to HTML responses. It uses a per-request
 // nonce (Next.js applies it to its inline scripts/styles automatically) plus
@@ -21,9 +23,17 @@ const buildCsp = (nonce: string): string => {
   ].join("; ");
 };
 
+// next-intl resolves the request locale and either rewrites it into the
+// `[locale]` segment or redirects (e.g. missing locale prefix).
+const intlMiddleware = createIntlMiddleware(routing);
+
 // Every page view gets a fresh nonce. Next.js reads it from the x-nonce
 // request header and stamps it onto the inline scripts and styles it emits.
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  // Let next-intl handle locale detection/rewriting first.
+  const intlResponse = await intlMiddleware(request);
+  if (intlResponse) return intlResponse;
+
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = buildCsp(nonce);
 

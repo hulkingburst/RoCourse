@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { GitBranch, Heart } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ export function AppShell({
   searchEntries: SearchEntry[];
 }) {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
+  const t = useTranslations("footer");
 
   return (
     <div className="min-h-screen">
@@ -39,47 +41,44 @@ export function AppShell({
         <main className="flex-1">{children}</main>
         <footer className="border-t py-6">
           <div className="mx-auto flex max-w-3xl flex-col items-center justify-between gap-2 px-6 text-center text-xs text-muted-foreground sm:flex-row sm:text-left">
-            <p>
-              {process.env.NEXT_PUBLIC_COURSE_NAME ?? "RoCourse"} — a
-              hands-on course for building your first Roblox games.
-            </p>
-            <p className="font-mono">Learn by building, not by copying.</p>
+            <p>{t("about", { courseName: process.env.NEXT_PUBLIC_COURSE_NAME ?? "RoCourse" })}</p>
+            <p className="font-mono">{t("tagline")}</p>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               <Link
                 href="/privacy"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                Privacy
+                {t("privacy")}
               </Link>
               <Link
                 href="/terms"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                Terms
+                {t("terms")}
               </Link>
               <Link
                 href="/faq"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                FAQ
+                {t("faq")}
               </Link>
               <Link
                 href="/guides"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                Guides
+                {t("guides")}
               </Link>
               <Link
                 href="/showcase"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                Showcase
+                {t("showcase")}
               </Link>
               <Link
                 href="/questions"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                Questions
+                {t("questions")}
               </Link>
               <FeedbackButton />
               <a
@@ -95,11 +94,11 @@ export function AppShell({
                 href="https://throne.com/hulkingburst"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Donate to support RoCourse"
+                aria-label={t("donateAria")}
                 className="flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 <Heart className="h-3 w-3" />
-                Donate
+                {t("donate")}
               </a>
             </div>
           </div>

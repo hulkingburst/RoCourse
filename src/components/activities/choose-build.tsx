@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { CheckCircle2, CircleDollarSign, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
   markActivity,
@@ -48,6 +49,7 @@ const BUILD_OPTIONS: BuildOption[] = [
  * uses <Variant name="..."> to show only the content for the chosen game.
  */
 export function ChooseBuild() {
+  const t = useTranslations("activity");
   const finishedPath = useProgressStore((state) => state.finishedPath);
   const setFinishedPath = useProgressStore((state) => state.setFinishedPath);
   const { onResult } = useStepper();
@@ -58,9 +60,9 @@ export function ChooseBuild() {
   };
 
   return (
-    <ActivityCard label="Pick your build" icon={Sparkles} status="idle">
+    <ActivityCard label={t("pickBuild")} icon={Sparkles} status="idle">
       <p className="text-sm leading-relaxed text-muted-foreground">
-        This is saved on this device — you can switch later from the sidebar.
+        {t("pickBuildHint")}
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {BUILD_OPTIONS.map((build) => {
@@ -111,7 +113,7 @@ export function ChooseBuild() {
                     : "bg-muted text-muted-foreground"
                 )}
               >
-                {selected ? "Selected" : "Select this build"}
+                {selected ? t("selected") : t("selectBuild")}
               </span>
             </button>
           );

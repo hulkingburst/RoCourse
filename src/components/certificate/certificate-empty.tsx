@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Award, UserCircle2 } from "lucide-react";
 import { useAuthUiStore } from "@/lib/auth-ui";
 import { Button } from "@/components/ui/button";

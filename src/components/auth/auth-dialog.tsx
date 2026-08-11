@@ -1,8 +1,9 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { createAccount } from "@/lib/auth-actions";
@@ -22,6 +23,7 @@ import { Loader2 } from "lucide-react";
 export function AuthDialog() {
   const { open, mode, closeDialog } = useAuthUiStore();
   const router = useRouter();
+  const t = useTranslations("auth");
   const [error, setError] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
 
@@ -44,7 +46,7 @@ export function AuthDialog() {
     const password = String(formData.get("password") ?? "");
     const result = await signIn("credentials", { email, password, redirect: false });
     if (result?.error) {
-      setError("Invalid email or password.");
+      setError(t("invalidCredentials"));
       setSubmitting(false);
     } else {
       closeDialog();
@@ -71,7 +73,7 @@ export function AuthDialog() {
       redirect: false,
     });
     if (signInResult?.error) {
-      setError("Account created, but sign-in failed. Please sign in.");
+      setError(t("signInFailed"));
     } else {
       closeDialog();
       router.refresh();
@@ -85,77 +87,77 @@ export function AuthDialog() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isSignup ? "Create account" : "Sign in"}</DialogTitle>
-          <DialogDescription>
-            Accounts are optional. They only let you keep your progress in sync
-            across devices — everything else works the same with or without one.
-          </DialogDescription>
+          <DialogTitle>{isSignup ? t("createAccount") : t("signIn")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         {isSignup ? (
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" required maxLength={40} placeholder="Ada" />
+              <Label htmlFor="name">{t("name")}</Label>
+              <Input id="name" name="name" required maxLength={40} placeholder={t("namePlaceholder")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="signup-email">Email</Label>
-              <Input id="signup-email" name="email" type="email" required placeholder="ada@example.com" />
+              <Label htmlFor="signup-email">{t("email")}</Label>
+              <Input id="signup-email" name="email" type="email" required placeholder={t("emailPlaceholder")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="signup-password">Password</Label>
-              <Input id="signup-password" name="password" type="password" required minLength={8} placeholder="At least 8 characters" />
+              <Label htmlFor="signup-password">{t("password")}</Label>
+              <Input id="signup-password" name="password" type="password" required minLength={8} placeholder={t("passwordPlaceholder")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="signup-confirm">Confirm password</Label>
-              <Input id="signup-confirm" name="confirm" type="password" required placeholder="Repeat your password" />
+              <Label htmlFor="signup-confirm">{t("confirmPassword")}</Label>
+              <Input id="signup-confirm" name="confirm" type="password" required placeholder={t("confirmPasswordPlaceholder")} />
             </div>
             <label className="flex items-start gap-2 text-xs text-muted-foreground">
               <input type="checkbox" name="agree" required className="mt-0.5 h-4 w-4" />
               <span>
-                I&apos;m at least 13 years old and agree to the{" "}
-                <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
-                  Terms
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
-                  Privacy Policy
-                </Link>
-                .
+                {t.rich("agreeText", {
+                  terms: (chunks) => (
+                    <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
+                      {chunks}
+                    </Link>
+                  ),
+                  privacy: (chunks) => (
+                    <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </span>
             </label>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {submitting ? "Creating…" : "Create account"}
+              {submitting ? t("creating") : t("createAccount")}
             </Button>
           </form>
         ) : (
           <form onSubmit={handleSignin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="signin-email">Email</Label>
-              <Input id="signin-email" name="email" type="email" required placeholder="ada@example.com" />
+              <Label htmlFor="signin-email">{t("email")}</Label>
+              <Input id="signin-email" name="email" type="email" required placeholder={t("emailPlaceholder")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="signin-password">Password</Label>
-              <Input id="signin-password" name="password" type="password" required placeholder="Your password" />
+              <Label htmlFor="signin-password">{t("password")}</Label>
+              <Input id="signin-password" name="password" type="password" required placeholder={t("passwordPlaceholderShort")} />
             </div>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {submitting ? "Signing in…" : "Sign in"}
+              {submitting ? t("signingIn") : t("signIn")}
             </Button>
           </form>
         )}
 
         <p className="text-center text-sm text-muted-foreground">
-          {isSignup ? "Already have an account? " : "New to RoCourse? "}
+          {isSignup ? t("alreadyHaveAccount") : t("newHere")}
           <button
             type="button"
             onClick={() => useAuthUiStore.setState({ mode: isSignup ? "signin" : "signup" })}
             className="font-medium text-primary underline underline-offset-4"
           >
-            {isSignup ? "Sign in" : "Create one"}
+            {isSignup ? t("signIn") : t("createOne")}
           </button>
         </p>
       </DialogContent>

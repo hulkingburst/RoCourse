@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Fuse from "fuse.js";
 import { BookOpen, Flame, Search, SearchX, Trophy, Users } from "lucide-react";
 import type { PublicUserSummary } from "@/lib/users";

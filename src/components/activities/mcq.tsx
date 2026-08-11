@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { CheckCircle2, HelpCircle, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
   markActivity,
@@ -32,10 +33,12 @@ export function Mcq({
   options,
   answer,
   explanation,
-  label = "Quick check",
+  label,
   alreadySolved = false,
 }: McqProps) {
+  const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
+  const resolvedLabel = label ?? t("quickCheck");
   const [selected, setSelected] = React.useState<number | null>(null);
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -59,7 +62,7 @@ export function Mcq({
 
   return (
     <ActivityCard
-      label={label}
+      label={resolvedLabel}
       icon={HelpCircle}
       status={isCorrect ? "correct" : status}
     >

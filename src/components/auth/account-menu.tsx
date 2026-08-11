@@ -1,7 +1,8 @@
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { LinkIcon, UserCircle2, LogOut, Loader2, UserPlus } from "lucide-react";
 import * as React from "react";
 
@@ -22,6 +23,7 @@ export function AccountMenu() {
   const { data: session, status } = useSession();
   const { openDialog } = useAuthUiStore();
   const router = useRouter();
+  const t = useTranslations("auth");
   const [signingOut, setSigningOut] = React.useState(false);
 
   const handleSignOut = async () => {
@@ -52,7 +54,7 @@ export function AccountMenu() {
               <UserCircle2 className="h-4 w-4" />
             )}
             <span className="hidden max-w-[120px] truncate sm:block">
-              {session.user.name || "Account"}
+              {session.user.name || t("account")}
             </span>
           </Button>
         </DropdownMenuTrigger>
@@ -63,17 +65,17 @@ export function AccountMenu() {
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => router.push("/profile")}>
             <UserCircle2 className="h-4 w-4" />
-            Profile
+            {t("profile")}
           </DropdownMenuItem>
           {session.user.handle ? (
             <DropdownMenuItem onSelect={() => router.push(`/u/${session.user.handle}`)}>
               <LinkIcon className="h-4 w-4" />
-              Public profile
+              {t("publicProfile")}
             </DropdownMenuItem>
           ) : null}
           <DropdownMenuItem onSelect={handleSignOut}>
             <LogOut className="h-4 w-4" />
-            Sign out
+            {t("signOut")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -83,17 +85,17 @@ export function AccountMenu() {
   return (
     <div className="flex items-center gap-1.5">
       <Button variant="ghost" size="sm" onClick={() => openDialog("signin")}>
-        Sign in
+        {t("signIn")}
       </Button>
       <Button size="sm" onClick={() => openDialog("signup")} className="hidden sm:inline-flex">
-        Create account
+        {t("createAccount")}
       </Button>
       <Button
         variant="ghost"
         size="icon"
         className="sm:hidden"
         onClick={() => openDialog("signup")}
-        aria-label="Create account"
+        aria-label={t("createAccount")}
       >
         <UserPlus className="h-4 w-4" />
       </Button>

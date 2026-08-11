@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Bookmark, CheckCircle2, Circle, Clock, LockKeyhole } from "lucide-react";
 import type { CourseSection } from "@/lib/types";
 import {
@@ -15,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 export function LessonList({ sections }: { sections: CourseSection[] }) {
+  const t = useTranslations("course");
   const hydrated = useProgressStore((state) => state.hydrated);
   const lessonsRecord = useProgressStore((state) => state.lessons);
   const bookmarks = useProgressStore((state) => state.bookmarks);
@@ -39,7 +41,7 @@ export function LessonList({ sections }: { sections: CourseSection[] }) {
               <span className="font-mono text-xs text-muted-foreground">
                 {hydrated
                   ? `${sectionCompleted}/${section.lessons.length}`
-                  : `${section.lessons.length} lessons`}
+                  : t("lessonsCount", { count: section.lessons.length })}
               </span>
             </div>
             <p className="mb-4 text-sm text-muted-foreground">{section.description}</p>
@@ -91,7 +93,7 @@ export function LessonList({ sections }: { sections: CourseSection[] }) {
                         </span>
                       </div>
                       {locked && !complete && (
-                        <span className="text-[11px] text-muted-foreground">Locked</span>
+                        <span className="text-[11px] text-muted-foreground">{t("locked")}</span>
                       )}
                     </div>
                   </Link>
