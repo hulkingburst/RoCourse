@@ -17,6 +17,9 @@ export interface CreateAccountResult {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Requires at least one number (\p{N}), punctuation (\p{P}), or symbol (\p{S}),
+// so a password can't be letters alone.
+const PASSWORD_STRENGTH_RE = /[\p{N}\p{P}\p{S}]/u;
 
 /**
  * Creates a new account. Password is hashed server-side; the caller then signs
@@ -53,6 +56,9 @@ export async function createAccount(
   }
   if (password.length < 8) {
     return { error: "Password must be at least 8 characters." };
+  }
+  if (!PASSWORD_STRENGTH_RE.test(password)) {
+    return { error: "Password must include a number or a symbol." };
   }
   if (password !== confirm) {
     return { error: "Passwords do not match." };

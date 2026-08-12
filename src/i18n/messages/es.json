@@ -103,7 +103,7 @@
     "email": "Correo electrónico",
     "emailPlaceholder": "ada@ejemplo.com",
     "password": "Contraseña",
-    "passwordPlaceholder": "Al menos 8 caracteres",
+    "passwordPlaceholder": "8+ caracteres con un número o símbolo",
     "passwordPlaceholderShort": "Tu contraseña",
     "confirmPassword": "Confirmar contraseña",
     "confirmPasswordPlaceholder": "Repite tu contraseña",
