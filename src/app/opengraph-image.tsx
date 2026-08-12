@@ -1,10 +1,12 @@
 import { ImageResponse } from "next/og";
+import { countLessons } from "@/lib/lessons";
 
 export const alt = "RoCourse — Learn Luau & Roblox for Free";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const lessonCount = countLessons();
   return new ImageResponse(
     (
       <div
@@ -65,7 +67,7 @@ export default function OpenGraphImage() {
             fontWeight: 600,
           }}
         >
-          <span>52 lessons · Luau playground · No sign-up</span>
+          <span>{lessonCount} lessons · Luau playground · No sign-up</span>
           <span>ro-course.vercel.app</span>
         </div>
       </div>
