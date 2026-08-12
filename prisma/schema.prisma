@@ -48,6 +48,18 @@ model AuthAttempt {
   @@index([createdAt])
 }
 
+// Generic sliding-window rate limits for non-auth endpoints (feedback,
+// resource submissions/uploads, Q&A writes) so they're shared across
+// instances instead of per-process in-memory maps.
+model RateLimitEvent {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@index([createdAt])
+}
+
 model Question {
   id          String   @id @default(cuid())
   authorId    String

@@ -14,6 +14,12 @@ function hashDate(dateKey: string): number {
 /**
  * Picks the daily challenge question deterministically from the calendar date
  * so every learner sees the same question on the same day (local timezone).
+ *
+ * Accepted trade-off: the challenge is graded in the client, so a determined
+ * learner can read the correct answer from the shipped bundle (it's a
+ * gamification feature, not a security boundary). Moving grading server-side
+ * would require an auth-less, abuse-resistant scoring endpoint; the benefit
+ * doesn't justify the complexity today.
  */
 export function dailyQuestionIndex(dateKey: string): number {
   return hashDate(dateKey) % QUIZ_QUESTIONS.length;

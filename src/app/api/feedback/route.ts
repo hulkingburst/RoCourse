@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { trustedIp } from "@/lib/auth-limiter";
+import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -9,17 +10,13 @@ const MAX_PAGE = 500;
 const LIMIT_PER_IP = 5;
 const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 
-// Lightweight in-memory rate limit. Per-instance, so it is a soft guard
-// against spam rather than a hard guarantee.
-const submissions = new Map<string, number[]>();
+const limitKey = (ip: string) => `feedback:${ip}`;
 
 export async function POST(request: Request) {
   const ip = trustedIp(request.headers);
 
-  // Soft rate limit: keep the private inbox usable.
-  const now = Date.now();
-  const recent = (submissions.get(ip) ?? []).filter((t) => now - t < LIMIT_WINDOW_MS);
-  if (recent.length >= LIMIT_PER_IP) {
+  // DB-backed rate limit (shared across instances) so the inbox stays usable.
+  if (await isRateLimited(limitKey(ip), LIMIT_PER_IP, LIMIT_WINDOW_MS)) {
     return NextResponse.json({ ok: false }, { status: 429 });
   }
 
@@ -82,6 +79,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false }, { status: 502 });
   }
 
-  submissions.set(ip, [...recent, now]);
+  await recordRateLimit(limitKey(ip));
+  await pruneRateLimits();
   return NextResponse.json({ ok: true });
 }

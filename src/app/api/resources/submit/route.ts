@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { trustedIp } from "@/lib/auth-limiter";
+import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { ensureResourceLabels } from "@/lib/resources";
 import {
   CODE_LANGS,
@@ -17,7 +18,8 @@ export const maxDuration = 15;
 
 const LIMIT_PER_IP = 5;
 const LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
-const submissions = new Map<string, number[]>();
+
+const limitKey = (ip: string) => `resource-submit:${ip}`;
 
 // Only accept blobs that came from this project's Vercel Blob store.
 const BLOB_HOST_RE = /(^|\.)public\.blob\.vercel-storage\.com$/;
@@ -28,9 +30,9 @@ const cleanLine = (value: unknown): string => clean(value).replace(/[\r\n]+/g, "
 export async function POST(request: Request) {
   const ip = trustedIp(request.headers);
 
-  const now = Date.now();
-  const recent = (submissions.get(ip) ?? []).filter((t) => now - t < LIMIT_WINDOW_MS);
-  if (recent.length >= LIMIT_PER_IP) {
+  // DB-backed rate limit (shared across instances) so the review queue stays
+  // usable.
+  if (await isRateLimited(limitKey(ip), LIMIT_PER_IP, LIMIT_WINDOW_MS)) {
     return NextResponse.json({ ok: false }, { status: 429 });
   }
 
@@ -156,6 +158,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false }, { status: 502 });
   }
 
-  submissions.set(ip, [...recent, now]);
+  await recordRateLimit(limitKey(ip));
+  await pruneRateLimits();
   return NextResponse.json({ ok: true });
 }

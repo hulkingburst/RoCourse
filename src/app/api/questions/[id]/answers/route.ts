@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { validateAnswerInput } from "@/lib/questions";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_BODY_BYTES = 16 * 1024;
+
+// Auth-required but a signed-in user could otherwise spam the write endpoint.
+const LIMIT_PER_USER = 30;
+const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 
 export async function POST(
   request: Request,
@@ -15,6 +20,14 @@ export async function POST(
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  }
+
+  const limitKey = `answer:${session.user.id}`;
+  if (await isRateLimited(limitKey, LIMIT_PER_USER, LIMIT_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "You've posted too many answers. Please try again later." },
+      { status: 429 }
+    );
   }
 
   const { id } = await params;
@@ -59,6 +72,9 @@ export async function POST(
       author: { select: { name: true, handle: true } },
     },
   });
+
+  await recordRateLimit(limitKey);
+  await pruneRateLimits();
 
   return NextResponse.json(
     {

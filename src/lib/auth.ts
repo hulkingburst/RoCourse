@@ -26,7 +26,7 @@ const DUMMY_HASH =
  * records and sessions live in the DB; everything else is JWT.
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
   // Required for credentials sign-in on hosted platforms (Vercel). We only use
   // our own host and credentials (no OAuth redirect flows), so this is safe.
   trustHost: true,
