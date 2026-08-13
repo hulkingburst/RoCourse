@@ -149,6 +149,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
   const [open, setOpen] = React.useState<Record<string, boolean>>(() =>
     Object.fromEntries(sections.map((section) => [section.id, true]))
   );
+  const [toolsOpen, setToolsOpen] = React.useState(false);
 
   const allLessons = sections.flatMap((section) => section.lessons);
   const slugIndex = new Map(allLessons.map((lesson, index) => [lesson.slug, index]));
@@ -245,115 +246,139 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
       </div>
 
       <div className="border-t px-4 py-3">
-        <div className="max-h-[42vh] space-y-1 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/quiz/daily">
-              <CalendarDays className="h-3.5 w-3.5" />
-              {t("dailyChallenge")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/quiz">
-              <ListChecks className="h-3.5 w-3.5" />
-              {t("quickQuiz")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/quiz/drills">
-              <Timer className="h-3.5 w-3.5" />
-              {t("drills")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/questions">
-              <MessageCircleQuestion className="h-3.5 w-3.5" />
-              {t("questions")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/playground">
-              <Terminal className="h-3.5 w-3.5" />
-              {t("playground")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/reference">
-              <BookOpenCheck className="h-3.5 w-3.5" />
-              {t("reference")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/resources">
-              <Package className="h-3.5 w-3.5" />
-              {t("resources")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="w-full justify-start text-muted-foreground"
-          >
-            <Link href="/users">
-              <Users className="h-3.5 w-3.5" />
-              {t("learners")}
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-muted-foreground"
-            onClick={handleSwitchProject}
-          >
-            <Gamepad2 className="h-3.5 w-3.5" />
-            {finishedPath
-              ? `${t("switchFinalProject")} (${finishedPath === "tycoon" ? t("finalProjectTycoon") : t("finalProjectCollector")})`
-              : t("chooseFinalProject")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-muted-foreground"
-            onClick={handleReset}
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            {t("resetProgress")}
-          </Button>
+        <button
+          type="button"
+          onClick={() => setToolsOpen((open) => !open)}
+          aria-expanded={toolsOpen}
+          className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent/60 lg:hidden"
+        >
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 text-muted-foreground transition-transform",
+              toolsOpen && "rotate-180"
+            )}
+          />
+          {t("moreTools")}
+        </button>
+        <div
+          className={cn(
+            "grid transition-[grid-template-rows] duration-200",
+            toolsOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+            "lg:grid-rows-[1fr]"
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="max-h-[30vh] space-y-1 overflow-y-auto pr-1 pt-2 [scrollbar-gutter:stable] lg:pt-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/quiz/daily">
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  {t("dailyChallenge")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/quiz">
+                  <ListChecks className="h-3.5 w-3.5" />
+                  {t("quickQuiz")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/quiz/drills">
+                  <Timer className="h-3.5 w-3.5" />
+                  {t("drills")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/questions">
+                  <MessageCircleQuestion className="h-3.5 w-3.5" />
+                  {t("questions")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/playground">
+                  <Terminal className="h-3.5 w-3.5" />
+                  {t("playground")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/reference">
+                  <BookOpenCheck className="h-3.5 w-3.5" />
+                  {t("reference")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/resources">
+                  <Package className="h-3.5 w-3.5" />
+                  {t("resources")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/users">
+                  <Users className="h-3.5 w-3.5" />
+                  {t("learners")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-muted-foreground"
+                onClick={handleSwitchProject}
+              >
+                <Gamepad2 className="h-3.5 w-3.5" />
+                {finishedPath
+                  ? `${t("switchFinalProject")} (${finishedPath === "tycoon" ? t("finalProjectTycoon") : t("finalProjectCollector")})`
+                  : t("chooseFinalProject")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-muted-foreground"
+                onClick={handleReset}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                {t("resetProgress")}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
