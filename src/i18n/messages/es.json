@@ -232,10 +232,12 @@
     "markSolved": "Marcar como resuelto"
   },
   "mdx": {
-    "callouts.note": "Nota",
-    "callouts.tip": "Consejo",
-    "callouts.warning": "Ojo",
-    "callouts.mistake": "Error común",
+    "callouts": {
+      "note": "Nota",
+      "tip": "Consejo",
+      "warning": "Ojo",
+      "mistake": "Error común"
+    },
     "challenge": "Tu turno",
     "linkTo": "Enlace a {text}"
   },
@@ -296,50 +298,94 @@
     "earned": "{earned} de {total} conseguidos"
   },
   "badge": {
-    "first-steps.name": "Primeros pasos",
-    "first-steps.description": "Completa 1 lección",
-    "lesson-10.name": "Estudiante en ascenso",
-    "lesson-10.description": "Completa 10 lecciones",
-    "lesson-25.name": "Estudiante dedicado",
-    "lesson-25.description": "Completa 25 lecciones",
-    "lesson-50.name": "Erudito",
-    "lesson-50.description": "Completa 50 lecciones",
-    "course-complete.name": "Campeón del curso",
-    "course-complete.description": "Completa todas las lecciones del curso",
-    "streak-3.name": "Entrando en calor",
-    "streak-3.description": "Consigue una racha de 3 días",
-    "streak-7.name": "Ritmo semanal",
-    "streak-7.description": "Consigue una racha de 7 días",
-    "streak-30.name": "Imparable",
-    "streak-30.description": "Consigue una racha de 30 días",
-    "daily-1.name": "Hábito diario",
-    "daily-1.description": "Termina 1 reto diario",
-    "daily-10.name": "Asiduo diario",
-    "daily-10.description": "Termina 10 retos diarios",
-    "daily-30.name": "Veterano diario",
-    "daily-30.description": "Termina 30 retos diarios",
-    "quiz-1.name": "Novato del cuestionario",
-    "quiz-1.description": "Termina 1 cuestionario rápido",
-    "quiz-10.name": "Entusiasta del cuestionario",
-    "quiz-10.description": "Termina 10 cuestionarios rápidos",
-    "quiz-25.name": "Maestro del cuestionario",
-    "quiz-25.description": "Termina 25 cuestionarios rápidos",
-    "bookmark-5.name": "Creando tu biblioteca",
-    "bookmark-5.description": "Marca 5 lecciones",
-    "bookmark-15.name": "Coleccionista",
-    "bookmark-15.description": "Marca 15 lecciones",
-    "medal-10.name": "Instintos afinados",
-    "medal-10.description": "Resuelve 10 actividades a la primera",
-    "medal-25.name": "Cosecha de medallas",
-    "medal-25.description": "Resuelve 25 actividades a la primera",
-    "medal-50.name": "Impecable",
-    "medal-50.description": "Resuelve 50 actividades a la primera",
-    "bug-hunter.name": "Cazador de errores",
-    "bug-hunter.description": "Resuelve 5 retos de programación",
-    "challenge-20.name": "Destructor de retos",
-    "challenge-20.description": "Resuelve 20 retos de programación",
-    "final-project.name": "Constructor",
-    "final-project.description": "Elige y construye tu proyecto final"
+    "first-steps": {
+      "name": "Primeros pasos",
+      "description": "Completa 1 lección"
+    },
+    "lesson-10": {
+      "name": "Estudiante en ascenso",
+      "description": "Completa 10 lecciones"
+    },
+    "lesson-25": {
+      "name": "Estudiante dedicado",
+      "description": "Completa 25 lecciones"
+    },
+    "lesson-50": {
+      "name": "Erudito",
+      "description": "Completa 50 lecciones"
+    },
+    "course-complete": {
+      "name": "Campeón del curso",
+      "description": "Completa todas las lecciones del curso"
+    },
+    "streak-3": {
+      "name": "Entrando en calor",
+      "description": "Consigue una racha de 3 días"
+    },
+    "streak-7": {
+      "name": "Ritmo semanal",
+      "description": "Consigue una racha de 7 días"
+    },
+    "streak-30": {
+      "name": "Imparable",
+      "description": "Consigue una racha de 30 días"
+    },
+    "daily-1": {
+      "name": "Hábito diario",
+      "description": "Termina 1 reto diario"
+    },
+    "daily-10": {
+      "name": "Asiduo diario",
+      "description": "Termina 10 retos diarios"
+    },
+    "daily-30": {
+      "name": "Veterano diario",
+      "description": "Termina 30 retos diarios"
+    },
+    "quiz-1": {
+      "name": "Novato del cuestionario",
+      "description": "Termina 1 cuestionario rápido"
+    },
+    "quiz-10": {
+      "name": "Entusiasta del cuestionario",
+      "description": "Termina 10 cuestionarios rápidos"
+    },
+    "quiz-25": {
+      "name": "Maestro del cuestionario",
+      "description": "Termina 25 cuestionarios rápidos"
+    },
+    "bookmark-5": {
+      "name": "Creando tu biblioteca",
+      "description": "Marca 5 lecciones"
+    },
+    "bookmark-15": {
+      "name": "Coleccionista",
+      "description": "Marca 15 lecciones"
+    },
+    "medal-10": {
+      "name": "Instintos afinados",
+      "description": "Resuelve 10 actividades a la primera"
+    },
+    "medal-25": {
+      "name": "Cosecha de medallas",
+      "description": "Resuelve 25 actividades a la primera"
+    },
+    "medal-50": {
+      "name": "Impecable",
+      "description": "Resuelve 50 actividades a la primera"
+    },
+    "bug-hunter": {
+      "name": "Cazador de errores",
+      "description": "Resuelve 5 retos de programación"
+    },
+    "challenge-20": {
+      "name": "Destructor de retos",
+      "description": "Resuelve 20 retos de programación"
+    },
+    "final-project": {
+      "name": "Constructor",
+      "description": "Elige y construye tu proyecto final"
+    }
   },
   "activityCalendar": {
     "count": "{count, plural, one {# actividad} other {# actividades}}",
@@ -356,27 +402,31 @@
     "savePdf": "Guardar como PDF",
     "dpiNote": "El PNG se descarga a 3200×2200 — listo para imprimir a 300 DPI.",
     "completedOn": "Completado el {date}",
-    "themes.cream": "Claro",
-    "themes.midnight": "Oscuro",
-    "themes.white": "Blanco",
-    "themes.ivory": "Marfil",
-    "themes.ocean": "Océano",
-    "themes.mint": "Menta",
-    "themes.charcoal": "Carbón",
-    "themes.slate": "Pizarra",
+    "themes": {
+      "cream": "Claro",
+      "midnight": "Oscuro",
+      "white": "Blanco",
+      "ivory": "Marfil",
+      "ocean": "Océano",
+      "mint": "Menta",
+      "charcoal": "Carbón",
+      "slate": "Pizarra"
+    },
     "emptyTitle": "Aún no hay certificado",
     "emptyBody": "Consigues un certificado cuando completas el proyecto final. Vuelve al curso y termínalo — estás cerca.",
     "goToFinalProject": "Ir al proyecto final",
     "viewProfile": "Ver perfil",
     "signInTitle": "Inicia sesión para ver certificados",
     "signInBody": "Los certificados están vinculados a tu cuenta. Inicia sesión para ver y descargar los que hayas conseguido.",
-    "svg.tagline": "APRENDE · CONSTRUYE · PUBLICA",
-    "svg.title": "Certificado",
-    "svg.subtitle": "de Finalización",
-    "svg.certifies": "Este certificado acredita que",
-    "svg.completed": "ha completado con éxito el",
-    "svg.team": "Equipo RoCourse",
-    "svg.aria": "Certificado de finalización para {name}"
+    "svg": {
+      "tagline": "APRENDE · CONSTRUYE · PUBLICA",
+      "title": "Certificado",
+      "subtitle": "de Finalización",
+      "certifies": "Este certificado acredita que",
+      "completed": "ha completado con éxito el",
+      "team": "Equipo RoCourse",
+      "aria": "Certificado de finalización para {name}"
+    }
   },
   "feedback": {
     "button": "Comentarios",
@@ -397,13 +447,15 @@
   "playground": {
     "title": "Playground de Luau",
     "description": "Escribe y ejecuta Luau real en tu navegador — aislado mediante WebAssembly, el mismo lenguaje que usas en Roblox Studio. El código se guarda en la URL, así que puedes compartir lo que crees.",
-    "examples.helloWorld": "Hola mundo",
-    "examples.variables": "Variables",
-    "examples.types": "Tipos",
-    "examples.functions": "Funciones",
-    "examples.tables": "Tablas",
-    "examples.stringInterpolation": "Interpolación de cadenas",
-    "examples.fizzBuzz": "FizzBuzz",
+    "examples": {
+      "helloWorld": "Hola mundo",
+      "variables": "Variables",
+      "types": "Tipos",
+      "functions": "Funciones",
+      "tables": "Tablas",
+      "stringInterpolation": "Interpolación de cadenas",
+      "fizzBuzz": "FizzBuzz"
+    },
     "stop": "Detener",
     "run": "Ejecutar",
     "resetCode": "Reiniciar código",
@@ -418,111 +470,185 @@
   "reference": {
     "searchPlaceholder": "Busca sintaxis… p. ej. pairs, task.wait, return",
     "all": "Todas",
-    "categories.basics": "Fundamentos",
-    "categories.variables-types": "Variables y tipos",
-    "categories.strings": "Cadenas",
-    "categories.operators": "Operadores",
-    "categories.control-flow": "Flujo de control",
-    "categories.functions": "Funciones",
-    "categories.tables": "Tablas",
-    "categories.tasks-timing": "Tareas y tiempos",
-    "categories.debugging": "Depuración",
+    "categories": {
+      "basics": "Fundamentos",
+      "variables-types": "Variables y tipos",
+      "strings": "Cadenas",
+      "operators": "Operadores",
+      "control-flow": "Flujo de control",
+      "functions": "Funciones",
+      "tables": "Tablas",
+      "tasks-timing": "Tareas y tiempos",
+      "debugging": "Depuración"
+    },
     "noResults": "Nada coincide con “{query}”{category, select, All {.} other { en {category}.}}",
     "copyCode": "Copiar código",
     "pageTitle": "Referencia de Luau",
     "pageIntro": "Una hoja de referencia de la sintaxis de Luau y los patrones más comunes. Cada tarjeta enlaza a la lección que enseña la idea en detalle.",
-    "entries.hello-world.title": "Hola, mundo",
-    "entries.hello-world.description": "El clásico primer programa. Todo script de Luau puede llamar a print.",
-    "entries.comments.title": "Comentarios",
-    "entries.comments.description": "Los comentarios son notas para ti (y para tu yo del futuro) — Luau los ignora.",
-    "entries.statements.title": "Sentencias",
-    "entries.statements.description": "Los punto y coma son opcionales. Una sentencia por línea es el estilo habitual.",
-    "entries.local-variables.title": "Variables locales",
-    "entries.local-variables.description": "Declara valores con local. Las locales viven dentro del bloque donde se crean.",
-    "entries.reassigning.title": "Reasignar variables",
-    "entries.reassigning.description": "Las variables guardan un valor a la vez — puedes cambiar lo que contienen.",
-    "entries.main-types.title": "Los tipos principales",
-    "entries.main-types.description": "Números, cadenas, booleanos y nil son los bloques fundamentales.",
-    "entries.type-checking.title": "Comprobar el tipo de un valor",
-    "entries.type-checking.description": "type() devuelve el nombre del tipo de un valor como cadena.",
-    "entries.multiple-assignment.title": "Asignación múltiple",
-    "entries.multiple-assignment.description": "Asigna varias variables a la vez, y úsalo para intercambiar valores.",
-    "entries.string-basics.title": "Conceptos básicos de cadenas",
-    "entries.string-basics.description": "El texto en Luau es una cadena. Las comillas dobles o simples funcionan igual.",
-    "entries.concatenation.title": "Concatenación",
-    "entries.concatenation.description": "Usa .. para unir cadenas.",
-    "entries.interpolation.title": "Interpolación de cadenas",
-    "entries.interpolation.description": "Las comillas invertidas te permiten incrustar valores directamente en una cadena.",
-    "entries.string-methods.title": "Funciones comunes de cadenas",
-    "entries.string-methods.description": "La librería string cubre las operaciones de texto del día a día.",
-    "entries.arithmetic.title": "Aritmética",
-    "entries.arithmetic.description": "Las matemáticas habituales, más la división entera y el resto.",
-    "entries.comparison.title": "Comparación",
-    "entries.comparison.description": "Compara valores por igualdad y orden. ~= significa \"no igual\".",
-    "entries.boolean-logic.title": "Lógica booleana",
-    "entries.boolean-logic.description": "and, or y not combinan condiciones de verdadero/falso.",
-    "entries.compound-assignment.title": "Asignación compuesta",
-    "entries.compound-assignment.description": "Abreviaturas para actualizar una variable con una operación.",
-    "entries.if-else.title": "if / elseif / else",
-    "entries.if-else.description": "Ejecuta código distinto según una condición.",
-    "entries.while-loop.title": "Bucle while",
-    "entries.while-loop.description": "Repite mientras una condición siga siendo verdadera.",
-    "entries.numeric-for.title": "Bucle for numérico",
-    "entries.numeric-for.description": "Cuenta hacia arriba (o abajo) en un rango. Un tercer número marca el paso.",
-    "entries.break.title": "break",
-    "entries.break.description": "Sale de un bucle antes de tiempo desde su interior.",
-    "entries.define-call.title": "Definir y llamar",
-    "entries.define-call.description": "Agrupa código en una función con nombre y llámala con argumentos.",
-    "entries.return-values.title": "Valores de retorno",
-    "entries.return-values.description": "Una función puede devolver un valor a quien la llamó.",
-    "entries.multiple-returns.title": "Retornos múltiples",
-    "entries.multiple-returns.description": "Devuelve varios valores a la vez y captúralos todos.",
-    "entries.anonymous-functions.title": "Funciones anónimas",
-    "entries.anonymous-functions.description": "Las funciones también son valores — pásalas como callbacks.",
-    "entries.varargs.title": "Varargs",
-    "entries.varargs.description": "... acepta cualquier número de argumentos extra.",
-    "entries.create-index.title": "Crear e indexar",
-    "entries.create-index.description": "Las tablas guardan varios valores. Las listas empiezan en el índice 1; los diccionarios usan claves.",
-    "entries.dictionary-iteration.title": "Recorrer un diccionario",
-    "entries.dictionary-iteration.description": "pairs() visita cada clave y valor.",
-    "entries.list-iteration.title": "Recorrer una lista",
-    "entries.list-iteration.description": "ipairs() recorre una lista en orden, del 1 al #lista.",
-    "entries.table-methods.title": "Funciones de tablas",
-    "entries.table-methods.description": "table.insert y table.remove mantienen las listas ordenadas.",
-    "entries.task-wait.title": "task.wait",
-    "entries.task-wait.description": "Pausa el script actual durante un número de segundos.",
-    "entries.task-spawn.title": "task.spawn",
-    "entries.task-spawn.description": "Ejecuta una función sin bloquear el código que viene después.",
-    "entries.warn.title": "warn",
-    "entries.warn.description": "Muestra un mensaje que destaca en la ventana de Output.",
-    "entries.common-mistakes.title": "Errores comunes",
-    "entries.common-mistakes.description": "Los dos errores que más cometen los principiantes: = en lugar de == y un end que falta.",
-    "links.welcome": "Lección de bienvenida",
-    "links.scripts": "Scripts",
-    "links.comments": "Comentarios",
-    "links.variables": "Variables",
-    "links.types": "Tipos",
-    "links.strings": "Cadenas",
-    "links.conditionals": "Condicionales",
-    "links.loops": "Bucles",
-    "links.for-loops": "Bucles for",
-    "links.functions": "Funciones",
-    "links.function-returns": "Retornos de funciones",
-    "links.events": "Eventos",
-    "links.tables": "Tablas",
-    "links.task-wait": "task.wait",
-    "links.print-debugging": "Depuración con print",
-    "links.output-errors": "Output y errores",
-    "links.common-errors": "Errores comunes"
+    "entries": {
+      "hello-world": {
+        "title": "Hola, mundo",
+        "description": "El clásico primer programa. Todo script de Luau puede llamar a print."
+      },
+      "comments": {
+        "title": "Comentarios",
+        "description": "Los comentarios son notas para ti (y para tu yo del futuro) — Luau los ignora."
+      },
+      "statements": {
+        "title": "Sentencias",
+        "description": "Los punto y coma son opcionales. Una sentencia por línea es el estilo habitual."
+      },
+      "local-variables": {
+        "title": "Variables locales",
+        "description": "Declara valores con local. Las locales viven dentro del bloque donde se crean."
+      },
+      "reassigning": {
+        "title": "Reasignar variables",
+        "description": "Las variables guardan un valor a la vez — puedes cambiar lo que contienen."
+      },
+      "main-types": {
+        "title": "Los tipos principales",
+        "description": "Números, cadenas, booleanos y nil son los bloques fundamentales."
+      },
+      "type-checking": {
+        "title": "Comprobar el tipo de un valor",
+        "description": "type() devuelve el nombre del tipo de un valor como cadena."
+      },
+      "multiple-assignment": {
+        "title": "Asignación múltiple",
+        "description": "Asigna varias variables a la vez, y úsalo para intercambiar valores."
+      },
+      "string-basics": {
+        "title": "Conceptos básicos de cadenas",
+        "description": "El texto en Luau es una cadena. Las comillas dobles o simples funcionan igual."
+      },
+      "concatenation": {
+        "title": "Concatenación",
+        "description": "Usa .. para unir cadenas."
+      },
+      "interpolation": {
+        "title": "Interpolación de cadenas",
+        "description": "Las comillas invertidas te permiten incrustar valores directamente en una cadena."
+      },
+      "string-methods": {
+        "title": "Funciones comunes de cadenas",
+        "description": "La librería string cubre las operaciones de texto del día a día."
+      },
+      "arithmetic": {
+        "title": "Aritmética",
+        "description": "Las matemáticas habituales, más la división entera y el resto."
+      },
+      "comparison": {
+        "title": "Comparación",
+        "description": "Compara valores por igualdad y orden. ~= significa \"no igual\"."
+      },
+      "boolean-logic": {
+        "title": "Lógica booleana",
+        "description": "and, or y not combinan condiciones de verdadero/falso."
+      },
+      "compound-assignment": {
+        "title": "Asignación compuesta",
+        "description": "Abreviaturas para actualizar una variable con una operación."
+      },
+      "if-else": {
+        "title": "if / elseif / else",
+        "description": "Ejecuta código distinto según una condición."
+      },
+      "while-loop": {
+        "title": "Bucle while",
+        "description": "Repite mientras una condición siga siendo verdadera."
+      },
+      "numeric-for": {
+        "title": "Bucle for numérico",
+        "description": "Cuenta hacia arriba (o abajo) en un rango. Un tercer número marca el paso."
+      },
+      "break": {
+        "title": "break",
+        "description": "Sale de un bucle antes de tiempo desde su interior."
+      },
+      "define-call": {
+        "title": "Definir y llamar",
+        "description": "Agrupa código en una función con nombre y llámala con argumentos."
+      },
+      "return-values": {
+        "title": "Valores de retorno",
+        "description": "Una función puede devolver un valor a quien la llamó."
+      },
+      "multiple-returns": {
+        "title": "Retornos múltiples",
+        "description": "Devuelve varios valores a la vez y captúralos todos."
+      },
+      "anonymous-functions": {
+        "title": "Funciones anónimas",
+        "description": "Las funciones también son valores — pásalas como callbacks."
+      },
+      "varargs": {
+        "title": "Varargs",
+        "description": "... acepta cualquier número de argumentos extra."
+      },
+      "create-index": {
+        "title": "Crear e indexar",
+        "description": "Las tablas guardan varios valores. Las listas empiezan en el índice 1; los diccionarios usan claves."
+      },
+      "dictionary-iteration": {
+        "title": "Recorrer un diccionario",
+        "description": "pairs() visita cada clave y valor."
+      },
+      "list-iteration": {
+        "title": "Recorrer una lista",
+        "description": "ipairs() recorre una lista en orden, del 1 al #lista."
+      },
+      "table-methods": {
+        "title": "Funciones de tablas",
+        "description": "table.insert y table.remove mantienen las listas ordenadas."
+      },
+      "task-wait": {
+        "title": "task.wait",
+        "description": "Pausa el script actual durante un número de segundos."
+      },
+      "task-spawn": {
+        "title": "task.spawn",
+        "description": "Ejecuta una función sin bloquear el código que viene después."
+      },
+      "warn": {
+        "title": "warn",
+        "description": "Muestra un mensaje que destaca en la ventana de Output."
+      },
+      "common-mistakes": {
+        "title": "Errores comunes",
+        "description": "Los dos errores que más cometen los principiantes: = en lugar de == y un end que falta."
+      }
+    },
+    "links": {
+      "welcome": "Lección de bienvenida",
+      "scripts": "Scripts",
+      "comments": "Comentarios",
+      "variables": "Variables",
+      "types": "Tipos",
+      "strings": "Cadenas",
+      "conditionals": "Condicionales",
+      "loops": "Bucles",
+      "for-loops": "Bucles for",
+      "functions": "Funciones",
+      "function-returns": "Retornos de funciones",
+      "events": "Eventos",
+      "tables": "Tablas",
+      "task-wait": "task.wait",
+      "print-debugging": "Depuración con print",
+      "output-errors": "Output y errores",
+      "common-errors": "Errores comunes"
+    }
   },
   "resources": {
-    "kinds.plugin": "Plugin",
-    "kinds.script": "Script",
-    "kinds.asset-pack": "Paquete de assets",
-    "kinds.ui-module": "Módulo de UI",
-    "kinds.model": "Modelo",
-    "kinds.website": "Sitio web",
-    "kinds.other": "Otro",
+    "kinds": {
+      "plugin": "Plugin",
+      "script": "Script",
+      "asset-pack": "Paquete de assets",
+      "ui-module": "Módulo de UI",
+      "model": "Modelo",
+      "website": "Sitio web",
+      "other": "Otro"
+    },
     "visitWebsite": "Visitar sitio web",
     "download": "Descargar",
     "viewCode": "Ver código",
@@ -647,274 +773,476 @@
     "wrongAnswer": "Casi — la respuesta es {letter}.",
     "seeResults": "Ver resultados",
     "nextQuestion": "Siguiente pregunta",
-    "questions.q1.question": "¿Qué hace la función print en Luau?",
-    "questions.q1.options.0": "Crea una nueva parte",
-    "questions.q1.options.1": "Abre un diálogo",
-    "questions.q1.options.2": "Muestra texto en la ventana Output",
-    "questions.q1.options.3": "Ejecuta un script",
-    "questions.q1.explanation": "print() escribe texto en la ventana Output de Studio — tu primera herramienta de depuración.",
-    "questions.q2.question": "¿Cómo se escribe un comentario de una sola línea en Luau?",
-    "questions.q2.options.0": "-- texto",
-    "questions.q2.options.1": "// texto",
-    "questions.q2.options.2": "# texto",
-    "questions.q2.options.3": "/* texto */",
-    "questions.q2.explanation": "Luau usa -- para los comentarios. // es estilo C y no es Luau válido.",
-    "questions.q3.question": "¿Qué palabra clave crea una nueva variable local?",
-    "questions.q3.options.0": "var",
-    "questions.q3.options.1": "let",
-    "questions.q3.options.2": "local",
-    "questions.q3.options.3": "const",
-    "questions.q4.question": "¿Qué devuelve el operador # cuando se aplica a una cadena?",
-    "questions.q4.options.0": "Su primer carácter",
-    "questions.q4.options.1": "El número 0",
-    "questions.q4.options.2": "Un error",
-    "questions.q4.options.3": "Su longitud en bytes",
-    "questions.q4.explanation": "#\"hello\" devuelve 5 — la longitud de la cadena en bytes.",
-    "questions.q5.question": "¿Cuál es el valor de \"10\" + 5 en Luau?",
-    "questions.q5.options.0": "\"105\"",
-    "questions.q5.options.1": "Un error",
-    "questions.q5.options.2": "10.5",
-    "questions.q5.options.3": "15",
-    "questions.q5.explanation": "Luau convierte automáticamente las cadenas numéricas en aritmética, así que \"10\" + 5 es 15.",
-    "questions.q6.question": "¿Qué hace el operador %?",
-    "questions.q6.options.0": "Divide dos números",
-    "questions.q6.options.1": "Devuelve el resto de una división",
-    "questions.q6.options.2": "Concatena cadenas",
-    "questions.q6.options.3": "Multiplica números",
-    "questions.q6.explanation": "El operador módulo da el resto, p. ej. 7 % 3 es 1.",
-    "questions.q7.question": "¿Qué operador une dos cadenas?",
-    "questions.q7.options.0": "..",
-    "questions.q7.options.1": "+",
-    "questions.q7.options.2": "&",
-    "questions.q7.options.3": ".join()",
-    "questions.q7.explanation": ".. es el operador de concatenación: \"foo\" .. \"bar\" da \"foobar\".",
-    "questions.q8.question": "¿Cuál es el resultado de 5 ^ 2?",
-    "questions.q8.options.0": "10",
-    "questions.q8.options.1": "25",
-    "questions.q8.options.2": "7",
-    "questions.q8.options.3": "52",
-    "questions.q8.explanation": "^ es la potenciación, así que 5 al cuadrado es 25.",
-    "questions.q9.question": "Después de local x = 10 y luego x = x + 5, ¿cuánto vale x?",
-    "questions.q9.options.0": "15",
-    "questions.q9.options.1": "5",
-    "questions.q9.options.2": "10",
-    "questions.q9.options.3": "105",
-    "questions.q10.question": "¿Qué devuelve type(true)?",
-    "questions.q10.options.0": "true",
-    "questions.q10.options.1": "\"string\"",
-    "questions.q10.options.2": "nil",
-    "questions.q10.options.3": "\"boolean\"",
-    "questions.q10.explanation": "type() devuelve una cadena que describe el tipo del valor.",
-    "questions.q11.question": "¿Qué valores son 'truthy' en Luau?",
-    "questions.q11.options.0": "Solo true",
-    "questions.q11.options.1": "Solo números",
-    "questions.q11.options.2": "Todo excepto false y nil",
-    "questions.q11.options.3": "Solo valores distintos de cero",
-    "questions.q11.explanation": "Solo false y nil son falsy — incluso el 0 y las cadenas vacías son truthy.",
-    "questions.q12.question": "¿Qué representa nil en Luau?",
-    "questions.q12.options.0": "El número 0",
-    "questions.q12.options.1": "Una cadena vacía",
-    "questions.q12.options.2": "La ausencia de un valor",
-    "questions.q12.options.3": "Un script roto",
-    "questions.q13.question": "¿Cuál es la diferencia entre = y ==?",
-    "questions.q13.options.0": "== asigna, = compara",
-    "questions.q13.options.1": "Son lo mismo",
-    "questions.q13.options.2": "Ninguno es válido",
-    "questions.q13.options.3": "= asigna, == compara",
-    "questions.q14.question": "¿Cuál es el resultado de true and false?",
-    "questions.q14.options.0": "false",
-    "questions.q14.options.1": "true",
-    "questions.q14.options.2": "nil",
-    "questions.q14.options.3": "Un error",
-    "questions.q15.question": "¿Cuál es el resultado de not false?",
-    "questions.q15.options.0": "false",
-    "questions.q15.options.1": "nil",
-    "questions.q15.options.2": "Un error",
-    "questions.q15.options.3": "true",
-    "questions.q16.question": "¿Qué valores hacen que if x then ejecute su bloque?",
-    "questions.q16.options.0": "Solo true",
-    "questions.q16.options.1": "Cualquier valor truthy",
-    "questions.q16.options.2": "Solo números",
-    "questions.q16.options.3": "Solo valores distintos de cero",
-    "questions.q17.question": "¿Cuándo se ejecuta if health <= 0 then?",
-    "questions.q17.options.0": "Cuando health es cero o negativo",
-    "questions.q17.options.1": "Solo cuando health es exactamente 0",
-    "questions.q17.options.2": "Cuando health es positivo",
-    "questions.q17.options.3": "Cuando health no existe",
-    "questions.q18.question": "¿Cuál es el propósito de elseif?",
-    "questions.q18.options.0": "Comprobar otra condición cuando la anterior fue falsa",
-    "questions.q18.options.1": "Repetir un bloque de código",
-    "questions.q18.options.2": "Salir de una función antes de tiempo",
-    "questions.q18.options.3": "Asignar una variable",
-    "questions.q19.question": "¿Cómo termina todo if en Luau?",
-    "questions.q19.options.0": "fi",
-    "questions.q19.options.1": "}",
-    "questions.q19.options.2": "end",
-    "questions.q19.options.3": "endif",
-    "questions.q20.question": "¿A qué evalúa local x = false and error(\"boom\")?",
-    "questions.q20.options.0": "Un error",
-    "questions.q20.options.1": "true",
-    "questions.q20.options.2": "nil",
-    "questions.q20.options.3": "false, sin lanzar el error",
-    "questions.q20.explanation": "and hace cortocircuito: cuando el lado izquierdo es falsy, el derecho nunca se evalúa.",
-    "questions.q21.question": "¿Cuántas veces se ejecuta el cuerpo de for i = 1, 5 do?",
-    "questions.q21.options.0": "6",
-    "questions.q21.options.1": "4",
-    "questions.q21.options.2": "Infinitas",
-    "questions.q21.options.3": "5",
-    "questions.q22.question": "¿Qué valores produce for i = 1, 5, 2 do?",
-    "questions.q22.options.0": "1, 2, 3, 4, 5",
-    "questions.q22.options.1": "1, 3, 5",
-    "questions.q22.options.2": "1, 3",
-    "questions.q22.options.3": "5, 3, 1",
-    "questions.q22.explanation": "Un paso de 2 salta cada dos valores, terminando en 5.",
-    "questions.q23.question": "Un bucle while true do sin condición de salida…",
-    "questions.q23.options.0": "Se ejecuta para siempre (bloquea el script)",
-    "questions.q23.options.1": "Se ejecuta una vez",
-    "questions.q23.options.2": "Nunca se ejecuta",
-    "questions.q23.options.3": "Se detiene solo a los 60 s",
-    "questions.q24.question": "En repeat ... until condition, ¿cuándo se comprueba la condición?",
-    "questions.q24.options.0": "Antes de que se ejecute el cuerpo",
-    "questions.q24.options.1": "Después de que se ejecute el cuerpo (al menos una vez)",
-    "questions.q24.options.2": "Solo en la primera pasada",
-    "questions.q24.options.3": "Nunca",
-    "questions.q25.question": "¿Qué hace break dentro de un bucle?",
-    "questions.q25.options.0": "Salta una iteración",
-    "questions.q25.options.1": "Reinicia el bucle",
-    "questions.q25.options.2": "Sale del bucle actual inmediatamente",
-    "questions.q25.options.3": "Devuelve un valor",
-    "questions.q26.question": "¿Qué salta el resto de la iteración actual en un bucle de Luau?",
-    "questions.q26.options.0": "skip",
-    "questions.q26.options.1": "next",
-    "questions.q26.options.2": "continue",
-    "questions.q26.options.3": "repeat",
-    "questions.q26.explanation": "Luau admite continue para saltar a la siguiente iteración.",
-    "questions.q27.question": "¿Cómo defines una función llamada heal?",
-    "questions.q27.options.0": "local function heal() end",
-    "questions.q27.options.1": "function = heal() end",
-    "questions.q27.options.2": "def heal():",
-    "questions.q27.options.3": "heal := function()",
-    "questions.q28.question": "¿Qué palabra clave envía un valor de vuelta desde una función?",
-    "questions.q28.options.0": "output",
-    "questions.q28.options.1": "send",
-    "questions.q28.options.2": "yield",
-    "questions.q28.options.3": "return",
-    "questions.q29.question": "Una función que nunca llega a return devuelve…",
-    "questions.q29.options.0": "nil",
-    "questions.q29.options.1": "0",
-    "questions.q29.options.2": "false",
-    "questions.q29.options.3": "Un error",
-    "questions.q30.question": "En local function add(a, b), ¿qué son a y b?",
-    "questions.q30.options.0": "Globales",
-    "questions.q30.options.1": "Retornos",
-    "questions.q30.options.2": "Parámetros",
-    "questions.q30.options.3": "Comentarios",
-    "questions.q31.question": "¿Qué significa ... en una función como local function log(...)?",
-    "questions.q31.options.0": "Acepta cualquier número de argumentos extra",
-    "questions.q31.options.1": "Significa 'etcétera' (un comentario)",
-    "questions.q31.options.2": "Declara un tipo",
-    "questions.q31.options.3": "Es Luau inválido",
-    "questions.q31.explanation": "El variadic ... permite a una función aceptar argumentos extra.",
-    "questions.q32.question": "Llamar part:SetPosition() en lugar de part.SetPosition(part) — ¿qué hace el :?",
-    "questions.q32.options.0": "Hace la llamada más rápida",
-    "questions.q32.options.1": "Pasa part como primer argumento (self)",
-    "questions.q32.options.2": "Crea una parte nueva",
-    "questions.q32.options.3": "Ignora los argumentos",
-    "questions.q32.explanation": "Los dos puntos pasan la propia instancia como primer argumento, llamado self.",
-    "questions.q33.question": "En Luau, ¿cuál es el índice del primer elemento de un array?",
-    "questions.q33.options.0": "0",
-    "questions.q33.options.1": "-1",
-    "questions.q33.options.2": "1",
-    "questions.q33.options.3": "Depende de la tabla",
-    "questions.q33.explanation": "Los arrays de Luau empiezan en 1: {10, 20, 30}[1] es 10.",
-    "questions.q34.question": "¿Qué es #{10, 20, 30}?",
-    "questions.q34.options.0": "10",
-    "questions.q34.options.1": "3",
-    "questions.q34.options.2": "30",
-    "questions.q34.options.3": "60",
-    "questions.q34.explanation": "# devuelve la longitud de una tabla tipo array.",
-    "questions.q35.question": "Si t = {name = \"Ada\"}, ¿de qué otra forma puedes escribir t.name?",
-    "questions.q35.options.0": "t.name()",
-    "questions.q35.options.1": "t::name",
-    "questions.q35.options.2": "t\\name",
-    "questions.q35.options.3": "t[\"name\"]",
-    "questions.q36.question": "¿Qué hace table.insert(t, x)?",
-    "questions.q36.options.0": "Reemplaza el primer elemento",
-    "questions.q36.options.1": "Añade x al final de t",
-    "questions.q36.options.2": "Borra t",
-    "questions.q36.options.3": "Ordena t",
-    "questions.q37.question": "¿Cuál es el resultado de (\"hello\"):sub(1, 2)?",
-    "questions.q37.options.0": "\"el\"",
-    "questions.q37.options.1": "\"h\"",
-    "questions.q37.options.2": "\"he\"",
-    "questions.q37.options.3": "\"hello\"",
-    "questions.q38.question": "¿Qué devuelve string.upper(\"hi\")?",
-    "questions.q38.options.0": "\"hi\"",
-    "questions.q38.options.1": "\"HI\"",
-    "questions.q38.options.2": "\"Hi\"",
-    "questions.q38.options.3": "\"hI\"",
-    "questions.q39.question": "¿Qué devuelve table.concat({\"a\", \"b\"}, \"-\")?",
-    "questions.q39.options.0": "\"ab\"",
-    "questions.q39.options.1": "\"a-b\"",
-    "questions.q39.options.2": "\"a, b\"",
-    "questions.q39.options.3": "\"a\" \"b\"",
-    "questions.q40.question": "¿Cuál es el resultado de 5 // 2 en Luau?",
-    "questions.q40.options.0": "2.5",
-    "questions.q40.options.1": "3",
-    "questions.q40.options.2": "Un error",
-    "questions.q40.options.3": "2",
-    "questions.q40.explanation": "// es la división entera — redondea hacia abajo, así que 5 // 2 es 2.",
-    "questions.q41.question": "¿Qué devuelve math.random(1, 6)?",
-    "questions.q41.options.0": "Siempre 3",
-    "questions.q41.options.1": "Una cadena al azar",
-    "questions.q41.options.2": "Una tabla",
-    "questions.q41.options.3": "Un entero entre 1 y 6",
-    "questions.q42.question": "¿Qué devuelve math.floor(3.7)?",
-    "questions.q42.options.0": "4",
-    "questions.q42.options.1": "3",
-    "questions.q42.options.2": "3.7",
-    "questions.q42.options.3": "0",
-    "questions.q43.question": "¿Qué devuelve tonumber(\"42\")?",
-    "questions.q43.options.0": "\"42\" (una cadena)",
-    "questions.q43.options.1": "true",
-    "questions.q43.options.2": "42 (un número)",
-    "questions.q43.options.3": "nil",
-    "questions.q44.question": "¿Dónde se guardan las partes del mundo de un juego?",
-    "questions.q44.options.0": "game.ReplicatedStorage",
-    "questions.q44.options.1": "game.Workspace",
-    "questions.q44.options.2": "game.Players",
-    "questions.q44.options.3": "game.ServerStorage",
-    "questions.q45.question": "¿Qué servicio rastrea a los jugadores de tu juego?",
-    "questions.q45.options.0": "game.Players",
-    "questions.q45.options.1": "game.Workspace",
-    "questions.q45.options.2": "game.Lighting",
-    "questions.q45.options.3": "game.SoundService",
-    "questions.q46.question": "¿Dónde se ejecuta un LocalScript?",
-    "questions.q46.options.0": "En el dispositivo del jugador (cliente)",
-    "questions.q46.options.1": "Solo en los servidores de Roblox",
-    "questions.q46.options.2": "En ningún sitio",
-    "questions.q46.options.3": "En la ventana Output",
-    "questions.q47.question": "¿Cómo obtienes el modelo del personaje de un jugador?",
-    "questions.q47.options.0": "player.Model",
-    "questions.q47.options.1": "player.Torso",
-    "questions.q47.options.2": "player.Character",
-    "questions.q47.options.3": "player.Body",
-    "questions.q48.question": "¿Qué hace Instance.new(\"Part\")?",
-    "questions.q48.options.0": "Borra una Part",
-    "questions.q48.options.1": "Busca una Part",
-    "questions.q48.options.2": "Carga un modelo",
-    "questions.q48.options.3": "Crea una Part nueva",
-    "questions.q49.question": "¿Qué evento se dispara cuando una parte toca a otra?",
-    "questions.q49.options.0": "Click",
-    "questions.q49.options.1": "Collided",
-    "questions.q49.options.2": "Hit",
-    "questions.q49.options.3": "Touched",
-    "questions.q50.question": "¿Qué describe CFrame.new(0, 10, 0)?",
-    "questions.q50.options.0": "Solo un color",
-    "questions.q50.options.1": "Una posición y una rotación",
-    "questions.q50.options.2": "Un script",
-    "questions.q50.options.3": "Un sonido",
-    "questions.q50.explanation": "Un CFrame guarda una posición y una rotación en el espacio 3D."
+    "questions": {
+      "q1": {
+        "question": "¿Qué hace la función print en Luau?",
+        "options": {
+          "0": "Crea una nueva parte",
+          "1": "Abre un diálogo",
+          "2": "Muestra texto en la ventana Output",
+          "3": "Ejecuta un script"
+        },
+        "explanation": "print() escribe texto en la ventana Output de Studio — tu primera herramienta de depuración."
+      },
+      "q2": {
+        "question": "¿Cómo se escribe un comentario de una sola línea en Luau?",
+        "options": {
+          "0": "-- texto",
+          "1": "// texto",
+          "2": "# texto",
+          "3": "/* texto */"
+        },
+        "explanation": "Luau usa -- para los comentarios. // es estilo C y no es Luau válido."
+      },
+      "q3": {
+        "question": "¿Qué palabra clave crea una nueva variable local?",
+        "options": {
+          "0": "var",
+          "1": "let",
+          "2": "local",
+          "3": "const"
+        }
+      },
+      "q4": {
+        "question": "¿Qué devuelve el operador # cuando se aplica a una cadena?",
+        "options": {
+          "0": "Su primer carácter",
+          "1": "El número 0",
+          "2": "Un error",
+          "3": "Su longitud en bytes"
+        },
+        "explanation": "#\"hello\" devuelve 5 — la longitud de la cadena en bytes."
+      },
+      "q5": {
+        "question": "¿Cuál es el valor de \"10\" + 5 en Luau?",
+        "options": {
+          "0": "\"105\"",
+          "1": "Un error",
+          "2": "10.5",
+          "3": "15"
+        },
+        "explanation": "Luau convierte automáticamente las cadenas numéricas en aritmética, así que \"10\" + 5 es 15."
+      },
+      "q6": {
+        "question": "¿Qué hace el operador %?",
+        "options": {
+          "0": "Divide dos números",
+          "1": "Devuelve el resto de una división",
+          "2": "Concatena cadenas",
+          "3": "Multiplica números"
+        },
+        "explanation": "El operador módulo da el resto, p. ej. 7 % 3 es 1."
+      },
+      "q7": {
+        "question": "¿Qué operador une dos cadenas?",
+        "options": {
+          "0": "..",
+          "1": "+",
+          "2": "&",
+          "3": ".join()"
+        },
+        "explanation": ".. es el operador de concatenación: \"foo\" .. \"bar\" da \"foobar\"."
+      },
+      "q8": {
+        "question": "¿Cuál es el resultado de 5 ^ 2?",
+        "options": {
+          "0": "10",
+          "1": "25",
+          "2": "7",
+          "3": "52"
+        },
+        "explanation": "^ es la potenciación, así que 5 al cuadrado es 25."
+      },
+      "q9": {
+        "question": "Después de local x = 10 y luego x = x + 5, ¿cuánto vale x?",
+        "options": {
+          "0": "15",
+          "1": "5",
+          "2": "10",
+          "3": "105"
+        }
+      },
+      "q10": {
+        "question": "¿Qué devuelve type(true)?",
+        "options": {
+          "0": "true",
+          "1": "\"string\"",
+          "2": "nil",
+          "3": "\"boolean\""
+        },
+        "explanation": "type() devuelve una cadena que describe el tipo del valor."
+      },
+      "q11": {
+        "question": "¿Qué valores son 'truthy' en Luau?",
+        "options": {
+          "0": "Solo true",
+          "1": "Solo números",
+          "2": "Todo excepto false y nil",
+          "3": "Solo valores distintos de cero"
+        },
+        "explanation": "Solo false y nil son falsy — incluso el 0 y las cadenas vacías son truthy."
+      },
+      "q12": {
+        "question": "¿Qué representa nil en Luau?",
+        "options": {
+          "0": "El número 0",
+          "1": "Una cadena vacía",
+          "2": "La ausencia de un valor",
+          "3": "Un script roto"
+        }
+      },
+      "q13": {
+        "question": "¿Cuál es la diferencia entre = y ==?",
+        "options": {
+          "0": "== asigna, = compara",
+          "1": "Son lo mismo",
+          "2": "Ninguno es válido",
+          "3": "= asigna, == compara"
+        }
+      },
+      "q14": {
+        "question": "¿Cuál es el resultado de true and false?",
+        "options": {
+          "0": "false",
+          "1": "true",
+          "2": "nil",
+          "3": "Un error"
+        }
+      },
+      "q15": {
+        "question": "¿Cuál es el resultado de not false?",
+        "options": {
+          "0": "false",
+          "1": "nil",
+          "2": "Un error",
+          "3": "true"
+        }
+      },
+      "q16": {
+        "question": "¿Qué valores hacen que if x then ejecute su bloque?",
+        "options": {
+          "0": "Solo true",
+          "1": "Cualquier valor truthy",
+          "2": "Solo números",
+          "3": "Solo valores distintos de cero"
+        }
+      },
+      "q17": {
+        "question": "¿Cuándo se ejecuta if health <= 0 then?",
+        "options": {
+          "0": "Cuando health es cero o negativo",
+          "1": "Solo cuando health es exactamente 0",
+          "2": "Cuando health es positivo",
+          "3": "Cuando health no existe"
+        }
+      },
+      "q18": {
+        "question": "¿Cuál es el propósito de elseif?",
+        "options": {
+          "0": "Comprobar otra condición cuando la anterior fue falsa",
+          "1": "Repetir un bloque de código",
+          "2": "Salir de una función antes de tiempo",
+          "3": "Asignar una variable"
+        }
+      },
+      "q19": {
+        "question": "¿Cómo termina todo if en Luau?",
+        "options": {
+          "0": "fi",
+          "1": "}",
+          "2": "end",
+          "3": "endif"
+        }
+      },
+      "q20": {
+        "question": "¿A qué evalúa local x = false and error(\"boom\")?",
+        "options": {
+          "0": "Un error",
+          "1": "true",
+          "2": "nil",
+          "3": "false, sin lanzar el error"
+        },
+        "explanation": "and hace cortocircuito: cuando el lado izquierdo es falsy, el derecho nunca se evalúa."
+      },
+      "q21": {
+        "question": "¿Cuántas veces se ejecuta el cuerpo de for i = 1, 5 do?",
+        "options": {
+          "0": "6",
+          "1": "4",
+          "2": "Infinitas",
+          "3": "5"
+        }
+      },
+      "q22": {
+        "question": "¿Qué valores produce for i = 1, 5, 2 do?",
+        "options": {
+          "0": "1, 2, 3, 4, 5",
+          "1": "1, 3, 5",
+          "2": "1, 3",
+          "3": "5, 3, 1"
+        },
+        "explanation": "Un paso de 2 salta cada dos valores, terminando en 5."
+      },
+      "q23": {
+        "question": "Un bucle while true do sin condición de salida…",
+        "options": {
+          "0": "Se ejecuta para siempre (bloquea el script)",
+          "1": "Se ejecuta una vez",
+          "2": "Nunca se ejecuta",
+          "3": "Se detiene solo a los 60 s"
+        }
+      },
+      "q24": {
+        "question": "En repeat ... until condition, ¿cuándo se comprueba la condición?",
+        "options": {
+          "0": "Antes de que se ejecute el cuerpo",
+          "1": "Después de que se ejecute el cuerpo (al menos una vez)",
+          "2": "Solo en la primera pasada",
+          "3": "Nunca"
+        }
+      },
+      "q25": {
+        "question": "¿Qué hace break dentro de un bucle?",
+        "options": {
+          "0": "Salta una iteración",
+          "1": "Reinicia el bucle",
+          "2": "Sale del bucle actual inmediatamente",
+          "3": "Devuelve un valor"
+        }
+      },
+      "q26": {
+        "question": "¿Qué salta el resto de la iteración actual en un bucle de Luau?",
+        "options": {
+          "0": "skip",
+          "1": "next",
+          "2": "continue",
+          "3": "repeat"
+        },
+        "explanation": "Luau admite continue para saltar a la siguiente iteración."
+      },
+      "q27": {
+        "question": "¿Cómo defines una función llamada heal?",
+        "options": {
+          "0": "local function heal() end",
+          "1": "function = heal() end",
+          "2": "def heal():",
+          "3": "heal := function()"
+        }
+      },
+      "q28": {
+        "question": "¿Qué palabra clave envía un valor de vuelta desde una función?",
+        "options": {
+          "0": "output",
+          "1": "send",
+          "2": "yield",
+          "3": "return"
+        }
+      },
+      "q29": {
+        "question": "Una función que nunca llega a return devuelve…",
+        "options": {
+          "0": "nil",
+          "1": "0",
+          "2": "false",
+          "3": "Un error"
+        }
+      },
+      "q30": {
+        "question": "En local function add(a, b), ¿qué son a y b?",
+        "options": {
+          "0": "Globales",
+          "1": "Retornos",
+          "2": "Parámetros",
+          "3": "Comentarios"
+        }
+      },
+      "q31": {
+        "question": "¿Qué significa ... en una función como local function log(...)?",
+        "options": {
+          "0": "Acepta cualquier número de argumentos extra",
+          "1": "Significa 'etcétera' (un comentario)",
+          "2": "Declara un tipo",
+          "3": "Es Luau inválido"
+        },
+        "explanation": "El variadic ... permite a una función aceptar argumentos extra."
+      },
+      "q32": {
+        "question": "Llamar part:SetPosition() en lugar de part.SetPosition(part) — ¿qué hace el :?",
+        "options": {
+          "0": "Hace la llamada más rápida",
+          "1": "Pasa part como primer argumento (self)",
+          "2": "Crea una parte nueva",
+          "3": "Ignora los argumentos"
+        },
+        "explanation": "Los dos puntos pasan la propia instancia como primer argumento, llamado self."
+      },
+      "q33": {
+        "question": "En Luau, ¿cuál es el índice del primer elemento de un array?",
+        "options": {
+          "0": "0",
+          "1": "-1",
+          "2": "1",
+          "3": "Depende de la tabla"
+        },
+        "explanation": "Los arrays de Luau empiezan en 1: {10, 20, 30}[1] es 10."
+      },
+      "q34": {
+        "question": "¿Qué es #{10, 20, 30}?",
+        "options": {
+          "0": "10",
+          "1": "3",
+          "2": "30",
+          "3": "60"
+        },
+        "explanation": "# devuelve la longitud de una tabla tipo array."
+      },
+      "q35": {
+        "question": "Si t = {name = \"Ada\"}, ¿de qué otra forma puedes escribir t.name?",
+        "options": {
+          "0": "t.name()",
+          "1": "t::name",
+          "2": "t\\name",
+          "3": "t[\"name\"]"
+        }
+      },
+      "q36": {
+        "question": "¿Qué hace table.insert(t, x)?",
+        "options": {
+          "0": "Reemplaza el primer elemento",
+          "1": "Añade x al final de t",
+          "2": "Borra t",
+          "3": "Ordena t"
+        }
+      },
+      "q37": {
+        "question": "¿Cuál es el resultado de (\"hello\"):sub(1, 2)?",
+        "options": {
+          "0": "\"el\"",
+          "1": "\"h\"",
+          "2": "\"he\"",
+          "3": "\"hello\""
+        }
+      },
+      "q38": {
+        "question": "¿Qué devuelve string.upper(\"hi\")?",
+        "options": {
+          "0": "\"hi\"",
+          "1": "\"HI\"",
+          "2": "\"Hi\"",
+          "3": "\"hI\""
+        }
+      },
+      "q39": {
+        "question": "¿Qué devuelve table.concat({\"a\", \"b\"}, \"-\")?",
+        "options": {
+          "0": "\"ab\"",
+          "1": "\"a-b\"",
+          "2": "\"a, b\"",
+          "3": "\"a\" \"b\""
+        }
+      },
+      "q40": {
+        "question": "¿Cuál es el resultado de 5 // 2 en Luau?",
+        "options": {
+          "0": "2.5",
+          "1": "3",
+          "2": "Un error",
+          "3": "2"
+        },
+        "explanation": "// es la división entera — redondea hacia abajo, así que 5 // 2 es 2."
+      },
+      "q41": {
+        "question": "¿Qué devuelve math.random(1, 6)?",
+        "options": {
+          "0": "Siempre 3",
+          "1": "Una cadena al azar",
+          "2": "Una tabla",
+          "3": "Un entero entre 1 y 6"
+        }
+      },
+      "q42": {
+        "question": "¿Qué devuelve math.floor(3.7)?",
+        "options": {
+          "0": "4",
+          "1": "3",
+          "2": "3.7",
+          "3": "0"
+        }
+      },
+      "q43": {
+        "question": "¿Qué devuelve tonumber(\"42\")?",
+        "options": {
+          "0": "\"42\" (una cadena)",
+          "1": "true",
+          "2": "42 (un número)",
+          "3": "nil"
+        }
+      },
+      "q44": {
+        "question": "¿Dónde se guardan las partes del mundo de un juego?",
+        "options": {
+          "0": "game.ReplicatedStorage",
+          "1": "game.Workspace",
+          "2": "game.Players",
+          "3": "game.ServerStorage"
+        }
+      },
+      "q45": {
+        "question": "¿Qué servicio rastrea a los jugadores de tu juego?",
+        "options": {
+          "0": "game.Players",
+          "1": "game.Workspace",
+          "2": "game.Lighting",
+          "3": "game.SoundService"
+        }
+      },
+      "q46": {
+        "question": "¿Dónde se ejecuta un LocalScript?",
+        "options": {
+          "0": "En el dispositivo del jugador (cliente)",
+          "1": "Solo en los servidores de Roblox",
+          "2": "En ningún sitio",
+          "3": "En la ventana Output"
+        }
+      },
+      "q47": {
+        "question": "¿Cómo obtienes el modelo del personaje de un jugador?",
+        "options": {
+          "0": "player.Model",
+          "1": "player.Torso",
+          "2": "player.Character",
+          "3": "player.Body"
+        }
+      },
+      "q48": {
+        "question": "¿Qué hace Instance.new(\"Part\")?",
+        "options": {
+          "0": "Borra una Part",
+          "1": "Busca una Part",
+          "2": "Carga un modelo",
+          "3": "Crea una Part nueva"
+        }
+      },
+      "q49": {
+        "question": "¿Qué evento se dispara cuando una parte toca a otra?",
+        "options": {
+          "0": "Click",
+          "1": "Collided",
+          "2": "Hit",
+          "3": "Touched"
+        }
+      },
+      "q50": {
+        "question": "¿Qué describe CFrame.new(0, 10, 0)?",
+        "options": {
+          "0": "Solo un color",
+          "1": "Una posición y una rotación",
+          "2": "Un script",
+          "3": "Un sonido"
+        },
+        "explanation": "Un CFrame guarda una posición y una rotación en el espacio 3D."
+      }
+    }
   },
   "drill": {
     "title": "Drill de 60 segundos",
@@ -940,156 +1268,258 @@
     "drillsPlayed": "Drills jugados:",
     "dayStreak": "Racha de días:",
     "day": "{count, plural, one {# día} other {# días}}",
-    "questions.d1.question": "local t = {}; t[1] = \"a\"; t[2] = \"b\". ¿Qué devuelve #t?",
-    "questions.d1.options.0": "0",
-    "questions.d1.options.1": "1",
-    "questions.d1.options.2": "2",
-    "questions.d1.options.3": "\"ab\"",
-    "questions.d1.explanation": "# devuelve la longitud de la parte de array; ambas posiciones están llenas, así que es 2 — no \"ab\".",
-    "questions.d2.question": "Después de local a, b = 1, ¿cuál es el valor de b?",
-    "questions.d2.options.0": "1",
-    "questions.d2.options.1": "nil",
-    "questions.d2.options.2": "0",
-    "questions.d2.options.3": "Un error",
-    "questions.d2.explanation": "Asignar menos valores que nombres deja el resto como nil — a b nunca se le dio un valor.",
-    "questions.d3.question": "¿Qué devuelve math.floor(-2.7)?",
-    "questions.d3.options.0": "-2",
-    "questions.d3.options.1": "-3",
-    "questions.d3.options.2": "2",
-    "questions.d3.options.3": "Un error",
-    "questions.d3.explanation": "floor redondea hacia menos infinito, así que -2.7 se convierte en -3.",
-    "questions.d4.question": "Necesitas que exista una parte llamada \"Door\" antes de continuar. ¿Qué línea espera de forma segura?",
-    "questions.d4.options.0": "part = workspace.Door",
-    "questions.d4.options.1": "while not workspace:FindFirstChild(\"Door\") do end",
-    "questions.d4.options.2": "part = workspace:WaitForChild(\"Door\")",
-    "questions.d4.options.3": "part = Instance.new(\"Door\")",
-    "questions.d4.explanation": "WaitForChild cede hasta que exista el hijo con ese nombre. El bucle while no cede nunca, así que bloquea el hilo.",
-    "questions.d5.question": "¿Cuál es el valor de 1 .. 2?",
-    "questions.d5.options.0": "3",
-    "questions.d5.options.1": "\"12\"",
-    "questions.d5.options.2": "\"1 2\"",
-    "questions.d5.options.3": "12",
-    "questions.d5.explanation": ".. siempre concatena — los números se convierten a texto, dando \"12\", no 3.",
-    "questions.d6.question": "¿Qué devuelve type(CFrame.new())?",
-    "questions.d6.options.0": "\"Instance\"",
-    "questions.d6.options.1": "\"table\"",
-    "questions.d6.options.2": "\"Vector3\"",
-    "questions.d6.options.3": "\"CFrame\"",
-    "questions.d6.explanation": "CFrame es su propio tipo en Luau, así que type() devuelve el texto \"CFrame\".",
-    "questions.d7.question": "local x = 10; if x == 10 then x = 20 elseif true then x = 30 end — ¿cuánto vale x?",
-    "questions.d7.options.0": "20",
-    "questions.d7.options.1": "30",
-    "questions.d7.options.2": "10",
-    "questions.d7.options.3": "Un error",
-    "questions.d7.explanation": "Una vez que se ejecuta la primera rama, el resto de la cadena elseif se omite — 30 nunca se asigna.",
-    "questions.d8.question": "¿Qué devuelve #{nil}?",
-    "questions.d8.options.0": "1",
-    "questions.d8.options.1": "0",
-    "questions.d8.options.2": "nil",
-    "questions.d8.options.3": "Un error",
-    "questions.d8.explanation": "nil no ocupa ninguna posición, así que la secuencia está vacía y su longitud es 0.",
-    "questions.d9.question": "¿Qué secuencia visita for i = 5, 1, -1 do?",
-    "questions.d9.options.0": "5, 4, 3, 2, 1",
-    "questions.d9.options.1": "1, 2, 3, 4, 5",
-    "questions.d9.options.2": "5, 3, 1",
-    "questions.d9.options.3": "Nada — no se permiten pasos negativos",
-    "questions.d9.explanation": "Un paso negativo cuenta hacia abajo y se detiene cuando i baja de 1.",
-    "questions.d10.question": "local t = {10, 20, 30}. Después de table.remove(t, 1), ¿cuánto vale #t?",
-    "questions.d10.options.0": "2",
-    "questions.d10.options.1": "3",
-    "questions.d10.options.2": "0",
-    "questions.d10.options.3": "1",
-    "questions.d10.explanation": "table.remove desplaza los elementos restantes hacia abajo, así que el array queda como {20, 30} con longitud 2.",
-    "questions.d11.question": "¿Cuál es la diferencia real entre wait() y task.wait()?",
-    "questions.d11.options.0": "Son idénticos",
-    "questions.d11.options.1": "task.wait() usa el programador de tareas y puede esperar menos de 0.03s",
-    "questions.d11.options.2": "wait() siempre es más rápido",
-    "questions.d11.options.3": "wait() solo funciona en Scripts",
-    "questions.d11.explanation": "task.wait() corre en el programador de tareas nuevo y no tiene mínimo de 0.03s, mientras que wait() clampa a ese valor.",
-    "questions.d12.question": "¿Cuál de estos se ejecuta en el dispositivo del jugador (cliente)?",
-    "questions.d12.options.0": "Script en ServerScriptService",
-    "questions.d12.options.1": "LocalScript en StarterPlayerScripts",
-    "questions.d12.options.2": "ModuleScript en ReplicatedStorage",
-    "questions.d12.options.3": "Script en Workspace",
-    "questions.d12.explanation": "Los LocalScript se ejecutan en el cliente. Los ModuleScript solo se ejecutan cuando otro script los requiere.",
-    "questions.d13.question": "¿Cuántos argumentos necesita string.gsub como mínimo?",
-    "questions.d13.options.0": "1",
-    "questions.d13.options.1": "2",
-    "questions.d13.options.2": "3",
-    "questions.d13.options.3": "4",
-    "questions.d13.explanation": "string.gsub(origen, patrón, reemplazo) necesita tres: el texto, un patrón y qué sustituir.",
-    "questions.d14.question": "¿Qué evento se dispara una vez por frame en el cliente?",
-    "questions.d14.options.0": "game.Players.PlayerAdded",
-    "questions.d14.options.1": "game:GetService(\"RunService\").Heartbeat",
-    "questions.d14.options.2": "part.Touched",
-    "questions.d14.options.3": "game.Players.LocalPlayer.CharacterAdded",
-    "questions.d14.explanation": "Heartbeat se dispara en cada frame renderizado. Los demás solo se disparan en sus eventos específicos.",
-    "questions.d15.question": "¿Qué devuelve string.rep(\"ab\", 3)?",
-    "questions.d15.options.0": "\"ab3\"",
-    "questions.d15.options.1": "\"ababab\"",
-    "questions.d15.options.2": "\"abababab\"",
-    "questions.d15.options.3": "\"ab\"",
-    "questions.d15.explanation": "rep repite el texto el número de veces indicado — \"ab\" tres veces es \"ababab\".",
-    "questions.d16.question": "¿Qué bucle siempre ejecuta su cuerpo al menos una vez?",
-    "questions.d16.options.0": "for",
-    "questions.d16.options.1": "while",
-    "questions.d16.options.2": "repeat",
-    "questions.d16.options.3": "ipairs",
-    "questions.d16.explanation": "repeat...until comprueba su condición después del cuerpo, así que el cuerpo siempre se ejecuta al menos una vez.",
-    "questions.d17.question": "¿Qué devuelve table.concat({1, 2, 3}, \", \")?",
-    "questions.d17.options.0": "\"123\"",
-    "questions.d17.options.1": "\"1, 2, 3\"",
-    "questions.d17.options.2": "\"1 2 3\"",
-    "questions.d17.options.3": "Un error",
-    "questions.d17.explanation": "concat une cada elemento con el separador, convirtiendo los números a texto.",
-    "questions.d18.question": "¿Cuál de estos NO es válido para crear un Vector3?",
-    "questions.d18.options.0": "Vector3.new(1, 2, 3)",
-    "questions.d18.options.1": "Vector3.new(1, 2)",
-    "questions.d18.options.2": "Vector3.zero",
-    "questions.d18.options.3": "Vector3.new(1, 2, 3, 4)",
-    "questions.d18.explanation": "Vector3 recibe exactamente tres números — la cuarta forma lanza un error. (Las formas de dos argumentos y de cero son atajos válidos.)",
-    "questions.d19.question": "¿Cómo evitas que un evento conectado vuelva a dispararse?",
-    "questions.d19.options.0": "connection:Disconnect()",
-    "questions.d19.options.1": "connection = nil",
-    "questions.d19.options.2": "game:GetService(\"RunService\"):Stop()",
-    "questions.d19.options.3": "connection:Destroy()",
-    "questions.d19.explanation": "RBXScriptConnection tiene un método Disconnect. Poner la variable a nil no detiene el evento.",
-    "questions.d20.question": "¿Qué mide os.clock()?",
-    "questions.d20.options.0": "El tiempo de pared",
-    "questions.d20.options.1": "El tiempo de CPU usado por el programa en ejecución",
-    "questions.d20.options.2": "El tiempo desde que inició el servidor",
-    "questions.d20.options.3": "La fecha actual",
-    "questions.d20.explanation": "os.clock() devuelve el tiempo de CPU consumido por el programa — útil para medir cuánto tardó el código.",
-    "questions.d21.question": "¿Qué pasa al ejecutar if 0 then print(\"yes\") end?",
-    "questions.d21.options.0": "Imprime \"yes\" — 0 es truthy",
-    "questions.d21.options.1": "Nada — 0 es falsy",
-    "questions.d21.options.2": "Imprime \"no\"",
-    "questions.d21.options.3": "Lanza un error",
-    "questions.d21.explanation": "Solo false y nil son falsy. El 0, los textos vacíos y las tablas vacías son truthy en Luau.",
-    "questions.d22.question": "local x = 5; local x = 10; print(x) — ¿qué imprime?",
-    "questions.d22.options.0": "10",
-    "questions.d22.options.1": "5",
-    "questions.d22.options.2": "Un error — x ya está declarada",
-    "questions.d22.options.3": "15",
-    "questions.d22.explanation": "El segundo local sombrea al primero en el mismo ámbito, así que x vale 10 al imprimirse.",
-    "questions.d23.question": "¿Qué imprime print(math.huge > 1000)?",
-    "questions.d23.options.0": "true",
-    "questions.d23.options.1": "false",
-    "questions.d23.options.2": "math.huge",
-    "questions.d23.options.3": "Un error",
-    "questions.d23.explanation": "math.huge es infinito, e infinito es mayor que cualquier número finito.",
-    "questions.d24.question": "local ok, err = pcall(function() error(\"boom\") end). ¿Cuánto vale ok?",
-    "questions.d24.options.0": "false",
-    "questions.d24.options.1": "true",
-    "questions.d24.options.2": "\"boom\"",
-    "questions.d24.options.3": "nil",
-    "questions.d24.explanation": "pcall devuelve false como primer valor cuando la función falla, junto con el mensaje de error.",
-    "questions.d25.question": "game:GetService(\"TweenService\"):Create(part, TweenInfo.new(1), {...}) — ¿qué falta para que anime?",
-    "questions.d25.options.0": ":Play()",
-    "questions.d25.options.1": ":Start()",
-    "questions.d25.options.2": ":Run()",
-    "questions.d25.options.3": "Nada — se anima inmediatamente",
-    "questions.d25.explanation": "Los tweens se crean en pausa; debes llamar a :Play() para iniciar la animación."
+    "questions": {
+      "d1": {
+        "question": "local t = {}; t[1] = \"a\"; t[2] = \"b\". ¿Qué devuelve #t?",
+        "options": {
+          "0": "0",
+          "1": "1",
+          "2": "2",
+          "3": "\"ab\""
+        },
+        "explanation": "# devuelve la longitud de la parte de array; ambas posiciones están llenas, así que es 2 — no \"ab\"."
+      },
+      "d2": {
+        "question": "Después de local a, b = 1, ¿cuál es el valor de b?",
+        "options": {
+          "0": "1",
+          "1": "nil",
+          "2": "0",
+          "3": "Un error"
+        },
+        "explanation": "Asignar menos valores que nombres deja el resto como nil — a b nunca se le dio un valor."
+      },
+      "d3": {
+        "question": "¿Qué devuelve math.floor(-2.7)?",
+        "options": {
+          "0": "-2",
+          "1": "-3",
+          "2": "2",
+          "3": "Un error"
+        },
+        "explanation": "floor redondea hacia menos infinito, así que -2.7 se convierte en -3."
+      },
+      "d4": {
+        "question": "Necesitas que exista una parte llamada \"Door\" antes de continuar. ¿Qué línea espera de forma segura?",
+        "options": {
+          "0": "part = workspace.Door",
+          "1": "while not workspace:FindFirstChild(\"Door\") do end",
+          "2": "part = workspace:WaitForChild(\"Door\")",
+          "3": "part = Instance.new(\"Door\")"
+        },
+        "explanation": "WaitForChild cede hasta que exista el hijo con ese nombre. El bucle while no cede nunca, así que bloquea el hilo."
+      },
+      "d5": {
+        "question": "¿Cuál es el valor de 1 .. 2?",
+        "options": {
+          "0": "3",
+          "1": "\"12\"",
+          "2": "\"1 2\"",
+          "3": "12"
+        },
+        "explanation": ".. siempre concatena — los números se convierten a texto, dando \"12\", no 3."
+      },
+      "d6": {
+        "question": "¿Qué devuelve type(CFrame.new())?",
+        "options": {
+          "0": "\"Instance\"",
+          "1": "\"table\"",
+          "2": "\"Vector3\"",
+          "3": "\"CFrame\""
+        },
+        "explanation": "CFrame es su propio tipo en Luau, así que type() devuelve el texto \"CFrame\"."
+      },
+      "d7": {
+        "question": "local x = 10; if x == 10 then x = 20 elseif true then x = 30 end — ¿cuánto vale x?",
+        "options": {
+          "0": "20",
+          "1": "30",
+          "2": "10",
+          "3": "Un error"
+        },
+        "explanation": "Una vez que se ejecuta la primera rama, el resto de la cadena elseif se omite — 30 nunca se asigna."
+      },
+      "d8": {
+        "question": "¿Qué devuelve #{nil}?",
+        "options": {
+          "0": "1",
+          "1": "0",
+          "2": "nil",
+          "3": "Un error"
+        },
+        "explanation": "nil no ocupa ninguna posición, así que la secuencia está vacía y su longitud es 0."
+      },
+      "d9": {
+        "question": "¿Qué secuencia visita for i = 5, 1, -1 do?",
+        "options": {
+          "0": "5, 4, 3, 2, 1",
+          "1": "1, 2, 3, 4, 5",
+          "2": "5, 3, 1",
+          "3": "Nada — no se permiten pasos negativos"
+        },
+        "explanation": "Un paso negativo cuenta hacia abajo y se detiene cuando i baja de 1."
+      },
+      "d10": {
+        "question": "local t = {10, 20, 30}. Después de table.remove(t, 1), ¿cuánto vale #t?",
+        "options": {
+          "0": "2",
+          "1": "3",
+          "2": "0",
+          "3": "1"
+        },
+        "explanation": "table.remove desplaza los elementos restantes hacia abajo, así que el array queda como {20, 30} con longitud 2."
+      },
+      "d11": {
+        "question": "¿Cuál es la diferencia real entre wait() y task.wait()?",
+        "options": {
+          "0": "Son idénticos",
+          "1": "task.wait() usa el programador de tareas y puede esperar menos de 0.03s",
+          "2": "wait() siempre es más rápido",
+          "3": "wait() solo funciona en Scripts"
+        },
+        "explanation": "task.wait() corre en el programador de tareas nuevo y no tiene mínimo de 0.03s, mientras que wait() clampa a ese valor."
+      },
+      "d12": {
+        "question": "¿Cuál de estos se ejecuta en el dispositivo del jugador (cliente)?",
+        "options": {
+          "0": "Script en ServerScriptService",
+          "1": "LocalScript en StarterPlayerScripts",
+          "2": "ModuleScript en ReplicatedStorage",
+          "3": "Script en Workspace"
+        },
+        "explanation": "Los LocalScript se ejecutan en el cliente. Los ModuleScript solo se ejecutan cuando otro script los requiere."
+      },
+      "d13": {
+        "question": "¿Cuántos argumentos necesita string.gsub como mínimo?",
+        "options": {
+          "0": "1",
+          "1": "2",
+          "2": "3",
+          "3": "4"
+        },
+        "explanation": "string.gsub(origen, patrón, reemplazo) necesita tres: el texto, un patrón y qué sustituir."
+      },
+      "d14": {
+        "question": "¿Qué evento se dispara una vez por frame en el cliente?",
+        "options": {
+          "0": "game.Players.PlayerAdded",
+          "1": "game:GetService(\"RunService\").Heartbeat",
+          "2": "part.Touched",
+          "3": "game.Players.LocalPlayer.CharacterAdded"
+        },
+        "explanation": "Heartbeat se dispara en cada frame renderizado. Los demás solo se disparan en sus eventos específicos."
+      },
+      "d15": {
+        "question": "¿Qué devuelve string.rep(\"ab\", 3)?",
+        "options": {
+          "0": "\"ab3\"",
+          "1": "\"ababab\"",
+          "2": "\"abababab\"",
+          "3": "\"ab\""
+        },
+        "explanation": "rep repite el texto el número de veces indicado — \"ab\" tres veces es \"ababab\"."
+      },
+      "d16": {
+        "question": "¿Qué bucle siempre ejecuta su cuerpo al menos una vez?",
+        "options": {
+          "0": "for",
+          "1": "while",
+          "2": "repeat",
+          "3": "ipairs"
+        },
+        "explanation": "repeat...until comprueba su condición después del cuerpo, así que el cuerpo siempre se ejecuta al menos una vez."
+      },
+      "d17": {
+        "question": "¿Qué devuelve table.concat({1, 2, 3}, \", \")?",
+        "options": {
+          "0": "\"123\"",
+          "1": "\"1, 2, 3\"",
+          "2": "\"1 2 3\"",
+          "3": "Un error"
+        },
+        "explanation": "concat une cada elemento con el separador, convirtiendo los números a texto."
+      },
+      "d18": {
+        "question": "¿Cuál de estos NO es válido para crear un Vector3?",
+        "options": {
+          "0": "Vector3.new(1, 2, 3)",
+          "1": "Vector3.new(1, 2)",
+          "2": "Vector3.zero",
+          "3": "Vector3.new(1, 2, 3, 4)"
+        },
+        "explanation": "Vector3 recibe exactamente tres números — la cuarta forma lanza un error. (Las formas de dos argumentos y de cero son atajos válidos.)"
+      },
+      "d19": {
+        "question": "¿Cómo evitas que un evento conectado vuelva a dispararse?",
+        "options": {
+          "0": "connection:Disconnect()",
+          "1": "connection = nil",
+          "2": "game:GetService(\"RunService\"):Stop()",
+          "3": "connection:Destroy()"
+        },
+        "explanation": "RBXScriptConnection tiene un método Disconnect. Poner la variable a nil no detiene el evento."
+      },
+      "d20": {
+        "question": "¿Qué mide os.clock()?",
+        "options": {
+          "0": "El tiempo de pared",
+          "1": "El tiempo de CPU usado por el programa en ejecución",
+          "2": "El tiempo desde que inició el servidor",
+          "3": "La fecha actual"
+        },
+        "explanation": "os.clock() devuelve el tiempo de CPU consumido por el programa — útil para medir cuánto tardó el código."
+      },
+      "d21": {
+        "question": "¿Qué pasa al ejecutar if 0 then print(\"yes\") end?",
+        "options": {
+          "0": "Imprime \"yes\" — 0 es truthy",
+          "1": "Nada — 0 es falsy",
+          "2": "Imprime \"no\"",
+          "3": "Lanza un error"
+        },
+        "explanation": "Solo false y nil son falsy. El 0, los textos vacíos y las tablas vacías son truthy en Luau."
+      },
+      "d22": {
+        "question": "local x = 5; local x = 10; print(x) — ¿qué imprime?",
+        "options": {
+          "0": "10",
+          "1": "5",
+          "2": "Un error — x ya está declarada",
+          "3": "15"
+        },
+        "explanation": "El segundo local sombrea al primero en el mismo ámbito, así que x vale 10 al imprimirse."
+      },
+      "d23": {
+        "question": "¿Qué imprime print(math.huge > 1000)?",
+        "options": {
+          "0": "true",
+          "1": "false",
+          "2": "math.huge",
+          "3": "Un error"
+        },
+        "explanation": "math.huge es infinito, e infinito es mayor que cualquier número finito."
+      },
+      "d24": {
+        "question": "local ok, err = pcall(function() error(\"boom\") end). ¿Cuánto vale ok?",
+        "options": {
+          "0": "false",
+          "1": "true",
+          "2": "\"boom\"",
+          "3": "nil"
+        },
+        "explanation": "pcall devuelve false como primer valor cuando la función falla, junto con el mensaje de error."
+      },
+      "d25": {
+        "question": "game:GetService(\"TweenService\"):Create(part, TweenInfo.new(1), {...}) — ¿qué falta para que anime?",
+        "options": {
+          "0": ":Play()",
+          "1": ":Start()",
+          "2": ":Run()",
+          "3": "Nada — se anima inmediatamente"
+        },
+        "explanation": "Los tweens se crean en pausa; debes llamar a :Play() para iniciar la animación."
+      }
+    }
   },
   "dailyChallenge": {
     "loading": "Cargando el reto de hoy…",
@@ -1115,90 +1545,140 @@
     "debugThis": "Depura este script",
     "wrongAnswer": "Casi — la respuesta es {letter}.",
     "finish": "Terminar",
-    "challenges.debug-nil-part.question": "¿Cuál es el bug?",
-    "challenges.debug-nil-part.options.0": "Al script le falta una variable local",
-    "challenges.debug-nil-part.options.1": "SpawnPart no existe, así que part es nil",
-    "challenges.debug-nil-part.options.2": "Position no es una propiedad real",
-    "challenges.debug-nil-part.options.3": "print necesita una cadena, no un número",
-    "challenges.debug-nil-part.explanation": "workspace.SpawnPart es nil cuando no existe una parte llamada SpawnPart — no puedes leer .Position de nil. Usa WaitForChild(\"SpawnPart\") o compruébalo antes con FindFirstChild.",
-    "challenges.debug-nil-part.lessonLabel": "Workspace y partes",
-    "challenges.debug-arithmetic-nil.question": "¿Cuál es el bug?",
-    "challenges.debug-arithmetic-nil.options.0": "No se puede sumar a nil — coins no tiene valor inicial",
-    "challenges.debug-arithmetic-nil.options.1": "El nombre de la variable tiene una errata",
-    "challenges.debug-arithmetic-nil.options.2": "+ no se puede usar con números",
-    "challenges.debug-arithmetic-nil.options.3": "local debe ir después de la asignación",
-    "challenges.debug-arithmetic-nil.explanation": "coins se declaró sin valor, así que es nil, y nil + 10 es un error. Dale un valor inicial: local coins = 0.",
-    "challenges.debug-arithmetic-nil.lessonLabel": "Variables",
-    "challenges.debug-call-nil.question": "¿Cuál es el bug?",
-    "challenges.debug-call-nil.options.0": "makeCoins es una palabra clave reservada",
-    "challenges.debug-call-nil.options.1": "Las funciones deben llamarse con dos puntos",
-    "challenges.debug-call-nil.options.2": "makeCoins aún no está definida — es nil",
-    "challenges.debug-call-nil.options.3": "Al script le falta un require",
-    "challenges.debug-call-nil.explanation": "No puedes llamar a nil. Define la función antes de llamarla — y revisa la ortografía. Los scripts se ejecutan de arriba a abajo.",
-    "challenges.debug-call-nil.lessonLabel": "Funciones",
-    "challenges.debug-undefined-global.question": "¿Cuál es el bug?",
-    "challenges.debug-undefined-global.options.0": "print está mal escrito",
-    "challenges.debug-undefined-global.options.1": "coin no existe — querías decir coins",
-    "challenges.debug-undefined-global.options.2": "coins no puede contener números",
-    "challenges.debug-undefined-global.options.3": "Necesitas usar +=",
-    "challenges.debug-undefined-global.explanation": "coin (sin s) nunca se declaró. Studio avisa con \"Undefined global\" — los nombres de variables deben coincidir exactamente.",
-    "challenges.debug-undefined-global.lessonLabel": "Nombres de variables",
-    "challenges.debug-missing-end.question": "¿Cuál es el bug?",
-    "challenges.debug-missing-end.options.0": "Falta end para cerrar el bloque if",
-    "challenges.debug-missing-end.options.1": "> es el operador de comparación equivocado",
-    "challenges.debug-missing-end.options.2": "print no se puede llamar dentro de un if",
-    "challenges.debug-missing-end.options.3": "La cadena necesita comillas simples",
-    "challenges.debug-missing-end.explanation": "Todo if necesita un end que lo cierre. Studio informa de \"Expected end\" y señala la línea donde se abrió el bloque.",
-    "challenges.debug-missing-end.lessonLabel": "Condicionales",
-    "challenges.debug-string-concat.question": "¿Cuál es el bug?",
-    "challenges.debug-string-concat.options.0": "+ no puede unir cadenas — usa ..",
-    "challenges.debug-string-concat.options.1": "name debe ser un número",
-    "challenges.debug-string-concat.options.2": "\"Hello \" no necesita comillas",
-    "challenges.debug-string-concat.options.3": "print no es una función",
-    "challenges.debug-string-concat.explanation": "+ es para aritmética. Para unir cadenas en Luau usa ..: print(\"Hello \" .. name).",
-    "challenges.debug-string-concat.lessonLabel": "Cadenas",
-    "challenges.debug-zero-index.question": "¿Cuál es el bug?",
-    "challenges.debug-zero-index.options.0": "items[0] es nil — los arrays de Luau empiezan en 1",
-    "challenges.debug-zero-index.options.1": "Los arrays solo pueden contener cadenas",
-    "challenges.debug-zero-index.options.2": "Necesitas table.insert antes de leer",
-    "challenges.debug-zero-index.options.3": "print requiere dos argumentos",
-    "challenges.debug-zero-index.explanation": "Los arrays de Luau empiezan en 1. items[1] es \"sword\" e items[0] es nil.",
-    "challenges.debug-zero-index.lessonLabel": "Tablas",
-    "challenges.debug-localplayer.question": "¿Cuál es el bug?",
-    "challenges.debug-localplayer.options.0": "LocalPlayer solo existe en el cliente — es nil en el servidor",
-    "challenges.debug-localplayer.options.1": "Players está mal escrito",
-    "challenges.debug-localplayer.options.2": "Los Scripts no pueden acceder a game",
-    "challenges.debug-localplayer.options.3": "Necesitas cargar el servicio Players con require",
-    "challenges.debug-localplayer.explanation": "El servidor no tiene un único \"LocalPlayer\" — ve a todos los jugadores. En el servidor, usa game.Players.PlayerAdded.",
-    "challenges.debug-localplayer.lessonLabel": "RemoteEvents",
-    "challenges.debug-character-nil.question": "¿Cuál es el bug?",
-    "challenges.debug-character-nil.options.0": "Character aún no existe — aparece después de unirse",
-    "challenges.debug-character-nil.options.1": "Humanoid está obsoleto",
-    "challenges.debug-character-nil.options.2": "PlayerAdded solo se dispara en el cliente",
-    "challenges.debug-character-nil.options.3": "El personaje hay que clonarlo manualmente",
-    "challenges.debug-character-nil.explanation": "El Character de un jugador es nil hasta que carga. Espera a CharacterAdded y luego WaitForChild(\"Humanoid\").",
-    "challenges.debug-character-nil.lessonLabel": "Personajes y Humanoids",
-    "challenges.debug-infinite-loop.question": "¿Cuál es el bug?",
-    "challenges.debug-infinite-loop.options.0": "El bucle nunca termina, así que print nunca se ejecuta",
-    "challenges.debug-infinite-loop.options.1": "coins es accidentalmente global",
-    "challenges.debug-infinite-loop.options.2": "Los bucles while necesitan la palabra clave end",
-    "challenges.debug-infinite-loop.options.3": "Solo los bucles for pueden contar",
-    "challenges.debug-infinite-loop.explanation": "while true do sin condición de salida y sin task.wait() se ejecuta para siempre — el script nunca llega a print y Studio puede congelarse.",
-    "challenges.debug-infinite-loop.lessonLabel": "Bucles",
-    "challenges.debug-touch-event.question": "¿Cuál es el bug?",
-    "challenges.debug-touch-event.options.0": "Touch no es una propiedad — el evento se llama Touched y necesita :Connect",
-    "challenges.debug-touch-event.options.1": "Las puertas no se pueden tocar en código",
-    "challenges.debug-touch-event.options.2": "No se permite asignar funciones",
-    "challenges.debug-touch-event.options.3": "print es una palabra clave reservada",
-    "challenges.debug-touch-event.explanation": "Los eventos no se asignan — se conectan con :Connect, y el evento de toque se llama Touched: door.Touched:Connect(function() ... end).",
-    "challenges.debug-touch-event.lessonLabel": "Eventos",
-    "challenges.debug-property-typo.question": "¿Cuál es el bug?",
-    "challenges.debug-property-typo.options.0": "Positon no es una propiedad — es Position",
-    "challenges.debug-property-typo.options.1": "MyPart necesita WaitForChild",
-    "challenges.debug-property-typo.options.2": "print no puede mostrar números",
-    "challenges.debug-property-typo.options.3": "Part es una palabra reservada",
-    "challenges.debug-property-typo.explanation": "Studio informa de \"Positon is not a valid member\". Las erratas mínimas en nombres de propiedades son el primer bug clásico — y por eso ayuda el autocompletado.",
-    "challenges.debug-property-typo.lessonLabel": "Depuración"
+    "challenges": {
+      "debug-nil-part": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "Al script le falta una variable local",
+          "1": "SpawnPart no existe, así que part es nil",
+          "2": "Position no es una propiedad real",
+          "3": "print necesita una cadena, no un número"
+        },
+        "explanation": "workspace.SpawnPart es nil cuando no existe una parte llamada SpawnPart — no puedes leer .Position de nil. Usa WaitForChild(\"SpawnPart\") o compruébalo antes con FindFirstChild.",
+        "lessonLabel": "Workspace y partes"
+      },
+      "debug-arithmetic-nil": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "No se puede sumar a nil — coins no tiene valor inicial",
+          "1": "El nombre de la variable tiene una errata",
+          "2": "+ no se puede usar con números",
+          "3": "local debe ir después de la asignación"
+        },
+        "explanation": "coins se declaró sin valor, así que es nil, y nil + 10 es un error. Dale un valor inicial: local coins = 0.",
+        "lessonLabel": "Variables"
+      },
+      "debug-call-nil": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "makeCoins es una palabra clave reservada",
+          "1": "Las funciones deben llamarse con dos puntos",
+          "2": "makeCoins aún no está definida — es nil",
+          "3": "Al script le falta un require"
+        },
+        "explanation": "No puedes llamar a nil. Define la función antes de llamarla — y revisa la ortografía. Los scripts se ejecutan de arriba a abajo.",
+        "lessonLabel": "Funciones"
+      },
+      "debug-undefined-global": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "print está mal escrito",
+          "1": "coin no existe — querías decir coins",
+          "2": "coins no puede contener números",
+          "3": "Necesitas usar +="
+        },
+        "explanation": "coin (sin s) nunca se declaró. Studio avisa con \"Undefined global\" — los nombres de variables deben coincidir exactamente.",
+        "lessonLabel": "Nombres de variables"
+      },
+      "debug-missing-end": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "Falta end para cerrar el bloque if",
+          "1": "> es el operador de comparación equivocado",
+          "2": "print no se puede llamar dentro de un if",
+          "3": "La cadena necesita comillas simples"
+        },
+        "explanation": "Todo if necesita un end que lo cierre. Studio informa de \"Expected end\" y señala la línea donde se abrió el bloque.",
+        "lessonLabel": "Condicionales"
+      },
+      "debug-string-concat": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "+ no puede unir cadenas — usa ..",
+          "1": "name debe ser un número",
+          "2": "\"Hello \" no necesita comillas",
+          "3": "print no es una función"
+        },
+        "explanation": "+ es para aritmética. Para unir cadenas en Luau usa ..: print(\"Hello \" .. name).",
+        "lessonLabel": "Cadenas"
+      },
+      "debug-zero-index": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "items[0] es nil — los arrays de Luau empiezan en 1",
+          "1": "Los arrays solo pueden contener cadenas",
+          "2": "Necesitas table.insert antes de leer",
+          "3": "print requiere dos argumentos"
+        },
+        "explanation": "Los arrays de Luau empiezan en 1. items[1] es \"sword\" e items[0] es nil.",
+        "lessonLabel": "Tablas"
+      },
+      "debug-localplayer": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "LocalPlayer solo existe en el cliente — es nil en el servidor",
+          "1": "Players está mal escrito",
+          "2": "Los Scripts no pueden acceder a game",
+          "3": "Necesitas cargar el servicio Players con require"
+        },
+        "explanation": "El servidor no tiene un único \"LocalPlayer\" — ve a todos los jugadores. En el servidor, usa game.Players.PlayerAdded.",
+        "lessonLabel": "RemoteEvents"
+      },
+      "debug-character-nil": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "Character aún no existe — aparece después de unirse",
+          "1": "Humanoid está obsoleto",
+          "2": "PlayerAdded solo se dispara en el cliente",
+          "3": "El personaje hay que clonarlo manualmente"
+        },
+        "explanation": "El Character de un jugador es nil hasta que carga. Espera a CharacterAdded y luego WaitForChild(\"Humanoid\").",
+        "lessonLabel": "Personajes y Humanoids"
+      },
+      "debug-infinite-loop": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "El bucle nunca termina, así que print nunca se ejecuta",
+          "1": "coins es accidentalmente global",
+          "2": "Los bucles while necesitan la palabra clave end",
+          "3": "Solo los bucles for pueden contar"
+        },
+        "explanation": "while true do sin condición de salida y sin task.wait() se ejecuta para siempre — el script nunca llega a print y Studio puede congelarse.",
+        "lessonLabel": "Bucles"
+      },
+      "debug-touch-event": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "Touch no es una propiedad — el evento se llama Touched y necesita :Connect",
+          "1": "Las puertas no se pueden tocar en código",
+          "2": "No se permite asignar funciones",
+          "3": "print es una palabra clave reservada"
+        },
+        "explanation": "Los eventos no se asignan — se conectan con :Connect, y el evento de toque se llama Touched: door.Touched:Connect(function() ... end).",
+        "lessonLabel": "Eventos"
+      },
+      "debug-property-typo": {
+        "question": "¿Cuál es el bug?",
+        "options": {
+          "0": "Positon no es una propiedad — es Position",
+          "1": "MyPart necesita WaitForChild",
+          "2": "print no puede mostrar números",
+          "3": "Part es una palabra reservada"
+        },
+        "explanation": "Studio informa de \"Positon is not a valid member\". Las erratas mínimas en nombres de propiedades son el primer bug clásico — y por eso ayuda el autocompletado.",
+        "lessonLabel": "Depuración"
+      }
+    }
   },
   "search": {
     "button": "Buscar lecciones…",
@@ -1296,72 +1776,96 @@
     "metadataDescription": "Guías gratuitas para desarrollo en Roblox: cómo hacer un juego en Roblox, scripting de Roblox para principiantes y qué es Luau.",
     "title": "Guías",
     "intro": "Guías cortas y prácticas para desarrollo en Roblox. Cada una enlaza directamente al curso gratuito cuando estés listo para empezar a construir.",
-    "makeGame.title": "Cómo hacer un juego en Roblox",
-    "makeGame.description": "La ruta completa para principiantes: instala Studio, escribe tus primeros scripts, construye un juego real y publícalo.",
-    "scriptingBeginners.title": "Scripting de Roblox para principiantes",
-    "scriptingBeginners.description": "Aprende Luau desde cero absoluto — variables, funciones, bucles, eventos y depuración — con práctica guiada.",
-    "whatIsLuau.title": "¿Qué es Luau?",
-    "whatIsLuau.description": "El lenguaje de scripting detrás de cada juego de Roblox, explicado: de dónde viene, cómo funciona y cómo empezar.",
-    "fixErrors.title": "Corrige errores comunes de Luau",
-    "fixErrors.description": "Los ocho mensajes de error que todo scripter de Roblox encuentra — qué significan y la solución exacta, con ejemplos de código.",
-    "learnWeek.title": "Aprende scripting de Roblox en una semana",
-    "learnWeek.description": "Un plan de 7 días que te lleva por todo el curso gratuito hasta un juego publicado, alrededor de una hora al día.",
-    "eyebrow": "Guías",
-    "whatIsLuau.metaTitle": "¿Qué es Luau? El lenguaje de scripting de Roblox, explicado",
-    "whatIsLuau.metaDescription": "Luau es el lenguaje de scripting detrás de cada juego de Roblox. Aprende qué es, cómo se relaciona con Lua, por qué es ideal para principiantes y cómo empezar a programar con él.",
-    "whatIsLuau.intro": "El lenguaje de scripting detrás de cada juego de Roblox — de dónde viene, por qué es ideal para principiantes y cómo escribir tu primera línea.",
-    "whatIsLuau.sections.robloxsLanguage": "Luau es el lenguaje de Roblox",
-    "whatIsLuau.sections.fasterSafer": "Luau es un Lua más rápido y seguro",
-    "whatIsLuau.sections.whereRuns": "Dónde se ejecuta Luau",
-    "whatIsLuau.sections.beginnerFriendly": "Qué hace a Luau ideal para principiantes",
-    "whatIsLuau.sections.startToday": "Empieza a escribir Luau hoy",
-    "scriptingBeginners.metaTitle": "Scripting de Roblox para principiantes — Aprende Luau paso a paso",
-    "scriptingBeginners.metaDescription": "¿Nuevo en scripting de Roblox? Aprende Luau desde cero con esta guía para principiantes: variables, funciones, bucles, eventos y depuración — con práctica gratuita.",
-    "scriptingBeginners.intro": "El scripting es lo que convierte una escena estática en un juego. Esto es lo que realmente necesitas saber para empezar — y cómo practicarlo gratis.",
-    "scriptingBeginners.sections.scriptingMeans": "Qué significa “scripting” en Roblox",
-    "scriptingBeginners.sections.firstScript": "Tu primer script",
-    "scriptingBeginners.sections.fiveIdeas": "Las cinco ideas sobre las que se construye todo",
-    "scriptingBeginners.sections.readErrors": "Lee tus errores como un profesional",
-    "scriptingBeginners.sections.practiceFree": "Practica gratis, ahora mismo",
-    "makeGame.metaTitle": "Cómo hacer un juego en Roblox — Guía para principiantes",
-    "makeGame.metaDescription": "Una guía paso a paso para hacer tu primer juego de Roblox: instala Roblox Studio, aprende lo básico del scripting de Luau, construye un proyecto real y publícalo.",
-    "makeGame.intro": "Todo el camino desde “nunca he tocado Roblox Studio” hasta “mi juego está en línea” — organizado en cuatro pasos.",
-    "makeGame.sections.installStudio": "1. Instala Roblox Studio",
-    "makeGame.sections.learnEssentials": "2. Aprende lo esencial del scripting de Luau",
-    "makeGame.sections.buildProject": "3. Construye un proyecto de juego real",
-    "makeGame.sections.publishGame": "4. Publica tu juego",
-    "makeGame.sections.readyToStart": "¿Listo para empezar?",
-    "fixErrors.metaTitle": "Corrige errores comunes de Luau — Errores de scripting de Roblox explicados",
-    "fixErrors.metaDescription": "Los errores de Luau más comunes que los principiantes encuentran en Roblox Studio, explicados: qué significa cada mensaje de error y la solución exacta — con ejemplos de código reales.",
-    "fixErrors.intro": "Ocho mensajes de error que casi todo scripter de Roblox encuentra — qué significan y la solución. Marca esta página para cuando Studio te regañe.",
-    "fixErrors.theCodeThatTriggers": "El código que lo provoca:",
-    "fixErrors.theFix": "La solución:",
-    "fixErrors.teachesTheConcept": "enseña el concepto en detalle.",
-    "fixErrors.sections.notObvious": "Cuando la solución no es obvia",
-    "fixErrors.sections.practiceNoPressure": "Practica sin presión",
-    "learnWeek.metaTitle": "Aprende scripting de Roblox en una semana — Plan de 7 días",
-    "learnWeek.metaDescription": "Un plan de 7 días para completar el curso gratuito RoCourse desde cero hasta un juego de Roblox publicado: un horario paso a paso de aproximadamente una hora al día.",
-    "learnWeek.intro": "Todo el curso gratuito, un día a la vez. Aproximadamente {hours} horas de lecciones guiadas repartidas en 7 días — con días más ligeros para que no te quemes.",
-    "learnWeek.weight.light": "Ligero",
-    "learnWeek.weight.medium": "Medio",
-    "learnWeek.weight.full": "Día completo",
-    "learnWeek.weight.finish": "Línea de meta",
-    "learnWeek.sections.howToUse": "Cómo usar este plan",
-    "learnWeek.sections.behindByDay": "¿Te has atrasado un día?",
-    "learnWeek.sections.whyOrderWorks": "Por qué funciona este orden"
+    "makeGame": {
+      "title": "Cómo hacer un juego en Roblox",
+      "description": "La ruta completa para principiantes: instala Studio, escribe tus primeros scripts, construye un juego real y publícalo.",
+      "metaTitle": "Cómo hacer un juego en Roblox — Guía para principiantes",
+      "metaDescription": "Una guía paso a paso para hacer tu primer juego de Roblox: instala Roblox Studio, aprende lo básico del scripting de Luau, construye un proyecto real y publícalo.",
+      "intro": "Todo el camino desde “nunca he tocado Roblox Studio” hasta “mi juego está en línea” — organizado en cuatro pasos.",
+      "sections": {
+        "installStudio": "1. Instala Roblox Studio",
+        "learnEssentials": "2. Aprende lo esencial del scripting de Luau",
+        "buildProject": "3. Construye un proyecto de juego real",
+        "publishGame": "4. Publica tu juego",
+        "readyToStart": "¿Listo para empezar?"
+      }
+    },
+    "scriptingBeginners": {
+      "title": "Scripting de Roblox para principiantes",
+      "description": "Aprende Luau desde cero absoluto — variables, funciones, bucles, eventos y depuración — con práctica guiada.",
+      "metaTitle": "Scripting de Roblox para principiantes — Aprende Luau paso a paso",
+      "metaDescription": "¿Nuevo en scripting de Roblox? Aprende Luau desde cero con esta guía para principiantes: variables, funciones, bucles, eventos y depuración — con práctica gratuita.",
+      "intro": "El scripting es lo que convierte una escena estática en un juego. Esto es lo que realmente necesitas saber para empezar — y cómo practicarlo gratis.",
+      "sections": {
+        "scriptingMeans": "Qué significa “scripting” en Roblox",
+        "firstScript": "Tu primer script",
+        "fiveIdeas": "Las cinco ideas sobre las que se construye todo",
+        "readErrors": "Lee tus errores como un profesional",
+        "practiceFree": "Practica gratis, ahora mismo"
+      }
+    },
+    "whatIsLuau": {
+      "title": "¿Qué es Luau?",
+      "description": "El lenguaje de scripting detrás de cada juego de Roblox, explicado: de dónde viene, cómo funciona y cómo empezar.",
+      "metaTitle": "¿Qué es Luau? El lenguaje de scripting de Roblox, explicado",
+      "metaDescription": "Luau es el lenguaje de scripting detrás de cada juego de Roblox. Aprende qué es, cómo se relaciona con Lua, por qué es ideal para principiantes y cómo empezar a programar con él.",
+      "intro": "El lenguaje de scripting detrás de cada juego de Roblox — de dónde viene, por qué es ideal para principiantes y cómo escribir tu primera línea.",
+      "sections": {
+        "robloxsLanguage": "Luau es el lenguaje de Roblox",
+        "fasterSafer": "Luau es un Lua más rápido y seguro",
+        "whereRuns": "Dónde se ejecuta Luau",
+        "beginnerFriendly": "Qué hace a Luau ideal para principiantes",
+        "startToday": "Empieza a escribir Luau hoy"
+      }
+    },
+    "fixErrors": {
+      "title": "Corrige errores comunes de Luau",
+      "description": "Los ocho mensajes de error que todo scripter de Roblox encuentra — qué significan y la solución exacta, con ejemplos de código.",
+      "metaTitle": "Corrige errores comunes de Luau — Errores de scripting de Roblox explicados",
+      "metaDescription": "Los errores de Luau más comunes que los principiantes encuentran en Roblox Studio, explicados: qué significa cada mensaje de error y la solución exacta — con ejemplos de código reales.",
+      "intro": "Ocho mensajes de error que casi todo scripter de Roblox encuentra — qué significan y la solución. Marca esta página para cuando Studio te regañe.",
+      "theCodeThatTriggers": "El código que lo provoca:",
+      "theFix": "La solución:",
+      "teachesTheConcept": "enseña el concepto en detalle.",
+      "sections": {
+        "notObvious": "Cuando la solución no es obvia",
+        "practiceNoPressure": "Practica sin presión"
+      }
+    },
+    "learnWeek": {
+      "title": "Aprende scripting de Roblox en una semana",
+      "description": "Un plan de 7 días que te lleva por todo el curso gratuito hasta un juego publicado, alrededor de una hora al día.",
+      "metaTitle": "Aprende scripting de Roblox en una semana — Plan de 7 días",
+      "metaDescription": "Un plan de 7 días para completar el curso gratuito RoCourse desde cero hasta un juego de Roblox publicado: un horario paso a paso de aproximadamente una hora al día.",
+      "intro": "Todo el curso gratuito, un día a la vez. Aproximadamente {hours} horas de lecciones guiadas repartidas en 7 días — con días más ligeros para que no te quemes.",
+      "weight": {
+        "light": "Ligero",
+        "medium": "Medio",
+        "full": "Día completo",
+        "finish": "Línea de meta"
+      },
+      "sections": {
+        "howToUse": "Cómo usar este plan",
+        "behindByDay": "¿Te has atrasado un día?",
+        "whyOrderWorks": "Por qué funciona este orden"
+      }
+    },
+    "eyebrow": "Guías"
   },
   "faq": {
     "metadataTitle": "Preguntas frecuentes de RoCourse — Aprende Luau y Roblox, respondidas",
     "metadataDescription": "Preguntas frecuentes sobre RoCourse: ¿es realmente gratis, necesito experiencia, qué es Luau y cuánto dura el curso?",
     "title": "Preguntas frecuentes",
     "intro": "Todo lo que la gente suele preguntar sobre RoCourse. ¿Falta algo? Usa el botón de comentarios en el pie de página y lo añadiremos.",
-    "q.reallyFree": "¿RoCourse es realmente gratis?",
-    "q.codingExperience": "¿Necesito experiencia en programación para empezar?",
-    "q.getStarted": "¿Qué necesito para empezar?",
-    "q.whatIsLuau": "¿Qué es Luau?",
-    "q.howLong": "¿Cuánto dura el curso?",
-    "q.withoutAccount": "¿Puedo usar RoCourse sin una cuenta?",
-    "q.certificate": "¿Recibo un certificado?",
-    "q.forKids": "¿RoCourse es para niños?"
+    "q": {
+      "reallyFree": "¿RoCourse es realmente gratis?",
+      "codingExperience": "¿Necesito experiencia en programación para empezar?",
+      "getStarted": "¿Qué necesito para empezar?",
+      "whatIsLuau": "¿Qué es Luau?",
+      "howLong": "¿Cuánto dura el curso?",
+      "withoutAccount": "¿Puedo usar RoCourse sin una cuenta?",
+      "certificate": "¿Recibo un certificado?",
+      "forKids": "¿RoCourse es para niños?"
+    }
   }
 }
