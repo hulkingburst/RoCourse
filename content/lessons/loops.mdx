@@ -42,8 +42,8 @@ Without the `task.wait`, the loop would spin millions of times a second — prin
     "while can't be used with print",
     "It needs an end statement",
   ]}
-  answer={1}
-  explanation="An endless loop with no pause spins millions of times a second. Every forever loop needs a wait."
+  answer={0}
+  explanation="The loop includes task.wait(1), so it pauses once per second and runs safely. Only a forever loop with no wait would spin out of control."
 />
 
 </Step>

@@ -1,0 +1,186 @@
+---
+slug: monetization
+title: Monetization — making money from your game
+description: Turn a popular game into income with game passes, developer products, and an approach that treats players like people.
+sectionId: publishing
+order: 4
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [monetization, game-pass, developer-product, robux]
+objectives:
+  - Tell a game pass from a developer product
+  - Wire up a game pass purchase with MarketplaceService
+  - Process a developer product receipt server-side, exactly once
+  - Explain Premium Payouts and DevEx
+prerequisites: [datastore-testing, modules]
+keywords: [monetization, game pass, developer product, robux, devex, premium payout]
+---
+
+Your game is live and its saves are proven. Now the question every developer eventually asks: how does this become money? Roblox handles all the payment infrastructure — you never touch a credit card. You make things players want, price them, and the platform pays you. This lesson maps the money and wires up the two most common sellers: game passes and developer products.
+
+<Step>
+
+## The money map
+
+Three ways Robux flow in a normal game:
+
+- **Game pass** — bought once, grants a permanent perk. Example: a "Double Coins" pass for your clicker. The player owns it forever.
+- **Developer product** — bought many times. Example: a "100 Coins" pack. Same purchase, repeatable.
+- **Premium Payouts** — players with Roblox Premium earn you a share just by playing your game. No store entry needed; it's an engagement reward.
+
+Then **DevEx** (Developer Exchange) lets you swap your earned Robux for real money. It has real rules: you must be 18+, meet minimum earnings, and follow the platform rules. Treat it as a milestone, not a daily routine — most games never get there, and that's fine.
+
+<Mcq
+  question="A 'Double Coins' perk a player buys once and keeps forever is a ____."
+  options={[
+    "Developer product",
+    "Game pass",
+    "Premium payout",
+    "DevEx withdrawal",
+  ]}
+  answer={1}
+  explanation="A game pass is a one-time purchase for a permanent perk. Developer products are for repeatable buys like coin packs."
+/>
+
+</Step>
+
+<Step>
+
+## Sell something: the game pass
+
+Game passes live on the Creator Dashboard under **Monetization → Game Passes** — create one, set a price, and Roblox gives you a numeric **pass ID**. Your code never holds the price; the platform does. You only prompt the sale:
+
+```luau
+local MarketplaceService = game:GetService("MarketplaceService")
+
+local DOUBLE_COINS_PASS_ID = 123456789 -- paste your real pass ID
+
+local function promptDoubleCoins(player)
+	MarketplaceService:PromptGamePassPurchase(player, DOUBLE_COINS_PASS_ID)
+end
+```
+
+The prompt opens Roblox's own purchase dialog — you can't and shouldn't fake it. When the dialog closes, `PromptGamePassPurchaseFinished` tells you what happened:
+
+```luau
+MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, gamePassId, wasPurchased)
+	if gamePassId == DOUBLE_COINS_PASS_ID and wasPurchased then
+		print(player.Name, "bought the Double Coins pass!")
+	end
+end)
+```
+
+To check whether a player already owns a pass — which is what gates the perk — ask the server:
+
+```luau
+local ownsPass = MarketplaceService:UserOwnsGamePassAsync(player.UserId, DOUBLE_COINS_PASS_ID)
+```
+
+<Note>
+Like DataStores, purchases are live-only: test them in a published game, not as a Studio shortcut. The pass is a flag; the actual double-coin logic still runs through the same server-side idle loop you built.
+</Note>
+
+<FillBlank
+  prompt="The Creator Dashboard section where you create a game pass and get its ID is Monetization → ____."
+  answer="Game Passes"
+  explanation="Game Passes live under Monetization in the Creator Dashboard, and each one gets a numeric ID your script uses."
+/>
+
+</Step>
+
+<Step>
+
+## Sell it again: developer products
+
+A coin pack is the same idea, except the player can buy it over and over. The prompt is one line:
+
+```luau
+MarketplaceService:PromptProductPurchase(player, COIN_PACK_ID)
+```
+
+The important part is what happens after. Roblox delivers a **receipt** to the server via the `ProcessReceipt` callback, and it is the *server* — never the client — that grants the coins:
+
+```luau
+local MarketplaceService = game:GetService("MarketplaceService")
+local DataStoreService = game:GetService("DataStoreService")
+local Players = game:GetService("Players")
+
+local COIN_PACK_ID = 987654321 -- your developer product ID
+local COINS_PER_PACK = 100
+
+local purchaseHistory = DataStoreService:GetDataStore("PurchaseHistory")
+
+MarketplaceService.ProcessReceipt = function(receiptInfo)
+	-- Keying on the purchase ID makes granting happen exactly once,
+	-- even if Roblox redelivers the same receipt after a hiccup.
+	local granted = purchaseHistory:UpdateAsync(receiptInfo.PurchaseId, function(alreadyGranted)
+		if alreadyGranted then
+			return true
+		end
+
+		local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
+		if not player then
+			return nil -- not on this server yet; get redelivered later
+		end
+
+		local leaderstats = player:FindFirstChild("leaderstats")
+		local coins = leaderstats and leaderstats:FindFirstChild("Coins")
+		if not coins then
+			return nil
+		end
+
+		coins.Value += COINS_PER_PACK
+		return true
+	end)
+
+	return if granted == true
+		then Enum.ProductPurchaseDecision.PurchaseGranted
+		else Enum.ProductPurchaseDecision.NotProcessedYet
+end
+```
+
+This is your data-security lesson paying rent: the purchase *prompt* happens on the client, but the *benefit* is granted by a server callback that ignores anything the client claims. And keying on `receiptInfo.PurchaseId` stops double-grants when a receipt is redelivered. `ProcessReceipt` can be set once, by one server script.
+
+<Mcq
+  question="Why must the coins be granted inside ProcessReceipt instead of in a client script?"
+  options={[
+    "Client scripts are slower",
+    "A client could grant itself infinite coins",
+    "ProcessReceipt runs faster",
+    "It doesn't matter where you grant them",
+  ]}
+  answer={1}
+  explanation="The client is untrusted. Only a server callback can verify the purchase with Roblox and grant the benefit, like every other economy rule in this course."
+/>
+
+</Step>
+
+<Step>
+
+## The part money can't buy
+
+Premium Payouts and DevEx happen outside your code — no scripts, just rules and thresholds. What's fully in your hands is *how* you sell.
+
+- **Price for the game, not against the player.** A fun free game that offers a skip-a-grind pack makes money for years. A game designed to annoy until you pay loses players fast.
+- **Never promise "free Robux" or sell in ways that mislead.** That's a fast trip to moderation, and worse, it teaches players to distrust you.
+- **Ship the fun first.** Monetization layered onto a game people already love outperforms monetization built in to rescue one they don't.
+
+<Warning>
+Real money means real players and real rules. Keep purchases optional, visible, and honest — the best business decision in a Roblox game is also the decent one.
+</Warning>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Granting on the client.** Any "purchase handling" that trusts the client is free money for cheaters. Grant in `ProcessReceipt`, server-side.
+- **Ignoring the purchase ID.** Granting without keying on `PurchaseId` double-grants whenever a receipt is redelivered.
+- **Pass vs product mix-ups.** Permanent perk → game pass; repeatable buy → developer product. Same idea, different door.
+- **Expecting instant DevEx.** Age, earnings thresholds, and platform history all apply. It's a milestone, not a switch.
+- **Selling before the game is fun.** A pass nobody wants is a bug in the design, not the code.
+
+Next: leveling up — reading errors like a pro and growing beyond this course.
+
+</Step>
