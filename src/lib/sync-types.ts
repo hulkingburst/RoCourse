@@ -14,6 +14,10 @@ export interface ProgressSnapshot {
   quickQuizzesCompleted: number;
   /** Lifetime count of completed daily challenges. */
   dailyChallengesCompleted: number;
+  /** Lifetime count of finished 60-second drills. */
+  drillsPlayed: number;
+  /** Best number of correct answers in a single 60-second drill. */
+  drillHighScore: number;
   /** Local day (YYYY-MM-DD) of the most recently completed daily challenge. */
   lastDailyChallengeDate: string | null;
   /** Local day (YYYY-MM-DD) → qualifying-action count (activity calendar). */

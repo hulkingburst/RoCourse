@@ -17,6 +17,7 @@ import {
   Loader2,
   ShieldCheck,
   Target,
+  Timer,
   Trophy,
   UserCircle2,
 } from "lucide-react";
@@ -72,6 +73,8 @@ export function ProfileClient({
   const dailyChallengesCompleted = useProgressStore(
     (state) => state.dailyChallengesCompleted
   );
+  const drillsPlayed = useProgressStore((state) => state.drillsPlayed);
+  const drillHighScore = useProgressStore((state) => state.drillHighScore);
   const activityDays = useProgressStore((state) => state.activityDays);
   const [cloud, setCloud] = React.useState<CloudState | null>(null);
   const [loadingSync, setLoadingSync] = React.useState(true);
@@ -280,7 +283,7 @@ export function ProfileClient({
         </CardHeader>
         <CardContent className="space-y-4">
           <Progress value={pct} />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             <Stat icon={<CheckCircle2 className="h-4 w-4" />} label={t("statLessons")} value={String(completedCount)} />
             <Stat icon={<Bookmark className="h-4 w-4" />} label={t("statBookmarks")} value={String(bookmarks.length)} />
             <Stat
@@ -302,6 +305,16 @@ export function ProfileClient({
               icon={<CalendarDays className="h-4 w-4" />}
               label={t("statDailyChallenges")}
               value={String(dailyChallengesCompleted)}
+            />
+            <Stat
+              icon={<Trophy className="h-4 w-4" />}
+              label={t("statDrillsBest")}
+              value={String(drillHighScore)}
+            />
+            <Stat
+              icon={<Timer className="h-4 w-4" />}
+              label={t("statDrillsPlayed")}
+              value={String(drillsPlayed)}
             />
           </div>
         </CardContent>

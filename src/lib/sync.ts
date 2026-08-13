@@ -20,6 +20,8 @@ export function getSnapshot(): ProgressSnapshot {
     finishedPath: state.finishedPath,
     quickQuizzesCompleted: state.quickQuizzesCompleted,
     dailyChallengesCompleted: state.dailyChallengesCompleted,
+    drillsPlayed: state.drillsPlayed,
+    drillHighScore: state.drillHighScore,
     lastDailyChallengeDate: state.lastDailyChallengeDate,
     activityDays: state.activityDays,
     streak: state.streak,
@@ -39,6 +41,8 @@ export function hasAnyProgress(snapshot: ProgressSnapshot): boolean {
     snapshot.finishedPath != null ||
     snapshot.quickQuizzesCompleted > 0 ||
     snapshot.dailyChallengesCompleted > 0 ||
+    snapshot.drillsPlayed > 0 ||
+    snapshot.drillHighScore > 0 ||
     Object.keys(snapshot.activityDays).length > 0 ||
     snapshot.streak > 0
   );
@@ -77,6 +81,8 @@ export function applySnapshot(
     finishedPath: clean.finishedPath,
     quickQuizzesCompleted: clean.quickQuizzesCompleted,
     dailyChallengesCompleted: clean.dailyChallengesCompleted,
+    drillsPlayed: clean.drillsPlayed,
+    drillHighScore: clean.drillHighScore,
     lastDailyChallengeDate: clean.lastDailyChallengeDate,
     activityDays: clean.activityDays,
     streak: clean.streak,
@@ -115,6 +121,8 @@ export function sanitizeSnapshot(
     finishedPath: sanitizeFinishedPath(snapshot?.finishedPath),
     quickQuizzesCompleted: sanitizeCount(snapshot?.quickQuizzesCompleted),
     dailyChallengesCompleted: sanitizeCount(snapshot?.dailyChallengesCompleted),
+    drillsPlayed: sanitizeCount(snapshot?.drillsPlayed),
+    drillHighScore: sanitizeCount(snapshot?.drillHighScore),
     lastDailyChallengeDate: sanitizeDayKey(snapshot?.lastDailyChallengeDate),
     activityDays: sanitizeActivityDays(snapshot?.activityDays),
     streak: sanitizeCount(snapshot?.streak),
@@ -287,6 +295,12 @@ export function mergeSnapshots(
     finishedPath: cloud.finishedPath ?? local.finishedPath,
     quickQuizzesCompleted: cloud.quickQuizzesCompleted,
     dailyChallengesCompleted: cloud.dailyChallengesCompleted,
+    drillsPlayed: cloud.drillsPlayed,
+    // Best-score is a max across devices: neither side can "lose" a record.
+    drillHighScore: Math.max(
+      cloud.drillHighScore,
+      local.drillHighScore
+    ),
     lastDailyChallengeDate:
       cloud.lastDailyChallengeDate ?? local.lastDailyChallengeDate,
     activityDays: { ...local.activityDays, ...cloud.activityDays },

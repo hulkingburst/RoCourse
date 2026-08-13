@@ -11,6 +11,8 @@ export interface PublicStats {
   longestStreak: number;
   dailyChallengesCompleted: number;
   quickQuizzesCompleted: number;
+  drillsPlayed: number;
+  drillHighScore: number;
   finishedPath: "tycoon" | "collector" | null;
   activityDays: Record<string, number>;
 }
@@ -80,6 +82,8 @@ export function extractPublicStats(data: unknown): PublicStats {
       longestStreak: 0,
       dailyChallengesCompleted: 0,
       quickQuizzesCompleted: 0,
+      drillsPlayed: 0,
+      drillHighScore: 0,
       finishedPath: null,
       activityDays: {},
     };
@@ -112,6 +116,8 @@ export function extractPublicStats(data: unknown): PublicStats {
     longestStreak: clampInt(record.longestStreak),
     dailyChallengesCompleted: clampInt(record.dailyChallengesCompleted),
     quickQuizzesCompleted: clampInt(record.quickQuizzesCompleted),
+    drillsPlayed: clampInt(record.drillsPlayed),
+    drillHighScore: clampInt(record.drillHighScore),
     finishedPath,
     activityDays: extractActivityDays(record.activityDays),
   };

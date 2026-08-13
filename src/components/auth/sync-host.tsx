@@ -107,6 +107,8 @@ function emptySnapshot(): ProgressSnapshot {
     finishedPath: null,
     quickQuizzesCompleted: 0,
     dailyChallengesCompleted: 0,
+    drillsPlayed: 0,
+    drillHighScore: 0,
     lastDailyChallengeDate: null,
     activityDays: {},
     streak: 0,

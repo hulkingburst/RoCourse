@@ -9,6 +9,7 @@ import {
   ListChecks,
   Search,
   ShieldCheck,
+  Timer,
   Trophy,
 } from "lucide-react";
 import { ActivityCalendar } from "@/components/profile/activity-calendar";
@@ -77,7 +78,7 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         <Stat
           icon={<BookOpen className="h-4 w-4" />}
           label={t("statLessons")}
@@ -102,6 +103,16 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
           icon={<CalendarDays className="h-4 w-4" />}
           label={t("statDailyChallenges")}
           value={String(stats.dailyChallengesCompleted)}
+        />
+        <Stat
+          icon={<Trophy className="h-4 w-4" />}
+          label={t("statDrillsBest")}
+          value={String(stats.drillHighScore)}
+        />
+        <Stat
+          icon={<Timer className="h-4 w-4" />}
+          label={t("statDrillsPlayed")}
+          value={String(stats.drillsPlayed)}
         />
         <Stat
           icon={<Trophy className="h-4 w-4" />}

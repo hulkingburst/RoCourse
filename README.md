@@ -36,6 +36,8 @@ are optional and exist purely to sync your progress across devices.
   anywhere in the course.
 - **Daily challenges and a final certificate** to keep your streak alive and
   celebrate the finish line.
+- **A 60-second drill** — a timed sprint through harder Luau questions, with
+  your best score saved to your profile.
 - **A Luau reference and a learner directory** for quick lookups — including
   public progress profiles that never expose your email.
 - **Optional cloud sync** so your progress follows you across devices.

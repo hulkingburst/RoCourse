@@ -7,6 +7,41 @@ export interface QuizQuestion {
 /** How many questions a single quick quiz draws (randomly) from the bank. */
 export const QUIZ_SIZE = 10;
 
+/** How long a 60-second drill lasts, in seconds. */
+export const DRILL_TIME_SECONDS = 60;
+
+/**
+ * The bank for the 60-second drill: deliberately harder than the quick quiz —
+ * edge cases, tricky semantics, and multi-step reasoning.
+ */
+export const DRILL_QUESTIONS: QuizQuestion[] = [
+  { id: "d1", answer: 2 },
+  { id: "d2", answer: 1 },
+  { id: "d3", answer: 1 },
+  { id: "d4", answer: 2 },
+  { id: "d5", answer: 1 },
+  { id: "d6", answer: 3 },
+  { id: "d7", answer: 0 },
+  { id: "d8", answer: 1 },
+  { id: "d9", answer: 0 },
+  { id: "d10", answer: 0 },
+  { id: "d11", answer: 1 },
+  { id: "d12", answer: 1 },
+  { id: "d13", answer: 2 },
+  { id: "d14", answer: 1 },
+  { id: "d15", answer: 1 },
+  { id: "d16", answer: 2 },
+  { id: "d17", answer: 1 },
+  { id: "d18", answer: 3 },
+  { id: "d19", answer: 0 },
+  { id: "d20", answer: 1 },
+  { id: "d21", answer: 0 },
+  { id: "d22", answer: 0 },
+  { id: "d23", answer: 0 },
+  { id: "d24", answer: 0 },
+  { id: "d25", answer: 0 },
+];
+
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
   { id: "q1", answer: 2 },
   { id: "q2", answer: 0 },

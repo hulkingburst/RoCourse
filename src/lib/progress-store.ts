@@ -46,6 +46,10 @@ interface ProgressState {
   quickQuizzesCompleted: number;
   /** Lifetime count of completed daily challenges. */
   dailyChallengesCompleted: number;
+  /** Lifetime count of finished 60-second drills. */
+  drillsPlayed: number;
+  /** Best number of correct answers in a single 60-second drill. */
+  drillHighScore: number;
   /** Local day (YYYY-MM-DD) of the most recently completed daily challenge. */
   lastDailyChallengeDate: string | null;
   /** Local day (YYYY-MM-DD) → qualifying-action count (activity calendar). */
@@ -62,6 +66,8 @@ interface ProgressState {
   setHydrated: (value: boolean) => void;
   recordQuickQuizCompleted: () => void;
   recordDailyChallengeCompleted: () => void;
+  /** Records a finished drill with its correct-answer count. */
+  recordDrillCompleted: (correct: number) => void;
   markLessonComplete: (slug: string) => void;
   toggleLessonComplete: (slug: string) => void;
   recordView: (slug: string) => void;
@@ -105,6 +111,8 @@ export const useProgressStore = create<ProgressState>()(
       finishedPath: null,
       quickQuizzesCompleted: 0,
       dailyChallengesCompleted: 0,
+      drillsPlayed: 0,
+      drillHighScore: 0,
       lastDailyChallengeDate: null,
       activityDays: {},
       lastUpdated: null,
@@ -132,6 +140,14 @@ export const useProgressStore = create<ProgressState>()(
             lastUpdated: nowIso(),
           };
         }),
+
+      recordDrillCompleted: (correct) =>
+        set((state) => ({
+          drillsPlayed: state.drillsPlayed + 1,
+          drillHighScore: Math.max(state.drillHighScore, correct),
+          ...recordActivity(state),
+          lastUpdated: nowIso(),
+        })),
 
       markLessonComplete: (slug) =>
         set((state) => {
@@ -256,6 +272,8 @@ export const useProgressStore = create<ProgressState>()(
           quickQuizzesCompleted: snapshot.quickQuizzesCompleted ?? state.quickQuizzesCompleted,
           dailyChallengesCompleted:
             snapshot.dailyChallengesCompleted ?? state.dailyChallengesCompleted,
+          drillsPlayed: snapshot.drillsPlayed ?? state.drillsPlayed,
+          drillHighScore: snapshot.drillHighScore ?? state.drillHighScore,
           lastDailyChallengeDate:
             snapshot.lastDailyChallengeDate ?? state.lastDailyChallengeDate,
           activityDays: snapshot.activityDays ?? state.activityDays,
@@ -273,6 +291,8 @@ export const useProgressStore = create<ProgressState>()(
           finishedPath: null,
           quickQuizzesCompleted: 0,
           dailyChallengesCompleted: 0,
+          drillsPlayed: 0,
+          drillHighScore: 0,
           lastDailyChallengeDate: null,
           activityDays: {},
           lastUpdated: null,
@@ -292,6 +312,8 @@ export const useProgressStore = create<ProgressState>()(
         finishedPath: state.finishedPath,
         quickQuizzesCompleted: state.quickQuizzesCompleted,
         dailyChallengesCompleted: state.dailyChallengesCompleted,
+        drillsPlayed: state.drillsPlayed,
+        drillHighScore: state.drillHighScore,
         lastDailyChallengeDate: state.lastDailyChallengeDate,
         activityDays: state.activityDays,
         lastUpdated: state.lastUpdated,

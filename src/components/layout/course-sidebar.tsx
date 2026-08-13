@@ -17,6 +17,7 @@ import {
   PlayCircle,
   RotateCcw,
   Terminal,
+  Timer,
   Users,
   Package,
 } from "lucide-react";
@@ -265,6 +266,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
             <Link href="/quiz">
               <ListChecks className="h-3.5 w-3.5" />
               {t("quickQuiz")}
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="w-full justify-start text-muted-foreground"
+          >
+            <Link href="/quiz/drills">
+              <Timer className="h-3.5 w-3.5" />
+              {t("drills")}
             </Link>
           </Button>
           <Button

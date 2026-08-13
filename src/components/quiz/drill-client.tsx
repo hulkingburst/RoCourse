@@ -8,21 +8,22 @@ import {
   CheckCircle2,
   ChevronRight,
   Flame,
-  HelpCircle,
   ListChecks,
   RotateCcw,
-  Target,
   Timer,
+  Trophy,
   XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { QUIZ_QUESTIONS, QUIZ_SIZE } from "@/lib/quiz-data";
+import { DRILL_QUESTIONS, DRILL_TIME_SECONDS } from "@/lib/quiz-data";
 import type { QuizQuestion } from "@/lib/quiz-data";
 import { useProgressStore } from "@/lib/progress-store";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
 const OPTION_LETTERS = ["A", "B", "C", "D"];
+/** How long the correct/incorrect feedback shows before auto-advancing. */
+const ADVANCE_DELAY_MS = 700;
 
 function shuffle<T>(items: readonly T[]): T[] {
   const copy = [...items];
@@ -36,13 +37,9 @@ function shuffle<T>(items: readonly T[]): T[] {
 /** A drawn question plus the order its options should display in. */
 type DrawnQuestion = QuizQuestion & { order: number[] };
 
-/** Draws a fresh quiz: random questions with shuffled option positions. */
-function drawQuestions(): DrawnQuestion[] {
-  const picked = shuffle(QUIZ_QUESTIONS).slice(
-    0,
-    Math.min(QUIZ_SIZE, QUIZ_QUESTIONS.length)
-  );
-  return picked.map((question) => ({
+/** A shuffled pool of drill questions. Refilled whenever the deck runs out. */
+function drawPool(): DrawnQuestion[] {
+  return shuffle(DRILL_QUESTIONS).map((question) => ({
     ...question,
     order: shuffle([0, 1, 2, 3]),
   }));
@@ -50,73 +47,110 @@ function drawQuestions(): DrawnQuestion[] {
 
 type Phase = "intro" | "active" | "done";
 
-export function QuizClient() {
-  const t = useTranslations("quiz");
-  const quickQuizzesCompleted = useProgressStore(
-    (state) => state.quickQuizzesCompleted
-  );
-  const recordQuickQuizCompleted = useProgressStore(
-    (state) => state.recordQuickQuizCompleted
+export function DrillClient() {
+  const t = useTranslations("drill");
+  const drillsPlayed = useProgressStore((state) => state.drillsPlayed);
+  const drillHighScore = useProgressStore((state) => state.drillHighScore);
+  const recordDrillCompleted = useProgressStore(
+    (state) => state.recordDrillCompleted
   );
   const streak = useProgressStore((state) => state.streak);
 
   const [phase, setPhase] = React.useState<Phase>("intro");
-  const [questions, setQuestions] = React.useState<DrawnQuestion[]>([]);
-  const [index, setIndex] = React.useState(0);
+  const [queue, setQueue] = React.useState<DrawnQuestion[]>([]);
+  const [timeLeft, setTimeLeft] = React.useState(DRILL_TIME_SECONDS);
   const [selected, setSelected] = React.useState<number | null>(null);
   const [answered, setAnswered] = React.useState(false);
   const [correctCount, setCorrectCount] = React.useState(0);
+  const [isNewBest, setIsNewBest] = React.useState(false);
+
+  const endTimeRef = React.useRef(0);
+  const correctRef = React.useRef(0);
+  const advanceTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const finishedRef = React.useRef(false);
   const reportedRef = React.useRef(false);
+
+  const finish = React.useCallback(() => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+    const previousBest = useProgressStore.getState().drillHighScore;
+    setIsNewBest(correctRef.current > previousBest);
+    setPhase("done");
+  }, []);
+
+  React.useEffect(() => {
+    if (phase !== "active") return;
+    const interval = setInterval(() => {
+      const remaining = Math.max(
+        0,
+        Math.ceil((endTimeRef.current - Date.now()) / 1000)
+      );
+      setTimeLeft(remaining);
+      if (remaining <= 0) finish();
+    }, 200);
+    return () => clearInterval(interval);
+  }, [phase, finish]);
 
   React.useEffect(() => {
     if (phase === "done" && !reportedRef.current) {
       reportedRef.current = true;
-      recordQuickQuizCompleted();
+      recordDrillCompleted(correctRef.current);
     }
-  }, [phase, recordQuickQuizCompleted]);
+  }, [phase, recordDrillCompleted]);
 
-  const startQuiz = () => {
-    setQuestions(drawQuestions());
-    setIndex(0);
+  React.useEffect(() => {
+    return () => {
+      if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+    };
+  }, []);
+
+  const startDrill = () => {
+    finishedRef.current = false;
+    reportedRef.current = false;
+    setQueue(drawPool());
+    setTimeLeft(DRILL_TIME_SECONDS);
     setSelected(null);
     setAnswered(false);
     setCorrectCount(0);
-    reportedRef.current = false;
+    correctRef.current = 0;
+    setIsNewBest(false);
+    endTimeRef.current = Date.now() + DRILL_TIME_SECONDS * 1000;
     setPhase("active");
   };
 
-  const pick = (optionIndex: number) => {
-    if (answered) return;
-    setSelected(optionIndex);
-    setAnswered(true);
-    const current = questions[index];
-    if (current && optionIndex === current.order.indexOf(current.answer)) {
-      setCorrectCount((count) => count + 1);
-    }
+  const advance = () => {
+    setQueue((current) => {
+      const [, ...rest] = current;
+      return rest.length > 0 ? rest : drawPool();
+    });
+    setSelected(null);
+    setAnswered(false);
   };
 
-  const next = () => {
-    if (index + 1 >= questions.length) {
-      setPhase("done");
-    } else {
-      setIndex((value) => value + 1);
-      setSelected(null);
-      setAnswered(false);
+  const pick = (optionIndex: number) => {
+    if (answered || finishedRef.current) return;
+    const current = queue[0];
+    setSelected(optionIndex);
+    setAnswered(true);
+    if (current && optionIndex === current.order.indexOf(current.answer)) {
+      setCorrectCount((count) => count + 1);
+      correctRef.current += 1;
     }
+    advanceTimerRef.current = setTimeout(advance, ADVANCE_DELAY_MS);
   };
 
   if (phase === "intro") {
     return (
       <div className="rounded-xl border bg-card p-8">
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-          <Target className="h-6 w-6 text-primary" />
+          <Timer className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-center text-xl font-bold">{t("title")}</h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          {t("introCount", {
-            bank: QUIZ_QUESTIONS.length,
-            size: Math.min(QUIZ_SIZE, QUIZ_QUESTIONS.length),
-          })}
+          {t("introCount", { bank: DRILL_QUESTIONS.length })}
         </p>
         <ul className="mx-auto mt-6 max-w-sm space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2">
@@ -132,13 +166,24 @@ export function QuizClient() {
             {t("introRuleThree")}
           </li>
         </ul>
-        <div className="mt-8 flex justify-center">
-          <Button size="lg" onClick={startQuiz}>
+        <p className="mt-6 text-center text-sm">
+          <Trophy className="mr-1 inline h-4 w-4 text-yellow-500" />
+          {t("bestScore", { count: drillHighScore })}
+        </p>
+        <div className="mt-6 flex justify-center">
+          <Button size="lg" onClick={startDrill}>
             {t("start")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-muted-foreground">
+          <Link
+            href="/quiz"
+            className="inline-flex items-center gap-1.5 underline-offset-4 hover:text-foreground hover:underline"
+          >
+            <ListChecks className="h-4 w-4" />
+            {t("quickQuizLink")}
+          </Link>
           <Link
             href="/quiz/daily"
             className="inline-flex items-center gap-1.5 underline-offset-4 hover:text-foreground hover:underline"
@@ -146,53 +191,48 @@ export function QuizClient() {
             <CalendarDays className="h-4 w-4" />
             {t("dailyLink")}
           </Link>
-          <Link
-            href="/quiz/drills"
-            className="inline-flex items-center gap-1.5 underline-offset-4 hover:text-foreground hover:underline"
-          >
-            <Timer className="h-4 w-4" />
-            {t("drillLink")}
-          </Link>
         </div>
       </div>
     );
   }
 
   if (phase === "done") {
-    const total = questions.length;
-    const percent =
-      total > 0 ? Math.round((correctCount / total) * 100) : 0;
     const messageKey =
-      percent === 100
-        ? "resultPerfect"
-        : percent >= 70
-          ? "resultGreat"
-          : percent >= 40
-            ? "resultDecent"
-            : "resultLow";
-
+      correctCount >= 15
+        ? "resultElite"
+        : correctCount >= 10
+          ? "resultSolid"
+          : "resultPractice";
     return (
       <div className="rounded-xl border bg-card p-8">
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-          <ListChecks className="h-6 w-6 text-primary" />
+          <Trophy className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-center text-2xl font-bold">
-          {t("result", { correct: correctCount, total })}
+          {t("result", { count: correctCount })}
         </h2>
+        {isNewBest ? (
+          <p className="mt-2 text-center text-sm font-medium text-yellow-600 dark:text-yellow-400">
+            <Trophy className="mr-1 inline h-4 w-4" />
+            {t("resultNewBest")}
+          </p>
+        ) : (
+          <p className="mt-1 text-center text-sm text-muted-foreground">
+            {t("bestScore", { count: drillHighScore })}
+          </p>
+        )}
         <p className="mt-1 text-center text-sm text-muted-foreground">
-          {percent}% · {t(messageKey)}
+          {t(messageKey)}
         </p>
         <div className="mt-6 flex justify-center">
-          <Button variant="outline" onClick={startQuiz}>
+          <Button variant="outline" onClick={startDrill}>
             <RotateCcw className="h-4 w-4" />
             {t("playAgain")}
           </Button>
         </div>
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          {t("miniQuizzesCompleted")}{" "}
-          <span className="font-semibold text-foreground">
-            {quickQuizzesCompleted}
-          </span>
+          {t("drillsPlayed")}{" "}
+          <span className="font-semibold text-foreground">{drillsPlayed}</span>
         </p>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           <Flame className="mr-1 inline h-3.5 w-3.5 text-orange-500" />
@@ -205,26 +245,34 @@ export function QuizClient() {
     );
   }
 
-  const question = questions[index];
+  const question = queue[0];
   if (!question) return null;
 
   const correctDisplay = question.order.indexOf(question.answer);
   const isCorrect = selected === correctDisplay;
+  const lowTime = timeLeft <= 10;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          {t("questionProgress", {
-            current: index + 1,
-            total: questions.length,
-          })}
+      <div className="flex items-center justify-between gap-4 text-sm text-muted-foreground">
+        <span
+          aria-label={t("timeLeft")}
+          className={cn(
+            "inline-flex items-center gap-1.5 font-medium tabular-nums",
+            lowTime ? "text-destructive" : "text-primary"
+          )}
+        >
+          <Timer className="h-4 w-4" />
+          {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
         </span>
-        <span className="font-medium text-primary">
+        <span className="font-medium text-primary tabular-nums">
           {t("correctCount", { count: correctCount })}
         </span>
       </div>
-      <Progress value={(index / questions.length) * 100} />
+      <Progress
+        value={(timeLeft / DRILL_TIME_SECONDS) * 100}
+        className={cn(lowTime && "[&>div]:bg-destructive")}
+      />
 
       <div className="rounded-xl border bg-card p-6">
         <p className="text-base font-medium leading-relaxed">
@@ -300,29 +348,13 @@ export function QuizClient() {
                 </>
               ) : (
                 <>
-                  <HelpCircle className="h-4 w-4 text-destructive" />
+                  <XCircle className="h-4 w-4 text-destructive" />
                   {t("wrongAnswer", {
                     letter: OPTION_LETTERS[correctDisplay],
                   })}
                 </>
               )}
             </div>
-            {t.has(`questions.${question.id}.explanation`) && (
-              <p className="mt-1 text-muted-foreground">
-                {t(`questions.${question.id}.explanation`)}
-              </p>
-            )}
-          </div>
-        )}
-
-        {answered && (
-          <div className="mt-4 flex justify-end">
-            <Button onClick={next}>
-              {index + 1 >= questions.length
-                ? t("seeResults")
-                : t("nextQuestion")}
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </div>
         )}
       </div>
