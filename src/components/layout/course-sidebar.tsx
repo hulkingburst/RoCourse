@@ -330,7 +330,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           >
             <Gamepad2 className="h-3.5 w-3.5" />
             {finishedPath
-              ? `${t("switchFinalProject")} (${finishedPath === "tycoon" ? "Coin Tycoon" : "The Collector"})`
+              ? `${t("switchFinalProject")} (${finishedPath === "tycoon" ? t("finalProjectTycoon") : t("finalProjectCollector")})`
               : t("chooseFinalProject")}
           </Button>
           <Button

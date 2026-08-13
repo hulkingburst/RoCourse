@@ -16,27 +16,19 @@ import {
 
 interface BuildOption {
   path: FinishedPath;
-  name: string;
-  tagline: string;
-  description: string;
+  nameKey: "Tycoon" | "Collector";
   icon: typeof CircleDollarSign;
 }
 
 const BUILD_OPTIONS: BuildOption[] = [
   {
     path: "tycoon",
-    name: "Coin Tycoon",
-    tagline: "Clicker",
-    description:
-      "Click a coin to earn, buy upgrades that multiply every click, and climb an idle fortune. Pure UI-to-server economy.",
+    nameKey: "Tycoon",
     icon: CircleDollarSign,
   },
   {
     path: "collector",
-    name: "The Collector",
-    tagline: "Pet game",
-    description:
-      "Walk into coins to grab them, spend them on pets, and every pet makes each pickup worth more. Same economy, new loop.",
+    nameKey: "Collector",
     icon: Sparkles,
   },
 ];
@@ -68,6 +60,9 @@ export function ChooseBuild() {
         {BUILD_OPTIONS.map((build) => {
           const Icon = build.icon;
           const selected = finishedPath === build.path;
+          const name = t(`build${build.nameKey}Name`);
+          const tagline = t(`build${build.nameKey}Tagline`);
+          const description = t(`build${build.nameKey}Description`);
           return (
             <button
               key={build.path}
@@ -93,9 +88,9 @@ export function ChooseBuild() {
                   <Icon className="h-4 w-4" />
                 </span>
                 <span className="flex-1">
-                  <span className="block text-sm font-bold">{build.name}</span>
+                  <span className="block text-sm font-bold">{name}</span>
                   <span className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                    {build.tagline}
+                    {tagline}
                   </span>
                 </span>
                 {selected && (
@@ -103,7 +98,7 @@ export function ChooseBuild() {
                 )}
               </span>
               <span className="text-[13px] leading-relaxed text-muted-foreground">
-                {build.description}
+                {description}
               </span>
               <span
                 className={cn(

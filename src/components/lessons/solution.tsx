@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLesson } from "@/components/lessons/lesson-context";
@@ -17,9 +18,10 @@ interface SolutionProps {
  * completion in the progress store.
  */
 export function Solution({
-  label = "One possible solution",
+  label,
   children,
 }: SolutionProps) {
+  const t = useTranslations("solution");
   const { slug } = useLesson();
   const recordChallengeResult = useProgressStore(
     (state) => state.recordChallengeResult
@@ -36,13 +38,13 @@ export function Solution({
   return (
     <div className="my-6 rounded-xl border bg-card shadow-sm">
       <div className="flex flex-wrap items-center gap-2 border-b px-5 py-3">
-        <span className="text-sm font-semibold">{label}</span>
+        <span className="text-sm font-semibold">{label ?? t("defaultLabel")}</span>
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           className="ml-auto flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
         >
-          {open ? "Hide" : "Show solution"}
+          {open ? t("hide") : t("showSolution")}
           <ChevronDown
             className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")}
           />
@@ -58,7 +60,7 @@ export function Solution({
           )}
         >
           <CheckCircle2 className="h-3.5 w-3.5" />
-          {solved ? "I solved it" : "Mark as solved"}
+          {solved ? t("solved") : t("markSolved")}
         </button>
       </div>
       {open && <div className="p-5 pt-4">{children}</div>}

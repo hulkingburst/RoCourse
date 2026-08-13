@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import JSZip from "jszip";
 import { CheckCircle2, FileArchive, Loader2, XCircle } from "lucide-react";
 import { upload } from "@vercel/blob/client";
@@ -29,28 +30,31 @@ type Status = "idle" | "uploading" | "submitting" | "success" | "error";
 const inputClass =
   "w-full rounded-md border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring";
 
-function validateZip(file: File): Promise<string | null> {
+function validateZip(
+  file: File,
+  t: ReturnType<typeof useTranslations>
+): Promise<string | null> {
   return (async () => {
-    if (!/\.zip$/i.test(file.name)) return "Only .zip files are allowed.";
+    if (!/\.zip$/i.test(file.name)) return t("zipOnlyZip");
     if (file.size > MAX_ZIP_BYTES) {
-      return `That zip is too large (max ${MAX_ZIP_BYTES / 1024 / 1024} MB).`;
+      return t("zipTooLarge", { max: MAX_ZIP_BYTES / 1024 / 1024 });
     }
     let zip: JSZip;
     try {
       zip = await JSZip.loadAsync(await file.arrayBuffer());
     } catch {
-      return "That file isn't a valid zip archive.";
+      return t("zipInvalid");
     }
     const entries = Object.values(zip.files);
     if (entries.length > MAX_ZIP_ENTRIES) {
-      return `That zip has too many files (max ${MAX_ZIP_ENTRIES}).`;
+      return t("zipTooManyFiles", { max: MAX_ZIP_ENTRIES });
     }
     let total = 0;
     for (const entry of entries) {
       if (entry.dir) continue;
       const ext = entry.name.split(".").pop()?.toLowerCase() ?? "";
       if (!ZIP_ALLOWED_EXTENSIONS.has(ext)) {
-        return `"${entry.name}" is not an allowed file type. Zips may only contain images and 3D/model files.`;
+        return t("zipBadFile", { name: entry.name });
       }
       const zipEntry = entry as unknown as { uncompressedSize?: number };
       const size =
@@ -60,13 +64,14 @@ function validateZip(file: File): Promise<string | null> {
       total += size;
     }
     if (total > MAX_UNCOMPRESSED_TOTAL) {
-      return "That zip is too large once unpacked.";
+      return t("zipTooLargeUnpacked");
     }
     return null;
   })();
 }
 
 export function SubmitForm() {
+  const t = useTranslations("resources");
   const [kind, setKind] = React.useState<ResourceKind>("script");
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -86,7 +91,7 @@ export function SubmitForm() {
     setFile(selected);
     setFileError(null);
     if (selected) {
-      const problem = await validateZip(selected);
+      const problem = await validateZip(selected, t);
       if (problem) {
         setFileError(problem);
         setFile(null);
@@ -101,7 +106,7 @@ export function SubmitForm() {
 
     if (mode === "file") {
       if (!file) {
-        setError("Choose a .zip file to submit.");
+        setError(t("errorChooseZip"));
         return;
       }
       setStatus("uploading");
@@ -113,7 +118,7 @@ export function SubmitForm() {
         await post({ fileUrl: blob.url });
       } catch {
         setStatus("error");
-        setError("Uploading the file failed. Try again in a moment.");
+        setError(t("errorUploadFailed"));
       }
     } else if (mode === "url") {
       const trimmed = url.trim();
@@ -122,19 +127,19 @@ export function SubmitForm() {
         parsed = new URL(trimmed);
       } catch {
         setStatus("error");
-        setError("Enter a valid website link (e.g. https://example.com).");
+        setError(t("errorInvalidUrl"));
         return;
       }
       if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
         setStatus("error");
-        setError("Only http and https links are allowed.");
+        setError(t("errorProtocol"));
         return;
       }
       setStatus("submitting");
       await post({ url: trimmed });
     } else {
       if (code.trim().length === 0) {
-        setError("Paste some code to submit.");
+        setError(t("errorNoCode"));
         return;
       }
       setStatus("submitting");
@@ -168,14 +173,14 @@ export function SubmitForm() {
         setStatus("success");
       } else if (response.status === 429) {
         setStatus("error");
-        setError("You've submitted too many resources recently. Try again tomorrow.");
+        setError(t("errorTooMany"));
       } else {
         setStatus("error");
-        setError("Something went wrong. Please try again in a moment.");
+        setError(t("errorGeneric"));
       }
     } catch {
       setStatus("error");
-      setError("Something went wrong. Please try again in a moment.");
+      setError(t("errorGeneric"));
     }
   };
 
@@ -183,10 +188,9 @@ export function SubmitForm() {
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-14 text-center shadow-sm">
         <CheckCircle2 className="h-10 w-10 text-success" />
-        <p className="text-lg font-semibold">Submitted for review!</p>
+        <p className="text-lg font-semibold">{t("submittedTitle")}</p>
         <p className="max-w-md text-sm text-muted-foreground">
-          The course author will review it. If it gets accepted it will show up
-          on the Resources page.
+          {t("submittedBody")}
         </p>
       </div>
     );
@@ -206,7 +210,7 @@ export function SubmitForm() {
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="rc-kind">Resource type</Label>
+        <Label htmlFor="rc-kind">{t("resourceType")}</Label>
         <select
           id="rc-kind"
           value={kind}
@@ -215,25 +219,25 @@ export function SubmitForm() {
         >
           {RESOURCE_KINDS.map((option) => (
             <option key={option.value} value={option.value} className="bg-white text-black">
-              {option.label}
+              {t(`kinds.${option.labelKey}`)}
             </option>
           ))}
         </select>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="rc-name">Name</Label>
+        <Label htmlFor="rc-name">{t("nameLabel")}</Label>
         <Input
           id="rc-name"
           value={name}
           onChange={(event) => setName(event.target.value)}
           maxLength={MAX_RESOURCE_NAME}
-          placeholder="e.g. Simple save system"
+          placeholder={t("namePlaceholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="rc-desc">Description</Label>
+        <Label htmlFor="rc-desc">{t("descriptionLabel")}</Label>
         <textarea
           id="rc-desc"
           value={description}
@@ -241,26 +245,29 @@ export function SubmitForm() {
           maxLength={MAX_DESCRIPTION}
           rows={4}
           required
-          placeholder="What is it, and what does it help people build?"
+          placeholder={t("descriptionPlaceholder")}
           className={cn(inputClass, "resize-none")}
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="rc-author">
-          Credit name <span className="font-normal text-muted-foreground">(optional)</span>
+          {t("creditName")}{" "}
+          <span className="font-normal text-muted-foreground">
+            {t("optional")}
+          </span>
         </Label>
         <Input
           id="rc-author"
           value={author}
           onChange={(event) => setAuthor(event.target.value)}
           maxLength={MAX_AUTHOR}
-          placeholder="How you want to be credited"
+          placeholder={t("creditPlaceholder")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label>Content</Label>
+        <Label>{t("contentLabel")}</Label>
         <div className="inline-flex rounded-md border bg-muted/40 p-1">
           {(["file", "code", "url"] as Mode[]).map((option) => (
             <button
@@ -275,10 +282,10 @@ export function SubmitForm() {
               )}
             >
               {option === "file"
-                ? "Upload a .zip"
+                ? t("modeFile")
                 : option === "code"
-                  ? "Paste code"
-                  : "Website link"}
+                  ? t("modeCode")
+                  : t("modeUrl")}
             </button>
           ))}
         </div>
@@ -296,15 +303,16 @@ export function SubmitForm() {
                 <>
                   <span className="text-sm font-medium">{file.name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {(file.size / 1024 / 1024).toFixed(2)} MB — contents checked
+                    {t("zipChecked", {
+                      size: (file.size / 1024 / 1024).toFixed(2),
+                    })}
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="text-sm font-medium">Choose a .zip file</span>
+                  <span className="text-sm font-medium">{t("chooseZip")}</span>
                   <span className="max-w-sm text-xs text-muted-foreground">
-                    Zips may only contain images and 3D/model files (png, jpg,
-                    fbx, obj, and similar). Code is shared by pasting it instead.
+                    {t("zipHint")}
                   </span>
                 </>
               )}
@@ -330,11 +338,10 @@ export function SubmitForm() {
               value={url}
               onChange={(event) => setUrl(event.target.value)}
               maxLength={MAX_URL}
-              placeholder="https://example.com/your-tool"
+              placeholder={t("urlPlaceholder")}
             />
             <p className="text-xs text-muted-foreground">
-              A website that helps people build — a tool, docs page, or
-              resource hub.
+              {t("urlHint")}
             </p>
           </div>
         ) : (
@@ -355,7 +362,7 @@ export function SubmitForm() {
               onChange={(event) => setCode(event.target.value)}
               maxLength={MAX_CODE}
               rows={12}
-              placeholder="Paste your code here. It's stored as plain text — never executed."
+              placeholder={t("codePlaceholder")}
               className={cn(inputClass, "resize-none font-mono text-[13px]")}
             />
             <p className="text-right font-mono text-xs text-muted-foreground">
@@ -373,14 +380,14 @@ export function SubmitForm() {
           className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
         />
         <span className="text-muted-foreground">
-          I confirm I created this myself and have the rights to share it.
+          {t("rightsNote")}
         </span>
       </label>
 
       {(status === "error" || error) && (
         <p className="flex items-center gap-1.5 text-xs text-destructive">
           <XCircle className="h-3.5 w-3.5" />
-          {error ?? "Something went wrong. Please try again."}
+          {error ?? t("errorGeneric")}
         </p>
       )}
 
@@ -393,10 +400,10 @@ export function SubmitForm() {
           {status === "uploading" || status === "submitting" ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              {status === "uploading" ? "Uploading…" : "Submitting…"}
+              {status === "uploading" ? t("uploading") : t("submitting")}
             </>
           ) : (
-            "Submit for review"
+            t("submitForReview")
           )}
         </Button>
       </div>

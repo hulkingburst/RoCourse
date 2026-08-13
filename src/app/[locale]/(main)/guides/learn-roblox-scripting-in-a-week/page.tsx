@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getAllLessonMetas } from "@/lib/lessons";
 import type { LessonMeta } from "@/lib/types";
 
-export const metadata: Metadata = {
-  title: "Learn Roblox Scripting in a Week — 7-Day Plan",
-  description:
-    "A 7-day plan to complete the free RoCourse from zero to a published Roblox game: a step-by-step schedule that takes about an hour a day.",
-  alternates: { canonical: "/guides/learn-roblox-scripting-in-a-week" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
+  return {
+    title: t("learnWeek.metaTitle"),
+    description: t("learnWeek.metaDescription"),
+    alternates: { canonical: "/guides/learn-roblox-scripting-in-a-week" },
+  };
+}
 
 const days = [
   {
@@ -155,13 +163,6 @@ function getPlanData() {  const bySlug = new Map(getAllLessonMetas().map((meta) 
   return { plan, totalMinutes: plan.reduce((sum, day) => sum + day.minutes, 0) };
 }
 
-const weightLabel: Record<string, string> = {
-  light: "Light",
-  medium: "Medium",
-  full: "Full day",
-  finish: "Finish line",
-};
-
 const weightClass: Record<string, string> = {
   light: "bg-emerald-500/10 text-emerald-600",
   medium: "bg-amber-500/10 text-amber-600",
@@ -169,7 +170,13 @@ const weightClass: Record<string, string> = {
   finish: "bg-primary/10 text-primary",
 };
 
-export default function LearnInAWeekGuide() {
+export default async function LearnInAWeekGuide({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
   const { plan, totalMinutes } = getPlanData();
 
   const steps = plan.map((day) => ({
@@ -192,16 +199,13 @@ export default function LearnInAWeekGuide() {
     <div className="mx-auto max-w-3xl px-6 py-10">
       <JsonLd data={weekJsonLd} />
       <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-        Guides
+        {t("eyebrow")}
       </p>
       <h1 className="text-3xl font-bold tracking-tight">
-        Learn Roblox Scripting in a Week
+        {t("learnWeek.title")}
       </h1>
       <p className="mt-3 text-lg text-muted-foreground">
-        The whole free course, one day at a time. Roughly{" "}
-        <strong>{Math.round(totalMinutes / 60)} hours</strong> of guided lessons
-        spread across 7 days — with lighter days built in so you don&apos;t burn
-        out.
+        {t("learnWeek.intro", { hours: Math.round(totalMinutes / 60) })}
       </p>
 
       <div className="mt-8 space-y-4">
@@ -217,7 +221,7 @@ export default function LearnInAWeekGuide() {
               <span
                 className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${weightClass[day.weight]}`}
               >
-                {weightLabel[day.weight]} · ~{day.minutes} min
+                {t(`learnWeek.weight.${day.weight}`)} · ~{day.minutes} min
               </span>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">{day.summary}</p>
@@ -238,7 +242,7 @@ export default function LearnInAWeekGuide() {
       </div>
 
       <div className="prose prose-sm mt-10 max-w-none text-[15px] leading-relaxed">
-        <h2>How to use this plan</h2>
+        <h2>{t("learnWeek.sections.howToUse")}</h2>
         <ul>
           <li>
             Do the lessons in order, and don&apos;t rush — the{" "}
@@ -259,7 +263,7 @@ export default function LearnInAWeekGuide() {
           </li>
         </ul>
 
-        <h2>Behind by a day?</h2>
+        <h2>{t("learnWeek.sections.behindByDay")}</h2>
         <p>
           The plan has slack built in: if a day runs long, skip nothing from
           that day but keep your pace. The <strong>recap</strong> and{" "}
@@ -267,7 +271,7 @@ export default function LearnInAWeekGuide() {
           compress if you&apos;re truly pressed for time.
         </p>
 
-        <h2>Why this order works</h2>
+        <h2>{t("learnWeek.sections.whyOrderWorks")}</h2>
         <p>
           Each section builds on the last: you learn the language before
           touching data, data before GUIs, and GUIs before the client-server

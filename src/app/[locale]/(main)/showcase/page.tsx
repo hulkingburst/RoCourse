@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { CheckCircle2, Gamepad2, Trophy, Users } from "lucide-react";
 import { getLearnerShowcase } from "@/lib/users";
@@ -22,47 +23,41 @@ function formatDate(iso: string): string {
   });
 }
 
-const projectLabel: Record<string, string> = {
-  tycoon: "Coin Tycoon",
-  collector: "The Collector",
-};
-
 export default async function ShowcasePage() {
+  const t = await getTranslations("showcase");
   const entries = await getLearnerShowcase();
+  const projectLabel: Record<string, string> = {
+    tycoon: t("projectTycoon"),
+    collector: t("projectCollector"),
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <div className="mb-8">
         <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-          Wall of fame
+          {t("wallOfFame")}
         </p>
-        <h1 className="text-3xl font-bold tracking-tight">Learner showcase</h1>
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          People who finished the course and shipped a complete, playable
-          Roblox game. If you&apos;re here, the only step left is to build.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="mt-2 max-w-2xl text-muted-foreground">{t("intro")}</p>
         <Link
           href="/users"
           className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
         >
           <Users className="h-3.5 w-3.5" />
-          Browse all learners
+          {t("browseAllLearners")}
         </Link>
       </div>
 
       {entries.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-xl border bg-card px-6 py-16 text-center">
           <Trophy className="h-10 w-10 text-muted-foreground/50" />
-          <p className="font-medium">No graduates yet</p>
-          <p className="max-w-sm text-sm text-muted-foreground">
-            Be the first name on the wall — the course is free and takes most
-            people about a week.
-          </p>
+          <p className="font-medium">{t("emptyTitle")}</p>
+          <p className="max-w-sm text-sm text-muted-foreground">{t("emptyBody")}</p>
           <Link
             href="/lessons/welcome"
             className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
-            Start the course
+            {t("startCourse")}
           </Link>
         </div>
       ) : (
@@ -79,13 +74,18 @@ export default async function ShowcasePage() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-medium">{entry.name}</span>
                 <span className="block truncate text-xs text-muted-foreground">
-                  Finished {entry.courseTitle} · {formatDate(entry.completedAt)}
+                  {t("finishedLine", {
+                    courseTitle: entry.courseTitle,
+                    date: formatDate(entry.completedAt),
+                  })}
                 </span>
               </span>
               {entry.project && (
                 <span className="hidden shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary sm:flex">
                   <Gamepad2 className="h-3.5 w-3.5" />
-                  Built {projectLabel[entry.project] ?? entry.project}
+                  {t("builtLine", {
+                    project: projectLabel[entry.project] ?? entry.project,
+                  })}
                 </span>
               )}
               <CheckCircle2 className="hidden h-4 w-4 shrink-0 text-success sm:block" />
@@ -96,8 +96,7 @@ export default async function ShowcasePage() {
 
       <p className="mt-8 flex items-center gap-1.5 text-xs text-muted-foreground">
         <Trophy className="h-3.5 w-3.5" />
-        Completing the course adds you here automatically — nothing to sign up
-        for beyond your free account.
+        {t("footerNote")}
       </p>
     </div>
   );

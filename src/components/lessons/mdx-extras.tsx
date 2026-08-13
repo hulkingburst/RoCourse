@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertTriangle,
   ChevronRight,
@@ -18,27 +19,23 @@ type CalloutType = "note" | "tip" | "warning" | "mistake";
 
 const calloutStyles: Record<
   CalloutType,
-  { icon: LucideIcon; accent: string; title: string }
+  { icon: LucideIcon; accent: string }
 > = {
   note: {
     icon: Info,
     accent: "text-sky-400",
-    title: "Note",
   },
   tip: {
     icon: Lightbulb,
     accent: "text-emerald-400",
-    title: "Tip",
   },
   warning: {
     icon: AlertTriangle,
     accent: "text-amber-400",
-    title: "Watch out",
   },
   mistake: {
     icon: Flame,
     accent: "text-rose-400",
-    title: "Common mistake",
   },
 };
 
@@ -51,13 +48,14 @@ export function Callout({
   title?: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("mdx");
   const config = calloutStyles[type];
   const Icon = config.icon;
   return (
     <div className="my-6 rounded-xl border border-border bg-card px-5 py-4 shadow-sm">
       <div className={cn("flex items-center gap-2 text-sm font-semibold", config.accent)}>
         <Icon className="h-4 w-4 shrink-0" />
-        {title ?? config.title}
+        {title ?? t(`callouts.${type}`)}
       </div>
       <div className="prose prose-sm mt-2 max-w-none text-[15px] leading-relaxed">
         {children}
@@ -87,17 +85,20 @@ export function Mistake(props: { title?: string; children: React.ReactNode }) {
  * ------------------------------------------------------------------------- */
 
 export function Challenge({
-  title = "Your turn",
+  title,
   children,
 }: {
   title?: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("mdx");
   return (
     <div className="my-8 rounded-xl border-2 border-dashed border-border bg-accent/30 px-5 py-5">
       <div className="mb-3 flex items-center gap-2">
         <Wrench className="h-4 w-4 text-primary" />
-        <span className="text-sm font-bold uppercase tracking-wide">{title}</span>
+        <span className="text-sm font-bold uppercase tracking-wide">
+          {title ?? t("challenge")}
+        </span>
       </div>
       <div className="prose prose-sm max-w-none text-[15px] leading-relaxed">{children}</div>
     </div>
@@ -141,6 +142,7 @@ export function MdxHeading({
   const id = slugify(text);
   const href = `#${id}`;
   const tag = `h${level}` as const;
+  const t = useTranslations("mdx");
 
   return React.createElement(
     tag,
@@ -158,7 +160,7 @@ export function MdxHeading({
     <a
       key="anchor"
       href={href}
-      aria-label={`Link to ${text}`}
+      aria-label={t("linkTo", { text })}
       className="absolute -left-6 hidden h-full w-6 items-start pt-1 text-muted-foreground opacity-0 transition-opacity no-underline group-hover:opacity-100 hover:text-primary sm:flex"
     >
       #

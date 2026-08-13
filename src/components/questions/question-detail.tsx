@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
@@ -28,6 +29,7 @@ export function QuestionDetailView({
   initialQuestion: QuestionDetail;
   lessonTitle?: string;
 }) {
+  const t = useTranslations("questions");
   const router = useRouter();
   const { data: session, status } = useSession();
   const { openDialog } = useAuthUiStore();
@@ -68,14 +70,14 @@ export function QuestionDetailView({
         error?: string;
       };
       if (!response.ok || !data.answer) {
-        setError(data.error ?? "Something went wrong. Try again.");
+        setError(data.error ?? t("errorGeneric"));
         return;
       }
       const newAnswer = data.answer;
       setQuestion((current) => ({ ...current, answers: [...current.answers, newAnswer] }));
       setBody("");
     } catch {
-      setError("Network error — please try again.");
+      setError(t("errorNetwork"));
     } finally {
       setSubmitting(false);
     }
@@ -94,23 +96,23 @@ export function QuestionDetailView({
         className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
       >
         <ArrowLeft className="h-4 w-4" />
-        All questions
+        {t("backToAll")}
       </Link>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {question.solved ? (
           <Badge variant="success">
             <CheckCircle2 className="h-3 w-3" />
-            Solved
+            {t("solved")}
           </Badge>
         ) : (
           <Badge variant="outline">
             <CircleDashed className="h-3 w-3" />
-            Open
+            {t("open")}
           </Badge>
         )}
         <span className="text-sm text-muted-foreground">
-          Asked by <AuthorLink author={question.author} /> ·{" "}
+          {t("askedBy")} <AuthorLink author={question.author} /> ·{" "}
           <RelativeTime date={question.createdAt} />
         </span>
       </div>
@@ -136,12 +138,12 @@ export function QuestionDetailView({
             {question.solved ? (
               <>
                 <CircleDashed className="h-4 w-4" />
-                Reopen question
+                {t("reopenQuestion")}
               </>
             ) : (
               <>
                 <CheckCircle2 className="h-4 w-4" />
-                Mark as solved
+                {t("markSolved")}
               </>
             )}
           </Button>
@@ -150,16 +152,15 @@ export function QuestionDetailView({
 
       <div className="mt-10">
         <h2 className="text-lg font-semibold">
-          {question.answers.length}{" "}
-          {question.answers.length === 1 ? "answer" : "answers"}
+          {t("answersCount", { count: question.answers.length })}
         </h2>
 
         <div className="mt-4 space-y-4">
           {question.answers.length === 0 ? (
             <div className="rounded-xl border border-dashed px-6 py-10 text-center">
-              <p className="font-medium">No answers yet</p>
+              <p className="font-medium">{t("noAnswers")}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Be the first to help this learner out.
+                {t("noAnswersBody")}
               </p>
             </div>
           ) : (
@@ -180,13 +181,13 @@ export function QuestionDetailView({
       </div>
 
       <div className="mt-10">
-        <h2 className="text-lg font-semibold">Add an answer</h2>
+        <h2 className="text-lg font-semibold">{t("addAnswer")}</h2>
         {status === "authenticated" ? (
           <form onSubmit={submitAnswer} className="mt-4 grid gap-3">
             <textarea
               value={body}
               onChange={(event) => setBody(event.target.value)}
-              placeholder="Explain what you did and why it fixes the problem. Include code snippets and links where helpful."
+              placeholder={t("answerPlaceholder")}
               maxLength={4000}
               rows={6}
               required
@@ -196,30 +197,30 @@ export function QuestionDetailView({
             <div className="flex justify-end">
               <Button type="submit" disabled={submitting || body.trim().length === 0}>
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Post answer
+                {t("postAnswer")}
               </Button>
             </div>
           </form>
         ) : (
           <div className="mt-4 flex flex-col items-start gap-3 rounded-xl border border-dashed px-6 py-6 sm:flex-row sm:items-center">
             <div className="flex-1 text-sm text-muted-foreground">
-              Sign in to share your knowledge and help other learners.
+              {t("signInToAnswerBody")}
             </div>
             <Button onClick={handleAnswerClick} className="shrink-0">
               <MessageSquarePlus className="h-4 w-4" />
-              Sign in to answer
+              {t("signInToAnswer")}
             </Button>
           </div>
         )}
         <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
           <ShieldCheck className="h-3.5 w-3.5" />
-          Be kind and constructive. No spam or self-promotion.
+          {t("kindNote")}
         </p>
       </div>
 
       <div className="mt-8 text-right">
         <Button variant="ghost" size="sm" onClick={() => router.push("/questions")}>
-          Back to all questions
+          {t("backToQuestions")}
         </Button>
       </div>
     </div>

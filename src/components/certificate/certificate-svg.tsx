@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 
 export interface CertificateTheme {
   id: string;
@@ -42,6 +43,7 @@ export function CertificateSvg({
   id,
   className,
 }: CertificateSvgProps) {
+  const t = useTranslations("certificate");
   return (
     <svg
       ref={svgRef}
@@ -52,7 +54,7 @@ export function CertificateSvg({
       viewBox="0 0 1600 1100"
       className={className}
       role="img"
-      aria-label={`Certificate of completion for ${name}`}
+      aria-label={t("svg.aria", { name })}
     >
       <rect width="1600" height="1100" fill={theme.bg} />
 
@@ -63,14 +65,14 @@ export function CertificateSvg({
         ROCOURSE
       </text>
       <text x="800" y="196" textAnchor="middle" fontFamily={SANS} fontSize="16" letterSpacing="4" fill={theme.muted}>
-        LEARN · BUILD · SHIP
+        {t("svg.tagline")}
       </text>
 
       <text x="800" y="330" textAnchor="middle" fontFamily={SERIF} fontSize="76" fontWeight="bold" fill={theme.ink}>
-        Certificate
+        {t("svg.title")}
       </text>
       <text x="800" y="400" textAnchor="middle" fontFamily={SERIF} fontSize="44" fontStyle="italic" fill={theme.gold}>
-        of Completion
+        {t("svg.subtitle")}
       </text>
 
       <line x1="560" y1="452" x2="800" y2="452" stroke={theme.gold} strokeWidth="3" />
@@ -78,13 +80,13 @@ export function CertificateSvg({
       <rect x="790" y="442" width="20" height="20" fill={theme.gold} transform="rotate(45 800 452)" />
 
       <text x="800" y="540" textAnchor="middle" fontFamily={SANS} fontSize="26" fill={theme.muted}>
-        This certifies that
+        {t("svg.certifies")}
       </text>
       <text x="800" y="630" textAnchor="middle" fontFamily={SERIF} fontSize="72" fontStyle="italic" fontWeight="bold" fill={theme.ink}>
         {name}
       </text>
       <text x="800" y="700" textAnchor="middle" fontFamily={SANS} fontSize="26" fill={theme.muted}>
-        has successfully completed the
+        {t("svg.completed")}
       </text>
       <text x="800" y="770" textAnchor="middle" fontFamily={SERIF} fontSize="42" fontWeight="bold" fill={theme.gold}>
         {courseTitle}
@@ -95,7 +97,7 @@ export function CertificateSvg({
 
       <line x1="180" y1="930" x2="460" y2="930" stroke={theme.ink} strokeWidth="2" />
       <text x="320" y="960" textAnchor="middle" fontFamily={SANS} fontSize="16" fill={theme.muted}>
-        RoCourse Team
+        {t("svg.team")}
       </text>
 
       <circle cx="1320" cy="895" r="62" fill="none" stroke={theme.gold} strokeWidth="5" />

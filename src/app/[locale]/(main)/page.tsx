@@ -78,7 +78,7 @@ export default async function HomePage() {
           <div className="rounded-xl border bg-card p-4">
             <dt className="text-xs text-muted-foreground">{t("statsTime")}</dt>
             <dd className="mt-1 text-2xl font-bold">
-              {Math.round(totalMinutes / 60)}+ hrs
+              {Math.round(totalMinutes / 60)}+ {t("hoursUnit")}
             </dd>
           </div>
           <div className="rounded-xl border bg-card p-4">

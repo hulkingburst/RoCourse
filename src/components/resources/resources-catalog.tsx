@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   CheckCircle2,
   ChevronDown,
@@ -18,10 +19,6 @@ import {
   type ResourceKind,
 } from "@/lib/resources-shared";
 import { Badge } from "@/components/ui/badge";
-
-function kindLabel(kind: ResourceKind): string {
-  return RESOURCE_KINDS.find((k) => k.value === kind)?.label ?? "Other";
-}
 
 function CodeViewer({ code, language }: { code: string; language: string }) {
   const [html, setHtml] = React.useState<string | null>(null);
@@ -52,6 +49,7 @@ function CodeViewer({ code, language }: { code: string; language: string }) {
 }
 
 function ResourceCard({ resource }: { resource: Resource }) {
+  const t = useTranslations("resources");
   const [open, setOpen] = React.useState(false);
   const downloadUrl = resource.fileUrl
     ? `${resource.fileUrl}?download=1`
@@ -63,7 +61,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">{kindLabel(resource.kind)}</Badge>
+            <Badge variant="secondary">{t(`kinds.${resource.kind}`)}</Badge>
             {resource.author && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <User className="h-3 w-3" />
@@ -86,7 +84,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
             className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
           >
             <ExternalLink className="h-4 w-4" />
-            Visit website
+            {t("visitWebsite")}
           </a>
         )}
         {downloadUrl && (
@@ -96,7 +94,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
             className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
           >
             <Download className="h-4 w-4" />
-            Download
+            {t("download")}
           </a>
         )}
       </div>
@@ -110,7 +108,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
           >
             <span className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              View code
+              {t("viewCode")}
             </span>
             <ChevronDown
               className={cn("h-4 w-4 transition-transform", open && "rotate-180")}
@@ -128,6 +126,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
 }
 
 export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
+  const t = useTranslations("resources");
   const [filter, setFilter] = React.useState<ResourceKind | "all">("all");
 
   const filtered =
@@ -156,7 +155,7 @@ export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
               : "text-muted-foreground hover:bg-accent"
           )}
         >
-          All ({counts.get("all") ?? 0})
+          {t("all")} ({counts.get("all") ?? 0})
         </button>
         {RESOURCE_KINDS.map((kind) => (
           <button
@@ -170,7 +169,7 @@ export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
                 : "text-muted-foreground hover:bg-accent"
             )}
           >
-            {kind.label} ({counts.get(kind.value) ?? 0})
+            {t(`kinds.${kind.value}`)} ({counts.get(kind.value) ?? 0})
           </button>
         ))}
       </div>
@@ -178,13 +177,13 @@ export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-center">
           <ShieldCheck className="h-8 w-8 text-muted-foreground/60" />
-          <p className="text-sm font-medium">No resources here yet</p>
+          <p className="text-sm font-medium">{t("noResources")}</p>
           <p className="max-w-sm text-sm text-muted-foreground">
             {resources.length === 0
-              ? "Resources accepted by the course author will appear here. If you made something great, submit it."
+              ? t("noResourcesEmpty")
               : filter === "all"
-                ? "No resources here yet."
-                : `No ${kindLabel(filter)} resources yet.`}
+                ? t("noResourcesFiltered")
+                : t("noResourcesKind", { kind: t(`kinds.${filter}`) })}
           </p>
         </div>
       ) : (
@@ -199,7 +198,7 @@ export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
 
       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-        Every resource is manually reviewed before it is listed here.
+        {t("reviewNote")}
       </p>
     </div>
   );

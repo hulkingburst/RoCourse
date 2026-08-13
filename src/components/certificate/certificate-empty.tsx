@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Award, UserCircle2 } from "lucide-react";
 import { useAuthUiStore } from "@/lib/auth-ui";
@@ -10,6 +11,8 @@ import { Button } from "@/components/ui/button";
  * signed in or they haven't finished a course.
  */
 export function CertificateEmptyState({ signedIn }: { signedIn: boolean }) {
+  const t = useTranslations("certificate");
+  const auth = useTranslations("auth");
   const openDialog = useAuthUiStore((state) => state.openDialog);
 
   return (
@@ -19,17 +22,14 @@ export function CertificateEmptyState({ signedIn }: { signedIn: boolean }) {
       </div>
       {signedIn ? (
         <>
-          <h1 className="text-2xl font-bold">No certificate yet</h1>
-          <p className="mt-3 text-muted-foreground">
-            You earn a certificate when you complete the final project. Head
-            back to the course and finish it off — you&apos;re close.
-          </p>
+          <h1 className="text-2xl font-bold">{t("emptyTitle")}</h1>
+          <p className="mt-3 text-muted-foreground">{t("emptyBody")}</p>
           <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
             <Button asChild>
-              <Link href="/lessons/final-project">Go to the final project</Link>
+              <Link href="/lessons/final-project">{t("goToFinalProject")}</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/profile">View profile</Link>
+              <Link href="/profile">{t("viewProfile")}</Link>
             </Button>
           </div>
         </>
@@ -38,15 +38,12 @@ export function CertificateEmptyState({ signedIn }: { signedIn: boolean }) {
           <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
             <UserCircle2 className="h-7 w-7 text-muted-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">Sign in to view certificates</h1>
-          <p className="mt-3 text-muted-foreground">
-            Certificates are linked to your account. Sign in to see and
-            download the ones you&apos;ve earned.
-          </p>
+          <h1 className="text-2xl font-bold">{t("signInTitle")}</h1>
+          <p className="mt-3 text-muted-foreground">{t("signInBody")}</p>
           <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
-            <Button onClick={() => openDialog("signin")}>Sign in</Button>
+            <Button onClick={() => openDialog("signin")}>{auth("signIn")}</Button>
             <Button variant="outline" onClick={() => openDialog("signup")}>
-              Create account
+              {auth("createAccount")}
             </Button>
           </div>
         </>

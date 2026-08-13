@@ -104,7 +104,7 @@ export function WriteCode({
   const acceptedFirst = (Array.isArray(answer) ? answer : [answer])[0];
   const hint =
     status === "wrong" && !checks
-      ? generateHint(value, answer, { strictLocal: requireLocal })
+      ? generateHint(value, answer, { strictLocal: requireLocal }, t)
       : undefined;
 
   return (

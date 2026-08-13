@@ -1,8 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Medal } from "lucide-react";
 import { useProgressStore } from "@/lib/progress-store";
-import { lessonMedal, medalLabel, type LessonMedal } from "@/lib/medal";
+import { lessonMedal, type LessonMedal } from "@/lib/medal";
 import { cn } from "@/lib/utils";
 
 const MEDAL_COLOR: Record<LessonMedal, string> = {
@@ -23,6 +24,7 @@ interface LessonMedalProps {
  * progress store by lesson slug, so it can live in server-rendered layouts.
  */
 export function LessonMedalBadge({ slug, activityCount, className }: LessonMedalProps) {
+  const t = useTranslations("medal");
   const record = useProgressStore((state) => state.lessons[slug]);
   const firstTry = record?.firstTrySolvedSteps?.length ?? 0;
   const { medal, correct, total } = lessonMedal(firstTry, activityCount);
@@ -30,7 +32,7 @@ export function LessonMedalBadge({ slug, activityCount, className }: LessonMedal
 
   return (
     <span
-      title={`${medalLabel(medal)} medal — ${Math.min(correct, total)} of ${total} activities on the first try`}
+      title={t("title", { medal: t(medal), count: Math.min(correct, total), total })}
       className={cn("inline-flex items-center", className)}
     >
       <Medal className={cn("h-4 w-4", MEDAL_COLOR[medal])} />

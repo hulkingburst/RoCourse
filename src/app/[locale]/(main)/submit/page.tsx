@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { SubmitForm } from "@/components/resources/submit-form";
 import { Link } from "@/i18n/navigation";
 
@@ -10,17 +11,24 @@ export const metadata: Metadata = {
   alternates: { canonical: "/submit" },
 };
 
-export default function SubmitPage() {
+export default async function SubmitPage() {
+  const t = await getTranslations("resources");
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">Submit a resource</h1>
+      <h1 className="text-3xl font-bold tracking-tight">
+        {t("submitPageTitle")}
+      </h1>
       <p className="mt-2 text-muted-foreground">
-        Made something worth sharing? Submit it and it goes to the course
-        author for review. Accepted resources appear on the{" "}
-        <Link href="/resources" className="text-primary underline-offset-4 hover:underline">
-          Resources
-        </Link>{" "}
-        page.
+        {t.rich("submitPageIntro", {
+          link: (chunks) => (
+            <Link
+              href="/resources"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
       <div className="mt-8">
         <SubmitForm />

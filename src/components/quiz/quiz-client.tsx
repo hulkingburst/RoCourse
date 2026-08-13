@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   CalendarDays,
@@ -31,25 +32,25 @@ function shuffle<T>(items: readonly T[]): T[] {
   return copy;
 }
 
+/** A drawn question plus the order its options should display in. */
+type DrawnQuestion = QuizQuestion & { order: number[] };
+
 /** Draws a fresh quiz: random questions with shuffled option positions. */
-function drawQuestions(): QuizQuestion[] {
+function drawQuestions(): DrawnQuestion[] {
   const picked = shuffle(QUIZ_QUESTIONS).slice(
     0,
     Math.min(QUIZ_SIZE, QUIZ_QUESTIONS.length)
   );
-  return picked.map((question) => {
-    const order = shuffle([0, 1, 2, 3]);
-    return {
-      ...question,
-      options: order.map((i) => question.options[i]) as QuizQuestion["options"],
-      answer: order.indexOf(question.answer),
-    };
-  });
+  return picked.map((question) => ({
+    ...question,
+    order: shuffle([0, 1, 2, 3]),
+  }));
 }
 
 type Phase = "intro" | "active" | "done";
 
 export function QuizClient() {
+  const t = useTranslations("quiz");
   const quickQuizzesCompleted = useProgressStore(
     (state) => state.quickQuizzesCompleted
   );
@@ -59,7 +60,7 @@ export function QuizClient() {
   const streak = useProgressStore((state) => state.streak);
 
   const [phase, setPhase] = React.useState<Phase>("intro");
-  const [questions, setQuestions] = React.useState<QuizQuestion[]>([]);
+  const [questions, setQuestions] = React.useState<DrawnQuestion[]>([]);
   const [index, setIndex] = React.useState(0);
   const [selected, setSelected] = React.useState<number | null>(null);
   const [answered, setAnswered] = React.useState(false);
@@ -87,7 +88,8 @@ export function QuizClient() {
     if (answered) return;
     setSelected(optionIndex);
     setAnswered(true);
-    if (optionIndex === questions[index]?.answer) {
+    const current = questions[index];
+    if (current && optionIndex === current.order.indexOf(current.answer)) {
       setCorrectCount((count) => count + 1);
     }
   };
@@ -108,28 +110,30 @@ export function QuizClient() {
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <Target className="h-6 w-6 text-primary" />
         </div>
-        <h2 className="text-center text-xl font-bold">Quick quiz</h2>
+        <h2 className="text-center text-xl font-bold">{t("title")}</h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          {QUIZ_QUESTIONS.length} questions in the bank — each quiz draws{" "}
-          {Math.min(QUIZ_SIZE, QUIZ_QUESTIONS.length)} random ones.
+          {t("introCount", {
+            bank: QUIZ_QUESTIONS.length,
+            size: Math.min(QUIZ_SIZE, QUIZ_QUESTIONS.length),
+          })}
         </p>
         <ul className="mx-auto mt-6 max-w-sm space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            One question at a time, one answer — A, B, C or D.
+            {t("introRuleOne")}
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            See the right answer instantly, with a quick explanation.
+            {t("introRuleTwo")}
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            Every finished quiz counts toward your profile total.
+            {t("introRuleThree")}
           </li>
         </ul>
         <div className="mt-8 flex justify-center">
           <Button size="lg" onClick={startQuiz}>
-            Start quiz
+            {t("start")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -139,7 +143,7 @@ export function QuizClient() {
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             <CalendarDays className="h-4 w-4" />
-            Or try today&apos;s daily challenge
+            {t("dailyLink")}
           </Link>
         </div>
       </div>
@@ -150,14 +154,14 @@ export function QuizClient() {
     const total = questions.length;
     const percent =
       total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    const message =
+    const messageKey =
       percent === 100
-        ? "Perfect score — you know your Luau."
+        ? "resultPerfect"
         : percent >= 70
-          ? "Great work! A couple of gaps to polish."
+          ? "resultGreat"
           : percent >= 40
-            ? "Decent start — review the lessons you missed."
-            : "Keep practicing — the lessons will fill these gaps.";
+            ? "resultDecent"
+            : "resultLow";
 
     return (
       <div className="rounded-xl border bg-card p-8">
@@ -165,28 +169,28 @@ export function QuizClient() {
           <ListChecks className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-center text-2xl font-bold">
-          {correctCount} / {total} correct
+          {t("result", { correct: correctCount, total })}
         </h2>
         <p className="mt-1 text-center text-sm text-muted-foreground">
-          {percent}% · {message}
+          {percent}% · {t(messageKey)}
         </p>
         <div className="mt-6 flex justify-center">
           <Button variant="outline" onClick={startQuiz}>
             <RotateCcw className="h-4 w-4" />
-            Play again
+            {t("playAgain")}
           </Button>
         </div>
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          Mini quizzes completed:{" "}
+          {t("miniQuizzesCompleted")}{" "}
           <span className="font-semibold text-foreground">
             {quickQuizzesCompleted}
           </span>
         </p>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           <Flame className="mr-1 inline h-3.5 w-3.5 text-orange-500" />
-          Day streak:{" "}
+          {t("dayStreak")}{" "}
           <span className="font-semibold text-foreground">
-            {streak} {streak === 1 ? "day" : "days"}
+            {t("day", { count: streak })}
           </span>
         </p>
       </div>
@@ -196,27 +200,34 @@ export function QuizClient() {
   const question = questions[index];
   if (!question) return null;
 
-  const isCorrect = selected === question.answer;
+  const correctDisplay = question.order.indexOf(question.answer);
+  const isCorrect = selected === correctDisplay;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>
-          Question {index + 1} of {questions.length}
+          {t("questionProgress", {
+            current: index + 1,
+            total: questions.length,
+          })}
         </span>
         <span className="font-medium text-primary">
-          {correctCount} correct
+          {t("correctCount", { count: correctCount })}
         </span>
       </div>
       <Progress value={(index / questions.length) * 100} />
 
       <div className="rounded-xl border bg-card p-6">
         <p className="text-base font-medium leading-relaxed">
-          {question.question}
+          {t(`questions.${question.id}.question`)}
         </p>
         <div className="mt-4 grid gap-2">
-          {question.options.map((option, optionIndex) => {
-            const isAnswer = optionIndex === question.answer;
+          {question.order.map((originalIndex, optionIndex) => {
+            const option = t(
+              `questions.${question.id}.options.${originalIndex}`
+            );
+            const isAnswer = optionIndex === correctDisplay;
             const isSelected = optionIndex === selected;
             return (
               <button
@@ -277,18 +288,20 @@ export function QuizClient() {
               {isCorrect ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-success" />
-                  Correct!
+                  {t("correct")}
                 </>
               ) : (
                 <>
                   <HelpCircle className="h-4 w-4 text-destructive" />
-                  Not quite — the answer is {OPTION_LETTERS[question.answer]}.
+                  {t("wrongAnswer", {
+                    letter: OPTION_LETTERS[correctDisplay],
+                  })}
                 </>
               )}
             </div>
-            {question.explanation && (
+            {t.has(`questions.${question.id}.explanation`) && (
               <p className="mt-1 text-muted-foreground">
-                {question.explanation}
+                {t(`questions.${question.id}.explanation`)}
               </p>
             )}
           </div>
@@ -297,7 +310,9 @@ export function QuizClient() {
         {answered && (
           <div className="mt-4 flex justify-end">
             <Button onClick={next}>
-              {index + 1 >= questions.length ? "See results" : "Next question"}
+              {index + 1 >= questions.length
+                ? t("seeResults")
+                : t("nextQuestion")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

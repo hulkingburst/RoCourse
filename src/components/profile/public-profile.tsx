@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   BookOpen,
@@ -20,6 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { PublicProfile } from "@/lib/users";
+import { courseTitleKey } from "@/lib/course-titles";
 
 function Stat({
   icon,
@@ -42,6 +44,8 @@ function Stat({
 }
 
 export function PublicProfileView({ profile }: { profile: PublicProfile }) {
+  const t = useTranslations("profile");
+  const course = useTranslations("course");
   const { stats } = profile;
   const initial = profile.name.trim().charAt(0).toUpperCase() || "?";
   const joined = new Date(profile.createdAt).toLocaleDateString(undefined, {
@@ -59,7 +63,7 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
         <div className="min-w-0">
           <h1 className="text-3xl font-bold tracking-tight">{profile.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            @{profile.handle} · Joined {joined}
+            {t("joinedAt", { handle: profile.handle, date: joined })}
           </p>
         </div>
         <div className="ml-auto">
@@ -68,7 +72,7 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
             className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
           >
             <Search className="h-3.5 w-3.5" />
-            Find learners
+            {t("findLearners")}
           </Link>
         </div>
       </div>
@@ -76,32 +80,32 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <Stat
           icon={<BookOpen className="h-4 w-4" />}
-          label="Lessons"
+          label={t("statLessons")}
           value={`${stats.lessonsCompleted}/${profile.totalLessons}`}
         />
         <Stat
           icon={<Flame className="h-4 w-4" />}
-          label="Day streak"
+          label={t("dayStreak")}
           value={String(stats.streak)}
         />
         <Stat
           icon={<Flame className="h-4 w-4" />}
-          label="Best streak"
+          label={t("bestStreak")}
           value={String(stats.longestStreak)}
         />
         <Stat
           icon={<ListChecks className="h-4 w-4" />}
-          label="Mini quizzes"
+          label={t("statMiniQuizzes")}
           value={String(stats.quickQuizzesCompleted)}
         />
         <Stat
           icon={<CalendarDays className="h-4 w-4" />}
-          label="Daily challenges"
+          label={t("statDailyChallenges")}
           value={String(stats.dailyChallengesCompleted)}
         />
         <Stat
           icon={<Trophy className="h-4 w-4" />}
-          label="Courses"
+          label={t("courses")}
           value={String(profile.completions.length)}
         />
       </div>
@@ -116,18 +120,15 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarDays className="h-5 w-5 text-primary" />
-            Recent activity
+            {t("recentActivity")}
           </CardTitle>
-          <CardDescription>Their last week of lessons, quizzes, and daily challenges.</CardDescription>
+          <CardDescription>{t("recentActivityHint")}</CardDescription>
         </CardHeader>
         <CardContent>
           {hasActivity ? (
             <ActivityCalendar activityDays={stats.activityDays} />
           ) : (
-            <p className="text-sm text-muted-foreground">
-              No public activity yet — they may have just started, or they learn
-              without an account.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("noPublicActivity")}</p>
           )}
         </CardContent>
       </Card>
@@ -137,7 +138,7 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Trophy className="h-5 w-5 text-primary" />
-              Courses completed
+              {t("coursesCompleted")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
@@ -148,7 +149,7 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
               >
                 <span className="flex items-center gap-2 font-medium">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-                  {completion.title}
+                  {course(courseTitleKey(completion.courseId))}
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {new Date(completion.completedAt).toLocaleDateString()}
@@ -161,7 +162,7 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
 
       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5" />
-        Public profiles show only summary stats — never personal details or email.
+        {t("privacyNote")}
       </p>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Bookmark, CheckCircle2, Circle } from "lucide-react";
 import { useLesson } from "@/components/lessons/lesson-context";
 import {
@@ -19,6 +20,9 @@ export function LessonActions({ slugOverride }: { slugOverride?: string }) {
   const { slug: contextSlug } = useLesson();
   const slug = slugOverride ?? contextSlug;
 
+  const t = useTranslations("lesson");
+  const labels = useTranslations("lessons");
+
   const hydrated = useProgressStore((state) => state.hydrated);
   const lessons = useProgressStore((state) => state.lessons);
   const bookmarks = useProgressStore((state) => state.bookmarks);
@@ -31,9 +35,9 @@ export function LessonActions({ slugOverride }: { slugOverride?: string }) {
     return (
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" disabled>
-          <Circle className="h-4 w-4" /> Complete
+          <Circle className="h-4 w-4" /> {labels("markComplete")}
         </Button>
-        <Button variant="ghost" size="icon" disabled aria-label="Bookmark">
+        <Button variant="ghost" size="icon" disabled aria-label={t("bookmarkLesson")}>
           <Bookmark className="h-4 w-4" />
         </Button>
       </div>
@@ -55,13 +59,13 @@ export function LessonActions({ slugOverride }: { slugOverride?: string }) {
         ) : (
           <Circle className="h-4 w-4" />
         )}
-        {complete ? "Completed" : "Mark complete"}
+        {complete ? labels("complete") : t("markComplete")}
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={() => toggleBookmark(slug)}
-        aria-label={bookmarked ? "Remove bookmark" : "Bookmark lesson"}
+        aria-label={bookmarked ? t("removeBookmark") : t("bookmarkLesson")}
         className={cn(bookmarked && "text-primary")}
       >
         <Bookmark className={cn("h-4 w-4", bookmarked && "fill-current")} />

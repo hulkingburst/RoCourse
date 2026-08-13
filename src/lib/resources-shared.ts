@@ -19,14 +19,14 @@ export interface Resource {
   acceptedAt: string;
 }
 
-export const RESOURCE_KINDS: { value: ResourceKind; label: string }[] = [
-  { value: "plugin", label: "Plugin" },
-  { value: "script", label: "Script" },
-  { value: "asset-pack", label: "Asset pack" },
-  { value: "ui-module", label: "UI module" },
-  { value: "model", label: "Model" },
-  { value: "website", label: "Website" },
-  { value: "other", label: "Other" },
+export const RESOURCE_KINDS: { value: ResourceKind; labelKey: string }[] = [
+  { value: "plugin", labelKey: "plugin" },
+  { value: "script", labelKey: "script" },
+  { value: "asset-pack", labelKey: "asset-pack" },
+  { value: "ui-module", labelKey: "ui-module" },
+  { value: "model", labelKey: "model" },
+  { value: "website", labelKey: "website" },
+  { value: "other", labelKey: "other" },
 ];
 
 export const CODE_LANGS = ["luau", "lua", "json", "markdown", "typescript", "css"] as const;

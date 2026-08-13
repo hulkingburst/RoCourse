@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "How to Make a Game in Roblox — Beginner's Guide",
-  description:
-    "A step-by-step guide to making your first Roblox game: install Roblox Studio, learn the basics of Luau scripting, build a real project, and publish it.",
-  alternates: { canonical: "/guides/how-to-make-a-game-in-roblox" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
+  return {
+    title: t("makeGame.metaTitle"),
+    description: t("makeGame.metaDescription"),
+    alternates: { canonical: "/guides/how-to-make-a-game-in-roblox" },
+  };
+}
 
 const howToJsonLd = {
   "@context": "https://schema.org",
@@ -40,23 +48,28 @@ const howToJsonLd = {
   ],
 };
 
-export default function MakeAGameGuide() {
+export default async function MakeAGameGuide({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <JsonLd data={howToJsonLd} />
       <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-        Guides
+        {t("eyebrow")}
       </p>
       <h1 className="text-3xl font-bold tracking-tight">
-        How to Make a Game in Roblox
+        {t("makeGame.title")}
       </h1>
       <p className="mt-3 text-lg text-muted-foreground">
-        The whole path from &ldquo;I&apos;ve never touched Roblox Studio&rdquo;
-        to &ldquo;my game is online&rdquo; — laid out in four steps.
+        {t("makeGame.intro")}
       </p>
 
       <div className="prose prose-sm mt-8 max-w-none text-[15px] leading-relaxed">
-        <h2>1. Install Roblox Studio</h2>
+        <h2>{t("makeGame.sections.installStudio")}</h2>
         <p>
           Every Roblox game is built in{" "}
           <strong>Roblox Studio</strong>, the free editor Roblox provides. You
@@ -70,7 +83,7 @@ export default function MakeAGameGuide() {
           walks you through the download and first launch.
         </p>
 
-        <h2>2. Learn the essentials of Luau scripting</h2>
+        <h2>{t("makeGame.sections.learnEssentials")}</h2>
         <p>
           A game without code is just a diorama. Scripting is what lets a
           player walk, click, earn coins, and open doors. You don&apos;t need a
@@ -103,7 +116,7 @@ export default function MakeAGameGuide() {
           one small step at a time — no copy-pasting, no walls of theory.
         </p>
 
-        <h2>3. Build a real game project</h2>
+        <h2>{t("makeGame.sections.buildProject")}</h2>
         <p>
           The fastest way to learn is to make something that actually works.
           The course is built around a complete project: a{" "}
@@ -113,7 +126,7 @@ export default function MakeAGameGuide() {
           <Link href="/lessons/final-project">final project</Link>.
         </p>
 
-        <h2>4. Publish your game</h2>
+        <h2>{t("makeGame.sections.publishGame")}</h2>
         <p>
           When it&apos;s ready, publishing takes a few clicks inside Studio:
           name your game, pick a thumbnail, and hit publish. Anyone on Roblox
@@ -122,7 +135,7 @@ export default function MakeAGameGuide() {
           full process, including permissions and sharing settings.
         </p>
 
-        <h2>Ready to start?</h2>
+        <h2>{t("makeGame.sections.readyToStart")}</h2>
         <p>
           The fastest route is to take the course. It&apos;s{" "}
           <strong>free, requires no account</strong>, and starts from absolute

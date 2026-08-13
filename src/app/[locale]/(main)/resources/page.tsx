@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Plus } from "lucide-react";
 import { getAcceptedResources } from "@/lib/resources";
@@ -15,22 +16,20 @@ export const metadata: Metadata = {
 };
 
 export default async function ResourcesPage() {
+  const t = await getTranslations("resources");
   const resources = await getAcceptedResources();
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Resources</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Hand-picked community assets for Roblox development. Every item here
-            was reviewed by the course author before being published.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("pageTitle")}</h1>
+          <p className="mt-2 max-w-2xl text-muted-foreground">{t("pageIntro")}</p>
         </div>
         <Button asChild>
           <Link href="/submit">
             <Plus className="h-4 w-4" />
-            Submit a resource
+            {t("submitAction")}
           </Link>
         </Button>
       </div>

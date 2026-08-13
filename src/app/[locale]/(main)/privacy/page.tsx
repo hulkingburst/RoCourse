@@ -1,20 +1,34 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description:
-    "How RoCourse handles your data: what we collect, why, and the choices you have.",
-  alternates: { canonical: "/privacy" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "privacy" });
+  return {
+    title: t("metadataTitle"),
+    description: t("metadataDescription"),
+    alternates: { canonical: "/privacy" },
+  };
+}
 
 const LAST_UPDATED = "August 8, 2026";
 
-export default function PrivacyPage() {
+export default async function PrivacyPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "privacy" });
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">Privacy Policy</h1>
+      <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Last updated: {LAST_UPDATED}
+        {t("lastUpdated", { date: LAST_UPDATED })}
       </p>
 
       <div className="prose prose-sm mt-8 max-w-none text-[15px] leading-relaxed">
@@ -25,7 +39,7 @@ export default function PrivacyPage() {
           collects it, and the choices you have.
         </p>
 
-        <h2>The short version</h2>
+        <h2>{t("shortVersion")}</h2>
         <ul>
           <li>Guests can use the whole course with zero personal data. Progress stays in your browser.</li>
           <li>Accounts are optional and store only a name, an email, and a hashed password.</li>
@@ -34,14 +48,14 @@ export default function PrivacyPage() {
           <li>Public profiles are opt-in — never automatic — and never show your email.</li>
         </ul>
 
-        <h2>What we collect</h2>
-        <h3>Account data</h3>
+        <h2>{t("whatWeCollect")}</h2>
+        <h3>{t("accountData")}</h3>
         <p>
           When you create an account we collect your display name, email
           address, and a hashed password. The password is hashed with bcrypt;
           the plaintext password is never stored or logged.
         </p>
-        <h3>Progress data</h3>
+        <h3>{t("progressData")}</h3>
         <p>
           Lesson progress, streaks, quiz results, daily challenge completions,
           bookmarks, and recently viewed lessons are stored in your browser&apos;s
@@ -49,27 +63,27 @@ export default function PrivacyPage() {
           can be restored on another device. You can reset this data from your
           profile at any time.
         </p>
-        <h3>Analytics</h3>
+        <h3>{t("analytics")}</h3>
         <p>
           We use Vercel Analytics to understand aggregate traffic, such as page
           views, referrer, and device type. It does not include your account
           data, email, or progress.
         </p>
-        <h3>Community resources</h3>
+        <h3>{t("communityResources")}</h3>
         <p>
           If you submit a resource via the site, we receive the content you
           submit (code, a file archive, or a link) along with any credit name
           you provide.
         </p>
 
-        <h2>Cookies</h2>
+        <h2>{t("cookies")}</h2>
         <p>
           Signed-in users get a single session cookie from our authentication
           provider (Auth.js). It is required to stay signed in. We do not use
           third-party advertising or tracking cookies.
         </p>
 
-        <h2>Public profiles</h2>
+        <h2>{t("publicProfiles")}</h2>
         <p>
           Nothing about you is public by default. If you choose to create a
           public handle, a page at <code>/u/&lt;handle&gt;</code> shows your
@@ -78,7 +92,7 @@ export default function PrivacyPage() {
           profile.
         </p>
 
-        <h2>Third parties</h2>
+        <h2>{t("thirdParties")}</h2>
         <ul>
           <li>Vercel — hosting and Vercel Analytics.</li>
           <li>Vercel Blob — storage for submitted resource files.</li>
@@ -86,7 +100,7 @@ export default function PrivacyPage() {
           <li>A hosted Postgres database (e.g. Vercel Postgres or Neon) — account and progress storage.</li>
         </ul>
 
-        <h2>Your choices and rights</h2>
+        <h2>{t("yourChoices")}</h2>
         <ul>
           <li>
             <strong>Reset progress:</strong> you can clear your local and synced
@@ -103,7 +117,7 @@ export default function PrivacyPage() {
           </li>
         </ul>
 
-        <h2>Children</h2>
+        <h2>{t("children")}</h2>
         <p>
           RoCourse is intended for people who are at least 13 years old.
           Creating an account requires confirming that you are 13 or older (or
@@ -113,7 +127,7 @@ export default function PrivacyPage() {
           applicable age, we will delete it.
         </p>
 
-        <h2>Contact</h2>
+        <h2>{t("contact")}</h2>
         <p>
           Questions about this policy? Open an issue at{" "}
           <a

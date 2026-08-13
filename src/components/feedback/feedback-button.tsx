@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, Loader2, MessageSquareText, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import {
 type Status = "idle" | "submitting" | "success" | "error";
 
 export function FeedbackButton({ className }: { className?: string }) {
+  const t = useTranslations("feedback");
   const [open, setOpen] = React.useState(false);
   const [text, setText] = React.useState("");
   const [status, setStatus] = React.useState<Status>("idle");
@@ -58,7 +60,7 @@ export function FeedbackButton({ className }: { className?: string }) {
         )}
       >
         <MessageSquareText className="h-3 w-3" />
-        Feedback
+        {t("button")}
       </button>
       <Dialog
         open={open}
@@ -69,17 +71,14 @@ export function FeedbackButton({ className }: { className?: string }) {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Send feedback</DialogTitle>
-            <DialogDescription>
-              Found a bug, or have an idea for the course? Tell us — it goes
-              straight to the course author.
-            </DialogDescription>
+            <DialogTitle>{t("title")}</DialogTitle>
+            <DialogDescription>{t("description")}</DialogDescription>
           </DialogHeader>
 
           {status === "success" ? (
             <div className="flex flex-col items-center gap-2 py-6 text-center">
               <CheckCircle2 className="h-8 w-8 text-success" />
-              <p className="text-sm font-medium">Thanks for the feedback!</p>
+              <p className="text-sm font-medium">{t("thanks")}</p>
             </div>
           ) : (
             <form
@@ -95,13 +94,13 @@ export function FeedbackButton({ className }: { className?: string }) {
                 maxLength={2000}
                 rows={5}
                 required
-                placeholder="What would you improve?"
+                placeholder={t("placeholder")}
                 className="w-full resize-none rounded-md border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
               />
               {status === "error" && (
                 <p className="flex items-center gap-1.5 text-xs text-destructive">
                   <XCircle className="h-3.5 w-3.5" />
-                  Something went wrong. Please try again in a moment.
+                  {t("error")}
                 </p>
               )}
               <div className="flex justify-end gap-2">
@@ -112,16 +111,16 @@ export function FeedbackButton({ className }: { className?: string }) {
                   onClick={() => setOpen(false)}
                   disabled={status === "submitting"}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button type="submit" size="sm" disabled={disabled}>
                   {status === "submitting" ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Sending…
+                      {t("sending")}
                     </>
                   ) : (
-                    "Send"
+                    t("send")
                   )}
                 </Button>
               </div>

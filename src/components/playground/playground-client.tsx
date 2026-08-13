@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   Check,
   Copy,
@@ -11,37 +12,33 @@ import {
 } from "lucide-react";
 import { runLuau, stopLuau } from "@/lib/luau-runtime";
 
-interface Example {
-  name: string;
-  code: string;
-}
+const EXAMPLE_KEYS = [
+  "helloWorld",
+  "variables",
+  "types",
+  "functions",
+  "tables",
+  "stringInterpolation",
+  "fizzBuzz",
+] as const;
 
-const EXAMPLES: Example[] = [
-  {
-    name: "Hello world",
-    code: `print("Hello from Luau!")`,
-  },
-  {
-    name: "Variables",
-    code: `local name = "Luau"
+type ExampleKey = (typeof EXAMPLE_KEYS)[number];
+
+const EXAMPLES: Record<ExampleKey, string> = {
+  helloWorld: `print("Hello from Luau!")`,
+  variables: `local name = "Luau"
 local coins = 12
 
 coins = coins + 8
 print(name .. " has " .. coins .. " coins")`,
-  },
-  {
-    name: "Types",
-    code: `local score: number = 10
+  types: `local score: number = 10
 local title: string = "RoCourse"
 local tagline: string = \`Learn Luau\`
 
 print(\`Score: {score}\`)
 print(\`Welcome to {title}\`)
 print(tagline)`,
-  },
-  {
-    name: "Functions",
-    code: `local function double(value)
+  functions: `local function double(value)
     return value * 2
 end
 
@@ -50,10 +47,7 @@ local function describe(name, level)
 end
 
 print(describe("Ada", double(3)))`,
-  },
-  {
-    name: "Tables",
-    code: `local player = {
+  tables: `local player = {
     name = "Sam",
     inventory = { "sword", "shield", "potion" },
 }
@@ -63,18 +57,12 @@ print("Inventory:")
 for _, item in ipairs(player.inventory) do
     print("  - " .. item)
 end`,
-  },
-  {
-    name: "String interpolation",
-    code: `local name = "World"
+  stringInterpolation: `local name = "World"
 local x = 42
 
 print(\`Hello, {name}!\`)
 print(\`The answer is {x}\`)`,
-  },
-  {
-    name: "FizzBuzz",
-    code: `for i = 1, 20 do
+  fizzBuzz: `for i = 1, 20 do
     if i % 15 == 0 then
         print("FizzBuzz")
     elseif i % 3 == 0 then
@@ -85,10 +73,9 @@ print(\`The answer is {x}\`)`,
         print(i)
     end
 end`,
-  },
-];
+};
 
-const DEFAULT_CODE = EXAMPLES[0].code;
+const DEFAULT_CODE = EXAMPLES.helloWorld;
 
 function readHash(): string | null {
   if (typeof window === "undefined" || !window.location.hash) return null;
@@ -110,6 +97,7 @@ function insertTab(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
 }
 
 export function PlaygroundClient() {
+  const t = useTranslations("playground");
   // The editor starts from the URL hash (client-only), so it loads lazily to
   // avoid hydration mismatches; `suppressHydrationWarning` covers the first
   // render where server and client can legitimately differ.
@@ -130,7 +118,7 @@ export function PlaygroundClient() {
     setRunning(false);
     setElapsed(result.elapsedMs);
     setIsError(result.error !== null || result.timedOut);
-    setOutput(result.error ?? (result.output || "(no output)"));
+    setOutput(result.error ?? (result.output || t("noOutput")));
     try {
       window.history.replaceState(
         null,
@@ -158,9 +146,10 @@ export function PlaygroundClient() {
     }
   };
 
-  const loadExample = (example: Example) => {
-    setCode(example.code);
-    run(example.code);
+  const loadExample = (key: ExampleKey) => {
+    const code = EXAMPLES[key];
+    setCode(code);
+    run(code);
   };
 
   const copyOutput = async () => {
@@ -179,24 +168,22 @@ export function PlaygroundClient() {
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
           <Terminal className="h-6 w-6 text-primary" />
-          Luau Playground
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Write and run real Luau in your browser — sandboxed via WebAssembly,
-          the same language you use in Roblox Studio. Code is saved in the URL,
-          so you can share what you make.
+          {t("description")}
         </p>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {EXAMPLES.map((example) => (
+        {EXAMPLE_KEYS.map((key) => (
           <button
-            key={example.name}
+            key={key}
             type="button"
-            onClick={() => loadExample(example)}
+            onClick={() => loadExample(key)}
             className="rounded-full border border-input bg-transparent px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
           >
-            {example.name}
+            {t(`examples.${key}`)}
           </button>
         ))}
       </div>
@@ -218,19 +205,19 @@ export function PlaygroundClient() {
                 {running ? (
                   <>
                     <Square className="h-3.5 w-3.5 fill-current" />
-                    Stop
+                    {t("stop")}
                   </>
                 ) : (
                   <>
                     <Play className="h-3.5 w-3.5" />
-                    Run
+                    {t("run")}
                   </>
                 )}
               </button>
               <button
                 type="button"
                 onClick={reset}
-                aria-label="Reset code"
+                aria-label={t("resetCode")}
                 className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-200"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -251,7 +238,7 @@ export function PlaygroundClient() {
             spellCheck={false}
             autoCapitalize="off"
             autoCorrect="off"
-            aria-label="Luau code editor"
+            aria-label={t("editor")}
             suppressHydrationWarning
             className="block h-[420px] w-full resize-none bg-transparent p-4 font-mono text-[13.5px] leading-relaxed text-zinc-200 outline-none"
           />
@@ -269,7 +256,7 @@ export function PlaygroundClient() {
               }`}
             />
             <span className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-              Output
+              {t("output")}
             </span>
             <div className="ml-auto flex items-center gap-2">
               {elapsed !== null && (
@@ -282,7 +269,7 @@ export function PlaygroundClient() {
                   type="button"
                   onClick={copyOutput}
                   className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-200"
-                  aria-label="Copy output"
+                  aria-label={t("copyOutput")}
                 >
                   {copied ? (
                     <Check className="h-4 w-4 text-emerald-400" />
@@ -300,7 +287,7 @@ export function PlaygroundClient() {
           >
             {output ?? (
               <span className="text-zinc-600">
-                Run your code to see the output here.
+                {t("outputHint")}
               </span>
             )}
           </pre>
@@ -308,13 +295,10 @@ export function PlaygroundClient() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Tip: press Ctrl/Cmd+Enter to run. Tab inserts two spaces. Runs are
-        capped at a few seconds so an accidental infinite loop can&apos;t hang
-        the page.
+        {t("tip")}
       </p>
       <p className="text-xs text-muted-foreground">
-        Luau is MIT-licensed (Roblox Corporation; Lua.org, PUC-Rio) — see the
-        attribution in the site README.
+        {t("attribution")}
       </p>
     </div>
   );

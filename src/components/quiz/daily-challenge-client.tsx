@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   Bug,
@@ -93,6 +94,8 @@ function ChallengeOptions({
 }
 
 export function DailyChallengeClient() {
+  const t = useTranslations("dailyChallenge");
+  const quiz = useTranslations("quiz");
   const recordDailyChallengeCompleted = useProgressStore(
     (state) => state.recordDailyChallengeCompleted
   );
@@ -126,6 +129,20 @@ export function DailyChallengeClient() {
     [kind, todayKey]
   );
 
+  const options = React.useMemo(() => {
+    if (kind === "quiz" && question) {
+      return [0, 1, 2, 3].map((i) =>
+        quiz(`questions.${question.id}.options.${i}`)
+      );
+    }
+    if (kind === "debug" && debugChallenge) {
+      return [0, 1, 2, 3].map((i) =>
+        t(`challenges.${debugChallenge.id}.options.${i}`)
+      );
+    }
+    return [];
+  }, [kind, question, debugChallenge, quiz, t]);
+
   React.useEffect(() => {
     if (phase === "done" && !reportedRef.current) {
       reportedRef.current = true;
@@ -136,7 +153,7 @@ export function DailyChallengeClient() {
   if (!mounted) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center text-sm text-muted-foreground">
-        Loading today&apos;s challenge…
+        {t("loading")}
       </div>
     );
   }
@@ -156,21 +173,20 @@ export function DailyChallengeClient() {
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <CheckCircle2 className="h-6 w-6 text-primary" />
         </div>
-        <h2 className="text-center text-2xl font-bold">Already done today</h2>
+        <h2 className="text-center text-2xl font-bold">{t("alreadyDone")}</h2>
         <p className="mx-auto mt-2 max-w-sm text-center text-sm text-muted-foreground">
-          You&apos;ve completed today&apos;s challenge. Come back tomorrow for a
-          fresh one — same for everyone, once a day.
+          {t("alreadyDoneBody")}
         </p>
         <p className="mt-6 text-center text-sm font-semibold text-orange-500">
           <Flame className="mr-1 inline h-4 w-4 fill-current" />
-          {streak} {streak === 1 ? "day" : "days"} streak
+          {t("streak", { count: streak })}
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Button variant="outline" asChild>
-            <Link href="/quiz">Quick quiz</Link>
+            <Link href="/quiz">{t("quickQuiz")}</Link>
           </Button>
           <Button asChild>
-            <Link href="/lessons">Back to lessons</Link>
+            <Link href="/lessons">{t("backToLessons")}</Link>
           </Button>
         </div>
       </div>
@@ -183,42 +199,38 @@ export function DailyChallengeClient() {
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <CalendarDays className="h-6 w-6 text-primary" />
         </div>
-        <h1 className="text-center text-2xl font-bold">Daily challenge</h1>
+        <h1 className="text-center text-2xl font-bold">{t("title")}</h1>
         <p className="mx-auto mt-2 max-w-sm text-center text-sm text-muted-foreground">
-          One challenge, once a day — a quick question or a broken script to
-          debug. Beat it to keep your streak alive.
+          {t("introBody")}
         </p>
         <ul className="mx-auto mt-6 max-w-sm space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            A fresh challenge every day, same for everyone.
+            {t("introRuleOne")}
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            Some days it&apos;s a question, some days it&apos;s a script to fix.
+            {t("introRuleTwo")}
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            Beating it feeds your streak even without a lesson.
+            {t("introRuleThree")}
           </li>
           <li className="flex items-start gap-2">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            Daily challenges completed:{" "}
-            <span className="font-semibold text-foreground">
-              {dailyChallengesCompleted}
-            </span>
+            {t("introRuleFour", { count: dailyChallengesCompleted })}
           </li>
         </ul>
         <div className="mt-8 flex flex-col items-center gap-3">
           <Button size="lg" onClick={() => setPhase("active")}>
-            Take today&apos;s challenge
+            {t("takeChallenge")}
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Link
             href="/quiz"
             className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
-            Back to the quick quiz
+            {t("backToQuiz")}
           </Link>
         </div>
       </div>
@@ -233,21 +245,24 @@ export function DailyChallengeClient() {
           <ListChecks className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-center text-2xl font-bold">
-          {isCorrect ? "Correct!" : "Not quite."}
+          {isCorrect ? t("correct") : t("notQuite")}
         </h2>
         <p className="mt-1 text-center text-sm text-muted-foreground">
           {isCorrect
-            ? "Nice — today's challenge is done."
-            : `The answer was ${OPTION_LETTERS[answer]} — come back tomorrow.`}
+            ? t("doneBodyCorrect")
+            : t("doneBodyWrong", { letter: OPTION_LETTERS[answer] })}
         </p>
-        {debugChallenge?.explanation ? (
-          <p className="mx-auto mt-3 max-w-md text-center text-sm text-muted-foreground">
-            {debugChallenge.explanation}
-          </p>
-        ) : (
-          question?.explanation && (
+        {debugChallenge ? (
+          t.has(`challenges.${debugChallenge.id}.explanation`) && (
             <p className="mx-auto mt-3 max-w-md text-center text-sm text-muted-foreground">
-              {question.explanation}
+              {t(`challenges.${debugChallenge.id}.explanation`)}
+            </p>
+          )
+        ) : (
+          question &&
+          quiz.has(`questions.${question.id}.explanation`) && (
+            <p className="mx-auto mt-3 max-w-md text-center text-sm text-muted-foreground">
+              {quiz(`questions.${question.id}.explanation`)}
             </p>
           )
         )}
@@ -257,20 +272,22 @@ export function DailyChallengeClient() {
               href={`/lessons/${debugChallenge.lessonSlug}`}
               className="font-medium text-primary underline underline-offset-4 hover:text-primary/80"
             >
-              Learn about {debugChallenge.lessonLabel} →
+              {t("learnAbout", {
+                lesson: t(`challenges.${debugChallenge.id}.lessonLabel`),
+              })}
             </Link>
           </p>
         )}
         <p className="mt-6 text-center text-sm font-semibold text-orange-500">
           <Flame className="mr-1 inline h-4 w-4 fill-current" />
-          {streak} {streak === 1 ? "day" : "days"} streak
+          {t("streak", { count: streak })}
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Button variant="outline" asChild>
-            <Link href="/quiz">Quick quiz</Link>
+            <Link href="/quiz">{t("quickQuiz")}</Link>
           </Button>
           <Button asChild>
-            <Link href="/lessons">Back to lessons</Link>
+            <Link href="/lessons">{t("backToLessons")}</Link>
           </Button>
         </div>
       </div>
@@ -281,30 +298,32 @@ export function DailyChallengeClient() {
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <CalendarDays className="h-4 w-4 text-primary" />
-        <span>Today&apos;s challenge</span>
+        <span>{t("todaysChallenge")}</span>
       </div>
       <div className="rounded-xl border bg-card p-6">
         {debugChallenge ? (
           <div>
             <div className="flex items-center gap-2 text-sm font-medium text-destructive">
               <Bug className="h-4 w-4" />
-              Debug this script
+              {t("debugThis")}
             </div>
             <div className="mt-3">
               <CodeBlock>
                 <code className="language-luau">{debugChallenge.code}</code>
               </CodeBlock>
             </div>
-            <p className="font-medium">{debugChallenge.question}</p>
+            <p className="font-medium">
+              {t(`challenges.${debugChallenge.id}.question`)}
+            </p>
           </div>
         ) : (
           <p className="text-base font-medium leading-relaxed">
-            {question?.question}
+            {question && quiz(`questions.${question.id}.question`)}
           </p>
         )}
 
         <ChallengeOptions
-          options={debugChallenge?.options ?? question?.options ?? []}
+          options={options}
           answer={answer}
           selected={selected}
           onPick={pick}
@@ -323,30 +342,31 @@ export function DailyChallengeClient() {
               {selected === answer ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-success" />
-                  Correct!
+                  {t("correct")}
                 </>
               ) : (
                 <>
                   <HelpCircle className="h-4 w-4 text-destructive" />
-                  Not quite — the answer is {OPTION_LETTERS[answer]}.
+                  {t("wrongAnswer", { letter: OPTION_LETTERS[answer] })}
                 </>
               )}
             </div>
             {debugChallenge ? (
               <p className="mt-1 text-muted-foreground">
-                {debugChallenge.explanation}{" "}
+                {t(`challenges.${debugChallenge.id}.explanation`)}{" "}
                 <Link
                   href={`/lessons/${debugChallenge.lessonSlug}`}
                   className="font-medium text-primary underline underline-offset-4"
                 >
-                  {debugChallenge.lessonLabel}
+                  {t(`challenges.${debugChallenge.id}.lessonLabel`)}
                 </Link>
                 .
               </p>
             ) : (
-              question?.explanation && (
+              question &&
+              quiz.has(`questions.${question.id}.explanation`) && (
                 <p className="mt-1 text-muted-foreground">
-                  {question.explanation}
+                  {quiz(`questions.${question.id}.explanation`)}
                 </p>
               )
             )}
@@ -355,7 +375,7 @@ export function DailyChallengeClient() {
 
         {selected !== null && (
           <div className="mt-4 flex justify-end">
-            <Button onClick={() => setPhase("done")}>Finish</Button>
+            <Button onClick={() => setPhase("done")}>{t("finish")}</Button>
           </div>
         )}
       </div>

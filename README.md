@@ -39,6 +39,10 @@ are optional and exist purely to sync your progress across devices.
 - **A Luau reference and a learner directory** for quick lookups — including
   public progress profiles that never expose your email.
 - **Optional cloud sync** so your progress follows you across devices.
+- **English and Spanish.** Every screen is localized via next-intl — the
+  interface, all five guides, the FAQ, and the full interactive content (every
+  quiz question, daily challenge, and reference entry). English lives at the
+  root URL; Spanish is served at `/es`.
 
 ## Quick start
 
@@ -57,7 +61,7 @@ npm run build
 npm run start
 ```
 
-Quality checks: `npx eslint`
+Quality checks: `npx eslint` and `npx tsc --noEmit`
 
 ## How the course works
 
@@ -131,6 +135,10 @@ src/
     sync.ts / sync-api.ts   client sync engine / server data access
     auth.ts, auth-actions.ts  Auth.js config + account creation action
     prisma.ts               Prisma client singleton
+  i18n/
+    routing.ts              locale config (en at root, /es prefixed)
+    messages/en.json        English UI strings
+    messages/es.json        Spanish UI strings (keys match en exactly)
 mobile/                     Capacitor/Android wrapper for the live site
 ```
 

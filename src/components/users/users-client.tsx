@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Fuse from "fuse.js";
 import { BookOpen, Flame, Search, SearchX, Trophy, Users } from "lucide-react";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
 export function UsersClient({ users }: { users: PublicUserSummary[] }) {
+  const t = useTranslations("profile");
   const [query, setQuery] = React.useState("");
   const [debounced, setDebounced] = React.useState("");
 
@@ -46,9 +48,7 @@ export function UsersClient({ users }: { users: PublicUserSummary[] }) {
     return (
       <div className="flex flex-col items-center gap-2 py-16 text-center">
         <Users className="h-8 w-8 text-muted-foreground/50" />
-        <p className="text-sm text-muted-foreground">
-          No public learners yet — be the first to share your progress.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("noLearners")}</p>
       </div>
     );
   }
@@ -60,7 +60,7 @@ export function UsersClient({ users }: { users: PublicUserSummary[] }) {
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search learners by name or handle…"
+          placeholder={t("searchLearners")}
           className="pl-9"
         />
       </div>
@@ -74,9 +74,7 @@ export function UsersClient({ users }: { users: PublicUserSummary[] }) {
       ) : (
         <div className="flex flex-col items-center gap-2 py-16 text-center">
           <SearchX className="h-8 w-8 text-muted-foreground/50" />
-          <p className="text-sm text-muted-foreground">
-            No learners match “{query}”.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("noLearnersMatch", { query })}</p>
         </div>
       )}
     </div>

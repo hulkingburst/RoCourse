@@ -3,12 +3,15 @@ import {
   BADGE_TIER_STYLES,
   type BadgeStats,
 } from "@/lib/badges";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Lock, Trophy } from "lucide-react";
 
 /** Achievement grid. Pure presentational — safe to render in both server and
  * client components. */
 export function BadgesSection({ stats }: { stats: BadgeStats }) {
+  const t = useTranslations("badge");
+  const labels = useTranslations("badges");
   const earnedCount = BADGES.filter((badge) => badge.earned(stats)).length;
 
   return (
@@ -16,10 +19,10 @@ export function BadgesSection({ stats }: { stats: BadgeStats }) {
       <div className="mb-4 flex items-baseline justify-between">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           <Trophy className="h-5 w-5 text-primary" />
-          Achievements
+          {labels("title")}
         </h2>
         <span className="text-sm text-muted-foreground">
-          {earnedCount} of {BADGES.length} earned
+          {labels("earned", { earned: earnedCount, total: BADGES.length })}
         </span>
       </div>
 
@@ -31,7 +34,7 @@ export function BadgesSection({ stats }: { stats: BadgeStats }) {
           return (
             <div
               key={badge.id}
-              title={`${badge.name} — ${badge.description}`}
+              title={`${t(`${badge.id}.name`)} — ${t(`${badge.id}.description`)}`}
               className={cn(
                 "relative flex flex-col items-center gap-2 rounded-xl border p-3 text-center transition-colors",
                 earned
@@ -59,9 +62,9 @@ export function BadgesSection({ stats }: { stats: BadgeStats }) {
                   </span>
                 )}
               </div>
-              <div className="text-xs font-medium leading-tight">{badge.name}</div>
+              <div className="text-xs font-medium leading-tight">{t(`${badge.id}.name`)}</div>
               <div className="text-[11px] leading-snug text-muted-foreground">
-                {badge.description}
+                {t(`${badge.id}.description`)}
               </div>
             </div>
           );

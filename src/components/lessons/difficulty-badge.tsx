@@ -1,5 +1,6 @@
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
-import { DIFFICULTY_LABEL, type Difficulty } from "@/lib/types";
+import type { Difficulty } from "@/lib/types";
 
 const difficultyVariant = {
   beginner: "success",
@@ -8,9 +9,8 @@ const difficultyVariant = {
 } as const;
 
 export function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
+  const t = useTranslations("difficulty");
   return (
-    <Badge variant={difficultyVariant[difficulty]}>
-      {DIFFICULTY_LABEL[difficulty]}
-    </Badge>
+    <Badge variant={difficultyVariant[difficulty]}>{t(difficulty)}</Badge>
   );
 }

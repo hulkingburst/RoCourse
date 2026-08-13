@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import * as React from "react";
 import {
@@ -24,6 +25,7 @@ import { useAuthUiStore } from "@/lib/auth-ui";
 import { extractBadgeStats } from "@/lib/badges";
 import { maskEmail } from "@/lib/privacy";
 import { useProgressStore } from "@/lib/progress-store";
+import { courseTitleKey } from "@/lib/course-titles";
 import { isStreakActive } from "@/lib/streak";
 import { cn } from "@/lib/utils";
 import type { CloudState } from "@/lib/sync-types";
@@ -50,6 +52,10 @@ export function ProfileClient({
   lessonMap,
   handle,
 }: ProfileClientProps) {
+  const t = useTranslations("profile");
+  const course = useTranslations("course");
+  const home = useTranslations("home");
+  const auth = useTranslations("auth");
   const { data: session, status } = useSession();
   const [revealEmail, setRevealEmail] = React.useState(false);
   const { openDialog } = useAuthUiStore();
@@ -104,16 +110,12 @@ export function ProfileClient({
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
           <UserCircle2 className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h1 className="text-2xl font-bold">Your progress, anywhere</h1>
-        <p className="mt-3 text-muted-foreground">
-          Sign in to sync your progress across devices and see your completed
-          courses. You can keep learning without an account — this is entirely
-          optional.
-        </p>
+        <h1 className="text-2xl font-bold">{t("signInTitle")}</h1>
+        <p className="mt-3 text-muted-foreground">{t("signInBody")}</p>
         <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
-          <Button onClick={() => openDialog("signin")}>Sign in</Button>
+          <Button onClick={() => openDialog("signin")}>{auth("signIn")}</Button>
           <Button variant="outline" onClick={() => openDialog("signup")}>
-            Create account
+            {auth("createAccount")}
           </Button>
         </div>
       </div>
@@ -144,9 +146,9 @@ export function ProfileClient({
   const lastLessonTitle = lessonMap.find((lesson) => lesson.slug === lastLesson)?.title;
   const currentPathLabel =
     finishedPath === "tycoon"
-      ? "Coin Tycoon"
+      ? t("finalProjectTycoon")
       : finishedPath === "collector"
-        ? "The Collector"
+        ? t("finalProjectCollector")
         : null;
 
   const completions = cloud?.completions ?? [];
@@ -169,7 +171,7 @@ export function ProfileClient({
     <div className="mx-auto max-w-4xl space-y-6 px-6 py-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {session.user.name || "Learner"}
+          {session.user.name || t("learner")}
         </h1>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
@@ -184,11 +186,11 @@ export function ProfileClient({
             >
               {revealEmail ? (
                 <>
-                  <EyeOff className="h-3 w-3" /> Hide
+                  <EyeOff className="h-3 w-3" /> {t("hide")}
                 </>
               ) : (
                 <>
-                  <Eye className="h-3 w-3" /> Reveal
+                  <Eye className="h-3 w-3" /> {t("reveal")}
                 </>
               )}
             </button>
@@ -203,13 +205,14 @@ export function ProfileClient({
           ) : null}
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          Joined{" "}
           {cloud?.account?.createdAt
-            ? new Date(cloud.account.createdAt).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
+            ? t("joined", {
+                date: new Date(cloud.account.createdAt).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                }),
               })
-            : "recently"}
+            : t("joinedRecently")}
         </p>
       </div>
 
@@ -222,12 +225,10 @@ export function ProfileClient({
                 streakActive ? "text-orange-500" : "text-muted-foreground"
               )}
             />
-            Day streak
+            {t("dayStreak")}
           </CardTitle>
           <CardDescription>
-            {streakActive
-              ? "Keep the momentum — a lesson, quick quiz, or daily challenge a day."
-              : "Complete a lesson, beat a quick quiz, or take the daily challenge to start a streak."}
+            {streakActive ? t("streakActiveHint") : t("streakStartHint")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -241,14 +242,14 @@ export function ProfileClient({
             <div>
               <div className="text-3xl font-bold leading-none">{streak}</div>
               <div className="mt-1 text-xs text-muted-foreground">
-                {streak === 1 ? "day" : "days"} in a row
+                {t("daysInARow", { count: streak })}
               </div>
             </div>
           </div>
           <div className="text-sm text-muted-foreground">
-            Best:{" "}
+            {t("bestLabel")}{" "}
             <span className="font-semibold text-foreground">
-              {longestStreak} {longestStreak === 1 ? "day" : "days"}
+              {t("bestValue", { count: longestStreak })}
             </span>
           </div>
         </CardContent>
@@ -258,11 +259,9 @@ export function ProfileClient({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarDays className="h-5 w-5 text-primary" />
-            Activity
+            {t("activity")}
           </CardTitle>
-          <CardDescription>
-            Your last week of lessons, quizzes, and daily challenges.
-          </CardDescription>
+          <CardDescription>{t("activityHint")}</CardDescription>
         </CardHeader>
         <CardContent>
           <ActivityCalendar activityDays={activityDays} />
@@ -273,35 +272,35 @@ export function ProfileClient({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" />
-            Course progress
+            {t("courseProgress")}
           </CardTitle>
           <CardDescription>
-            {completedCount} of {totalLessons} lessons completed
+            {t("completedOf", { completed: completedCount, total: totalLessons })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Progress value={pct} />
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            <Stat icon={<CheckCircle2 className="h-4 w-4" />} label="Lessons" value={String(completedCount)} />
-            <Stat icon={<Bookmark className="h-4 w-4" />} label="Bookmarks" value={String(bookmarks.length)} />
+            <Stat icon={<CheckCircle2 className="h-4 w-4" />} label={t("statLessons")} value={String(completedCount)} />
+            <Stat icon={<Bookmark className="h-4 w-4" />} label={t("statBookmarks")} value={String(bookmarks.length)} />
             <Stat
               icon={<Flame className="h-4 w-4" />}
-              label="Challenges solved"
+              label={t("statChallenges")}
               value={String(challengesSolved)}
             />
             <Stat
               icon={<Award className="h-4 w-4" />}
-              label="Quiz accuracy"
+              label={t("statQuizAccuracy")}
               value={quizAccuracy == null ? "—" : `${quizAccuracy}%`}
             />
             <Stat
               icon={<ListChecks className="h-4 w-4" />}
-              label="Mini quizzes"
+              label={t("statMiniQuizzes")}
               value={String(quickQuizzesCompleted)}
             />
             <Stat
               icon={<CalendarDays className="h-4 w-4" />}
-              label="Daily challenges"
+              label={t("statDailyChallenges")}
               value={String(dailyChallengesCompleted)}
             />
           </div>
@@ -319,7 +318,7 @@ export function ProfileClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              Continue learning
+              {course("continueLearning")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
@@ -335,12 +334,12 @@ export function ProfileClient({
                 href="/lessons"
                 className="text-primary underline underline-offset-4"
               >
-                Start the course
+                {home("startCourse")}
               </Link>
             )}
             {currentPathLabel ? (
               <p className="text-muted-foreground">
-                Final project: {currentPathLabel}
+                {t("finalProject", { path: currentPathLabel })}
               </p>
             ) : null}
           </CardContent>
@@ -350,7 +349,7 @@ export function ProfileClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Trophy className="h-5 w-5 text-primary" />
-              Courses completed
+              {t("coursesCompleted")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
@@ -360,13 +359,15 @@ export function ProfileClient({
                   key={completion.courseId}
                   className="flex items-center justify-between gap-2"
                 >
-                  <span className="font-medium">{completion.title}</span>
+                  <span className="font-medium">
+                    {course(courseTitleKey(completion.courseId))}
+                  </span>
                   <div className="flex items-center gap-3">
                     <Link
                       href={`/certificate?course=${completion.courseId}`}
                       className="text-xs font-medium text-primary underline underline-offset-4"
                     >
-                      Certificate
+                      {t("certificate")}
                     </Link>
                     <span className="text-xs text-muted-foreground">
                       {new Date(completion.completedAt).toLocaleDateString()}
@@ -376,9 +377,7 @@ export function ProfileClient({
               ))
             ) : (
               <p className="text-muted-foreground">
-                {loadingSync
-                  ? "Syncing…"
-                  : "No courses finished yet — the capstone awaits."}
+                {loadingSync ? t("syncing") : t("noCoursesYet")}
               </p>
             )}
           </CardContent>

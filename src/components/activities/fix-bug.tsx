@@ -53,7 +53,7 @@ export function FixBug({
   requireLocal = false,
   placeholder = "local …",
   explanation,
-  label = "Fix the bug",
+  label,
   alreadySolved = false,
 }: FixBugProps) {
   const t = useTranslations("activity");
@@ -88,7 +88,7 @@ export function FixBug({
   const acceptedFirst = Array.isArray(fix) ? fix[0] : fix;
   const hint =
     status === "wrong" && isTypeMode
-      ? generateHint(value, fix!, { strictLocal: requireLocal })
+      ? generateHint(value, fix!, { strictLocal: requireLocal }, t)
       : undefined;
 
   if (!isTypeMode) {

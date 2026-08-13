@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "Fix Common Luau Errors — Roblox Scripting Mistakes Explained",
-  description:
-    "The most common Luau errors beginners hit in Roblox Studio, explained: what each error message means, and the exact fix — with real code examples.",
-  alternates: { canonical: "/guides/fix-common-luau-errors" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
+  return {
+    title: t("fixErrors.metaTitle"),
+    description: t("fixErrors.metaDescription"),
+    alternates: { canonical: "/guides/fix-common-luau-errors" },
+  };
+}
 
 const articleJsonLd = {
   "@context": "https://schema.org",
@@ -150,17 +158,22 @@ game.Players.PlayerAdded:Connect(onCharacter)`,
   },
 ];
 
-export default function FixCommonLuauErrorsGuide() {
+export default async function FixCommonLuauErrorsGuide({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <JsonLd data={articleJsonLd} />
       <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-        Guides
+        {t("eyebrow")}
       </p>
-      <h1 className="text-3xl font-bold tracking-tight">Fix Common Luau Errors</h1>
+      <h1 className="text-3xl font-bold tracking-tight">{t("fixErrors.title")}</h1>
       <p className="mt-3 text-lg text-muted-foreground">
-        Eight error messages almost every Roblox scripter meets — what they
-        mean, and the fix. Bookmark this page for when Studio yells at you.
+        {t("fixErrors.intro")}
       </p>
 
       <div className="prose prose-sm mt-8 max-w-none text-[15px] leading-relaxed">
@@ -180,27 +193,27 @@ export default function FixCommonLuauErrorsGuide() {
               <code>{error.message}</code>
             </pre>
             <p>
-              <strong>The code that triggers it:</strong>
+              <strong>{t("fixErrors.theCodeThatTriggers")}</strong>
             </p>
             <pre className="rounded-lg border bg-muted p-3 text-[13px]">
               <code>{error.code}</code>
             </pre>
             <p>{error.cause}</p>
             <p>
-              <strong>The fix:</strong>
+              <strong>{t("fixErrors.theFix")}</strong>
             </p>
             <pre className="rounded-lg border bg-muted p-3 text-[13px]">
               <code>{error.fix}</code>
             </pre>
             <p>
               {error.fixText}
-              <Link href={error.fixLink.href}>{error.fixLink.label}</Link>
-              &nbsp;teaches the concept properly.
+              <Link href={error.fixLink.href}>{error.fixLink.label}</Link>{" "}
+              {t("fixErrors.teachesTheConcept")}
             </p>
           </div>
         ))}
 
-        <h2>When the fix isn&apos;t obvious</h2>
+        <h2>{t("fixErrors.sections.notObvious")}</h2>
         <p>
           If an error is still confusing, don&apos;t guess —{" "}
           <strong>read the error, then narrow it down</strong>. The{" "}
@@ -210,7 +223,7 @@ export default function FixCommonLuauErrorsGuide() {
           how to watch your code run line by line.
         </p>
 
-        <h2>Practice without pressure</h2>
+        <h2>{t("fixErrors.sections.practiceNoPressure")}</h2>
         <p>
           The course includes{" "}
           <Link href="/lessons/bug-hunt-first">bug-hunt exercises</Link> where

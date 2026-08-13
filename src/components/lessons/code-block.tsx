@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Check, Copy, Play, Terminal } from "lucide-react";
 import { highlightCode } from "@/lib/highlighter";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ export function CodeBlock({
   children,
   className,
 }: React.HTMLAttributes<HTMLPreElement>) {
+  const t = useTranslations("codeBlock");
   const codeElement = React.isValidElement(children) ? children : null;
   const codeProps = codeElement?.props as
     | { className?: string; children?: React.ReactNode }
@@ -92,7 +94,7 @@ export function CodeBlock({
       <div className="flex h-9 items-center justify-between border-b border-white/10 px-4">
         <span className="flex items-center gap-1.5 font-mono text-xs text-zinc-400">
           <Terminal className="h-3.5 w-3.5" />
-          {language ? languageLabel(language) : "Code"}
+          {language ? languageLabel(language) : t("code")}
         </span>
         <div className="flex items-center gap-1">
           {runnable && (
@@ -100,24 +102,24 @@ export function CodeBlock({
               type="button"
               onClick={() => setTrying(true)}
               className="flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
-              aria-label="Run this code"
+              aria-label={t("runThisCode")}
             >
-              <Play className="h-3.5 w-3.5" /> Try it
+              <Play className="h-3.5 w-3.5" /> {t("tryIt")}
             </button>
           )}
           <button
             type="button"
             onClick={handleCopy}
             className="flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
-            aria-label="Copy code"
+            aria-label={t("copyCode")}
           >
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5 text-emerald-400" /> Copied
+                <Check className="h-3.5 w-3.5 text-emerald-400" /> {t("copied")}
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5" /> Copy
+                <Copy className="h-3.5 w-3.5" /> {t("copy")}
               </>
             )}
           </button>

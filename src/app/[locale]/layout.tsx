@@ -5,11 +5,11 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/react";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { SyncHost } from "@/components/auth/sync-host";
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -17,28 +17,39 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: "RoCourse — Learn Luau & Roblox for Free",
-    template: "%s · RoCourse — Free",
-  },
-  description: SITE_DESCRIPTION,
-  keywords: ["Roblox", "Luau", "Lua", "Roblox Studio", "learn to code", "game development", "free course"],
-  openGraph: {
-    type: "website",
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: "RoCourse — Learn Luau & Roblox for Free",
-    description: SITE_DESCRIPTION,
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "RoCourse — Learn Luau & Roblox for Free",
-    description: SITE_DESCRIPTION,
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
+  const t = await getTranslations({ locale, namespace: "common" });
+  const title = t("metadataTitle");
+  const description = t("metadataDescription");
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: title,
+      template: t("metadataTitleTemplate"),
+    },
+    description,
+    keywords: ["Roblox", "Luau", "Lua", "Roblox Studio", "learn to code", "game development", "free course"],
+    openGraph: {
+      type: "website",
+      url: SITE_URL,
+      siteName: SITE_NAME,
+      title,
+      description,
+      locale: locale === "es" ? "es_ES" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function LocaleLayout({
   children,

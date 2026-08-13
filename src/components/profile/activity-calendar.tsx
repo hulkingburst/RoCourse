@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { dayKey } from "@/lib/streak";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ export function ActivityCalendar({
 }: {
   activityDays: Record<string, number>;
 }) {
+  const t = useTranslations("activityCalendar");
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -73,7 +75,7 @@ export function ActivityCalendar({
                 weekday: "short",
                 month: "short",
                 day: "numeric",
-              })}${count > 0 ? ` — ${count} ${count === 1 ? "activity" : "activities"}` : " — no activity"}`}
+              })}${count > 0 ? ` — ${t("count", { count })}` : ` — ${t("noActivity")}`}`}
             >
               <span className="text-xs text-muted-foreground">
                 {WEEK_ABBREV[cell.date.getDay()]}
@@ -90,11 +92,11 @@ export function ActivityCalendar({
         })}
       </div>
       <div className="mt-2 flex items-center justify-end gap-1 text-[10px] text-muted-foreground">
-        <span>Less</span>
+        <span>{t("less")}</span>
         {CELL_COLORS.map((color, index) => (
           <span key={index} className={cn("h-2 w-2 rounded-[2px]", color)} />
         ))}
-        <span>More</span>
+        <span>{t("more")}</span>
       </div>
     </div>
   );

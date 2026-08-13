@@ -38,6 +38,8 @@ export function FillBlank({
   const t = useTranslations("activity");
   const { solved: stepSolved, onResult } = useStepper();
   const resolvedLabel = label ?? t("fillBlankLabel");
+  const resolvedPlaceholder =
+    placeholder === "Type here…" ? t("fillBlankPlaceholder") : placeholder;
   const [value, setValue] = React.useState("");
   const [status, setStatus] = React.useState<ActivityStatus>(() =>
     alreadySolved || stepSolved ? "correct" : "idle"
@@ -77,11 +79,11 @@ export function FillBlank({
           onKeyDown={(event) => {
             if (event.key === "Enter") check();
           }}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
-          aria-label={placeholder}
+          aria-label={resolvedPlaceholder}
           className={cn(
             "mx-1 inline-block w-32 rounded-md border-b-2 bg-transparent px-1.5 py-0.5 text-center font-mono text-[15px] outline-none transition-colors placeholder:text-muted-foreground/50 disabled:opacity-60",
             correct
@@ -95,7 +97,7 @@ export function FillBlank({
         onCheck={check}
         canCheck={!correct && value.trim().length > 0}
         onReset={status === "wrong" ? reset : undefined}
-        checkLabel="Check"
+        checkLabel={t("check")}
       />
       <Feedback
         status={status}

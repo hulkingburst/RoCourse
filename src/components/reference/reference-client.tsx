@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, Check, Copy, Search, SearchX } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export function ReferenceClient({
   entries: ReferenceEntry[];
   categories: readonly ReferenceCategory[];
 }) {
+  const t = useTranslations("reference");
   const [query, setQuery] = React.useState("");
   const [debounced, setDebounced] = React.useState("");
   const [category, setCategory] = React.useState<ReferenceCategory | "All">("All");
@@ -38,17 +40,17 @@ export function ReferenceClient({
       if (category !== "All" && entry.category !== category) return false;
       if (!term) return true;
       const haystack = [
-        entry.title,
-        entry.description,
-        entry.category,
+        t(`entries.${entry.id}.title`),
+        t(`entries.${entry.id}.description`),
+        t(`categories.${entry.category}`),
         entry.code,
-        ...(entry.links ?? []).map((link) => link.label),
+        ...(entry.links ?? []).map((link) => t(link.labelKey)),
       ]
         .join("\n")
         .toLowerCase();
       return haystack.includes(term);
     });
-  }, [entries, debounced, category]);
+  }, [entries, debounced, category, t]);
 
   return (
     <div className="space-y-5">
@@ -57,7 +59,7 @@ export function ReferenceClient({
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search syntax… e.g. pairs, task.wait, return"
+          placeholder={t("searchPlaceholder")}
           className="pl-9"
         />
       </div>
@@ -75,7 +77,7 @@ export function ReferenceClient({
                 : "border-border text-muted-foreground hover:bg-accent hover:text-foreground"
             )}
           >
-            {cat}
+            {cat === "All" ? t("all") : t(`categories.${cat}`)}
           </button>
         ))}
       </div>
@@ -90,7 +92,7 @@ export function ReferenceClient({
         <div className="flex flex-col items-center gap-2 py-16 text-center">
           <SearchX className="h-8 w-8 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">
-            Nothing matches “{query}”{category !== "All" ? ` in ${category}` : ""}.
+            {t("noResults", { query, category })}
           </p>
         </div>
       )}
@@ -99,6 +101,7 @@ export function ReferenceClient({
 }
 
 function EntryCard({ entry }: { entry: ReferenceEntry }) {
+  const t = useTranslations("reference");
   const [copied, setCopied] = React.useState(false);
 
   const copy = async () => {
@@ -116,16 +119,18 @@ function EntryCard({ entry }: { entry: ReferenceEntry }) {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <CardTitle className="text-base">{entry.title}</CardTitle>
+            <CardTitle className="text-base">
+              {t(`entries.${entry.id}.title`)}
+            </CardTitle>
             <CardDescription className="mt-1 text-[13px]">
-              {entry.description}
+              {t(`entries.${entry.id}.description`)}
             </CardDescription>
           </div>
           <Badge
             variant="secondary"
             className="shrink-0 px-2 py-0 text-[10px]"
           >
-            {entry.category}
+            {t(`categories.${entry.category}`)}
           </Badge>
         </div>
       </CardHeader>
@@ -138,7 +143,7 @@ function EntryCard({ entry }: { entry: ReferenceEntry }) {
             variant="ghost"
             size="iconSm"
             onClick={copy}
-            aria-label="Copy code"
+            aria-label={t("copyCode")}
             className="absolute right-1.5 top-1.5 h-7 w-7"
           >
             {copied ? (
@@ -156,7 +161,7 @@ function EntryCard({ entry }: { entry: ReferenceEntry }) {
                 href={link.href}
                 className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-4 hover:underline"
               >
-                {link.label}
+                {t(link.labelKey)}
                 <ArrowRight className="h-3 w-3" />
               </Link>
             ))}

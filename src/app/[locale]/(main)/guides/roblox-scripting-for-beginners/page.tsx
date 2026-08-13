@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Roblox Scripting for Beginners — Learn Luau Step by Step",
-  description:
-    "New to Roblox scripting? Learn Luau from zero with this beginner-friendly guide: variables, functions, loops, events, and debugging — with free hands-on practice.",
-  alternates: { canonical: "/guides/roblox-scripting-for-beginners" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
+  return {
+    title: t("scriptingBeginners.metaTitle"),
+    description: t("scriptingBeginners.metaDescription"),
+    alternates: { canonical: "/guides/roblox-scripting-for-beginners" },
+  };
+}
 
 const scriptingJsonLd = {
   "@context": "https://schema.org",
@@ -26,23 +34,28 @@ const scriptingJsonLd = {
   },
 };
 
-export default function ScriptingBeginnersGuide() {
+export default async function ScriptingBeginnersGuide({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <JsonLd data={scriptingJsonLd} />
       <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-        Guides
+        {t("eyebrow")}
       </p>
       <h1 className="text-3xl font-bold tracking-tight">
-        Roblox Scripting for Beginners
+        {t("scriptingBeginners.title")}
       </h1>
       <p className="mt-3 text-lg text-muted-foreground">
-        Scripting is what turns a static scene into a game. Here&apos;s what
-        you actually need to know to start — and how to practice it for free.
+        {t("scriptingBeginners.intro")}
       </p>
 
       <div className="prose prose-sm mt-8 max-w-none text-[15px] leading-relaxed">
-        <h2>What &ldquo;scripting&rdquo; means in Roblox</h2>
+        <h2>{t("scriptingBeginners.sections.scriptingMeans")}</h2>
         <p>
           Roblox games are written in{" "}
           <Link href="/guides/what-is-luau">Luau</Link>, a fast, beginner-friendly
@@ -53,7 +66,7 @@ export default function ScriptingBeginnersGuide() {
           make the game respond to players.
         </p>
 
-        <h2>Your first script</h2>
+        <h2>{t("scriptingBeginners.sections.firstScript")}</h2>
         <p>
           Open Roblox Studio, insert a Script into the Workspace, and write{" "}
           <code>print(&quot;Hello, Roblox!&quot;)</code>. Hit Play and check the
@@ -64,7 +77,7 @@ export default function ScriptingBeginnersGuide() {
           you to read what the game tells you.
         </p>
 
-        <h2>The five ideas everything is built from</h2>
+        <h2>{t("scriptingBeginners.sections.fiveIdeas")}</h2>
         <p>
           Every game — from a coin tycoon to a multiplayer obby — is a
           combination of these five ideas:
@@ -92,7 +105,7 @@ export default function ScriptingBeginnersGuide() {
           </li>
         </ul>
 
-        <h2>Read your errors like a pro</h2>
+        <h2>{t("scriptingBeginners.sections.readErrors")}</h2>
         <p>
           Errors are not a failure — they&apos;re the game telling you exactly
           what to fix. The{" "}
@@ -104,7 +117,7 @@ export default function ScriptingBeginnersGuide() {
           that&apos;s normal.
         </p>
 
-        <h2>Practice for free, right now</h2>
+        <h2>{t("scriptingBeginners.sections.practiceFree")}</h2>
         <p>
           You can experiment in the{" "}
           <Link href="/playground">browser playground</Link> without even

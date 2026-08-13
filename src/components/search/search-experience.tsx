@@ -1,15 +1,17 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, Search, SearchX } from "lucide-react";
 import { createSearchFuse } from "@/lib/search";
-import { DIFFICULTY_LABEL, type SearchEntry } from "@/lib/types";
+import type { SearchEntry } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useProgressStore } from "@/lib/progress-store";
 
 function ResultRow({ entry }: { entry: SearchEntry }) {
+  const difficulty = useTranslations("difficulty");
   return (
     <Link
       href={`/lessons/${entry.slug}`}
@@ -22,7 +24,7 @@ function ResultRow({ entry }: { entry: SearchEntry }) {
             {entry.sectionTitle}
           </Badge>
           <Badge variant="outline" className="px-2 py-0 text-[10px] text-muted-foreground">
-            {DIFFICULTY_LABEL[entry.difficulty]}
+            {difficulty(entry.difficulty)}
           </Badge>
         </span>
       </div>
@@ -40,6 +42,8 @@ export function SearchExperience({
   entries: SearchEntry[];
   autoFocus?: boolean;
 }) {
+  const t = useTranslations("search");
+  const course = useTranslations("course");
   const [query, setQuery] = React.useState("");
   const [debounced, setDebounced] = React.useState("");
   const hydrated = useProgressStore((state) => state.hydrated);
@@ -83,7 +87,7 @@ export function SearchExperience({
           autoFocus={autoFocus}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search lessons…  e.g. RemoteEvents"
+          placeholder={t("placeholder")}
           className="pl-9"
         />
       </div>
@@ -100,11 +104,9 @@ export function SearchExperience({
             <div className="flex flex-col items-center gap-2 py-10 text-center">
               <SearchX className="h-8 w-8 text-muted-foreground/50" />
               <p className="text-sm text-muted-foreground">
-                No lessons match “{query}”.
+                {t("noResults", { query })}
               </p>
-              <p className="text-xs text-muted-foreground/70">
-                Try “variables”, “RemoteEvents”, or “leaderstats”.
-              </p>
+              <p className="text-xs text-muted-foreground/70">{t("suggestions")}</p>
             </div>
           )
         ) : (
@@ -112,7 +114,7 @@ export function SearchExperience({
             {bookmarkEntries.length > 0 && (
               <div>
                 <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Bookmarked
+                  {course("bookmarked")}
                 </p>
                 <div className="space-y-1">
                   {bookmarkEntries.map((entry) => (
@@ -124,7 +126,7 @@ export function SearchExperience({
             {recentEntries.length > 0 && (
               <div>
                 <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Recently viewed
+                  {course("recentlyViewed")}
                 </p>
                 <div className="space-y-1">
                   {recentEntries.map((entry) => (
@@ -135,14 +137,12 @@ export function SearchExperience({
             )}
             {bookmarkEntries.length === 0 && recentEntries.length === 0 && (
               <div className="space-y-2 px-3 py-2">
-                <p className="text-sm text-muted-foreground">
-                  Search finds lessons by title, description, tags, and keywords.
-                </p>
+                <p className="text-sm text-muted-foreground">{t("hint")}</p>
                 <Link
                   href="/lessons"
                   className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                 >
-                  Browse all {hydrated ? entries.length : ""} lessons
+                  {t("browseAll", { count: hydrated ? entries.length : 0 })}
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>

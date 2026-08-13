@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "What Is Luau? The Roblox Scripting Language, Explained",
-  description:
-    "Luau is the scripting language behind every Roblox game. Learn what it is, how it relates to Lua, what makes it beginner-friendly, and how to start coding with it.",
-  alternates: { canonical: "/guides/what-is-luau" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
+  return {
+    title: t("whatIsLuau.metaTitle"),
+    description: t("whatIsLuau.metaDescription"),
+    alternates: { canonical: "/guides/what-is-luau" },
+  };
+}
 
 const luauJsonLd = {
   "@context": "https://schema.org",
@@ -25,23 +33,28 @@ const luauJsonLd = {
   },
 };
 
-export default function WhatIsLuauGuide() {
+export default async function WhatIsLuauGuide({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "guides" });
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <JsonLd data={luauJsonLd} />
       <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-        Guides
+        {t("eyebrow")}
       </p>
       <h1 className="text-3xl font-bold tracking-tight">
-        What Is Luau?
+        {t("whatIsLuau.title")}
       </h1>
       <p className="mt-3 text-lg text-muted-foreground">
-        The scripting language behind every Roblox game — where it came from,
-        why it&apos;s great for beginners, and how to write your first line.
+        {t("whatIsLuau.intro")}
       </p>
 
       <div className="prose prose-sm mt-8 max-w-none text-[15px] leading-relaxed">
-        <h2>Luau is Roblox&apos;s language</h2>
+        <h2>{t("whatIsLuau.sections.robloxsLanguage")}</h2>
         <p>
           Every Roblox game is powered by <strong>Luau</strong> (pronounced
           &ldquo;loo-ow&rdquo;). It&apos;s the language scripts use inside
@@ -50,7 +63,7 @@ export default function WhatIsLuauGuide() {
           language you&apos;ll write.
         </p>
 
-        <h2>Luau is a faster, safer Lua</h2>
+        <h2>{t("whatIsLuau.sections.fasterSafer")}</h2>
         <p>
           Luau started as <strong>Lua</strong>, a small, famously
           beginner-friendly programming language. Roblox took Lua and made it
@@ -67,7 +80,7 @@ export default function WhatIsLuauGuide() {
           it&apos;s a real introduction to programming.
         </p>
 
-        <h2>Where Luau runs</h2>
+        <h2>{t("whatIsLuau.sections.whereRuns")}</h2>
         <ul>
           <li>
             <strong>In games</strong> — server scripts, local scripts, and
@@ -83,7 +96,7 @@ export default function WhatIsLuauGuide() {
           </li>
         </ul>
 
-        <h2>What makes Luau beginner-friendly</h2>
+        <h2>{t("whatIsLuau.sections.beginnerFriendly")}</h2>
         <ul>
           <li>
             <strong>Instant feedback.</strong> Play the game and see results
@@ -103,7 +116,7 @@ export default function WhatIsLuauGuide() {
           </li>
         </ul>
 
-        <h2>Start writing Luau today</h2>
+        <h2>{t("whatIsLuau.sections.startToday")}</h2>
         <p>
           Open the{" "}
           <Link href="/playground">Luau playground</Link> and try{" "}

@@ -60,9 +60,3 @@ export interface SearchEntry {
   keywords: string[];
   headings: string[];
 }
-
-export const DIFFICULTY_LABEL: Record<Difficulty, string> = {
-  beginner: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-};

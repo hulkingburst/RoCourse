@@ -1,21 +1,35 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description:
-    "The terms for using RoCourse, including accounts, user submissions, and intellectual property.",
-  alternates: { canonical: "/terms" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "terms" });
+  return {
+    title: t("metadataTitle"),
+    description: t("metadataDescription"),
+    alternates: { canonical: "/terms" },
+  };
+}
 
 const LAST_UPDATED = "August 8, 2026";
 
-export default function TermsPage() {
+export default async function TermsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "terms" });
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">Terms of Service</h1>
+      <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Last updated: {LAST_UPDATED}
+        {t("lastUpdated", { date: LAST_UPDATED })}
       </p>
 
       <div className="prose prose-sm mt-8 max-w-none text-[15px] leading-relaxed">
@@ -26,7 +40,7 @@ export default function TermsPage() {
           please don&apos;t use the site.
         </p>
 
-        <h2>The short version</h2>
+        <h2>{t("shortVersion")}</h2>
         <ul>
           <li>RoCourse is a free, interactive course. You can use it as a guest or with an account.</li>
           <li>You must be at least 13 years old (or the minimum age that applies to you) to create an account.</li>
@@ -35,7 +49,7 @@ export default function TermsPage() {
           <li>We are not affiliated with or endorsed by Roblox Corporation.</li>
         </ul>
 
-        <h2>Accounts</h2>
+        <h2>{t("accounts")}</h2>
         <ul>
           <li>
             To create an account you must be at least 13 years old, or the
@@ -47,7 +61,7 @@ export default function TermsPage() {
           <li>We may suspend or close accounts that break these terms.</li>
         </ul>
 
-        <h2>The course and intellectual property</h2>
+        <h2>{t("intellectualProperty")}</h2>
         <p>
           The RoCourse code and course content are made available under the{" "}
           <a
@@ -78,7 +92,7 @@ export default function TermsPage() {
           with, endorsed by, or sponsored by Roblox Corporation.
         </p>
 
-        <h2>User submissions (community resources)</h2>
+        <h2>{t("userSubmissions")}</h2>
         <ul>
           <li>
             When you submit a resource you represent that you own it or have
@@ -98,32 +112,32 @@ export default function TermsPage() {
           </li>
         </ul>
 
-        <h2>Certificate</h2>
+        <h2>{t("certificate")}</h2>
         <p>
           The completion certificate acknowledges that you finished the course.
           It is not an accredited credential, diploma, or qualification.
         </p>
 
-        <h2>Acceptable use</h2>
+        <h2>{t("acceptableUse")}</h2>
         <p>
           Don&apos;t try to break, overload, or disrupt the site or its
           services; scrape it abusively; or use it to spam or harass others.
         </p>
 
-        <h2>No warranty, no liability</h2>
+        <h2>{t("noWarranty")}</h2>
         <p>
           The site is provided &ldquo;as is&rdquo; without warranties of any
           kind. To the extent permitted by law, we are not liable for any
           damages arising out of your use of the site or any content on it.
         </p>
 
-        <h2>Changes</h2>
+        <h2>{t("changes")}</h2>
         <p>
           We may update these terms from time to time. Changes apply once
           posted on this page.
         </p>
 
-        <h2>Contact</h2>
+        <h2>{t("contact")}</h2>
         <p>
           Questions about these terms? Open an issue at{" "}
           <a

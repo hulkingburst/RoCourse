@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Play, RefreshCw, Square, Terminal } from "lucide-react";
 import { runLuau, stopLuau } from "@/lib/luau-runtime";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ function insertTab(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
  * re-run right where the learner is reading.
  */
 export function TryIt({ code }: { code: string }) {
+  const t = useTranslations("tryIt");
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(code);
   const [output, setOutput] = React.useState<string | null>(null);
@@ -36,7 +38,7 @@ export function TryIt({ code }: { code: string }) {
     setRunning(false);
     setElapsed(result.elapsedMs);
     setIsError(result.error !== null || result.timedOut);
-    setOutput(result.error ?? (result.output || "(no output)"));
+    setOutput(result.error ?? (result.output || t("noOutput")));
   };
 
   const stop = () => {
@@ -59,7 +61,7 @@ export function TryIt({ code }: { code: string }) {
         className="flex w-full items-center gap-1.5 px-4 py-2 font-mono text-xs text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100"
       >
         <Terminal className="h-3.5 w-3.5" />
-        {open ? "Hide runner" : "Try it — run this code in your browser"}
+        {open ? t("hideRunner") : t("tryIt")}
       </button>
 
       {open && (
@@ -78,18 +80,18 @@ export function TryIt({ code }: { code: string }) {
                 >
                   {running ? (
                     <>
-                      <Square className="h-3 w-3 fill-current" /> Stop
+                      <Square className="h-3 w-3 fill-current" /> {t("stop")}
                     </>
                   ) : (
                     <>
-                      <Play className="h-3 w-3" /> Run
+                      <Play className="h-3 w-3" /> {t("run")}
                     </>
                   )}
                 </button>
                 <button
                   type="button"
                   onClick={reset}
-                  aria-label="Reset code"
+                  aria-label={t("resetCode")}
                   className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-200"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
@@ -110,7 +112,7 @@ export function TryIt({ code }: { code: string }) {
               spellCheck={false}
               autoCapitalize="off"
               autoCorrect="off"
-              aria-label="Luau code editor"
+              aria-label={t("editor")}
               className="block h-52 w-full resize-none bg-transparent p-4 font-mono text-[13px] leading-relaxed text-zinc-200 outline-none"
             />
           </div>
@@ -128,7 +130,7 @@ export function TryIt({ code }: { code: string }) {
                 )}
               />
               <span className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                Output
+                {t("output")}
               </span>
               {elapsed !== null && (
                 <span className="ml-auto text-[11px] text-zinc-500">
@@ -143,7 +145,7 @@ export function TryIt({ code }: { code: string }) {
               )}
             >
               {output ?? (
-                <span className="text-zinc-600">Run the code to see output here.</span>
+                <span className="text-zinc-600">{t("runHint")}</span>
               )}
             </pre>
           </div>

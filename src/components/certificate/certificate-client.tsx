@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Download, Loader2, Palette, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { courseTitleKey } from "@/lib/course-titles";
 import { Button } from "@/components/ui/button";
 import {
   CertificateSvg,
@@ -84,16 +86,6 @@ export const CERT_THEMES: CertificateTheme[] = [
 
 const THEME_STORAGE_KEY = "rocourse:certificate:theme";
 
-function formatDate(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return `Completed on ${date.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })}`;
-}
-
 interface CertificateClientProps {
   name: string;
   completions: CertificateCompletion[];
@@ -105,6 +97,8 @@ export function CertificateClient({
   completions,
   initialCourseId,
 }: CertificateClientProps) {
+  const t = useTranslations("certificate");
+  const course = useTranslations("course");
   const [courseId, setCourseId] = React.useState<string>(() => {
     if (
       initialCourseId &&
@@ -137,7 +131,16 @@ export function CertificateClient({
   const theme = CERT_THEMES.find((item) => item.id === themeId) ?? CERT_THEMES[0];
   if (!completion) return null;
 
-  const dateLabel = formatDate(completion.completedAt);
+  const completionDate = new Date(completion.completedAt);
+  const dateLabel = Number.isNaN(completionDate.getTime())
+    ? ""
+    : t("completedOn", {
+        date: completionDate.toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+      });
 
   const handleDownload = async () => {
     const node = svgRef.current;
@@ -181,15 +184,12 @@ export function CertificateClient({
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">Your certificate</h1>
-      <p className="mt-2 max-w-2xl text-muted-foreground">
-        You earned this — pick a background that fits, then download it as a
-        high-resolution PNG or save it as a PDF.
-      </p>
+      <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+      <p className="mt-2 max-w-2xl text-muted-foreground">{t("intro")}</p>
 
       {completions.length > 1 && (
         <div className="mt-6">
-          <div className="text-sm font-medium">Course</div>
+          <div className="text-sm font-medium">{t("course")}</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {completions.map((item) => (
               <button
@@ -203,7 +203,7 @@ export function CertificateClient({
                     : "text-muted-foreground hover:bg-accent"
                 )}
               >
-                {item.title}
+                {course(courseTitleKey(item.courseId))}
               </button>
             ))}
           </div>
@@ -213,7 +213,7 @@ export function CertificateClient({
       <div className="mt-6">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Palette className="h-4 w-4 text-primary" />
-          Background
+          {t("background")}
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           {CERT_THEMES.map((item) => {
@@ -223,9 +223,9 @@ export function CertificateClient({
                 key={item.id}
                 type="button"
                 onClick={() => setThemeId(item.id)}
-                aria-label={item.label}
+                aria-label={t(`themes.${item.id}`)}
                 aria-pressed={active}
-                title={item.label}
+                title={t(`themes.${item.id}`)}
                 className={cn(
                   "flex flex-col items-center gap-1.5 rounded-lg border p-2 transition-colors",
                   active
@@ -243,7 +243,7 @@ export function CertificateClient({
                     active ? "font-medium text-primary" : "text-muted-foreground"
                   )}
                 >
-                  {item.label}
+                  {t(`themes.${item.id}`)}
                 </span>
               </button>
             );
@@ -257,7 +257,7 @@ export function CertificateClient({
           id="certificate-print"
           theme={theme}
           name={name}
-          courseTitle={completion.title}
+          courseTitle={course(courseTitleKey(completion.courseId))}
           dateLabel={dateLabel}
           className="h-auto w-full"
         />
@@ -270,16 +270,14 @@ export function CertificateClient({
           ) : (
             <Download className="h-4 w-4" />
           )}
-          Download PNG
+          {t("downloadPng")}
         </Button>
         <Button variant="outline" onClick={() => window.print()}>
           <Printer className="h-4 w-4" />
-          Save as PDF
+          {t("savePdf")}
         </Button>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        The PNG downloads at 3200×2200 — print-ready at 300 DPI.
-      </p>
+      <p className="mt-3 text-xs text-muted-foreground">{t("dpiNote")}</p>
     </div>
   );
 }

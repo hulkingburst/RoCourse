@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
@@ -38,6 +39,7 @@ export function QuestionsClient({
   initialQuestions: QuestionListItem[];
   lessons: { slug: string; title: string }[];
 }) {
+  const t = useTranslations("questions");
   const router = useRouter();
   const { status } = useSession();
   const { openDialog } = useAuthUiStore();
@@ -83,25 +85,24 @@ export function QuestionsClient({
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
             <MessageCircleQuestion className="h-8 w-8 text-primary" />
-            Questions
+            {t("title")}
           </h1>
           <p className="mt-2 max-w-xl text-muted-foreground">
-            Stuck on an activity, a concept, or your final project? Ask a
-            question and the community will help.
+            {t("description")}
           </p>
         </div>
         <Button onClick={handleAsk}>
           <MessageSquarePlus className="h-4 w-4" />
-          Ask a question
+          {t("askButton")}
         </Button>
       </div>
 
       <div className="mt-8 flex gap-1 rounded-lg border bg-muted/40 p-1">
         {(
           [
-            ["all", "All"],
-            ["open", "Open"],
-            ["solved", "Solved"],
+            ["all", t("filterAll")],
+            ["open", t("filterOpen")],
+            ["solved", t("filterSolved")],
           ] as [Filter, string][]
         ).map(([value, label]) => (
           <button
@@ -125,11 +126,9 @@ export function QuestionsClient({
         {visible.length === 0 ? (
           <div className="rounded-xl border border-dashed px-6 py-16 text-center">
             <SearchX className="mx-auto h-8 w-8 text-muted-foreground" />
-            <p className="mt-3 font-medium">No questions here yet</p>
+            <p className="mt-3 font-medium">{t("noQuestions")}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {filter === "all"
-                ? "Be the first to ask — someone will jump in to help."
-                : "Nothing in this category right now."}
+              {filter === "all" ? t("noQuestionsAll") : t("noQuestionsFiltered")}
             </p>
           </div>
         ) : (
@@ -162,6 +161,7 @@ function QuestionRow({
   question: QuestionListItem;
   lessonTitle?: string;
 }) {
+  const t = useTranslations("questions");
   return (
     <Link
       href={`/questions/${question.id}`}
@@ -174,11 +174,11 @@ function QuestionRow({
         </div>
         {question.solved ? (
           <Badge variant="success" className="shrink-0">
-            Solved
+            {t("solved")}
           </Badge>
         ) : (
           <Badge variant="outline" className="shrink-0">
-            Open
+            {t("open")}
           </Badge>
         )}
       </div>
@@ -189,7 +189,7 @@ function QuestionRow({
         </span>
         <span className="inline-flex items-center gap-1">
           <HelpCircle className="h-3.5 w-3.5" />
-          {question.answerCount} {question.answerCount === 1 ? "answer" : "answers"}
+          {t("answerCount", { count: question.answerCount })}
         </span>
         {lessonTitle ? <span className="text-muted-foreground/80">{lessonTitle}</span> : null}
       </div>
@@ -221,6 +221,7 @@ function AskQuestionDialog({
   onOpenChange: (open: boolean) => void;
   onCreated: (question: QuestionListItem) => void;
 }) {
+  const t = useTranslations("questions");
   const [title, setTitle] = React.useState("");
   const [body, setBody] = React.useState("");
   const [lessonSlug, setLessonSlug] = React.useState("");
@@ -249,13 +250,13 @@ function AskQuestionDialog({
         error?: string;
       };
       if (!response.ok || !data.question) {
-        setError(data.error ?? "Something went wrong. Try again.");
+        setError(data.error ?? t("errorGeneric"));
         return;
       }
       reset();
       onCreated(data.question);
     } catch {
-      setError("Network error — please try again.");
+      setError(t("errorNetwork"));
     } finally {
       setSubmitting(false);
     }
@@ -265,26 +266,25 @@ function AskQuestionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Ask a question</DialogTitle>
+          <DialogTitle>{t("askTitle")}</DialogTitle>
           <DialogDescription>
-            Describe what you&apos;re stuck on. Links to the lesson are a big
-            help.
+            {t("askDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="question-title">Title</Label>
+            <Label htmlFor="question-title">{t("titleLabel")}</Label>
             <Input
               id="question-title"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="e.g. Why does my while loop never stop?"
+              placeholder={t("titlePlaceholder")}
               maxLength={120}
               required
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="question-lesson">Related lesson (optional)</Label>
+            <Label htmlFor="question-lesson">{t("lessonLabel")}</Label>
             <select
               id="question-lesson"
               value={lessonSlug}
@@ -292,7 +292,7 @@ function AskQuestionDialog({
               className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="" className="bg-white text-black">
-                No specific lesson
+                {t("noLesson")}
               </option>
               {lessons.map((lesson) => (
                 <option key={lesson.slug} value={lesson.slug} className="bg-white text-black">
@@ -302,12 +302,12 @@ function AskQuestionDialog({
             </select>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="question-body">Details</Label>
+            <Label htmlFor="question-body">{t("bodyLabel")}</Label>
             <textarea
               id="question-body"
               value={body}
               onChange={(event) => setBody(event.target.value)}
-              placeholder="What are you trying to do, what did you try, and what happened instead?"
+              placeholder={t("bodyPlaceholder")}
               maxLength={4000}
               rows={6}
               required
@@ -317,11 +317,11 @@ function AskQuestionDialog({
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              Post question
+              {t("postQuestion")}
             </Button>
           </DialogFooter>
         </form>

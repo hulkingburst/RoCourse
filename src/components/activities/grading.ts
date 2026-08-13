@@ -6,6 +6,10 @@
  * deliberately forgiving for the one-to-a-few-line exercises in this course.
  */
 
+import type { useTranslations } from "next-intl";
+
+export type Translator = ReturnType<typeof useTranslations>;
+
 export function normalizeAnswer(input: string): string {
   return input
     .toLowerCase()
@@ -93,7 +97,8 @@ function codeTokens(input: string): string[] {
 export function generateHint(
   input: string,
   answer: string | string[],
-  options?: AnswerOptions
+  options: AnswerOptions | undefined,
+  t: Translator
 ): string | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
@@ -107,7 +112,7 @@ export function generateHint(
   const acceptedClean = accepted.map((a) => cleanCode(a).toLowerCase());
 
   if (options?.strictLocal && !/^\s*local\b/.test(inputClean)) {
-    return "Add the `local` keyword at the start — without it, this becomes a global variable.";
+    return t("hintMissingLocal");
   }
 
   const inputTokens = codeTokens(inputClean);
@@ -139,39 +144,39 @@ export function generateHint(
   const bestRhs = rhsOf(best);
 
   if (bestRhs !== null && !inputClean.includes("=")) {
-    return "You're missing the `= value` — a declaration assigns a value to the name.";
+    return t("hintMissingEquals");
   }
 
   if (bestName !== null && inputName !== null && inputName !== bestName) {
-    return "The variable name doesn't match what the rest of the script expects — check the name.";
+    return t("hintNameMismatch");
   }
 
   if (bestRhs !== null && inputRhs === null) {
-    return "A declaration needs `= <value>` after the name — you're missing the value.";
+    return t("hintMissingValue");
   }
 
   if (bestRhs !== null && inputRhs !== null && bestRhs !== inputRhs) {
     if (inputRhs.startsWith(bestRhs) && inputRhs.length > bestRhs.length) {
-      return "Your line has extra parts after the value — keep it to the single corrected line.";
+      return t("hintExtraParts");
     }
     const isQuoted = (s: string) => /^['"].*['"]$/.test(s);
     const bestQuoted = isQuoted(bestRhs);
     const inputQuoted = isQuoted(inputRhs);
     if (!bestQuoted && inputQuoted) {
-      return "The value should be a number, not a string — remove the quotes.";
+      return t("hintNumberNotString");
     }
     if (bestQuoted && !inputQuoted) {
-      return "The value should be a string — wrap it in quotes.";
+      return t("hintStringNotNumber");
     }
     if (bestQuoted && inputQuoted) {
-      return "The string value isn't what the script expects — check the text.";
+      return t("hintStringMismatch");
     }
     const bestNum = Number(bestRhs);
     const inputNum = Number(inputRhs);
     if (!Number.isNaN(bestNum) && !Number.isNaN(inputNum)) {
-      return "The value on the right side of `=` is wrong — double-check the number.";
+      return t("hintNumberMismatch");
     }
-    return "The value after `=` isn't what the script expects — check what's being assigned.";
+    return t("hintRhsMismatch");
   }
 
   const missing = bestTokens.filter((token) => !inputTokens.includes(token));
@@ -180,18 +185,18 @@ export function generateHint(
       (token) => !/^['"]/.test(token) && !/^\d+$/.test(token)
     );
     if (structural.length === 1) {
-      return `You're missing \`${structural[0]}\` — compare your line to the pattern shown in the lesson.`;
+      return t("hintMissingToken", { token: structural[0] });
     }
     if (structural.length > 1) {
-      return "Your line looks incomplete — compare it to the pattern shown in the lesson.";
+      return t("hintIncomplete");
     }
-    return "You're missing a value — check what should be assigned.";
+    return t("hintMissingValueGeneric");
   }
 
   const extra = inputTokens.filter((token) => !bestTokens.includes(token));
   if (extra.length > 0) {
-    return "Your line has extra parts — keep it to the single corrected line.";
+    return t("hintExtraTokens");
   }
 
-  return "Compare your line to the pattern shown in the lesson — what's different?";
+  return t("hintCompare");
 }
