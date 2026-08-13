@@ -16,9 +16,10 @@ import {
 import { cn } from "@/lib/utils";
 import {
   dailyChallengeKind,
-  dailyDebugChallenge,
-  dailyQuestion,
+  dailyDebugChallengeId,
+  dailyQuestionId,
 } from "@/lib/daily";
+import { DEBUG_CHALLENGES } from "@/lib/daily-debug";
 import { dayKey } from "@/lib/streak";
 import { useProgressStore } from "@/lib/progress-store";
 import { Button } from "@/components/ui/button";
@@ -30,57 +31,60 @@ type Phase = "intro" | "active" | "done";
 
 function ChallengeOptions({
   options,
-  answer,
+  result,
   selected,
   onPick,
+  disabled,
 }: {
   options: string[];
-  answer: number;
+  result: boolean | null;
   selected: number | null;
   onPick: (index: number) => void;
+  disabled?: boolean;
 }) {
-  const answered = selected !== null;
+  const revealed = result !== null;
   return (
     <div className="mt-4 grid gap-2">
       {options.map((option, optionIndex) => {
-        const isAnswer = optionIndex === answer;
         const isSelected = optionIndex === selected;
+        const isCorrectPick = revealed && isSelected && result === true;
+        const isWrongPick = revealed && isSelected && result === false;
         return (
           <button
             key={optionIndex}
             type="button"
             onClick={() => onPick(optionIndex)}
-            disabled={answered}
+            disabled={disabled || revealed}
             className={cn(
               "flex items-start gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
-              !answered &&
+              !revealed && !disabled &&
                 "cursor-pointer hover:border-primary/50 hover:bg-accent",
-              answered &&
-                isAnswer &&
+              revealed &&
+                isCorrectPick &&
                 "border-success/60 bg-success/10",
-              answered &&
-                isSelected &&
-                !isAnswer &&
+              revealed &&
+                isWrongPick &&
                 "border-destructive/60 bg-destructive/10",
-              answered && !isAnswer && !isSelected && "opacity-50"
+              revealed && !isSelected && "opacity-50"
             )}
           >
             <span
               className={cn(
                 "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-xs font-semibold",
-                answered &&
-                  isAnswer &&
+                revealed &&
+                  isCorrectPick &&
                   "border-success/60 text-success",
-                answered &&
-                  isSelected &&
-                  !isAnswer &&
+                revealed &&
+                  isWrongPick &&
                   "border-destructive/60 text-destructive"
               )}
             >
-              {answered && isAnswer ? (
-                <CheckCircle2 className="h-3.5 w-3.5 -translate-y-px" />
-              ) : answered && isSelected && !isAnswer ? (
-                <XCircle className="h-3.5 w-3.5 -translate-y-px" />
+              {revealed && isSelected ? (
+                result === true ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 -translate-y-px" />
+                ) : (
+                  <XCircle className="h-3.5 w-3.5 -translate-y-px" />
+                )
               ) : (
                 OPTION_LETTERS[optionIndex]
               )}
@@ -115,24 +119,30 @@ export function DailyChallengeClient() {
 
   const [phase, setPhase] = React.useState<Phase>("intro");
   const [selected, setSelected] = React.useState<number | null>(null);
+  const [result, setResult] = React.useState<boolean | null>(null);
+  const [grading, setGrading] = React.useState(false);
+  const [error, setError] = React.useState(false);
   const reportedRef = React.useRef(false);
 
   // The challenge is fixed per local day; compute lazily so it survives renders.
   const todayKey = React.useMemo(() => dayKey(new Date()), []);
   const kind = React.useMemo(() => dailyChallengeKind(todayKey), [todayKey]);
-  const question = React.useMemo(
-    () => (kind === "quiz" ? dailyQuestion(todayKey) : null),
+  const questionId = React.useMemo(
+    () => (kind === "quiz" ? dailyQuestionId(todayKey) : null),
     [kind, todayKey]
   );
-  const debugChallenge = React.useMemo(
-    () => (kind === "debug" ? dailyDebugChallenge(todayKey) : null),
-    [kind, todayKey]
-  );
+  const debugChallenge = React.useMemo(() => {
+    if (kind !== "debug") return null;
+    return (
+      DEBUG_CHALLENGES.find((c) => c.id === dailyDebugChallengeId(todayKey)) ??
+      null
+    );
+  }, [kind, todayKey]);
 
   const options = React.useMemo(() => {
-    if (kind === "quiz" && question) {
+    if (kind === "quiz" && questionId) {
       return [0, 1, 2, 3].map((i) =>
-        quiz(`questions.${question.id}.options.${i}`)
+        quiz(`questions.${questionId}.options.${i}`)
       );
     }
     if (kind === "debug" && debugChallenge) {
@@ -141,7 +151,7 @@ export function DailyChallengeClient() {
       );
     }
     return [];
-  }, [kind, question, debugChallenge, quiz, t]);
+  }, [kind, questionId, debugChallenge, quiz, t]);
 
   React.useEffect(() => {
     if (phase === "done" && !reportedRef.current) {
@@ -158,12 +168,28 @@ export function DailyChallengeClient() {
     );
   }
 
-  const pick = (optionIndex: number) => {
-    if (selected !== null) return;
+  const pick = async (optionIndex: number) => {
+    if (result !== null || grading) return;
     setSelected(optionIndex);
+    setGrading(true);
+    setError(false);
+    try {
+      const response = await fetch("/api/daily-challenge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dateKey: todayKey, option: optionIndex }),
+      });
+      if (!response.ok) throw new Error("grading failed");
+      const data = (await response.json()) as { correct: boolean };
+      setResult(data.correct === true);
+    } catch {
+      // Allow the learner to retry without losing their pick.
+      setSelected(null);
+      setError(true);
+    } finally {
+      setGrading(false);
+    }
   };
-
-  const answer = debugChallenge ? debugChallenge.answer : question?.answer ?? 0;
 
   const completedToday = lastDailyChallengeDate === todayKey;
 
@@ -238,7 +264,7 @@ export function DailyChallengeClient() {
   }
 
   if (phase === "done") {
-    const isCorrect = selected === answer;
+    const isCorrect = result === true;
     return (
       <div className="rounded-xl border bg-card p-8">
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -248,9 +274,7 @@ export function DailyChallengeClient() {
           {isCorrect ? t("correct") : t("notQuite")}
         </h2>
         <p className="mt-1 text-center text-sm text-muted-foreground">
-          {isCorrect
-            ? t("doneBodyCorrect")
-            : t("doneBodyWrong", { letter: OPTION_LETTERS[answer] })}
+          {isCorrect ? t("doneBodyCorrect") : t("doneBodyWrong")}
         </p>
         {debugChallenge ? (
           t.has(`challenges.${debugChallenge.id}.explanation`) && (
@@ -259,10 +283,10 @@ export function DailyChallengeClient() {
             </p>
           )
         ) : (
-          question &&
-          quiz.has(`questions.${question.id}.explanation`) && (
+          questionId &&
+          quiz.has(`questions.${questionId}.explanation`) && (
             <p className="mx-auto mt-3 max-w-md text-center text-sm text-muted-foreground">
-              {quiz(`questions.${question.id}.explanation`)}
+              {quiz(`questions.${questionId}.explanation`)}
             </p>
           )
         )}
@@ -318,28 +342,36 @@ export function DailyChallengeClient() {
           </div>
         ) : (
           <p className="text-base font-medium leading-relaxed">
-            {question && quiz(`questions.${question.id}.question`)}
+            {questionId && quiz(`questions.${questionId}.question`)}
           </p>
         )}
 
         <ChallengeOptions
           options={options}
-          answer={answer}
+          result={result}
           selected={selected}
           onPick={pick}
+          disabled={grading}
         />
 
-        {selected !== null && (
+        {grading && (
+          <p className="mt-4 text-sm text-muted-foreground">{t("checking")}</p>
+        )}
+        {error && (
+          <p className="mt-4 text-sm text-destructive">{t("checkError")}</p>
+        )}
+
+        {result !== null && (
           <div
             className={cn(
               "mt-4 rounded-lg border p-3 text-sm",
-              selected === answer
+              result
                 ? "border-success/40 bg-success/5"
                 : "border-destructive/40 bg-destructive/5"
             )}
           >
             <div className="flex items-center gap-1.5 font-medium">
-              {selected === answer ? (
+              {result ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-success" />
                   {t("correct")}
@@ -347,7 +379,7 @@ export function DailyChallengeClient() {
               ) : (
                 <>
                   <HelpCircle className="h-4 w-4 text-destructive" />
-                  {t("wrongAnswer", { letter: OPTION_LETTERS[answer] })}
+                  {t("wrongAnswer")}
                 </>
               )}
             </div>
@@ -363,17 +395,17 @@ export function DailyChallengeClient() {
                 .
               </p>
             ) : (
-              question &&
-              quiz.has(`questions.${question.id}.explanation`) && (
+              questionId &&
+              quiz.has(`questions.${questionId}.explanation`) && (
                 <p className="mt-1 text-muted-foreground">
-                  {quiz(`questions.${question.id}.explanation`)}
+                  {quiz(`questions.${questionId}.explanation`)}
                 </p>
               )
             )}
           </div>
         )}
 
-        {selected !== null && (
+        {result !== null && (
           <div className="mt-4 flex justify-end">
             <Button onClick={() => setPhase("done")}>{t("finish")}</Button>
           </div>

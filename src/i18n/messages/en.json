@@ -1540,12 +1540,14 @@
     "correct": "Correct!",
     "notQuite": "Not quite.",
     "doneBodyCorrect": "Nice — today's challenge is done.",
-    "doneBodyWrong": "The answer was {letter} — come back tomorrow.",
+    "doneBodyWrong": "Not quite — come back tomorrow for a fresh one.",
     "learnAbout": "Learn about {lesson} →",
     "todaysChallenge": "Today's challenge",
     "debugThis": "Debug this script",
-    "wrongAnswer": "Not quite — the answer is {letter}.",
+    "wrongAnswer": "Not quite — take a look at the explanation.",
     "finish": "Finish",
+    "checking": "Checking…",
+    "checkError": "Something went wrong checking your answer — try again.",
     "challenges": {
       "debug-nil-part": {
         "question": "What's the bug?",

@@ -7,7 +7,7 @@ spectator. No copy-paste tutorials, no walls of theory. You assemble real game
 code yourself, one short step at a time, and the course only moves forward when
 you actually solve each activity.
 
-**Free forever. No paywall, no sign-up wall, no tricks.** All 52 lessons, every
+**Free forever. No paywall, no sign-up wall, no tricks.** All 72 lessons, every
 activity type, and the full Luau playground work without an account. Accounts
 are optional and exist purely to sync your progress across devices.
 
@@ -27,11 +27,11 @@ are optional and exist purely to sync your progress across devices.
 
 ## What's inside
 
-- **52 lessons across two complete games** — a Coin Tycoon and a collection
+- **72 lessons across two complete games** — a Coin Tycoon and a collection
   game — covering real Roblox Studio workflows and Luau fundamentals.
-- **Six activity types** that make you write, predict, fix, and arrange real
+- **Eight activity types** that make you write, predict, fix, and arrange real
   code: multiple choice, fill-in-the-blank, write-the-code, predict-the-output,
-  fix-the-bug, and arrange-the-code.
+  fix-the-bug, arrange-the-code, run-the-code, and choose-your-build.
 - **A live Luau playground** running in your browser, so you can experiment
   anywhere in the course.
 - **Daily challenges and a final certificate** to keep your streak alive and
@@ -103,7 +103,8 @@ All custom components are registered in `src/content/mdx-components.tsx`:
 
 - `<Step>` — a step in the lesson stepper
 - Activities (each must sit inside its own step): `<Mcq>`, `<FillBlank>`,
-  `<WriteCode>`, `<PredictOutput>`, `<FixBug>`, `<ArrangeCode>`
+  `<WriteCode>`, `<PredictOutput>`, `<FixBug>`, `<ArrangeCode>`,
+  `<RunCode>`, `<ChooseBuild>`
 - Extras: `<Callout>`, `<Expandable>`, `<Note>`, `<Tip>`, `<Warning>`,
   `<Mistake>`, `<Quiz>`, `<Challenge>`, plus a `<CodeBlock>` renderer for
   fenced code and custom heading/link rendering
@@ -121,7 +122,7 @@ src/
     api/auth/[...nextauth]  Auth.js credentials handlers
     api/sync/               progress sync API (GET pull, POST push)
   components/
-    activities/             the six activity components
+    activities/             the eight activity components
     auth/                   sign-in dialog, account menu, sync host
     layout/                 site header, course sidebar, app shell
     lessons/                step, quiz, prediction, code block, MDX extras

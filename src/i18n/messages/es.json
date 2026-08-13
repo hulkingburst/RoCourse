@@ -1540,12 +1540,14 @@
     "correct": "¡Correcto!",
     "notQuite": "Casi.",
     "doneBodyCorrect": "¡Bien — el reto de hoy está hecho!",
-    "doneBodyWrong": "La respuesta era {letter} — vuelve mañana.",
+    "doneBodyWrong": "Casi — vuelve mañana por uno nuevo.",
     "learnAbout": "Aprende sobre {lesson} →",
     "todaysChallenge": "Reto de hoy",
     "debugThis": "Depura este script",
-    "wrongAnswer": "Casi — la respuesta es {letter}.",
+    "wrongAnswer": "Casi — echa un vistazo a la explicación.",
     "finish": "Terminar",
+    "checking": "Comprobando…",
+    "checkError": "Algo salió mal al comprobar tu respuesta — inténtalo de nuevo.",
     "challenges": {
       "debug-nil-part": {
         "question": "¿Cuál es el bug?",

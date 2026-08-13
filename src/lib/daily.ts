@@ -12,21 +12,26 @@ function hashDate(dateKey: string): number {
 }
 
 /**
- * Picks the daily challenge question deterministically from the calendar date
- * so every learner sees the same question on the same day (local timezone).
+ * Daily challenge selection, shared by the client and the grading endpoint.
  *
- * Accepted trade-off: the challenge is graded in the client, so a determined
- * learner can read the correct answer from the shipped bundle (it's a
- * gamification feature, not a security boundary). Moving grading server-side
- * would require an auth-less, abuse-resistant scoring endpoint; the benefit
- * doesn't justify the complexity today.
+ * Every learner sees the same challenge on the same day (local timezone). The
+ * client renders a challenge using only its id; the correct answer is never
+ * part of this module's client surface. Grading happens server-side in
+ * POST /api/daily-challenge, which recomputes the answer for the submitted
+ * date and returns only `{ correct }` — the client can't read today's answer
+ * out of the shipped bundle or the endpoint response.
+ *
+ * Note: quiz-bank answers still ship to the client because the quick-quiz
+ * feature ships the whole bank (accepted). Debug-challenge answers now live
+ * only in `daily-debug-answers.ts` (server-only).
  */
 export function dailyQuestionIndex(dateKey: string): number {
   return hashDate(dateKey) % QUIZ_QUESTIONS.length;
 }
 
-export function dailyQuestion(dateKey: string) {
-  return QUIZ_QUESTIONS[dailyQuestionIndex(dateKey)];
+/** The id of today's quiz question (for the i18n keys and grading lookup). */
+export function dailyQuestionId(dateKey: string): string {
+  return QUIZ_QUESTIONS[dailyQuestionIndex(dateKey)].id;
 }
 
 /** What kind of challenge today is: a quick question or a script to debug. */
@@ -36,6 +41,7 @@ export function dailyChallengeKind(dateKey: string): DailyChallengeKind {
   return hashDate(dateKey) % 3 === 0 ? "debug" : "quiz";
 }
 
-export function dailyDebugChallenge(dateKey: string) {
-  return DEBUG_CHALLENGES[hashDate(dateKey) % DEBUG_CHALLENGES.length];
+/** The id of today's "find the bug" challenge. */
+export function dailyDebugChallengeId(dateKey: string): string {
+  return DEBUG_CHALLENGES[hashDate(dateKey) % DEBUG_CHALLENGES.length].id;
 }
