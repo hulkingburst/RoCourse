@@ -20,6 +20,7 @@ import {
   Timer,
   Trophy,
   UserCircle2,
+  Zap,
 } from "lucide-react";
 
 import { useAuthUiStore } from "@/lib/auth-ui";
@@ -28,6 +29,7 @@ import { maskEmail } from "@/lib/privacy";
 import { useProgressStore } from "@/lib/progress-store";
 import { courseTitleKey } from "@/lib/course-titles";
 import { isStreakActive } from "@/lib/streak";
+import { levelProgress, weekKey } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import type { CloudState } from "@/lib/sync-types";
 import { Button } from "@/components/ui/button";
@@ -76,6 +78,8 @@ export function ProfileClient({
   const drillsPlayed = useProgressStore((state) => state.drillsPlayed);
   const drillHighScore = useProgressStore((state) => state.drillHighScore);
   const activityDays = useProgressStore((state) => state.activityDays);
+  const xp = useProgressStore((state) => state.xp);
+  const weeklyXp = useProgressStore((state) => state.weeklyXp);
   const [cloud, setCloud] = React.useState<CloudState | null>(null);
   const [loadingSync, setLoadingSync] = React.useState(true);
 
@@ -254,6 +258,46 @@ export function ProfileClient({
             <span className="font-semibold text-foreground">
               {t("bestValue", { count: longestStreak })}
             </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-amber-500" />
+            {t("levelTitle")}
+          </CardTitle>
+          <CardDescription>{t("levelHint")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-2xl font-bold text-amber-500 ring-1 ring-amber-500/30">
+                {levelProgress(xp).level}
+              </div>
+              <div>
+                <div className="text-sm font-semibold">
+                  {t("levelLabel", { level: levelProgress(xp).level })}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {t("xpTotal", { xp })}
+                </div>
+              </div>
+            </div>
+            <div className="min-w-56 flex-1">
+              <Progress value={levelProgress(xp).progress * 100} />
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {t("xpToNext", {
+                  level: levelProgress(xp).level,
+                  xpInto: levelProgress(xp).xpIntoLevel,
+                  xpForNext: levelProgress(xp).xpForNextLevel,
+                })}
+              </p>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {t("weeklyXp", { xp: weeklyXp[weekKey(new Date())] ?? 0 })}
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { sanitizeWeeklyXp } from "@/lib/xp";
 import type {
   CloudState,
   ProgressSnapshot,
@@ -62,6 +63,49 @@ export async function saveCloudState(
           completedAt: new Date(completion.completedAt ?? Date.now()),
         },
         update: { title: completion.title },
+      });
+    }
+  }
+
+  await saveWeeklyXpRows(userId, payload.progress);
+}
+
+/**
+ * Keeps the user's weekly XP leaderboard rows in sync with the progress blob.
+ * Values are clamped (see sanitizeWeeklyXp) and only ever raised, never
+ * lowered, so a stale device pushing an older weekly total can't erase XP that
+ * was already recorded.
+ */
+async function saveWeeklyXpRows(
+  userId: string,
+  progress: ProgressSnapshot
+): Promise<void> {
+  const weeklyXp = sanitizeWeeklyXp(progress?.weeklyXp);
+  const weeks = Object.keys(weeklyXp);
+  if (weeks.length === 0) return;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { name: true },
+  });
+  if (!user) return;
+
+  for (const week of weeks) {
+    const xp = weeklyXp[week];
+    const existing = await prisma.weeklyXp.findUnique({
+      where: { week_userId: { week, userId } },
+      select: { id: true, xp: true },
+    });
+    if (existing) {
+      if (xp > existing.xp) {
+        await prisma.weeklyXp.update({
+          where: { id: existing.id },
+          data: { xp, name: user.name },
+        });
+      }
+    } else {
+      await prisma.weeklyXp.create({
+        data: { userId, name: user.name, week, xp },
       });
     }
   }

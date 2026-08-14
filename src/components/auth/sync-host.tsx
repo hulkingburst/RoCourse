@@ -114,6 +114,8 @@ function emptySnapshot(): ProgressSnapshot {
     streak: 0,
     longestStreak: 0,
     lastStreakDate: null,
+    xp: 0,
+    weeklyXp: {},
     lastUpdated: null,
   };
 }

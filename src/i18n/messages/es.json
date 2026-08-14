@@ -27,6 +27,7 @@
     "showSidebar": "Mostrar barra lateral",
     "hideSidebar": "Ocultar barra lateral",
     "dayStreak": "Racha de días",
+    "level": "Tu nivel",
     "continueLearning": "Seguir aprendiendo",
     "overallProgress": "Progreso general",
     "dailyChallenge": "Reto diario",
@@ -51,6 +52,7 @@
     "faq": "Preguntas frecuentes",
     "guides": "Guías",
     "showcase": "Galería",
+    "leaderboard": "Clasificación",
     "questions": "Preguntas",
     "donate": "Donar",
     "donateAria": "Donar para apoyar a RoCourse"
@@ -265,6 +267,13 @@
     "activityHint": "Tu última semana de lecciones, cuestionarios y retos diarios.",
     "courseProgress": "Progreso del curso",
     "completedOf": "{completed} de {total} lecciones completadas",
+    "statLevel": "Nivel",
+    "levelTitle": "Nivel y XP",
+    "levelHint": "Gana XP completando lecciones, resolviendo actividades y retos, y superando cuestionarios y drills.",
+    "levelLabel": "Nivel {level}",
+    "xpTotal": "{xp} XP en total",
+    "xpToNext": "{xpInto}/{xpForNext} XP para el nivel {level}",
+    "weeklyXp": "Esta semana: {xp} XP",
     "statLessons": "Lecciones",
     "statBookmarks": "Marcadores",
     "statChallenges": "Retos resueltos",
@@ -1728,7 +1737,8 @@
   "users": {
     "title": "Estudiantes",
     "intro": "Perfiles públicos de personas que aprenden Luau aquí. Toca uno para ver su progreso, rachas y cursos completados.",
-    "seeShowcase": "Ver quién terminó el curso"
+    "seeShowcase": "Ver quién terminó el curso",
+    "seeLeaderboard": "Ver la clasificación semanal de XP"
   },
   "notFound": {
     "title": "Página no encontrada",
@@ -1870,5 +1880,26 @@
       "certificate": "¿Recibo un certificado?",
       "forKids": "¿RoCourse es para niños?"
     }
+  },
+  "leaderboard": {
+    "metadataTitle": "Clasificación semanal de XP",
+    "metadataDescription": "Quién ganó más XP en RoCourse esta semana, con cuentas e invitados.",
+    "title": "Clasificación semanal de XP",
+    "intro": "El XP que ganas con lecciones, actividades, cuestionarios y el reto diario cuenta para la carrera semanal. Las cuentas aparecen solas; los invitados pueden unirse con un nombre.",
+    "thisWeek": "Esta semana",
+    "prevWeek": "Semana anterior",
+    "nextWeek": "Semana siguiente",
+    "loading": "Cargando…",
+    "error": "No se pudo cargar la clasificación.",
+    "retry": "Reintentar",
+    "empty": "Aún no se ha ganado XP esta semana: ¡sé el primero!",
+    "you": "Tú",
+    "yourXp": "Tu XP esta semana: {xp}",
+    "guestNameLabel": "Únete a la clasificación",
+    "guestNameHint": "Elige un nombre y tu XP se publicará de forma anónima bajo él. Puedes cambiarlo cuando quieras.",
+    "guestNamePlaceholder": "p. ej. LuauRookie",
+    "saveName": "Guardar nombre",
+    "playingAs": "Jugando como",
+    "editName": "Editar nombre"
   }
 }

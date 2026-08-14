@@ -11,11 +11,13 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Sun,
+  Zap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
 import { useProgressStore } from "@/lib/progress-store";
 import { isStreakActive } from "@/lib/streak";
+import { levelFromXp } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/lib/ui-store";
 import type { CourseSection, SearchEntry } from "@/lib/types";
@@ -89,6 +91,7 @@ export function SiteHeader({
   const setSidebarCollapsed = useUiStore((state) => state.setSidebarCollapsed);
   const streak = useProgressStore((state) => state.streak);
   const lastStreakDate = useProgressStore((state) => state.lastStreakDate);
+  const xp = useProgressStore((state) => state.xp);
   const pathname = usePathname();
   const t = useTranslations("nav");
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -171,6 +174,16 @@ export function SiteHeader({
         >
           <Flame className={cn("h-4 w-4", streakActive && "fill-current")} />
           {streak}
+        </Link>
+      )}
+      {mounted && (
+        <Link
+          href="/profile"
+          aria-label={t("level")}
+          className="hidden items-center gap-1.5 rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-accent sm:inline-flex text-amber-500"
+        >
+          <Zap className="h-4 w-4 fill-current" />
+          {levelFromXp(xp)}
         </Link>
       )}
       <AccountMenu />

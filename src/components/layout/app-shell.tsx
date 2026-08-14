@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { FeedbackButton } from "@/components/feedback/feedback-button";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SidebarNav } from "@/components/layout/course-sidebar";
+import { useGuestXpReporter } from "@/lib/use-guest-xp-reporter";
 import type { CourseSection, SearchEntry } from "@/lib/types";
 
 export function AppShell({
@@ -22,6 +23,8 @@ export function AppShell({
 }) {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
   const t = useTranslations("footer");
+
+  useGuestXpReporter();
 
   return (
     <div className="min-h-screen">
@@ -73,6 +76,12 @@ export function AppShell({
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
                 {t("showcase")}
+              </Link>
+              <Link
+                href="/leaderboard"
+                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                {t("leaderboard")}
               </Link>
               <Link
                 href="/questions"

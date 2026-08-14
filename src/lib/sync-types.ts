@@ -28,6 +28,10 @@ export interface ProgressSnapshot {
   longestStreak: number;
   /** Local calendar day (YYYY-MM-DD) of the last streak-building action. */
   lastStreakDate: string | null;
+  /** Lifetime total XP, source of the learner's level. */
+  xp: number;
+  /** Local Monday-week key (YYYY-MM-DD) → XP gained that week. */
+  weeklyXp: Record<string, number>;
   lastUpdated: string | null;
 }
 

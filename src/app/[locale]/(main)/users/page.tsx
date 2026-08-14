@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { Trophy } from "lucide-react";
+import { Trophy, Zap } from "lucide-react";
 import { getPublicUserSummaries } from "@/lib/users";
 import { UsersClient } from "@/components/users/users-client";
 
@@ -27,6 +27,13 @@ export default async function UsersPage() {
         >
           <Trophy className="h-3.5 w-3.5" />
           {t("seeShowcase")}
+        </Link>
+        <Link
+          href="/leaderboard"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+        >
+          <Zap className="h-3.5 w-3.5" />
+          {t("seeLeaderboard")}
         </Link>
       </div>
       <UsersClient users={users} />

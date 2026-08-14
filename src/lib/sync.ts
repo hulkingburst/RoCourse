@@ -3,6 +3,7 @@
 import type { FinishedPath, LessonRecord } from "@/lib/progress-store";
 import { useProgressStore } from "@/lib/progress-store";
 import { CONFLICT_TOLERANCE_MS } from "@/lib/sync-types";
+import { sanitizeWeeklyXp } from "@/lib/xp";
 import type {
   CloudState,
   CompletionRecord,
@@ -27,6 +28,8 @@ export function getSnapshot(): ProgressSnapshot {
     streak: state.streak,
     longestStreak: state.longestStreak,
     lastStreakDate: state.lastStreakDate,
+    xp: state.xp,
+    weeklyXp: state.weeklyXp,
     lastUpdated: state.lastUpdated,
   };
 }
@@ -44,7 +47,8 @@ export function hasAnyProgress(snapshot: ProgressSnapshot): boolean {
     snapshot.drillsPlayed > 0 ||
     snapshot.drillHighScore > 0 ||
     Object.keys(snapshot.activityDays).length > 0 ||
-    snapshot.streak > 0
+    snapshot.streak > 0 ||
+    snapshot.xp > 0
   );
 }
 
@@ -88,6 +92,8 @@ export function applySnapshot(
     streak: clean.streak,
     longestStreak: clean.longestStreak,
     lastStreakDate: clean.lastStreakDate,
+    xp: clean.xp,
+    weeklyXp: clean.weeklyXp,
     lastUpdated: lastUpdated ?? clean.lastUpdated,
   });
 }
@@ -128,6 +134,8 @@ export function sanitizeSnapshot(
     streak: sanitizeCount(snapshot?.streak),
     longestStreak: sanitizeCount(snapshot?.longestStreak),
     lastStreakDate: sanitizeDayKey(snapshot?.lastStreakDate),
+    xp: sanitizeCount(snapshot?.xp),
+    weeklyXp: sanitizeWeeklyXp(snapshot?.weeklyXp),
     lastUpdated:
       typeof snapshot?.lastUpdated === "string" ? snapshot.lastUpdated : null,
   };
@@ -307,8 +315,25 @@ export function mergeSnapshots(
     streak: cloud.streak,
     longestStreak: cloud.longestStreak,
     lastStreakDate: cloud.lastStreakDate,
+    // XP is a max rather than a copy: work done since the last push must
+    // never be lost. Same per week, so each weekly bucket keeps its peak.
+    xp: Math.max(cloud.xp, local.xp),
+    weeklyXp: maxWeeklyXp(cloud.weeklyXp, local.weeklyXp),
     lastUpdated: cloud.lastUpdated,
   };
+}
+
+function maxWeeklyXp(
+  ...maps: (Record<string, number> | undefined)[]
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const map of maps) {
+    if (!map) continue;
+    for (const [week, xp] of Object.entries(map)) {
+      out[week] = Math.max(out[week] ?? 0, xp);
+    }
+  }
+  return out;
 }
 
 function unionStrings(...arrays: string[][]): string[] {

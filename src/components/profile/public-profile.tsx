@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Timer,
   Trophy,
+  Zap,
 } from "lucide-react";
 import { ActivityCalendar } from "@/components/profile/activity-calendar";
 import { BadgesSection } from "@/components/profile/badges";
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import type { PublicProfile } from "@/lib/users";
 import { courseTitleKey } from "@/lib/course-titles";
+import { levelProgress } from "@/lib/xp";
 
 function Stat({
   icon,
@@ -79,6 +81,11 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <Stat
+          icon={<Zap className="h-4 w-4" />}
+          label={t("statLevel")}
+          value={String(levelProgress(stats.xp).level)}
+        />
         <Stat
           icon={<BookOpen className="h-4 w-4" />}
           label={t("statLessons")}

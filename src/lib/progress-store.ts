@@ -4,6 +4,17 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { dayKey, recordActivity } from "@/lib/streak";
 import type { ProgressSnapshot } from "@/lib/sync-types";
+import {
+  MAX_WEEKLY_XP_ENTRIES,
+  weekKey,
+  XP_ACTIVITY_FIRST_TRY,
+  XP_CHALLENGE,
+  XP_DAILY_CHALLENGE,
+  XP_DRILL,
+  XP_LESSON,
+  XP_QUICK_QUIZ,
+  XP_QUIZ_CORRECT,
+} from "@/lib/xp";
 
 /**
  * Per-lesson progress record.
@@ -62,6 +73,10 @@ interface ProgressState {
   streak: number;
   longestStreak: number;
   lastStreakDate: string | null;
+  /** Lifetime total XP, source of the learner's level. */
+  xp: number;
+  /** Local Monday-week key (YYYY-MM-DD) → XP gained that week. */
+  weeklyXp: Record<string, number>;
 
   setHydrated: (value: boolean) => void;
   recordQuickQuizCompleted: () => void;
@@ -100,6 +115,29 @@ function ensureRecord(lessons: ProgressState["lessons"], slug: string): LessonRe
   );
 }
 
+/**
+ * Returns the xp/weeklyXp fields after adding `amount` to the learner's
+ * totals. Negative amounts (e.g. un-completing a lesson) are clamped at zero,
+ * and only the newest weeks are kept so the blob stays small.
+ */
+function xpPatch(
+  state: ProgressState,
+  amount: number
+): { xp: number; weeklyXp: Record<string, number> } {
+  const week = weekKey(new Date());
+  const weeklyXp = {
+    ...state.weeklyXp,
+    [week]: Math.max(0, (state.weeklyXp[week] ?? 0) + amount),
+  };
+  const keys = Object.keys(weeklyXp).sort();
+  if (keys.length > MAX_WEEKLY_XP_ENTRIES) {
+    for (const key of keys.slice(0, keys.length - MAX_WEEKLY_XP_ENTRIES)) {
+      delete weeklyXp[key];
+    }
+  }
+  return { xp: Math.max(0, state.xp + amount), weeklyXp };
+}
+
 export const useProgressStore = create<ProgressState>()(
   persist(
     (set) => ({
@@ -119,6 +157,8 @@ export const useProgressStore = create<ProgressState>()(
       streak: 0,
       longestStreak: 0,
       lastStreakDate: null,
+      xp: 0,
+      weeklyXp: {},
 
       setHydrated: (value) => set({ hydrated: value }),
 
@@ -126,6 +166,7 @@ export const useProgressStore = create<ProgressState>()(
         set((state) => ({
           quickQuizzesCompleted: state.quickQuizzesCompleted + 1,
           ...recordActivity(state),
+          ...xpPatch(state, XP_QUICK_QUIZ),
           lastUpdated: nowIso(),
         })),
 
@@ -137,6 +178,7 @@ export const useProgressStore = create<ProgressState>()(
             dailyChallengesCompleted: state.dailyChallengesCompleted + 1,
             lastDailyChallengeDate: today,
             ...recordActivity(state),
+            ...xpPatch(state, XP_DAILY_CHALLENGE),
             lastUpdated: nowIso(),
           };
         }),
@@ -146,6 +188,7 @@ export const useProgressStore = create<ProgressState>()(
           drillsPlayed: state.drillsPlayed + 1,
           drillHighScore: Math.max(state.drillHighScore, correct),
           ...recordActivity(state),
+          ...xpPatch(state, XP_DRILL),
           lastUpdated: nowIso(),
         })),
 
@@ -162,6 +205,7 @@ export const useProgressStore = create<ProgressState>()(
               },
             },
             ...(completing ? recordActivity(state) : {}),
+            ...(completing ? xpPatch(state, XP_LESSON) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -181,6 +225,7 @@ export const useProgressStore = create<ProgressState>()(
               },
             },
             ...(completing ? recordActivity(state) : {}),
+            ...xpPatch(state, completing ? XP_LESSON : -XP_LESSON),
             lastUpdated: nowIso(),
           };
         }),
@@ -222,6 +267,7 @@ export const useProgressStore = create<ProgressState>()(
                 quizCorrect: existing.quizCorrect + (correct ? 1 : 0),
               },
             },
+            ...(correct ? xpPatch(state, XP_QUIZ_CORRECT) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -238,6 +284,7 @@ export const useProgressStore = create<ProgressState>()(
                 challengesSolved: existing.challengesSolved + (solved ? 1 : 0),
               },
             },
+            ...(solved ? xpPatch(state, XP_CHALLENGE) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -250,6 +297,7 @@ export const useProgressStore = create<ProgressState>()(
             correct && firstTryStep && !solvedSteps.includes(firstTryStep)
               ? [...solvedSteps, firstTryStep]
               : solvedSteps;
+          const newFirstTry = firstTrySolvedSteps.length > solvedSteps.length;
           return {
             lessons: {
               ...state.lessons,
@@ -260,6 +308,7 @@ export const useProgressStore = create<ProgressState>()(
                 firstTrySolvedSteps,
               },
             },
+            ...(newFirstTry ? xpPatch(state, XP_ACTIVITY_FIRST_TRY) : {}),
             lastUpdated: nowIso(),
           };
         }),
@@ -280,6 +329,8 @@ export const useProgressStore = create<ProgressState>()(
           streak: snapshot.streak ?? state.streak,
           longestStreak: snapshot.longestStreak ?? state.longestStreak,
           lastStreakDate: snapshot.lastStreakDate ?? state.lastStreakDate,
+          xp: snapshot.xp ?? state.xp,
+          weeklyXp: snapshot.weeklyXp ?? state.weeklyXp,
         })),
 
       resetProgress: () =>
@@ -299,6 +350,8 @@ export const useProgressStore = create<ProgressState>()(
           streak: 0,
           longestStreak: 0,
           lastStreakDate: null,
+          xp: 0,
+          weeklyXp: {},
         }),
     }),
     {
@@ -320,6 +373,8 @@ export const useProgressStore = create<ProgressState>()(
         streak: state.streak,
         longestStreak: state.longestStreak,
         lastStreakDate: state.lastStreakDate,
+        xp: state.xp,
+        weeklyXp: state.weeklyXp,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

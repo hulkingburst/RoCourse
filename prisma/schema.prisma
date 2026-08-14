@@ -9,16 +9,17 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String             @id @default(cuid())
+  email        String             @unique
   name         String
-  handle       String?  @unique
+  handle       String?            @unique
   passwordHash String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime           @default(now())
   progress     ProgressProfile?
   completions  CourseCompletion[]
   questions    Question[]
   answers      QuestionAnswer[]
+  weeklyXp     WeeklyXp[]
 }
 
 model ProgressProfile {
@@ -61,16 +62,16 @@ model RateLimitEvent {
 }
 
 model Question {
-  id          String   @id @default(cuid())
-  authorId    String
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  title       String
-  body        String
-  lessonSlug  String?
-  solved      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  answers     QuestionAnswer[]
+  id         String           @id @default(cuid())
+  authorId   String
+  author     User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title      String
+  body       String
+  lessonSlug String?
+  solved     Boolean          @default(false)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  answers    QuestionAnswer[]
 
   @@index([createdAt])
 }
@@ -85,4 +86,24 @@ model QuestionAnswer {
   createdAt  DateTime @default(now())
 
   @@index([questionId, createdAt])
+}
+
+// Weekly XP leaderboard rows. Signed-in users are written when their progress
+// syncs; guests (no account) write their own row through /api/guest-xp under a
+// client-generated anonymous id and a self-chosen display name. `name` is a
+// denormalized display name (account name for users) so rows survive renames.
+model WeeklyXp {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestId   String?
+  name      String
+  week      String // Monday YYYY-MM-DD
+  xp        Int
+  updatedAt DateTime @updatedAt
+
+  @@unique([week, userId])
+  @@unique([week, guestId])
+  @@index([week, xp])
+  @@index([userId])
 }

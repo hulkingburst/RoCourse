@@ -15,6 +15,8 @@ export interface PublicStats {
   drillHighScore: number;
   finishedPath: "tycoon" | "collector" | null;
   activityDays: Record<string, number>;
+  /** Lifetime total XP, source of the learner's level. */
+  xp: number;
 }
 
 export interface PublicCompletion {
@@ -86,6 +88,7 @@ export function extractPublicStats(data: unknown): PublicStats {
       drillHighScore: 0,
       finishedPath: null,
       activityDays: {},
+      xp: 0,
     };
   }
   const record = data as Record<string, unknown>;
@@ -120,6 +123,7 @@ export function extractPublicStats(data: unknown): PublicStats {
     drillHighScore: clampInt(record.drillHighScore),
     finishedPath,
     activityDays: extractActivityDays(record.activityDays),
+    xp: clampInt(record.xp),
   };
 }
 

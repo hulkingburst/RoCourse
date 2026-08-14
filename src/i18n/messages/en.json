@@ -27,6 +27,7 @@
     "showSidebar": "Show sidebar",
     "hideSidebar": "Hide sidebar",
     "dayStreak": "Day streak",
+    "level": "Your level",
     "continueLearning": "Continue learning",
     "overallProgress": "Overall progress",
     "dailyChallenge": "Daily challenge",
@@ -51,6 +52,7 @@
     "faq": "FAQ",
     "guides": "Guides",
     "showcase": "Showcase",
+    "leaderboard": "Leaderboard",
     "questions": "Questions",
     "donate": "Donate",
     "donateAria": "Donate to support RoCourse"
@@ -265,6 +267,13 @@
     "activityHint": "Your last week of lessons, quizzes, and daily challenges.",
     "courseProgress": "Course progress",
     "completedOf": "{completed} of {total} lessons completed",
+    "statLevel": "Level",
+    "levelTitle": "Level & XP",
+    "levelHint": "Earn XP by completing lessons, solving activities and challenges, and beating quizzes and drills.",
+    "levelLabel": "Level {level}",
+    "xpTotal": "{xp} total XP",
+    "xpToNext": "{xpInto}/{xpForNext} XP to level {level}",
+    "weeklyXp": "This week: {xp} XP",
     "statLessons": "Lessons",
     "statBookmarks": "Bookmarks",
     "statChallenges": "Challenges solved",
@@ -1728,7 +1737,8 @@
   "users": {
     "title": "Learners",
     "intro": "Public profiles of people learning Luau here. Tap one to see their progress, streaks, and completed courses.",
-    "seeShowcase": "See who finished the course"
+    "seeShowcase": "See who finished the course",
+    "seeLeaderboard": "See this week's XP leaderboard"
   },
   "notFound": {
     "title": "Page not found",
@@ -1870,5 +1880,26 @@
       "certificate": "Do I get a certificate?",
       "forKids": "Is RoCourse for kids?"
     }
+  },
+  "leaderboard": {
+    "metadataTitle": "Weekly XP Leaderboard",
+    "metadataDescription": "Who earned the most XP on RoCourse this week — accounts and guests alike.",
+    "title": "Weekly XP Leaderboard",
+    "intro": "The XP you earn from lessons, activities, quizzes, and the daily challenge counts toward a weekly race. Accounts appear automatically; guests can join with a name.",
+    "thisWeek": "This week",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "loading": "Loading…",
+    "error": "Couldn't load the leaderboard.",
+    "retry": "Retry",
+    "empty": "No XP earned yet this week — be the first!",
+    "you": "You",
+    "yourXp": "Your XP this week: {xp}",
+    "guestNameLabel": "Join the leaderboard",
+    "guestNameHint": "Pick a name and your XP will be posted anonymously under it. You can change it anytime.",
+    "guestNamePlaceholder": "e.g. LuauRookie",
+    "saveName": "Save name",
+    "playingAs": "Playing as",
+    "editName": "Edit name"
   }
 }
