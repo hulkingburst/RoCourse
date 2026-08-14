@@ -1,0 +1,180 @@
+---
+slug: camera-cutscenes
+title: Cutscenes — directing the camera
+description: Choreograph scripted camera moves with tweens, shakes, and FOV punches — the director's toolkit for intros, reveals, and boss moments.
+sectionId: objects
+order: 8
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [cutscene, camera, tween]
+objectives:
+  - Tween the camera CFrame for a smooth scripted shot
+  - Chain shots with a beat between them
+  - Add camera shake with a per-frame random offset
+  - Hand camera control back when the scene ends
+prerequisites: [camera-control, tweens]
+keywords: [cutscene, camerashake, tween, fieldofview, scriptable]
+---
+
+A cutscene is just a camera with a plan. Slide to one framing, hold it, slide to the next — while the player watches and, for a moment, the game runs itself. You already have the two tools: **camera control** from the last lesson and **tweens** for smooth motion. This lesson turns them into shots.
+
+<Step>
+
+## The shot
+
+Every cutscene starts the same way: take control, then tween the camera where you want it.
+
+```luau
+local TweenService = game:GetService("TweenService")
+local camera = workspace.CurrentCamera
+camera.CameraType = Enum.CameraType.Scriptable
+
+local shotInfo = TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local shotGoals = {
+    CFrame = CFrame.lookAt(Vector3.new(0, 20, 60), castle.Position),
+}
+
+TweenService:Create(camera, shotInfo, shotGoals):Play()
+```
+
+Two seconds later the camera has glided from wherever it was to a low, face-on framing of the castle. Scriptable first — otherwise the mouse fights the tween the whole way.
+
+<Mcq
+  question="Why switch the camera to Scriptable before tweening it?"
+  options={[
+    "So the player's mouse doesn't fight the tween",
+    "So TweenService works at all",
+    "Scriptable makes tweens faster",
+    "It stops the camera rendering",
+  ]}
+  answer={0}
+  explanation="In Scriptable mode the engine stops driving the camera, so nothing fights your tween."
+/>
+
+</Step>
+
+<Step>
+
+## Chaining shots
+
+One tween is a pan. A cutscene is *several* pans in a row. Chain them with a wait that lets each tween land:
+
+```luau
+TweenService:Create(camera, shotOne, goalsOne):Play()
+task.wait(2.5) -- give the 2-second tween time to land
+
+TweenService:Create(camera, shotTwo, goalsTwo):Play()
+task.wait(2.5)
+```
+
+The beat between shots is what lets the motion read. A cutscene is one of the few places a plain `task.wait` is the right tool — nothing else needs to happen while it runs.
+
+<WriteCode
+  instruction="The first shot has played. Write the lines that let it land, then play secondTween."
+  answer={["task.wait(2.5)", "secondTween:Play()"]}
+  starterCode="-- after the first shot
+"
+  explanation="task.wait(2.5) gives the 2-second tween time to finish, then secondTween:Play() starts the next shot."
+/>
+
+</Step>
+
+<Step>
+
+## Camera shake
+
+Shake is a tiny random offset applied every frame. Multiply the camera's base CFrame by a small displacement:
+
+```luau
+local shakeBase = camera.CFrame
+
+RunService.RenderStepped:Connect(function()
+    local offset = Vector3.new(
+        math.random(-0.05, 0.05),
+        math.random(-0.05, 0.05),
+        math.random(-0.05, 0.05)
+    )
+    camera.CFrame = shakeBase * CFrame.new(offset)
+end)
+```
+
+- `shakeBase` — the CFrame you shake *around*.
+- `* CFrame.new(offset)` — CFrame multiplication composes transforms: the base, nudged a few centimeters in a random direction, every frame.
+- The smaller the offset, the subtler the shake.
+
+<FixBug
+  instruction="Type the corrected line — combining two CFrames uses * (multiply), not +."
+  fix={["camera.CFrame = shakeBase * CFrame.new(offset)"]}
+  placeholder="camera.CFrame = ..."
+  explanation="CFrame + CFrame is invalid. Shake composes a small displacement onto the base with *, not +."
+  label="The bug"
+>
+
+```luau
+camera.CFrame = shakeBase + CFrame.new(offset)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## The FOV punch
+
+Widen the lens and the world rushes toward the player — the classic zoom punch when a boss lands or a bomb goes off. `FieldOfView` is a property, so it tweenable like anything else:
+
+```luau
+camera.FieldOfView = 70 -- the normal lens
+
+TweenService:Create(camera, punchInfo, { FieldOfView = 95 }):Play()
+```
+
+A quick tween up to 95 makes the hit *feel* like it hits. Tween it back to 70 for the recovery.
+
+<FillBlank
+  prompt="A quick tween that raises camera.____ from 70 to 95 gives a zoom punch."
+  answer="FieldOfView"
+  explanation="camera.FieldOfView widens the lens; tweening it up fast is the classic zoom punch."
+/>
+
+</Step>
+
+<Step>
+
+## The wrap
+
+A cutscene that never ends is a locked player. When the scene is over, hand the controls back:
+
+```luau
+camera.CameraType = Enum.CameraType.Custom
+```
+
+`Custom` returns the camera to the engine — character follows, mouse looks, back to normal.
+
+<Mcq
+  question="After a cutscene, what gives the player their normal camera back?"
+  options={[
+    "camera.CameraType = Enum.CameraType.Custom",
+    "camera.CameraType = Enum.CameraType.Scriptable",
+    "camera.CameraType = Enum.CameraType.Fixed",
+    "camera:Destroy()",
+  ]}
+  answer={0}
+  explanation="Enum.CameraType.Custom hands the camera back to the engine's normal control."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting to hand control back.** Leave it Scriptable and the player is trapped in your framing forever. `CameraType.Custom` on the way out.
+- **Shake and cutscene fighting.** A shake loop and a cutscene tween both assigning `camera.CFrame` stomp each other. End the shake before the tween — or shake the base you tween.
+- **Cutscenes on the server.** The camera is per-player and client-side. Run the scene in a LocalScript and trigger it with a RemoteEvent if the server decides *when*.
+- **Waiting too little between shots.** A 2-second tween with a 0.1-second wait gets chopped off. Give the tween its time to land.
+
+Next: a bug hunt across the whole world — camera bugs included.
+
+</Step>

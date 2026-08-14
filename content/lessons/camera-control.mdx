@@ -1,0 +1,155 @@
+---
+slug: camera-control
+title: Custom cameras — taking control
+description: Point the camera anywhere you want with a LocalScript — the foundation of cutscenes, cinematic views, and locked-camera puzzles.
+sectionId: objects
+order: 7
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [camera, cframe, localscript]
+objectives:
+  - Grab the active camera with Workspace.CurrentCamera
+  - Switch it to Scriptable and move it with camera.CFrame
+  - Aim it at a target with CFrame.lookAt
+  - Keep a moving target framed with a RenderStepped loop
+prerequisites: [tweens]
+keywords: [camera, currentcamera, cameratype, cframe.lookat, renderstepped]
+---
+
+The camera is your player's view of the world — and by default, Roblox drives it. The character follows, the mouse looks around, all automatic. **Custom cameras take the wheel:** you decide exactly where the view sits and where it points. Cutscenes, boss-intro pan shots, locked-camera puzzles, first-person views — they all start with the same five lines.
+
+<Step>
+
+## Meet the camera
+
+Every player has one camera, and you get it from Workspace:
+
+```luau
+local camera = workspace.CurrentCamera
+```
+
+- `CurrentCamera` — the active camera for *this* player.
+- The camera is **per-player and client-side**, so camera code lives in a **LocalScript** in `StarterPlayerScripts`. One player zooming to a tower must never tilt someone else's view.
+
+<Mcq
+  question="Where does a custom camera script live, and why?"
+  options={[
+    "In a Script, so the server controls every view",
+    "In a LocalScript, because the camera is your player's personal view",
+    "In either — the camera is shared",
+    "Attached to a part in Workspace",
+  ]}
+  answer={1}
+  explanation="The camera is your player's personal view, so the code is per-player: a LocalScript. The server never touches it."
+/>
+
+</Step>
+
+<Step>
+
+## Taking the wheel: Scriptable
+
+The engine ignores your CFrame assignments as long as it's in charge. Switch it off:
+
+```luau
+local camera = workspace.CurrentCamera
+
+camera.CameraType = Enum.CameraType.Scriptable
+camera.CFrame = CFrame.new(0, 30, 40)
+```
+
+- `CameraType.Scriptable` — "a script owns the camera now."
+- `camera.CFrame` — where the camera stands *and* which way it faces.
+
+From this moment the mouse and the character no longer move the camera. You set the CFrame, the camera obeys.
+
+<FillBlank
+  prompt="Setting camera.CameraType to ____ tells the engine a script owns the camera now."
+  answer="Scriptable"
+  explanation="Enum.CameraType.Scriptable hands the camera to your script — it no longer follows the character or the mouse."
+/>
+
+</Step>
+
+<Step>
+
+## Aiming: CFrame.lookAt
+
+`CFrame.new(0, 30, 40)` puts the camera high above the world — but it keeps whatever direction it was already facing. To *point* it, use `lookAt`:
+
+```luau
+camera.CFrame = CFrame.lookAt(Vector3.new(0, 30, 40), castle.Position)
+```
+
+Two arguments: **where the camera stands**, then **what it looks at**. If the target moves, the camera keeps staring at its old spot — which is why real camera scripts re-aim every frame (next step).
+
+<WriteCode
+  instruction="Aim the camera at castle.Position from the point (0, 30, 40). Write the line."
+  answer={["camera.CFrame = CFrame.lookAt(Vector3.new(0, 30, 40), castle.Position)"]}
+  starterCode="-- aim the camera at the castle
+"
+  explanation="CFrame.lookAt takes the camera's position first, then the target it should face."
+/>
+
+</Step>
+
+<Step>
+
+## The follow cam
+
+Aim once and a moving target walks out of frame. The fix: re-aim **every frame**. `RenderStepped` fires right before the game renders — the correct home for camera math:
+
+```luau
+local RunService = game:GetService("RunService")
+local camera = workspace.CurrentCamera
+local target = workspace.Coin
+
+RunService.RenderStepped:Connect(function()
+    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, target.Position)
+end)
+```
+
+`camera.CFrame.Position` — "where the camera already stands." Pass that plus the moving target, and the camera swings to follow the coin however it moves.
+
+<Note>
+RenderStepped runs on the client before every rendered frame. That's where smooth camera work goes — a `while true` loop with `task.wait` is too chunky for a camera.
+</Note>
+
+<WriteCode
+  instruction="Inside the RenderStepped handler, write the line that keeps the camera looking at target.Position from where it already stands."
+  answer={["camera.CFrame = CFrame.lookAt(camera.CFrame.Position, target.Position)"]}
+  starterCode="RunService.RenderStepped:Connect(function()
+    -- keep the camera aimed at the target
+end)
+"
+  explanation="lookAt(camera.CFrame.Position, target.Position) holds the camera in place and swings it to face the target — every frame, so it tracks perfectly."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Writing camera code in a Script.** The camera is your player's personal view — client-side, in a LocalScript. A server Script touching it is both wrong and pointless.
+- **Forgetting CFrame carries direction.** `camera.CFrame = CFrame.new(0, 30, 40)` teleports the camera but keeps the old facing. Point it with `lookAt`.
+- **Two writers fighting over CFrame.** A follow loop and a cutscene tween both assigning `camera.CFrame` = flicker. One camera, one writer at a time.
+- **Never giving control back.** A Scriptable camera stays locked until you say otherwise. Next lesson shows how to hand the mouse back.
+
+<FixBug
+  instruction="Type the corrected line — CFrame needs a CFrame, not a bare Vector3."
+  fix={["camera.CFrame = CFrame.new(0, 30, 40)"]}
+  placeholder="camera.CFrame = ..."
+  explanation="camera.CFrame holds position and direction, so you assign it a CFrame — CFrame.new(0, 30, 40) — not a plain Vector3."
+  label="The bug"
+>
+
+```luau
+camera.CFrame = Vector3.new(0, 30, 40)
+```
+
+</FixBug>
+
+Next: chaining scripted moves into a full cutscene.
+
+</Step>
