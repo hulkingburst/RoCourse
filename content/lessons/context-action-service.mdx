@@ -128,9 +128,7 @@ Forget to unbind and the old action keeps firing forever — you'll have stale b
 <WriteCode
   instruction="Bind the action 'sprint' to the LeftShift key. Create a touch button too, and print 'sprint!' only when the input begins."
   answer={["local function onSprint(actionName, inputState)", "if inputState == Enum.UserInputState.Begin then", "print(\"sprint!\")", "end", "end", "ContextActionService:BindAction(\"sprint\", onSprint, true, Enum.KeyCode.LeftShift)"]}
-  starterCode="local ContextActionService = game:GetService(\"ContextActionService\")
--- define onSprint and bind it here
-"
+  starterCode={"local ContextActionService = game:GetService(\"ContextActionService\")\n-- define onSprint and bind it here\n"}
   explanation="Define a handler that prints on Begin, then bind the 'sprint' action to LeftShift with a touch button."
 />
 

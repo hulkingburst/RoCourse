@@ -132,9 +132,7 @@ A named function keeps the Connect line tidy, and `.KeyCode.Name` gives you a re
 <WriteCode
   instruction="Connect to InputBegan with a callback that ignores processed events and prints 'JUMP' when the Space key is pressed."
   answer={["UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)", "if gameProcessedEvent then return end", "if input.KeyCode == Enum.KeyCode.Space then", "print(\"JUMP\")", "end", "end)"]}
-  starterCode="local UserInputService = game:GetService(\"UserInputService\")
--- your connect here
-"
+  starterCode={"local UserInputService = game:GetService(\"UserInputService\")\n-- your connect here\n"}
   explanation="Connect InputBegan, guard against processed events, check for Space, then print."
 />
 
