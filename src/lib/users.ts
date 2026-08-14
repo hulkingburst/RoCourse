@@ -36,16 +36,6 @@ export interface PublicProfile {
   completions: PublicCompletion[];
 }
 
-/** Compact row for the learners directory. */
-export interface PublicUserSummary {
-  handle: string;
-  name: string;
-  createdAt: string;
-  lessonsCompleted: number;
-  streak: number;
-  coursesCompleted: number;
-}
-
 /** Entry for the learner showcase — someone who finished a course. */
 export interface ShowcaseEntry {
   handle: string;
@@ -199,34 +189,6 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
       completedAt: completion.completedAt.toISOString(),
     })),
   };
-}
-
-/** Rows for the learners directory. Only users with a handle appear, since
- * only they have a public profile page. */
-export async function getPublicUserSummaries(): Promise<PublicUserSummary[]> {
-  const users = await prisma.user.findMany({
-    where: { handle: { not: null } },
-    select: {
-      handle: true,
-      name: true,
-      createdAt: true,
-      progress: { select: { data: true } },
-      _count: { select: { completions: true } },
-    },
-    orderBy: { createdAt: "asc" },
-  });
-
-  return users.map((user) => {
-    const stats = extractPublicStats(user.progress?.data);
-    return {
-      handle: user.handle as string,
-      name: user.name,
-      createdAt: user.createdAt.toISOString(),
-      lessonsCompleted: stats.lessonsCompleted,
-      streak: stats.streak,
-      coursesCompleted: user._count.completions,
-    };
-  });
 }
 
 /** Wall-of-fame rows: learners who completed a course, newest first. Only

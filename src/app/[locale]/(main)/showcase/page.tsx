@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { CheckCircle2, Gamepad2, Trophy, Users } from "lucide-react";
+import { CheckCircle2, Gamepad2, Trophy } from "lucide-react";
 import { getLearnerShowcase } from "@/lib/users";
 
 export const dynamic = "force-dynamic";
@@ -40,11 +40,11 @@ export default async function ShowcasePage() {
         <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">{t("intro")}</p>
         <Link
-          href="/users"
+          href="/leaderboard"
           className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
         >
-          <Users className="h-3.5 w-3.5" />
-          {t("browseAllLearners")}
+          <Trophy className="h-3.5 w-3.5" />
+          {t("seeLeaderboard")}
         </Link>
       </div>
 

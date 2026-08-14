@@ -37,7 +37,7 @@
     "playground": "Zona de práctica",
     "reference": "Referencia",
     "resources": "Recursos",
-    "learners": "Estudiantes",
+    "leaderboard": "Clasificación",
     "moreTools": "Más",
     "chooseFinalProject": "Elegir proyecto final",
     "switchFinalProject": "Cambiar proyecto final",
@@ -291,17 +291,14 @@
     "noCoursesYet": "Aún no has terminado ningún curso — el proyecto final te espera.",
     "signInTitle": "Tu progreso, donde quieras",
     "signInBody": "Inicia sesión para sincronizar tu progreso entre dispositivos y ver tus cursos completados. Puedes seguir aprendiendo sin cuenta: esto es totalmente opcional.",
-    "findLearners": "Buscar estudiantes",
+    "seeLeaderboard": "Ver la clasificación semanal",
     "bestStreak": "Mejor racha",
     "courses": "Cursos",
     "recentActivity": "Actividad reciente",
     "recentActivityHint": "Su última semana de lecciones, cuestionarios y retos diarios.",
     "noPublicActivity": "Aún no hay actividad pública — quizá acaba de empezar, o aprende sin cuenta.",
     "privacyNote": "Los perfiles públicos solo muestran estadísticas resumidas — nunca datos personales ni correo electrónico.",
-    "joinedAt": "@{handle} · Miembro desde {date}",
-    "noLearners": "Aún no hay estudiantes públicos — sé el primero en compartir tu progreso.",
-    "searchLearners": "Buscar estudiantes por nombre o identificador…",
-    "noLearnersMatch": "Ningún estudiante coincide con “{query}”."
+    "joinedAt": "@{handle} · Miembro desde {date}"
   },
   "badges": {
     "title": "Logros",
@@ -1724,7 +1721,7 @@
     "title": "Escaparate de estudiantes",
     "wallOfFame": "Muro de la fama",
     "intro": "Personas que terminaron el curso y publicaron un juego completo y jugable de Roblox. Si estás aquí, solo te queda construir.",
-    "browseAllLearners": "Ver todos los estudiantes",
+    "seeLeaderboard": "Ver la clasificación semanal",
     "emptyTitle": "Aún no hay graduados",
     "emptyBody": "Sé el primer nombre en el muro — el curso es gratis y a la mayoría le lleva alrededor de una semana.",
     "startCourse": "Empezar el curso",
@@ -1733,12 +1730,6 @@
     "footerNote": "Completar el curso te añade aquí automáticamente — no necesitas nada más que tu cuenta gratuita.",
     "projectTycoon": "Coin Tycoon",
     "projectCollector": "The Collector"
-  },
-  "users": {
-    "title": "Estudiantes",
-    "intro": "Perfiles públicos de personas que aprenden Luau aquí. Toca uno para ver su progreso, rachas y cursos completados.",
-    "seeShowcase": "Ver quién terminó el curso",
-    "seeLeaderboard": "Ver la clasificación semanal de XP"
   },
   "notFound": {
     "title": "Página no encontrada",

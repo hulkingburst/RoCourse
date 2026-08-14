@@ -37,7 +37,7 @@
     "playground": "Playground",
     "reference": "Reference",
     "resources": "Resources",
-    "learners": "Learners",
+    "leaderboard": "Leaderboard",
     "moreTools": "More",
     "chooseFinalProject": "Choose final project",
     "switchFinalProject": "Switch final project",
@@ -291,17 +291,14 @@
     "noCoursesYet": "No courses finished yet — the capstone awaits.",
     "signInTitle": "Your progress, anywhere",
     "signInBody": "Sign in to sync your progress across devices and see your completed courses. You can keep learning without an account — this is entirely optional.",
-    "findLearners": "Find learners",
+    "seeLeaderboard": "See the weekly leaderboard",
     "bestStreak": "Best streak",
     "courses": "Courses",
     "recentActivity": "Recent activity",
     "recentActivityHint": "Their last week of lessons, quizzes, and daily challenges.",
     "noPublicActivity": "No public activity yet — they may have just started, or they learn without an account.",
     "privacyNote": "Public profiles show only summary stats — never personal details or email.",
-    "joinedAt": "@{handle} · Joined {date}",
-    "noLearners": "No public learners yet — be the first to share your progress.",
-    "searchLearners": "Search learners by name or handle…",
-    "noLearnersMatch": "No learners match “{query}”."
+    "joinedAt": "@{handle} · Joined {date}"
   },
   "badges": {
     "title": "Achievements",
@@ -1724,7 +1721,7 @@
     "title": "Learner showcase",
     "wallOfFame": "Wall of fame",
     "intro": "People who finished the course and shipped a complete, playable Roblox game. If you're here, the only step left is to build.",
-    "browseAllLearners": "Browse all learners",
+    "seeLeaderboard": "See the weekly leaderboard",
     "emptyTitle": "No graduates yet",
     "emptyBody": "Be the first name on the wall — the course is free and takes most people about a week.",
     "startCourse": "Start the course",
@@ -1733,12 +1730,6 @@
     "footerNote": "Completing the course adds you here automatically — nothing to sign up for beyond your free account.",
     "projectTycoon": "Coin Tycoon",
     "projectCollector": "The Collector"
-  },
-  "users": {
-    "title": "Learners",
-    "intro": "Public profiles of people learning Luau here. Tap one to see their progress, streaks, and completed courses.",
-    "seeShowcase": "See who finished the course",
-    "seeLeaderboard": "See this week's XP leaderboard"
   },
   "notFound": {
     "title": "Page not found",

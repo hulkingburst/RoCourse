@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Flame,
   ListChecks,
-  Search,
   ShieldCheck,
   Timer,
   Trophy,
@@ -71,11 +70,11 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
         </div>
         <div className="ml-auto">
           <Link
-            href="/users"
+            href="/leaderboard"
             className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
           >
-            <Search className="h-3.5 w-3.5" />
-            {t("findLearners")}
+            <Trophy className="h-3.5 w-3.5" />
+            {t("seeLeaderboard")}
           </Link>
         </div>
       </div>

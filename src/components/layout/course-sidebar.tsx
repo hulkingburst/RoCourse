@@ -18,7 +18,7 @@ import {
   RotateCcw,
   Terminal,
   Timer,
-  Users,
+  Zap,
   Package,
 } from "lucide-react";
 import * as React from "react";
@@ -352,9 +352,9 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
                 asChild
                 className="w-full justify-start text-muted-foreground"
               >
-                <Link href="/users">
-                  <Users className="h-3.5 w-3.5" />
-                  {t("learners")}
+                <Link href="/leaderboard">
+                  <Zap className="h-3.5 w-3.5" />
+                  {t("leaderboard")}
                 </Link>
               </Button>
               <Button
