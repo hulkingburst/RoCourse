@@ -27,6 +27,14 @@ export const MAX_WEEKLY_XP = 5000;
 /** Number of week keys kept in the progress blob to bound its size. */
 export const MAX_WEEKLY_XP_ENTRIES = 26;
 
+/**
+ * Ceiling on lifetime XP accepted from untrusted payloads. Genuine learners
+ * land well below this (a full course completion is a few thousand); it only
+ * exists to stop a crafted payload from storing an absurd total that would
+ * inflate a public profile or level badge.
+ */
+export const MAX_LIFETIME_XP = 500_000;
+
 /** Cumulative XP required to reach `level` (1-indexed). */
 export function xpForLevel(level: number): number {
   const n = Math.max(1, Math.floor(level));

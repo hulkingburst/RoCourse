@@ -7,7 +7,7 @@ spectator. No copy-paste tutorials, no walls of theory. You assemble real game
 code yourself, one short step at a time, and the course only moves forward when
 you actually solve each activity.
 
-**Free forever. No paywall, no sign-up wall, no tricks.** All 72 lessons, every
+**Free forever. No paywall, no sign-up wall, no tricks.** All 74 lessons, every
 activity type, and the full Luau playground work without an account. Accounts
 are optional and exist purely to sync your progress across devices.
 
@@ -27,7 +27,7 @@ are optional and exist purely to sync your progress across devices.
 
 ## What's inside
 
-- **72 lessons across two complete games** — a Coin Tycoon and a collection
+- **74 lessons across two complete games** — a Coin Tycoon and a collection
   game — covering real Roblox Studio workflows and Luau fundamentals.
 - **Eight activity types** that make you write, predict, fix, and arrange real
   code: multiple choice, fill-in-the-blank, write-the-code, predict-the-output,
@@ -38,8 +38,11 @@ are optional and exist purely to sync your progress across devices.
   celebrate the finish line.
 - **A 60-second drill** — a timed sprint through harder Luau questions, with
   your best score saved to your profile.
-- **A Luau reference and a learner directory** for quick lookups — including
-  public progress profiles that never expose your email.
+- **XP and levels** — lessons, quizzes, daily challenges, and drills all earn
+  XP, and a weekly leaderboard ranks the top earners (guests included).
+- **A Luau reference and a weekly XP leaderboard** — look anything up, or see
+  who earned the most XP this week. Signed-in learners can share a public
+  progress profile (never your email).
 - **Optional cloud sync** so your progress follows you across devices.
 - **English and Spanish.** Every screen is localized via next-intl — the
   interface, all five guides, the FAQ, and the full interactive content (every
@@ -116,11 +119,15 @@ content/
   course.ts                 course map, section order, branding constants
   lessons/*.mdx             one MDX lesson per file
 prisma/
-  schema.prisma             User, ProgressProfile, CourseCompletion models
+  schema.prisma             User, ProgressProfile, CourseCompletion, Question,
+                            QuestionAnswer, WeeklyXp, AuthAttempt, RateLimitEvent
 src/
   app/                      Next.js App Router pages (home, lesson, search,
     api/auth/[...nextauth]  Auth.js credentials handlers
     api/sync/               progress sync API (GET pull, POST push)
+    api/leaderboard/        weekly XP leaderboard (top rows per week)
+    api/guest-xp/           guest XP reporting for the leaderboard
+    api/daily-challenge/    server-side grading of the daily challenge
   components/
     activities/             the eight activity components
     auth/                   sign-in dialog, account menu, sync host
@@ -128,14 +135,17 @@ src/
     lessons/                step, quiz, prediction, code block, MDX extras
     home/                   lesson list, course overview
     profile/                profile page UI
+    leaderboard/            weekly XP leaderboard UI
     reference/              Luau reference, search + copy
-    users/                  learner directory
   content/mdx-components.tsx  MDX component registry
   lib/
     steps.ts                source-level step splitter for MDX
     lessons.ts              course structure + lesson loading
     progress-store.ts       solved-activity progress (localStorage, zustand)
     sync.ts / sync-api.ts   client sync engine / server data access
+    sanitize-snapshot.ts    shared untrusted-progress sanitizer (client+server)
+    xp.ts                   XP/level/week math shared by store, sync, and APIs
+    rate-limit.ts, auth-limiter.ts  sliding-window rate limiting (DB-backed)
     auth.ts, auth-actions.ts  Auth.js config + account creation action
     prisma.ts               Prisma client singleton
   i18n/
@@ -181,8 +191,11 @@ local progress; signing in lets you continue on another device.
 - **Privacy by default** — public profiles are opt-in via a handle, and your
   email is never shown publicly (it's masked even on your own profile until you
   reveal it).
-- **Learner directory** — `/users` lists public profiles (`/u/<handle>`) with
-  progress stats and completions, so learners can show what they've built.
+- **Weekly XP leaderboard** — everyone (guests included) can earn and compare
+  weekly XP. Signed-in learners link to their public profile (`/u/<handle>`);
+  guests compete under an anonymous id and a self-chosen name.
+- **Learner showcase** — `/showcase` lists the learners who finished a course,
+  each linking to their public profile.
 - **Community resources** — a hand-vetted library of Roblox/Luau development
   assets on `/resources`, built from submissions the course author personally
   reviews (see the section below).

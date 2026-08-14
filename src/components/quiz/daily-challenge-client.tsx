@@ -153,12 +153,15 @@ export function DailyChallengeClient() {
     return [];
   }, [kind, questionId, debugChallenge, quiz, t]);
 
+  // XP is only earned for getting the challenge right. The store itself guards
+  // against double-awarding on the same day, so recording on the way to the
+  // "done" phase is safe even across renders.
   React.useEffect(() => {
-    if (phase === "done" && !reportedRef.current) {
+    if (phase === "done" && result === true && !reportedRef.current) {
       reportedRef.current = true;
       recordDailyChallengeCompleted();
     }
-  }, [phase, recordDailyChallengeCompleted]);
+  }, [phase, result, recordDailyChallengeCompleted]);
 
   if (!mounted) {
     return (
@@ -407,7 +410,20 @@ export function DailyChallengeClient() {
 
         {result !== null && (
           <div className="mt-4 flex justify-end">
-            <Button onClick={() => setPhase("done")}>{t("finish")}</Button>
+            {result ? (
+              <Button onClick={() => setPhase("done")}>{t("finish")}</Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSelected(null);
+                  setResult(null);
+                  setError(false);
+                }}
+              >
+                {t("tryAgain")}
+              </Button>
+            )}
           </div>
         )}
       </div>

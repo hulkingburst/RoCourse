@@ -33,6 +33,9 @@ export async function GET(request: Request) {
     }
     week = weekParam;
   } else {
+    // The leaderboard client always sends an explicit `week` derived from the
+    // learner's local timezone. This default (server-local week) only serves
+    // callers that omit the parameter.
     week = weekKey(new Date());
   }
 

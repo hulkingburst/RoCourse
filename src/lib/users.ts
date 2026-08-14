@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { countLessons } from "@/lib/lessons";
 import { extractBadgeStats, type BadgeStats } from "@/lib/badges";
+import { MAX_LIFETIME_XP } from "@/lib/xp";
 
 /** Public stats that are safe to show about any user, derived from the JSON
  * progress blob. Never includes email or any identifying detail. */
@@ -113,7 +114,7 @@ export function extractPublicStats(data: unknown): PublicStats {
     drillHighScore: clampInt(record.drillHighScore),
     finishedPath,
     activityDays: extractActivityDays(record.activityDays),
-    xp: clampInt(record.xp),
+    xp: Math.min(MAX_LIFETIME_XP, clampInt(record.xp)),
   };
 }
 

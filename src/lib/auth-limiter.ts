@@ -24,6 +24,9 @@ export function trustedIp(headers: { get(name: string): string | null }): string
     const last = parts[parts.length - 1];
     if (last) return last;
   }
+  // On Vercel x-real-ip is always set, so "unknown" only surfaces in local/dev
+  // where there's no proxy. It's a shared bucket then, which merely throttles
+  // local traffic together — not a real risk.
   return "unknown";
 }
 
