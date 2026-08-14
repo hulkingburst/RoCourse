@@ -7,7 +7,37 @@ import { highlightCode } from "@/lib/highlighter";
 import { cn } from "@/lib/utils";
 import { TryIt } from "@/components/lessons/try-it";
 
+interface LazyNode {
+  $$typeof: symbol;
+  _init: (payload: unknown) => unknown;
+  _payload: unknown;
+}
+
+/**
+ * React flight may serialize an element passed to a client component as a
+ * `React.lazy` node instead of a plain element. Resolve it when the chunk is
+ * already loaded; leave it untouched when still pending so the renderer can
+ * resolve it while rendering.
+ */
+function resolveNode(node: React.ReactNode): React.ReactNode {
+  if (node != null && typeof node === "object") {
+    const candidate = node as unknown as Partial<LazyNode>;
+    if (
+      candidate.$$typeof === Symbol.for("react.lazy") &&
+      typeof candidate._init === "function"
+    ) {
+      try {
+        return resolveNode(candidate._init(candidate._payload) as React.ReactNode);
+      } catch {
+        return node;
+      }
+    }
+  }
+  return node;
+}
+
 function extractText(node: React.ReactNode): string {
+  node = resolveNode(node);
   if (typeof node === "string" || typeof node === "number") return String(node);
   if (Array.isArray(node)) return node.map(extractText).join("");
   if (React.isValidElement(node)) {
@@ -45,7 +75,10 @@ export function CodeBlock({
   className,
 }: React.HTMLAttributes<HTMLPreElement>) {
   const t = useTranslations("codeBlock");
-  const codeElement = React.isValidElement(children) ? children : null;
+  const resolvedChildren = resolveNode(children);
+  const codeElement = React.isValidElement(resolvedChildren)
+    ? (resolvedChildren as React.ReactElement)
+    : null;
   const codeProps = codeElement?.props as
     | { className?: string; children?: React.ReactNode }
     | undefined;
@@ -132,7 +165,7 @@ export function CodeBlock({
         />
       ) : (
         <pre className="p-4 text-[13.5px] leading-relaxed text-zinc-300">
-          <code>{code}</code>
+          <code>{code !== "" ? code : children}</code>
         </pre>
       )}
       {trying && <TryIt code={code} />}
