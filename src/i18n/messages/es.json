@@ -715,6 +715,127 @@
     "daysAgo": "hace {count} d",
     "weeksAgo": "hace {count} sem"
   },
+  "glossary": {
+    "learnMore": "Saber más",
+    "defs": {
+      "part": {
+        "title": "Part",
+        "body": "Un objeto 3D en el mundo del juego — muros, bloques, monedas. Las parts son los ladrillos LEGO de cada construcción de Roblox."
+      },
+      "instance": {
+        "title": "Instancia",
+        "body": "Cualquier objeto en un lugar de Roblox — una part, un script, un sonido, una carpeta. Todo en el árbol del Explorer es una instancia."
+      },
+      "instancing": {
+        "title": "Instancing",
+        "body": "Crear instancias en tiempo de ejecución con Instance.new() para que el juego construya parts y objetos mientras corre."
+      },
+      "workspace": {
+        "title": "Workspace",
+        "body": "El contenedor del juego que guarda todo lo visible en el mundo. Los scripts colocan parts aquí para que aparezcan."
+      },
+      "script": {
+        "title": "Script",
+        "body": "Un archivo de código Luau que corre en un juego. Los scripts corren en el servidor y controlan lo que pasa en el mundo."
+      },
+      "local-script": {
+        "title": "Script local",
+        "body": "Un script que corre en el dispositivo de cada jugador. Los scripts locales manejan el input, la cámara y la interfaz."
+      },
+      "module-script": {
+        "title": "Script de módulo",
+        "body": "Un script que otros scripts pueden cargar para compartir código — una copia de una función usada en muchos lugares."
+      },
+      "variable": {
+        "title": "Variable",
+        "body": "Una caja con nombre que guarda un valor — un número, un texto, una part, lo que sea. La creas con local."
+      },
+      "function": {
+        "title": "Función",
+        "body": "Un bloque de código con nombre que corre al llamarlo. Las funciones te dejan reutilizar la lógica en vez de repetirla."
+      },
+      "table": {
+        "title": "Tabla",
+        "body": "Un contenedor que guarda muchos valores a la vez. Las listas empiezan en el índice 1; los diccionarios emparejan claves con valores."
+      },
+      "array": {
+        "title": "Array",
+        "body": "Una tabla que guarda una lista ordenada de valores, cada uno con un índice numérico que empieza en 1."
+      },
+      "dictionary": {
+        "title": "Diccionario",
+        "body": "Una tabla que guarda pares clave-valor, así buscas valores por nombre en vez de por número."
+      },
+      "loop": {
+        "title": "Bucle",
+        "body": "Un bloque que repite su código. Un bucle for cuenta valores; un bucle while corre hasta que una condición se vuelve falsa."
+      },
+      "for-loop": {
+        "title": "Bucle for",
+        "body": "Un bucle que corre un número conocido de veces, contando hacia arriba o hacia abajo por un rango de números."
+      },
+      "while-loop": {
+        "title": "Bucle while",
+        "body": "Un bucle que sigue corriendo mientras una condición sea verdadera y se detiene en cuanto se vuelve falsa."
+      },
+      "if-statement": {
+        "title": "Sentencia if",
+        "body": "Un bloque que corre código solo cuando una condición es verdadera, con ramas opcionales elseif y else."
+      },
+      "condition": {
+        "title": "Condición",
+        "body": "Una pregunta de verdadero o falso que el código comprueba — una comparación como score > 100, o un valor booleano."
+      },
+      "operator": {
+        "title": "Operador",
+        "body": "Un símbolo que opera sobre valores: matemáticas (+), comparaciones (==) y lógica (and, or, not)."
+      },
+      "event": {
+        "title": "Evento",
+        "body": "Algo que ocurre en el juego — que un jugador entre, que toquen una part. Escuchas con :Connect()."
+      },
+      "event-handler": {
+        "title": "Manejador de evento",
+        "body": "La función que corre cuando un evento se dispara. La conectas al evento para responder a él."
+      },
+      "tween": {
+        "title": "Tween",
+        "body": "Una animación suave y temporizada de una propiedad — mover una part de A a B en segundos en vez de saltar."
+      },
+      "cframe": {
+        "title": "CFrame",
+        "body": "Un valor que guarda una posición y una rotación juntas. Se usa para colocar y orientar parts con precisión."
+      },
+      "property": {
+        "title": "Propiedad",
+        "body": "Una configuración de una instancia — tamaño, color, posición, nombre. Las lees y cambias con un punto."
+      },
+      "player": {
+        "title": "Jugador",
+        "body": "Una persona en tu juego. El servicio Players las registra, y su personaje es su avatar en el mundo."
+      },
+      "leaderstats": {
+        "title": "Leaderstats",
+        "body": "Una carpeta que muestra números en la tabla de clasificación en pantalla — como monedas, puntos o nivel."
+      },
+      "datastore": {
+        "title": "DataStore",
+        "body": "Un guardado en la nube de Roblox que almacena valores entre sesiones, así el progreso sobrevive a que el jugador se vaya."
+      },
+      "remote-event": {
+        "title": "Remote event",
+        "body": "Una forma segura de que el servidor y el dispositivo de un jugador se envíen señales entre sí."
+      },
+      "debounce": {
+        "title": "Debounce",
+        "body": "Un candado que evita que una función corra dos veces seguidas — como una recompensa por toque de part."
+      },
+      "vector": {
+        "title": "Vector",
+        "body": "Un valor con tres números — x, y, z — usado para posiciones, tamaños y direcciones."
+      }
+    }
+  },
   "questions": {
     "title": "Preguntas",
     "description": "¿Atascado con una actividad, un concepto o tu proyecto final? Haz una pregunta y la comunidad te ayudará.",

@@ -715,6 +715,127 @@
     "daysAgo": "{count}d ago",
     "weeksAgo": "{count}w ago"
   },
+  "glossary": {
+    "learnMore": "Learn more",
+    "defs": {
+      "part": {
+        "title": "Part",
+        "body": "A 3D object in the game world — walls, blocks, coins. Parts are the LEGO bricks every Roblox build is made of."
+      },
+      "instance": {
+        "title": "Instance",
+        "body": "Any object in a Roblox place — a part, a script, a sound, a folder. Everything in the Explorer tree is an instance."
+      },
+      "instancing": {
+        "title": "Instancing",
+        "body": "Creating instances at runtime with Instance.new() so the game builds parts and objects while it runs."
+      },
+      "workspace": {
+        "title": "Workspace",
+        "body": "The container in the game that holds everything visible in the world. Scripts parent parts here to make them appear."
+      },
+      "script": {
+        "title": "Script",
+        "body": "A file of Luau code that runs in a game. Scripts run on the server and control what happens in the world."
+      },
+      "local-script": {
+        "title": "Local script",
+        "body": "A script that runs on each player's own device. Local scripts handle input, the camera, and the UI."
+      },
+      "module-script": {
+        "title": "Module script",
+        "body": "A script that other scripts can load to share code — one copy of a function used in many places."
+      },
+      "variable": {
+        "title": "Variable",
+        "body": "A named box that holds a value — a number, a string, a part, anything. You create one with local."
+      },
+      "function": {
+        "title": "Function",
+        "body": "A named block of code that runs when you call it. Functions let you reuse logic instead of repeating it."
+      },
+      "table": {
+        "title": "Table",
+        "body": "A container that holds many values at once. Lists start at index 1; dictionaries pair keys with values."
+      },
+      "array": {
+        "title": "Array",
+        "body": "A table that holds an ordered list of values, each with a number index starting at 1."
+      },
+      "dictionary": {
+        "title": "Dictionary",
+        "body": "A table that stores key-value pairs, so you look values up by a name instead of a number."
+      },
+      "loop": {
+        "title": "Loop",
+        "body": "A block that repeats its code. A for loop counts through values; a while loop runs until a condition turns false."
+      },
+      "for-loop": {
+        "title": "For loop",
+        "body": "A loop that runs a known number of times, counting up or down through a range of numbers."
+      },
+      "while-loop": {
+        "title": "While loop",
+        "body": "A loop that keeps running while a condition is true and stops the moment it turns false."
+      },
+      "if-statement": {
+        "title": "If statement",
+        "body": "A block that runs code only when a condition is true, with optional elseif and else branches."
+      },
+      "condition": {
+        "title": "Condition",
+        "body": "A true/false question the code checks — a comparison like score > 100, or a boolean value."
+      },
+      "operator": {
+        "title": "Operator",
+        "body": "A symbol that works on values: math (+), comparisons (==), and logic (and, or, not)."
+      },
+      "event": {
+        "title": "Event",
+        "body": "Something that happens in the game — a player joining, a part touched. You listen with :Connect()."
+      },
+      "event-handler": {
+        "title": "Event handler",
+        "body": "The function that runs when an event fires. You connect it to the event to respond to it."
+      },
+      "tween": {
+        "title": "Tween",
+        "body": "A smooth, timed animation of a property — moving a part from A to B over seconds instead of jumping."
+      },
+      "cframe": {
+        "title": "CFrame",
+        "body": "A value that holds a position and a rotation together. Used to place and point parts precisely."
+      },
+      "property": {
+        "title": "Property",
+        "body": "A setting on an instance — size, color, position, name. You read and change them with a dot."
+      },
+      "player": {
+        "title": "Player",
+        "body": "A person in your game. The Players service tracks them, and their character is their avatar in the world."
+      },
+      "leaderstats": {
+        "title": "Leaderstats",
+        "body": "A folder that shows numbers in the on-screen leaderboard — like coins, score, or level."
+      },
+      "datastore": {
+        "title": "DataStore",
+        "body": "A Roblox cloud save that stores values between sessions, so progress survives a player leaving."
+      },
+      "remote-event": {
+        "title": "Remote event",
+        "body": "A safe way for the server and a player's device to send signals to each other."
+      },
+      "debounce": {
+        "title": "Debounce",
+        "body": "A guard that stops a function from running twice in a row — like one reward per part touch."
+      },
+      "vector": {
+        "title": "Vector",
+        "body": "A value with three numbers — x, y, z — used for positions, sizes, and directions."
+      }
+    }
+  },
   "questions": {
     "title": "Questions",
     "description": "Stuck on an activity, a concept, or your final project? Ask a question and the community will help.",

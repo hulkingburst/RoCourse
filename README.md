@@ -43,6 +43,9 @@ are optional and exist purely to sync your progress across devices.
 - **A Luau reference and a weekly XP leaderboard** — look anything up, or see
   who earned the most XP this week. Signed-in learners can share a public
   progress profile (never your email).
+- **Inline glossary popovers** — hover any key term in a lesson (part,
+  workspace, tween, event, …) for a one-line definition and a link to the
+  lesson that teaches it.
 - **Optional cloud sync** so your progress follows you across devices.
 - **English and Spanish.** Every screen is localized via next-intl — the
   interface, all five guides, the FAQ, and the full interactive content (every

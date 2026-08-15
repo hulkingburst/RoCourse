@@ -1,5 +1,6 @@
 import type { MDXComponents } from "mdx/types";
 import { CodeBlock } from "@/components/lessons/code-block";
+import { GlossaryLi, GlossaryP } from "@/components/lessons/glossary-text";
 import { Solution } from "@/components/lessons/solution";
 import { Step } from "@/components/lessons/step";
 import { ArrangeCode } from "@/components/activities/arrange-code";
@@ -30,6 +31,8 @@ import {
 export const mdxComponents: MDXComponents = {
   pre: CodeBlock,
   a: MdxLink,
+  p: GlossaryP,
+  li: GlossaryLi,
   h2: (props) => <MdxHeading level={2} {...props} />,
   h3: (props) => <MdxHeading level={3} {...props} />,
   h4: (props) => <MdxHeading level={4} {...props} />,
