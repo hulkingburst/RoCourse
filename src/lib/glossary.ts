@@ -44,6 +44,7 @@ export const GLOSSARY_DEFS: GlossaryDef[] = [
   { id: "remote-event", match: ["remote event"], lesson: "remotes" },
   { id: "debounce", match: ["debounce"], lesson: "events" },
   { id: "vector", match: ["vector"], lesson: "camera-control" },
+  { id: "raycast", match: ["raycast", "raycasting"], lesson: "raycasting" },
 ];
 
 function escapeRegExp(value: string): string {

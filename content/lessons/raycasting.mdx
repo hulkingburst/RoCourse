@@ -1,0 +1,184 @@
+---
+slug: raycasting
+title: Raycasting — asking the world what's in the way
+description: Fire an invisible ray from any point and read exactly what it hits — the tool behind line of sight, ground checks, and laser beams.
+sectionId: objects
+order: 9
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [raycast, raycasting, world, collision]
+objectives:
+  - Cast a ray from an origin in a direction with workspace:Raycast
+  - Read what the ray hit from the RaycastResult
+  - Filter a raycast so it ignores parts you don't care about
+  - Find the ground below a character with a downward ray
+prerequisites: [camera-control, tweens]
+keywords: [raycast, raycasting, raycastparams, raycastresult, normal]
+---
+
+"Is this wall between me and the player? What's under my feet? Did my laser hit the target?" Games answer those questions with a **raycast**: an invisible ray fired from a point in a direction, with Roblox reporting back the first thing it hits.
+
+<Step>
+
+## The ray
+
+A ray needs two things: a **starting point** and a **direction**. Fire it and Roblox tells you what it hit:
+
+```luau
+local origin = Vector3.new(0, 5, 0)      -- where the ray starts
+local direction = Vector3.new(0, 0, -50) -- which way it goes, and how far (50 studs)
+
+local result = workspace:Raycast(origin, direction)
+```
+
+- `origin` — a position the ray leaves from.
+- `direction` — a vector whose *length* is the max distance the ray travels.
+- Returns a **RaycastResult** — or `nil` if the ray hit nothing.
+
+<Mcq
+  question="A ray travels its full distance without touching anything. What does workspace:Raycast return?"
+  options={[
+    "nil",
+    "An empty table",
+    "A RaycastResult with Instance = nil",
+    "An error",
+  ]}
+  answer={0}
+  explanation="Raycast returns a RaycastResult when it hits something, and nil when the ray reaches the end of its direction without touching anything."
+/>
+
+</Step>
+
+<Step>
+
+## Reading the hit
+
+When the ray hits, the result tells you everything about the impact:
+
+```luau
+if result then
+    print(result.Instance) -- the part the ray struck
+    print(result.Position) -- the exact point it landed on
+    print(result.Normal)   -- which way the surface faces
+end
+```
+
+Three fields, three answers:
+
+- `result.Instance` — **what** was hit (the part).
+- `result.Position` — **where** the ray landed (a Vector3).
+- `result.Normal` — which way that surface points, useful for placing things flush against it.
+
+<FillBlank
+  prompt="The ray hit a wall. To find out which part it hit, read ____ on the result."
+  answer="result.Instance"
+  explanation="result.Instance is the part the ray struck. Position is where it landed, and Normal is which way the surface faces."
+/>
+
+</Step>
+
+<Step>
+
+## Filtering the cast
+
+A raw ray hits *everything* in its path — including the player who fired it. Filter it with `RaycastParams` so you don't shoot yourself:
+
+```luau
+local rayParams = RaycastParams.new()
+rayParams.FilterType = Enum.RaycastFilterType.Exclude
+rayParams.FilterDescendantsInstances = { player.Character }
+
+local result = workspace:Raycast(origin, direction, rayParams)
+```
+
+- `FilterType.Exclude` — "hit everything *except* the list below."
+- `FilterDescendantsInstances` — the parts to ignore (your own character model).
+- The params go in as the **third argument** to `Raycast`.
+
+<WriteCode
+  instruction="Cast the ray with rayParams so it ignores the player's own character. Write the line."
+  answer={[
+    "local result = workspace:Raycast(origin, direction, rayParams)",
+    "result = workspace:Raycast(origin, direction, rayParams)",
+  ]}
+  starterCode="local rayParams = RaycastParams.new()
+rayParams.FilterType = Enum.RaycastFilterType.Exclude
+rayParams.FilterDescendantsInstances = { player.Character }
+
+-- cast the filtered ray
+"
+  explanation="The filter is the third argument: workspace:Raycast(origin, direction, rayParams)."
+/>
+
+</Step>
+
+<Step>
+
+## A real use: is there ground?
+
+Cast a ray straight down from the character and you can read the height of the floor below — for landing checks, footsteps, or keeping a camera off the ceiling:
+
+```luau
+local rayParams = RaycastParams.new()
+rayParams.FilterType = Enum.RaycastFilterType.Exclude
+rayParams.FilterDescendantsInstances = { character }
+
+local origin = character.HumanoidRootPart.Position
+local direction = Vector3.new(0, -100, 0) -- straight down, up to 100 studs
+
+local result = workspace:Raycast(origin, direction, rayParams)
+
+if result then
+    print("ground at", result.Position.Y)
+end
+```
+
+Downward rays are the same recipe as any other ray — the trick is that the direction points *down*, and the filter keeps the ray from hitting the character itself.
+
+<WriteCode
+  instruction="Write the direction vector that points straight down, so the ray checks for ground below."
+  answer={[
+    "local direction = Vector3.new(0, -100, 0)",
+    "direction = Vector3.new(0, -100, 0)",
+  ]}
+  starterCode="local origin = character.HumanoidRootPart.Position
+
+-- point the ray straight down
+"
+  explanation="Down is negative Y: Vector3.new(0, -100, 0) — direction straight down, 100 studs of reach."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting the nil check.** A ray that misses returns `nil` — `result.Instance` on a miss crashes. Always guard with `if result then`.
+- **No filter, hit yourself.** A raw ray hits the player who fired it. Exclude your own character (or the parts you don't want).
+- **Direction as a position.** `workspace:Raycast(origin, workspace.Target.Position)` fires a ray to a *point* far away, not toward the target. The direction must be a vector from the origin.
+- **Reusing the same params forever.** One `RaycastParams` is fine for one cast. If different casts need different filters, make a new one — or rebuild the list.
+
+<FixBug
+  instruction="Type the corrected direction line — a ray's direction must point from the origin toward the target."
+  fix={[
+    "local direction = workspace.Target.Position - origin",
+    "direction = workspace.Target.Position - origin",
+  ]}
+  placeholder="local direction = …"
+  explanation="Subtract the origin from the target: workspace.Target.Position - origin is the vector that points from where the ray starts to what it should hit."
+  label="The bug"
+>
+
+```luau
+local origin = Vector3.new(0, 5, 0)
+
+local direction = workspace.Target.Position -- a position, not a direction!
+local result = workspace:Raycast(origin, direction)
+```
+
+</FixBug>
+
+Next: a bug hunt across the whole world — raycast bugs included.
+
+</Step>

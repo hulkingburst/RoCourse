@@ -833,6 +833,10 @@
       "vector": {
         "title": "Vector",
         "body": "Un valor con tres números — x, y, z — usado para posiciones, tamaños y direcciones."
+      },
+      "raycast": {
+        "title": "Raycast",
+        "body": "Disparar un rayo invisible desde un punto en una dirección para preguntar al mundo qué hay en el camino — se usa para línea de visión, comprobaciones del suelo y láseres."
       }
     }
   },
