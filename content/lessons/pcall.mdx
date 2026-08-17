@@ -1,0 +1,117 @@
+---
+slug: pcall
+title: pcall — running code that might fail
+description: Wrap risky calls in pcall so a single DataStore error doesn't crash your entire game — the safety net every data script needs.
+sectionId: data
+order: 5
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [pcall, error, protected call, datastore, safety]
+objectives:
+  - Wrap a DataStore call in pcall to catch errors without crashing
+  - Read the success flag and error message from pcall's return values
+  - Use pcall for any operation that might fail at runtime
+prerequisites: [datastores]
+keywords: [pcall, protected call, error handling, datastores, safety, luau]
+---
+
+DataStores fail. The network hiccups, the store is throttled, the key is wrong — and if you don't catch the error, the entire script dies. `pcall` (protected call) runs a function inside a safety bubble: if it crashes, you get the error message instead of a dead game.
+
+<Step>
+
+## The problem — one crash kills everything
+
+```luau
+local data = dataStore:GetAsync(player.UserId) -- what if this fails?
+local coins = data.Coins  -- what if data is nil?
+```
+
+If `GetAsync` throws an error, the script stops. Every line below it — loading leaderstats, setting up the save loop — never runs. The player joins a broken game.
+
+<Note>
+DataStore errors are common in production: network timeouts, throttling, invalid keys, Studio vs. live environment differences. They're not bugs — they're normal.
+</Note>
+
+</Step>
+
+<Step>
+
+## pcall catches the crash
+
+`pcall` takes a function and runs it. If it succeeds, `pcall` returns `true` plus whatever the function returned. If it fails, `pcall` returns `false` plus the error message:
+
+```luau
+local success, result = pcall(function()
+    return dataStore:GetAsync(player.UserId)
+end)
+
+if success then
+    print("Got data:", result)
+else
+    warn("Failed to load:", result)
+end
+```
+
+The key: **even if GetAsync throws an error, the script keeps running.** You get `false` and the error string instead of a dead script.
+
+<Mcq
+  question={`What does pcall return when the function runs without error?`}
+  options={[
+    "true, then the return value",
+    "false, then nil",
+    "true, then nil",
+    "The function's return value only",
+  ]}
+  answer={0}
+  explanation="pcall always returns a boolean first (true = success), then either the return value or the error message."
+/>
+
+</Step>
+
+<Step>
+
+## The pattern — always check success
+
+The standard DataStore pattern wraps every call in pcall and handles both outcomes:
+
+```luau
+local success, data = pcall(function()
+    return dataStore:GetAsync(player.UserId)
+end)
+
+if success and data then
+    -- use the data
+    coins = data.Coins or 0
+else
+    -- default values, warn the developer
+    warn("Data load failed for", player.UserId, ":", data)
+    coins = 0
+end
+```
+
+Three things to notice:
+
+1. **`success and data`** — even if pcall succeeds, `data` could be nil (new player, no save). Always check both.
+2. **`or 0`** — default values protect against nil data.
+3. **`warn(...)`** — logs the error without crashing so you can debug in production.
+
+<WriteCode
+  instruction="Wrap a DataStore:GetAsync call in pcall. Store the result in 'success' and 'data'. If it fails or returns nil, set data to an empty table {}."
+  answer={["local success, data = pcall(function()", "    return dataStore:GetAsync(player.UserId)", "end)", "if not success or not data then", "    data = {}", "end"]}
+  starterCode="local dataStore = game:GetService(\"DataStoreService\"):GetDataStore(\"PlayerData\")\n-- wrap GetAsync in pcall and handle failure"
+  explanation="pcall catches errors, and the if-check handles nil data from new players."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting pcall entirely.** Every DataStore call in production should be wrapped. No exceptions.
+- **Not checking the success flag.** `pcall` returns `false, errorMessage` on failure — ignoring it means using the error message as if it were data.
+- **Using pcall for non-error code.** pcall has overhead. Don't wrap regular math or variable assignments — only use it for operations that genuinely might fail (network calls, file I/O, parsing external input).
+- **Catching errors silently.** `pcall` swallows the crash — if you don't `warn()` the error, you'll never know why saves are broken.
+
+Next: loading a player's data in detail — and handling brand-new players.
+</Step>

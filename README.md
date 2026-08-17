@@ -7,7 +7,7 @@ spectator. No copy-paste tutorials, no walls of theory. You assemble real game
 code yourself, one short step at a time, and the course only moves forward when
 you actually solve each activity.
 
-**Free forever. No paywall, no sign-up wall, no tricks.** All 75 lessons, every
+**Free forever. No paywall, no sign-up wall, no tricks.** All 80 lessons, every
 activity type, and the full Luau playground work without an account. Accounts
 are optional and exist purely to sync your progress across devices.
 
@@ -27,7 +27,7 @@ are optional and exist purely to sync your progress across devices.
 
 ## What's inside
 
-- **75 lessons across two complete games** — a Coin Tycoon and a collection
+- **80 lessons across two complete games** — a Coin Tycoon and a collection
   game — covering real Roblox Studio workflows and Luau fundamentals.
 - **Eight activity types** that make you write, predict, fix, and arrange real
   code: multiple choice, fill-in-the-blank, write-the-code, predict-the-output,

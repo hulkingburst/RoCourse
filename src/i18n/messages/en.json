@@ -837,6 +837,22 @@
       "raycast": {
         "title": "Raycast",
         "body": "Firing an invisible ray from a point in a direction to ask the world what's in the way — used for line of sight, ground checks, and lasers."
+      },
+      "particle-emitter": {
+        "title": "Particle Emitter",
+        "body": "An object that spawns small visual particles from a part — sparkles, smoke, fire, and other effects that make a game feel alive."
+      },
+      "proximity-prompt": {
+        "title": "Proximity Prompt",
+        "body": "A floating 'E to interact' prompt that appears when a player walks near a part — the modern way to let players interact with doors, NPCs, and objects."
+      },
+      "pcall": {
+        "title": "pcall",
+        "body": "Protected call — runs a function and catches errors instead of crashing the script, essential for safe DataStore calls."
+      },
+      "string-pattern": {
+        "title": "String Pattern",
+        "body": "A mini language for matching text inside strings — find words, extract numbers, replace parts of a message using codes like %d (digits) and %a (letters)."
       }
     }
   },

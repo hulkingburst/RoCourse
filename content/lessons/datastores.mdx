@@ -120,6 +120,6 @@ end)"
 - **Using the key as the saved value.** The *key* is UserId, the *value* is coins. Getting them backwards stores a number with a number for a key.
 - **Forgetting the nil check.** New player, no save → `GetAsync` gives nil. Default it with `or 0`.
 
-Next: loading a player's data in detail — and handling brand-new players.
+Next: safe DataStore calls with pcall — because the network always finds a way to fail.
 
 </Step>

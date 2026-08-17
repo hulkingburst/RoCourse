@@ -837,6 +837,22 @@
       "raycast": {
         "title": "Raycast",
         "body": "Disparar un rayo invisible desde un punto en una dirección para preguntar al mundo qué hay en el camino — se usa para línea de visión, comprobaciones del suelo y láseres."
+      },
+      "particle-emitter": {
+        "title": "Emisor de Partículas",
+        "body": "Un objeto que genera pequeñas partículas visuales desde una parte — chispas, humo, fuego y otros efectos que hacen que un juego se sienta vivo."
+      },
+      "proximity-prompt": {
+        "title": "Proximidad Prompt",
+        "body": "Un indicador flotante de 'E para interactuar' que aparece cuando un jugador se acerca a una parte — la forma moderna de permitir interacción con puertas, NPCs y objetos."
+      },
+      "pcall": {
+        "title": "pcall",
+        "body": "Llamada protegida — ejecuta una función y captura errores en lugar de bloquear el script, esencial para llamadas seguras a DataStore."
+      },
+      "string-pattern": {
+        "title": "Patrón de Texto",
+        "body": "Un mini lenguaje para buscar texto dentro de cadenas — encontrar palabras, extraer números, reemplazar partes de un mensaje usando códigos como %d (dígitos) y %a (letras)."
       }
     }
   },

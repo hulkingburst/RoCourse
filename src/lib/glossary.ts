@@ -36,15 +36,20 @@ export const GLOSSARY_DEFS: GlossaryDef[] = [
   { id: "event", match: ["event"], lesson: "events" },
   { id: "event-handler", match: ["event handler"], lesson: "events" },
   { id: "tween", match: ["tween"], lesson: "tweens" },
-  { id: "cframe", match: ["cframe"], lesson: "camera-control" },
+  { id: "cframe", match: ["cframe"], lesson: "vector3-cframe" },
+  { id: "vector3", match: ["vector3"], lesson: "vector3-cframe" },
   { id: "property", match: ["property", "properties"], lesson: "studio-interface" },
   { id: "player", match: ["player"], lesson: "players" },
   { id: "leaderstats", match: ["leaderstats"], lesson: "leaderstats" },
   { id: "datastore", match: ["datastore"], lesson: "datastores" },
   { id: "remote-event", match: ["remote event"], lesson: "remotes" },
   { id: "debounce", match: ["debounce"], lesson: "events" },
-  { id: "vector", match: ["vector"], lesson: "camera-control" },
+  { id: "vector", match: ["vector"], lesson: "vector3-cframe" },
   { id: "raycast", match: ["raycast", "raycasting"], lesson: "raycasting" },
+  { id: "particle-emitter", match: ["particle emitter"], lesson: "particle-effects" },
+  { id: "proximity-prompt", match: ["proximity prompt"], lesson: "proximity-prompt" },
+  { id: "pcall", match: ["pcall"], lesson: "pcall" },
+  { id: "string-pattern", match: ["string pattern", "pattern matching"], lesson: "string-patterns" },
 ];
 
 function escapeRegExp(value: string): string {

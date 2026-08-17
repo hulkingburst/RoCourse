@@ -1,0 +1,154 @@
+---
+slug: string-patterns
+title: String patterns — finding and replacing text
+description: Search inside strings, extract parts, and swap text with pattern matching — the tools that turn raw text into useful data.
+sectionId: luau-basics
+order: 7
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [string, pattern, gmatch, gsub, find]
+objectives:
+  - Use string.find to locate text inside a string
+  - Use string.gsub to replace matches in a string
+  - Use string.match to pull specific parts out of text
+  - Understand basic pattern characters like %d and %a
+prerequisites: [strings]
+keywords: [string, pattern, gmatch, gsub, find, match, replace, text, luau]
+---
+
+Strings hold text. Patterns let you *search* inside that text — find a word, replace a number, pull out a username. Every chat filter, name validator, and save-key parser uses them.
+
+<Step>
+
+## string.find — locate text
+
+`string.find` searches a string for a pattern and returns where it starts and ends:
+
+```luau
+local text = "Player scored 250 points"
+local start, finish = string.find(text, "scored")
+print(start, finish) -- 8 13
+```
+
+The numbers are character positions (1-indexed). If the pattern isn't found, it returns nil:
+
+```luau
+local result = string.find(text, "coins")
+print(result) -- nil
+```
+
+<FillBlank
+  prompt={`What does string.find("hello world", "world") return?  →  two numbers`}
+  answer={`7, 11`}
+  explanation="'world' starts at position 7 and ends at position 11 in 'hello world'."
+/>
+
+</Step>
+
+<Step>
+
+## string.gsub — find and replace
+
+`string.gsub` replaces every match of a pattern with something new:
+
+```luau
+local msg = "I have 5 apples and 3 oranges"
+local clean = string.gsub(msg, "apples", "bananas")
+print(clean) -- I have 5 bananas and 3 oranges
+```
+
+The original string is unchanged — gsub returns a *new* string.
+
+```luau
+print(msg) -- still says apples
+```
+
+This is important: strings are immutable. Every operation produces a new one.
+
+</Step>
+
+<Step>
+
+## Pattern characters — %d, %a, and more
+
+Raw text finds exact matches. But patterns use special codes to match *categories* of characters:
+
+| Pattern | Matches |
+|---------|---------|
+| `%d` | Any digit (0-9) |
+| `%a` | Any letter (a-z, A-Z) |
+| `%w` | Any letter or digit |
+| `%s` | Any whitespace (space, tab) |
+| `.` | Any character |
+
+```luau
+local text = "Player123 scored 456"
+local first = string.match(text, "%d+")  -- one or more digits
+print(first) -- 123
+```
+
+The `+` means "one or more of the thing before it." Without it, `%d` only matches a single digit.
+
+<Mcq
+  question={`What does string.match("abc123xyz", "%a+") return?`}
+  options={[
+    "abc123xyz",
+    "abc",
+    "123",
+    "xyz",
+  ]}
+  answer={1}
+  explanation="%a matches letters, and + means 'one or more'. The first group of letters is 'abc'."
+/>
+
+</Step>
+
+<Step>
+
+## Putting it together — extract data from text
+
+Patterns shine when you need to pull structured data out of messy text:
+
+```luau
+local log = "User204 earned 75 coins"
+local user = string.match(log, "(%a+)(%d+)")  -- letters then digits
+print(user) -- User204
+
+local coins = string.match(log, "(%d+) coins")
+print(coins) -- 75
+```
+
+Parentheses `()` **capture** the matched part — they're how you pull pieces out.
+
+Real-world example — validating a username:
+
+```luau
+local function isValidName(name)
+    return string.match(name, "^%a%w+$") ~= nil
+end
+print(isValidName("Player1")) -- true
+print(isValidName("1Player")) -- false (starts with a digit)
+```
+
+The `^` means "must be at the start" and `$` means "must be at the end" — together they require the *entire* string to match.
+
+<WriteCode
+  instruction="Extract the number from 'Score: 42' using string.match with a digit pattern. Store it in a variable called score."
+  answer={["local score = string.match(\"Score: 42\", \"%d+\")"]}
+  starterCode="local text = \"Score: 42\"\n-- your match line here"
+  explanation="string.match with %d+ grabs the first run of digits."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting gsub returns a new string.** The original stays the same — assign the result to a variable.
+- **Using literal dots instead of `%.`.** A bare `.` matches *any* character. To find a literal period, escape it: `string.find(text, "%.")`.
+- **Not using `+` for multiple characters.** `%d` matches one digit. `%d+` matches a whole number.
+- **Expecting patterns to work like exact text.** `string.find("abc123", "%d")` finds `1`, not `123`. Use `%d+` to grab all the digits.
+
+Next: booleans — yes, no, maybe.
+</Step>

@@ -1,0 +1,153 @@
+---
+slug: vector3-cframe
+title: Vector3 and CFrame — points in 3D space
+description: The two types that put anything anywhere in the world — position with Vector3, and position plus rotation with CFrame.
+sectionId: objects
+order: 1
+difficulty: beginner
+estimatedMinutes: 5
+tags: [vector3, cframe, position, rotation, coordinate]
+objectives:
+  - Create a Vector3 to describe a point or direction in 3D space
+  - Read and change a part's Position with Vector3
+  - Use CFrame to place and rotate an object in one step
+  - Convert between CFrame and position with CFrame.new
+prerequisites: [recap-objects]
+keywords: [vector3, cframe, position, rotation, coordinate, 3d space, vector]
+---
+
+Every object in Roblox lives at a point in 3D space. Two types describe that point: **Vector3** (where something is) and **CFrame** (where it is and which way it faces). Master these two and you can place anything, anywhere, facing any direction.
+
+<Step>
+
+## Vector3 — a point in space
+
+A Vector3 is three numbers: **X**, **Y**, and **Z**. X goes left-right, Y goes up-down, Z goes forward-back.
+
+```luau
+local point = Vector3.new(10, 5, -3)
+print(point.X) -- 10
+print(point.Y) -- 5
+print(point.Z) -- -3
+```
+
+You already know this — a part's `Position` property *is* a Vector3:
+
+```luau
+print(part.Position)        -- Vector3(10, 5, -3)
+print(part.Position.X)      -- 10
+```
+
+<FillBlank
+  prompt={`How do you create a Vector3 at X=3, Y=7, Z=0?  Vector3.new(____)  →  fill in the three numbers`}
+  answer={`3, 7, 0`}
+  explanation="Vector3.new takes three numbers: X, Y, Z in that order."
+/>
+
+</Step>
+
+<Step>
+
+## Moving things with Vector3
+
+Change a part's position by assigning a new Vector3 to its Position:
+
+```luau
+part.Position = Vector3.new(0, 10, 0) -- move to the sky
+```
+
+Vector3 also does math — add, subtract, multiply:
+
+```luau
+local start = part.Position
+local offset = Vector3.new(0, 5, 0)
+part.Position = start + offset -- move 5 studs up
+```
+
+Subtracting two positions gives the **direction and distance** between them — that's how raycasts and cameras figure out where to look.
+
+```luau
+local diff = target.Position - part.Position
+print(diff.Magnitude) -- how far apart (a number)
+```
+
+<Mcq
+  question="What does (A.Position - B.Position).Magnitude return?"
+  options={[
+    "The angle between A and B",
+    "The straight-line distance between A and B",
+    "A Vector3 pointing from B to A",
+    "The speed A needs to reach B",
+  ]}
+  answer={1}
+  explanation="Subtracting positions gives a difference Vector3, and .Magnitude turns it into a single distance number."
+/>
+
+</Step>
+
+<Step>
+
+## CFrame — position plus rotation
+
+A CFrame is a **position + orientation** in one value. It tells Roblox both *where* an object is and *which way it faces*.
+
+```luau
+local cf = CFrame.new(10, 5, 0)
+print(cf.Position) -- Vector3(10, 5, 0)
+```
+
+A plain `CFrame.new(x, y, z)` puts something at that point with no rotation — same as setting Position. The power comes from adding a rotation target:
+
+```luau
+-- Face the part toward a point
+part.CFrame = CFrame.new(part.Position, target.Position)
+```
+
+The second argument is the **lookAt** point. The part's front face points toward it.
+
+<Note>
+You can also rotate by angle: `CFrame.Angles(0, math.rad(90), 0)` rotates 90 degrees around the Y (up) axis. Angles are in radians — use `math.rad()` to convert degrees.
+</Note>
+
+</Step>
+
+<Step>
+
+## CFrame in action
+
+The real win: CFrame lets you place *and* orient something in one assignment. This is how moving platforms, camera rigs, and tool welds work:
+
+```luau
+-- Put a part at (0, 10, 0) facing toward the origin
+part.CFrame = CFrame.new(0, 10, 0, CFrame.new(0, 10, 0).LookVector)
+```
+
+Or simpler — use `CFrame.lookAt`:
+
+```luau
+part.CFrame = CFrame.lookAt(
+    Vector3.new(0, 10, 0),  -- where
+    Vector3.new(0, 0, 0)    -- what to face
+)
+```
+
+<WriteCode
+  instruction="Move part to position (5, 20, 5) and make it face toward (5, 0, 5) — straight down. Write one CFrame.lookAt assignment."
+  answer={["part.CFrame = CFrame.lookAt(Vector3.new(5, 20, 5), Vector3.new(5, 0, 5))"]}
+  starterCode="local part = workspace.Part\n-- your CFrame.lookAt line here"
+  explanation="CFrame.lookAt takes (position, lookAtPoint) — the part faces straight down from the sky."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Using Position when you need rotation.** Position is just X/Y/Z. If you need the part to face a direction, use CFrame instead.
+- **Forgetting CFrame.new takes Vector3 or three numbers.** `CFrame.new(part.Position)` and `CFrame.new(10, 5, 0)` both work.
+- **Mixing up position and lookAt.** `CFrame.new(pos, lookAt)` — first is where, second is what to face.
+- **Expecting Position and CFrame to stay in sync.** Always set CFrame when you need both position and rotation — setting Position separately overwrites the CFrame rotation.
+
+Next: let's put it to work — meeting the players in your game.
+</Step>

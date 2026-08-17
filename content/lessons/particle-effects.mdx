@@ -1,0 +1,132 @@
+---
+slug: particle-effects
+title: Particle effects — making the world feel alive
+description: Sparkle, smoke, and glow — add ParticleEmitters to parts so your game looks as good as it plays.
+sectionId: objects
+order: 7
+difficulty: intermediate
+estimatedMinutes: 4
+tags: [particles, emitter, effects, sparkle, smoke, visual]
+objectives:
+  - Create a ParticleEmitter and attach it to a part
+  - Control emission rate, lifetime, and speed
+  - Change color and size over a particle's lifetime
+  - Toggle effects on and off from a script
+prerequisites: [sounds]
+keywords: [particle, emitter, effect, sparkle, smoke, trail, visual, polish]
+---
+
+A game without effects is a movie without color grading — technically functional, but flat. ParticleEmitters turn a plain part into a fountain of sparkles, a cloud of smoke, or a shower of coins. They're one of the fastest ways to make a game feel polished.
+
+<Step>
+
+## Your first emitter
+
+A ParticleEmitter is an object you parent to a part. It spews particles automatically:
+
+```luau
+local emitter = Instance.new("ParticleEmitter")
+emitter.Rate = 20          -- particles per second
+emitter.Lifetime = NumberRange.new(0.5, 1.5)  -- each particle lives 0.5–1.5s
+emitter.Speed = NumberRange.new(5, 10)         -- speed when emitted
+emitter.Parent = part
+```
+
+- `Rate` — how many particles per second. Higher = denser effect.
+- `Lifetime` — how long each particle lives (randomized between the two numbers).
+- `Speed` — how fast particles fly outward.
+
+<FillBlank
+  prompt="To make a ParticleEmitter produce 50 particles per second, set its ____ property to 50."
+  answer="Rate"
+  explanation="Rate controls how many particles are emitted per second."
+/>
+
+</Step>
+
+<Step>
+
+## Shape and direction
+
+By default, particles spray upward from the part's surface. Change where they go:
+
+```luau
+emitter.SpreadAngle = Vector2.new(45, 45)  -- spread in a cone
+emitter.EmissionDirection = Enum.NormalId.Top  -- emit from the top face
+```
+
+`SpreadAngle` widens the spray cone — `Vector2.new(0, 0)` means a straight line, `Vector2.new(360, 360)` means everywhere.
+
+For a coin pickup, you want particles flying outward from the center. For a torch, you want them rising from the top. Match the shape to the moment.
+
+</Step>
+
+<Step>
+
+## Color and size over time
+
+The real magic: particles can change as they age.
+
+```luau
+emitter.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),  -- gold at start
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 0)),  -- orange at end
+})
+emitter.Size = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 0.5),  -- start small
+    NumberSequenceKeypoint.new(1, 0),    -- shrink to nothing
+})
+```
+
+- `Color` — a ColorSequence: what color at the start (0) and end (1).
+- `Size` — a NumberSequence: what size at the start and end.
+
+These let you make sparkles that fade from gold to transparent, smoke that shrinks as it rises, or coins that shrink as they fly up.
+
+<Mcq
+  question="How do you make particles start large and shrink to nothing?"
+  options={[
+    "Set Size to a NumberSequence from 1 to 0",
+    "Set Rate to 0",
+    "Set Lifetime to 0",
+    "Set Speed to 0",
+  ]}
+  answer={0}
+  explanation="A NumberSequence from 1 to 0 means particles start at size 1 and shrink to 0 over their lifetime."
+/>
+
+</Step>
+
+<Step>
+
+## Toggling effects
+
+Enable and disable emitters from a script:
+
+```luau
+emitter.Enabled = false  -- stop emitting (existing particles finish)
+emitter.Enabled = true   -- start again
+```
+
+This is how most game effects work — the emitter sits on the part, disabled by default, and a script flips it on at the right moment (coin pickup, explosion, level-up).
+
+<WriteCode
+  instruction="A coin pickup should sparkle for 2 seconds when collected. Enable the emitter, wait, then disable it."
+  answer={["coin.Emitter.Enabled = true", "task.wait(2)", "coin.Emitter.Enabled = false"]}
+  starterCode="local coin = workspace.Coin\nlocal emitter = coin:WaitForChild(\"ParticleEmitter\")\n-- toggle the emitter on, wait, then off"
+  explanation="Enable the emitter, wait 2 seconds, then disable it."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Rate too high.** Hundreds of particles per second tank performance on mobile. Start low (10–30) and test on weaker devices.
+- **Forgetting Lifetime.** Particles that live 30 seconds pile up and never leave. Keep pickup effects under 2 seconds.
+- **Using Particles for UI.** ParticleEmitters are 3D world effects. For on-screen sparkles, use ImageLabels or Roact-based effects.
+- **Not parenting the emitter.** An emitter with no parent emits nothing. Parent it to the part.
+
+Next: smooth movement and polish — tweens.
+</Step>

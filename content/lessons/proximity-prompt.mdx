@@ -1,0 +1,133 @@
+---
+slug: proximity-prompt
+title: ProximityPrompt — walk up and interact
+description: The modern way to let players interact with objects — a floating E prompt that works on every device, no ClickDetector needed.
+sectionId: gameplay
+order: 11
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [proximityprompt, interaction, prompt, input]
+objectives:
+  - Add a ProximityPrompt to a part to create an interaction trigger
+  - Handle the Triggered event to run code when the player interacts
+  - Customize the prompt's text, hold duration, and keyboard/gamepad icons
+  - Understand when to use ProximityPrompt vs ClickDetector vs ContextActionService
+prerequisites: [context-action-service]
+keywords: [proximityprompt, interaction, trigger, prompt, hold, e key, interaction]
+---
+
+ClickDetector only works with a mouse. ContextActionService is great for actions but doesn't show a floating prompt on the object. **ProximityPrompt** is the modern middle ground — a floating "E to interact" prompt that appears when a player walks up to something, and works on keyboard, gamepad, and mobile equally.
+
+<Step>
+
+## Adding a ProximityPrompt
+
+Parent a ProximityPrompt to any BasePart:
+
+```luau
+local prompt = Instance.new("ProximityPrompt")
+prompt.ActionText = "Open Shop"
+prompt.ObjectText = "Merchant"
+prompt.HoldDuration = 0  -- instant tap, no holding
+prompt.Parent = shopPart
+```
+
+- `ActionText` — the action label ("Open Shop", "Pick Up", "Talk")
+- `ObjectText` — what the prompt is attached to ("Merchant", "Chest", "Door")
+- `HoldDuration` — how long the player must hold the key (0 = instant)
+
+When a player gets close, a floating prompt appears. They press E (keyboard), the button (mobile), or the face button (gamepad) to trigger it.
+
+<FillBlank
+  prompt="To make a ProximityPrompt require holding the key for 2 seconds, set HoldDuration to ____."
+  answer="2"
+  explanation="HoldDuration is measured in seconds. Set to 0 for instant activation."
+/>
+
+</Step>
+
+<Step>
+
+## Handling the interaction
+
+ProximityPrompt fires `Triggered` when the player completes the interaction:
+
+```luau
+prompt.Triggered:Connect(function(player)
+    print(player.Name .. " opened the shop!")
+    -- open the shop GUI, give an item, etc.
+end)
+```
+
+The callback receives the **player** who triggered it — no need to look it up yourself.
+
+For hold-to-interact (like channeling a heal), use `HoldDuration` > 0 and the `Triggered` event fires when the hold completes:
+
+```luau
+prompt.HoldDuration = 3  -- hold for 3 seconds
+prompt.Triggered:Connect(function(player)
+    -- heal complete
+    player.Character.Humanoid.Health = player.Character.Humanoid.MaxHealth
+end)
+```
+
+<Note>
+You can also listen to `TriggeredEnded` if the player releases early — useful for canceling a channel.
+</Note>
+
+</Step>
+
+<Step>
+
+## Customizing the look
+
+ProximityPrompts have several visual settings:
+
+```luau
+prompt.KeyboardKeyCode = Enum.KeyCode.E         -- which key (default: E)
+prompt.GamepadKeyCode = Enum.KeyCode.ButtonX     -- which gamepad button
+prompt.MaxActivationDistance = 10                 -- how far away it works (studs)
+prompt.RequiresLineOfSight = false                -- true = must see the part
+prompt.Enabled = false                            -- hide it
+```
+
+`MaxActivationDistance` controls the bubble around the part where the prompt appears. Default is 10 studs — roughly 3 character heights.
+
+`RequiresLineOfSight = true` means walls block the prompt. Good for locked doors, bad for shop NPCs.
+
+</Step>
+
+<Step>
+
+## ProximityPrompt vs the alternatives
+
+Each interaction method has a sweet spot:
+
+| Method | Best for | Limitation |
+|--------|----------|------------|
+| **ProximityPrompt** | In-world objects (doors, NPCs, chests) | Attached to a part |
+| **ClickDetector** | Legacy click-to-interact | Mouse only, no gamepad |
+| **ContextActionService** | Global actions (jump, sprint, inventory) | No floating prompt |
+
+Use ProximityPrompt for things the player walks up to. Use ContextActionService for things triggered by a key binding. Use ClickDetector only for legacy compatibility.
+
+<WriteCode
+  instruction="Add a ProximityPrompt to a part called 'Door'. Set ActionText to 'Open', ObjectText to 'Door', and print the player's name when triggered."
+  answer={["local prompt = Instance.new(\"ProximityPrompt\")", "prompt.ActionText = \"Open\"", "prompt.ObjectText = \"Door\"", "prompt.Parent = workspace.Door", "prompt.Triggered:Connect(function(player)", "    print(player.Name .. \" opened the door!\")", "end)"]}
+  starterCode="local door = workspace.Door\n-- create and configure the ProximityPrompt, then connect Triggered"
+  explanation="Create the prompt, set its text properties, parent it to the door, and handle the Triggered event."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting to set Parent.** A ProximityPrompt with no parent doesn't appear. Parent it to a BasePart.
+- **Setting HoldDuration too high for simple interactions.** Players expect instant interaction for doors and NPCs. Save long holds for channeling abilities.
+- **Ignoring mobile.** ProximityPrompt works on mobile automatically — it shows a touch button. ClickDetector doesn't.
+- **Not checking Enabled.** If you want to conditionally show/hide the prompt (locked door), toggle `Enabled`, don't reparent it.
+
+Next: bug hunt — game systems.
+</Step>
