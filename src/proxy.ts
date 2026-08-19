@@ -60,12 +60,6 @@ export const config = {
      *   Luau engine files at /luau/*.js and /luau/*.wasm — these must be
      *   served verbatim, not passed through the intl middleware, or they 404)
      */
-    {
-      source: "/((?!api|_next/static|_next/image|_vercel|favicon.ico|.*\\..*).*)",
-      missing: [
-        { type: "header", key: "next-router-prefetch" },
-        { type: "header", key: "purpose", value: "prefetch" },
-      ],
-    },
+    "/((?!api|_next/static|_next/image|_vercel|favicon.ico|.*\\..*).*)",
   ],
 };
