@@ -1,9 +1,9 @@
-﻿---
+---
 slug: sounds
-title: Sounds — giving the world a voice
+title: Sounds � giving the world a voice
 description: Add Sound objects, load audio with a SoundId, and play effects where the player can actually hear them.
 sectionId: objects
-order: 6
+order: 8
 difficulty: intermediate
 estimatedMinutes: 4
 tags: [sounds, soundid, audio, effect]
@@ -15,7 +15,7 @@ prerequisites: [instances]
 keywords: [sound, soundid, play, audio]
 ---
 
-A game with no sound feels like a movie with the volume off. Sounds are objects — you create them, give them audio to play, and trigger them at exactly the right moment.
+A game with no sound feels like a movie with the volume off. Sounds are objects � you create them, give them audio to play, and trigger them at exactly the right moment.
 
 <Step>
 
@@ -31,9 +31,9 @@ sound.Parent = part
 sound:Play()
 ```
 
-- `SoundId` — which audio file. Sound IDs look like `rbxassetid://123456`. Upload your own audio to your account (or use free ones from the toolbox), copy its ID, and paste it. The placeholder number above won't play anything — swap in a real ID.
-- `Volume` — how loud (0 to 1).
-- `:Play()` — start it.
+- `SoundId` � which audio file. Sound IDs look like `rbxassetid://123456`. Upload your own audio to your account (or use free ones from the toolbox), copy its ID, and paste it. The placeholder number above won't play anything � swap in a real ID.
+- `Volume` � how loud (0 to 1).
+- `:Play()` � start it.
 
 <Note>
 Or, if you placed a Sound object in Studio, just grab it and play: `workspace.Coin:WaitForChild("CoinSound"):Play()`.
@@ -51,9 +51,9 @@ Or, if you placed a Sound object in Studio, just grab it and play: `workspace.Co
 
 ## Playing where it's heard
 
-Here's the catch: **sounds are heard per-player.** A `:Play()` on the server is silent to clients unless it's replicated — and that's a mess you don't need.
+Here's the catch: **sounds are heard per-player.** A `:Play()` on the server is silent to clients unless it's replicated � and that's a mess you don't need.
 
-For feel-effects — a coin pop, a button click, a jump — play them on the client:
+For feel-effects � a coin pop, a button click, a jump � play them on the client:
 
 ```luau
 -- LocalScript
@@ -70,7 +70,7 @@ The coin *sound* is feel, and feel is per-player. So it fires client-side, while
   options={[
     "On the server, so everyone hears it",
     "On the client, so the clicking player hears it",
-    "Nowhere — sounds can't be scripted",
+    "Nowhere � sounds can't be scripted",
     "In the leaderboard",
   ]}
   answer={1}
@@ -90,7 +90,7 @@ sound:Stop()          -- stop playing
 sound:SetAttribute("Playing", false) -- your own flag, if you like
 ```
 
-For looping ambient audio — wind, waves, a busy street — set `sound.Looped = true` before `:Play()`. One sound object can loop forever until you `:Stop()` it.
+For looping ambient audio � wind, waves, a busy street � set `sound.Looped = true` before `:Play()`. One sound object can loop forever until you `:Stop()` it.
 
 <WriteCode
   instruction="A player collects a coin. Play the coin's sound on their client right before firing the reward. Write the play line."
@@ -113,6 +113,6 @@ end)"
 - **Forgetting the Parent.** A Sound with no parent plays nowhere. Parent it to the part or the GUI.
 - **Expecting sounds to loop by default.** Set `Looped = true` for ambient audio.
 
-Next: particle effects — sparkles, smoke, and making the world feel alive.
+Next: lighting and atmosphere — setting the mood.
 
 </Step>

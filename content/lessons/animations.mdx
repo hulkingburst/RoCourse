@@ -1,0 +1,136 @@
+---
+slug: animations
+title: Animations — making characters move
+description: Load and play AnimationTracks so your characters run, jump, attack, and emote — not just stand around.
+sectionId: objects
+order: 4
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [animations, animationtrack, animate, humanoid]
+objectives:
+  - Load an Animation onto a Humanoid and play the AnimationTrack
+  - Adjust animation speed and stop animations from code
+  - Use AnimationLoaded and Stopped events to sequence actions
+prerequisites: [characters]
+keywords: [animation, animationtrack, loadanimation, animate, plays animation, rig]
+---
+
+A character that can only walk looks unfinished. Animations give characters personality — a running cycle, a jump, an attack swing. They're the difference between a moving puppet and a believable player.
+
+<Step>
+
+## Loading an animation
+
+Animations live in Roblox's asset library. To play one, you load it onto the Humanoid:
+
+```luau
+local humanoid = character:WaitForChild("Humanoid")
+
+local animation = Instance.new("Animation")
+animation.AnimationId = "rbxassetid://123456789" -- a real animation ID
+
+local track = humanoid:LoadAnimation(animation)
+track:Play()
+```
+
+- `Animation` — an object that points to a published animation asset via `AnimationId`.
+- `:LoadAnimation()` — returns an **AnimationTrack** you can play, stop, and tweak.
+- `:Play()` — starts it immediately.
+
+The animation must be uploaded to Roblox (via the Animation Editor in Studio or the website) and its ID pasted into `AnimationId`. A placeholder number won't play anything.
+
+<FillBlank
+  prompt="The method on Humanoid that loads an Animation and returns an AnimationTrack is ____."
+  answer="LoadAnimation"
+  explanation="humanoid:LoadAnimation(animation) gives you the track you can control."
+/>
+
+</Step>
+
+<Step>
+
+## Playing and stopping
+
+AnimationTracks have full playback control:
+
+```luau
+track:Play()          -- start from the beginning
+track:Stop()          -- stop immediately
+track:Play(0.5, 1.0, 2.0)  -- fade in over 0.5s, full speed, stop after 2s
+```
+
+The three arguments to `:Play()` are `fadeInTime`, `weight`, and `speed`. The most common use is `track:Play()` with defaults — fade and weight are rarely needed for basic playback.
+
+<WriteCode
+  instruction="A character just spawned. Load the idle animation (rbxassetid://111) and play it immediately."
+  answer={["local animation = Instance.new(\"Animation\")", "animation.AnimationId = \"rbxassetid://111\"", "local track = humanoid:LoadAnimation(animation)", "track:Play()"]}
+  starterCode='local humanoid = character:WaitForChild("Humanoid")
+-- create, load, and play the idle animation'
+  explanation="Create an Animation, set its ID, load it onto the Humanoid, and play the track."
+/>
+
+</Step>
+
+<Step>
+
+## Speed and looping
+
+Control how the animation plays:
+
+```luau
+track:AdjustSpeed(1.5)  -- 1.5x speed — faster run
+track:AdjustSpeed(0.5)  -- half speed — slow motion
+track.Looped = true     -- loop forever (set before Play)
+```
+
+`Looped = true` makes the animation repeat — perfect for idle, walk, and run cycles. One-shot animations like attacks or dances should stay `Looped = false`.
+
+<Mcq
+  question="How do you make a walk animation play at double speed?"
+  options={[
+    "Set track.Speed = 2",
+    "Call track:AdjustSpeed(2)",
+    "Set track.Looped = false",
+    "Call track:Play(2)",
+  ]}
+  answer={1}
+  explanation="track:AdjustSpeed(2) sets the playback speed multiplier to 2."
+/>
+
+</Step>
+
+<Step>
+
+## Stopping with events
+
+AnimationTracks fire events you can connect to:
+
+```luau
+track.Stopped:Connect(function()
+    print("Animation finished")
+end)
+
+track:GetMarkerReachedSignal("HitFrame"):Connect(function()
+    -- damage the enemy at the exact right moment
+end)
+```
+
+`Stopped` fires when the animation ends (or is stopped). `GetMarkerReachedSignal` fires when the animation reaches a named marker in the Animation Editor — useful for syncing damage, footsteps, or effects to specific frames.
+
+<Note>
+Markers are set in the Animation Editor in Studio. They're the most precise way to time gameplay events to an animation.
+</Note>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Using a fake AnimationId.** `rbxassetid://1234` plays nothing. Upload the animation in Studio's Animation Editor and copy the real asset ID.
+- **Playing on the server.** Animations are visual — play them on the client (in a LocalScript) or use `Humanoid:LoadAnimation` on the server with replication.
+- **Loading the same Animation multiple times.** Load once, save the track, and reuse it. Each load creates a new track and wastes memory.
+- **Not stopping old animations.** If a walk animation loops and you start a jump, stop the walk first or they'll fight over the character's joints.
+
+Next: building the world itself from scripts — instances.
+</Step>

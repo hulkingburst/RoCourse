@@ -1,9 +1,9 @@
-ï»¿---
+---
 slug: bug-hunt-world
-title: Bug hunt â€” the world around you
+title: Bug hunt — the world around you
 description: Hunt down the nil characters, the silent tweens, and the sounds nobody hears.
 sectionId: objects
-order: 12
+order: 15
 difficulty: intermediate
 estimatedMinutes: 7
 tags: [bug-hunt, debugging, objects, review]
@@ -19,9 +19,9 @@ The world's bugs are mostly about *timing* and *who runs what*: grabbing a chara
 
 <Step>
 
-## Hunt one â€” the too-early character
+## Hunt one — the too-early character
 
-A player joins and your script instantly errors on `player.Character.Humanoid` â€” nil.
+A player joins and your script instantly errors on `player.Character.Humanoid` — nil.
 
 ```luau
 Players.PlayerAdded:Connect(function(player)
@@ -32,7 +32,7 @@ end)
 <Mcq
   question="Why is player.Character nil at join time?"
   options={[
-    "The character spawns a moment after the player joins â€” you must listen for CharacterAdded",
+    "The character spawns a moment after the player joins — you must listen for CharacterAdded",
     "Characters can't have Humanoids",
     "The player is invisible",
     "player.Character is a string",
@@ -46,7 +46,7 @@ end)
 
 <Step>
 
-## Hunt two â€” type the fix
+## Hunt two — type the fix
 
 Even inside CharacterAdded, the character's parts load over a few frames. Make the grab safe so it can't error on an unloaded part.
 
@@ -68,9 +68,9 @@ local humanoid = character.Humanoid
 
 <Step>
 
-## Hunt three â€” the statue tween
+## Hunt three — the statue tween
 
-You built the tween perfectly â€” TweenInfo, goals, Create â€” and the part sits there. No error, no motion.
+You built the tween perfectly — TweenInfo, goals, Create — and the part sits there. No error, no motion.
 
 <FixBug
   instruction="Write the missing line that starts the tween."
@@ -93,9 +93,9 @@ local tween = TweenService:Create(coin, info, goals)
 
 <Step>
 
-## Hunt four â€” the silent coin
+## Hunt four — the silent coin
 
-You click the coin, the coins go up, but there's no sound â€” on anyone's computer.
+You click the coin, the coins go up, but there's no sound — on anyone's computer.
 
 ```luau
 -- Script (server)
@@ -108,7 +108,7 @@ end)
 <Mcq
   question="The pickup sound plays nowhere. What's the likely cause?"
   options={[
-    "The sound is played on the server â€” feel-effects belong on the client, per player",
+    "The sound is played on the server — feel-effects belong on the client, per player",
     "The SoundId is too short",
     "Sounds need Looped = true",
     "Volume can't be set",
@@ -122,7 +122,7 @@ end)
 
 <Step>
 
-## Hunt five â€” type the fix
+## Hunt five — type the fix
 
 You want the pickup sound to play for the clicking player, right before the reward is reported. Write the line that plays it.
 
@@ -147,7 +147,7 @@ end)
 
 <Step>
 
-## Hunt six â€” arrange the pickup
+## Hunt six — arrange the pickup
 
 Assemble a coin pickup: a touch, a character, a player, a reward.
 

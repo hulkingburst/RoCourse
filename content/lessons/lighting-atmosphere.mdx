@@ -1,0 +1,168 @@
+---
+slug: lighting-atmosphere
+title: Lighting and atmosphere — setting the mood
+description: Use Lighting, Sky, Atmosphere, and PostEffects to turn a flat workspace into a world with time of day, fog, and bloom.
+sectionId: objects
+order: 13
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [lighting, atmosphere, sky, bloom, posteffect, fog, mood]
+objectives:
+  - Change the time of day and ambient lighting
+  - Add Sky, Atmosphere, and fog for depth
+  - Use PostEffects like Bloom and ColorCorrection
+  - Animate lighting changes from a script for day/night cycles
+prerequisites: [instances, sounds]
+keywords: [lighting, atmosphere, sky, fog, bloom, color correction, post effect, time of day, ambient]
+---
+
+A flat white workspace feels like a test room. Lighting and atmosphere give your world depth, mood, and time of day — sunrise, night, fog over a swamp, bloom on neon signs. These aren't just decoration; they're the first thing players notice.
+
+<Step>
+
+## Time of day
+
+The `Lighting` service controls the global light:
+
+```luau
+local Lighting = game:GetService("Lighting")
+
+Lighting.ClockTime = 14   -- 2:00 PM (0 = midnight, 12 = noon)
+Lighting.GeographicLatitude = 0 -- angle of the sun
+```
+
+`ClockTime` is the simplest lever — a number from 0 to 24 that sets the sun position. 6 is sunrise, 12 is noon, 18 is sunset, 0 is midnight.
+
+<FillBlank
+  prompt="Setting Lighting.ClockTime to ____ makes it noon (sun directly overhead)."
+  answer="12"
+  explanation="ClockTime goes from 0 (midnight) to 24, with 12 being noon."
+/>
+
+</Step>
+
+<Step>
+
+## Sky and Atmosphere
+
+A skybox and atmosphere add realistic depth:
+
+```luau
+local sky = Instance.new("Sky")
+sky.SunTextureId = "rbxassetid://0"  -- default sun
+sky.MoonTextureId = "rbxassetid://0" -- default moon
+sky.StarCount = 3000
+sky.Parent = Lighting
+
+local atmosphere = Instance.new("Atmosphere")
+atmosphere.Density = 0.3    -- fog thickness (0 = clear, 1 = thick)
+atmosphere.Color = Color3.fromRGB(200, 220, 255)  -- tint
+atmosphere.Haze = 2         -- haze amount
+atmosphere.Parent = Lighting
+```
+
+- `Density` controls how much the horizon fades into the sky — low values for clear days, high for foggy swamps.
+- `Haze` adds a warm or cool haze layer.
+- The `Sky` object renders the skybox behind everything.
+
+Together they turn a gray void into a sky with clouds, a sun, and realistic horizon fading.
+
+</Step>
+
+<Step>
+
+## Fog for depth
+
+Built-in fog hides distant objects and adds atmosphere:
+
+```luau
+Lighting.FogEnd = 1000     -- objects beyond 1000 studs fade to fog color
+Lighting.FogColor = Color3.fromRGB(180, 200, 220)
+```
+
+`FogEnd` is the distance where objects are fully fogged. For a horror game, set it to 50 — the player can barely see. For an open world, set it to 5000 for subtle depth.
+
+<Note>
+Atmosphere and FogStackingDensity work together — Atmosphere gives realistic sky-based fog, while FogEnd gives a simple distance cutoff. Use one or both.
+</Note>
+
+</Step>
+
+<Step>
+
+## PostEffects for polish
+
+PostEffects add camera-level visual polish:
+
+```luau
+local bloom = Instance.new("BloomEffect")
+bloom.Intensity = 0.5     -- glow strength
+bloom.Size = 24           -- glow spread
+bloom.Threshold = 0.8     -- brightness cutoff
+bloom.Parent = Lighting
+
+local colorCorrection = Instance.new("ColorCorrectionEffect")
+colorCorrection.Brightness = 0.02
+colorCorrection.Contrast = 0.1
+colorCorrection.Saturation = 0.2
+colorCorrection.Parent = Lighting
+```
+
+- **BloomEffect** — makes bright things glow. Perfect for neon signs, magic effects, and sun glare.
+- **ColorCorrectionEffect** — adjusts overall brightness, contrast, and saturation. Warm up a sunset, desaturate a horror scene.
+
+<Mcq
+  question="Which PostEffect makes bright objects glow?"
+  options={[
+    "ColorCorrectionEffect",
+    "BloomEffect",
+    "SunRaysEffect",
+    "BlurEffect",
+  ]}
+  answer={1}
+  explanation="BloomEffect adds a glow around bright objects — the classic bloom look."
+/>
+
+</Step>
+
+<Step>
+
+## Animating a day/night cycle
+
+A simple day/night loop:
+
+```luau
+while true do
+    for t = 6, 20, 0.1 do  -- sunrise to sunset
+        Lighting.ClockTime = t
+        task.wait(0.05)
+    end
+    for t = 20, 30, 0.1 do  -- sunset to next sunrise (wraps past 24)
+        Lighting.ClockTime = t % 24
+        task.wait(0.05)
+    end
+end
+```
+
+This smoothly advances the sun across the sky. Combine with Atmosphere density changes (thicker fog at dawn, clear at noon) for a more dynamic feel.
+
+<WriteCode
+  instruction="Write a loop that sets Lighting.ClockTime to 6, then increments it by 0.1 every frame until it reaches 18 (sunrise to sunset)."
+  answer={["for t = 6, 18, 0.1 do", "    Lighting.ClockTime = t", "    task.wait(0.05)", "end"]}
+  starterCode="local Lighting = game:GetService(\"Lighting\")\n-- advance ClockTime from 6 to 18"
+  explanation="A for loop from 6 to 18, setting ClockTime each iteration with a small wait."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Setting FogEnd too low by accident.** 50 studs means the player can't see anything. Default is 1000000 — only lower it intentionally.
+- **Too many PostEffects.** Bloom + ColorCorrection + SunRays + Blur together is expensive. Pick one or two that match the mood.
+- **Forgetting Atmosphere.** A Sky alone doesn't fade the horizon — you need Atmosphere to blend the sky into distant terrain.
+- **Animating ClockTime in a tight loop with no wait.** The sun jumps instead of moving smoothly. Always `task.wait()` between updates.
+
+Next: raycasting — asking the world what's in the way.
+</Step>

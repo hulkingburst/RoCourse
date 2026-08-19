@@ -1,0 +1,180 @@
+---
+slug: teams
+title: Teams — splitting players into sides
+description: Use the Teams service to assign players to teams, show team colors, and build round-based gameplay with scores.
+sectionId: gameplay
+order: 12
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [teams, team, teamcolor, assign, round, pvp]
+objectives:
+  - Create teams and assign players to them
+  - Use TeamColor to visually distinguish teams
+  - Build a round system that picks teams automatically
+  - Track and compare team scores
+prerequisites: [players, leaderstats]
+keywords: [team, teams, teamcolor, assign, round, pvp, intermission, scoreboard]
+---
+
+Most multiplayer games split players into sides — red vs blue, survivors vs zombies, builders vs fighters. The `Teams` service handles assignment, scoring, and visual distinction so you don't have to build it from scratch.
+
+<Step>
+
+## Creating teams
+
+Teams live under the Teams service. Create them in Studio or from a script:
+
+```luau
+local Teams = game:GetService("Teams")
+
+local red = Instance.new("Team")
+red.Name = "Red"
+red.TeamColor = BrickColor.new("Bright red")
+red.Parent = Teams
+
+local blue = Instance.new("Team")
+blue.Name = "Blue"
+blue.TeamColor = BrickColor.new("Bright blue")
+blue.Parent = Teams
+```
+
+Each team has a `TeamColor` — a `BrickColor` that colors the player's name in the leaderboard and their character's health bar. Two teams are the minimum for a match.
+
+<FillBlank
+  prompt="The property on a Team that sets its color in the leaderboard is ____."
+  answer="TeamColor"
+  explanation="TeamColor is a BrickColor that visually distinguishes each team."
+/>
+
+</Step>
+
+<Step>
+
+## Assigning players
+
+Assign a player to a team with `JoinTeam`:
+
+```luau
+local Teams = game:GetService("Teams")
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+    -- alternate between red and blue
+    local teams = Teams:GetTeams()
+    local smaller = teams[1]
+    for _, team in ipairs(teams) do
+        if #team:GetPlayers() < #smaller:GetPlayers() then
+            smaller = team
+        end
+    end
+    player.Team = smaller
+end)
+```
+
+The simpler approach: `player.Team = red`. The smarter approach: put them on whichever team has fewer players. Balanced teams keep games fair.
+
+<Note>
+If `AutoAssignable` is true on a team (the default), players are assigned to teams automatically when they join. Set it to false if you want manual control.
+</Note>
+
+</Step>
+
+<Step>
+
+## Team scores with leaderstats
+
+Combine teams with leaderstats to track scores:
+
+```luau
+Players.PlayerAdded:Connect(function(player)
+    player:GetPropertyChangedSignal("Team"):Connect(function()
+        local leaderstats = Instance.new("Folder")
+        leaderstats.Name = "leaderstats"
+        leaderstats.Parent = player
+
+        local score = Instance.new("IntValue")
+        score.Name = "Score"
+        score.Value = 0
+        score.Parent = leaderstats
+    end)
+end)
+```
+
+Score is per-player, but you can sum all players on a team to get a team score:
+
+```luau
+local function getTeamScore(team)
+    local total = 0
+    for _, player in ipairs(team:GetPlayers()) do
+        local leaderstats = player:FindFirstChild("leaderstats")
+        if leaderstats and leaderstats:FindFirstChild("Score") then
+            total += leaderstats.Score.Value
+        end
+    end
+    return total
+end
+```
+
+<Mcq
+  question="How do you get all players currently on the Red team?"
+  options={[
+    "Teams.Red:GetPlayers()",
+    "Players:GetTeamPlayers(Team.Red)",
+    "Teams:GetChildren()",
+    "player.Team:GetPlayers()",
+  ]}
+  answer={0}
+  explanation="team:GetPlayers() returns an array of every player assigned to that team."
+/>
+
+</Step>
+
+<Step>
+
+## A simple round system
+
+Teams shine in round-based games. Here's a basic intermission loop:
+
+```luau
+local function pickTeams()
+    local allPlayers = Players:GetPlayers()
+    for i, player in ipairs(allPlayers) do
+        if i % 2 == 0 then
+            player.Team = red
+        else
+            player.Team = blue
+        end
+    end
+end
+
+while true do
+    task.wait(15)  -- intermission
+    pickTeams()
+    -- start the round...
+    task.wait(120) -- round duration
+    -- announce winner based on team scores
+end
+```
+
+The loop alternates players between teams, runs the round, and repeats. You can add win conditions, round counters, and team-specific spawns on top of this skeleton.
+
+<WriteCode
+  instruction="Write a function that loops through all players and puts even-indexed players on the Red team and odd-indexed players on the Blue team."
+  answer={["for i, player in ipairs(Players:GetPlayers()) do", "    if i % 2 == 0 then", "        player.Team = red", "    else", "        player.Team = blue", "    end", "end"]}
+  starterCode="local Players = game:GetService(\"Players\")\n-- assign players to teams by index"
+  explanation="Loop with ipairs, use modulo to alternate, and set player.Team for each."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting TeamColor.** Without it, teams look identical in the leaderboard. Always set a distinct BrickColor.
+- **Setting player.Team on the client.** Team assignment is replicated game data — do it on the server.
+- **AutoAssignable confusion.** If you create teams with AutoAssignable = true, Roblox assigns players automatically and your manual assignment fights it. Set AutoAssignable = false when you control assignment yourself.
+- **Not handling team-switching mid-round.** Players can sometimes switch teams via the player list. Lock team assignment or check `player.Team` before awarding round rewards.
+
+Next: bug hunt — game systems.
+</Step>

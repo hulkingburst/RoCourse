@@ -1,0 +1,154 @@
+---
+slug: npcs
+title: NPCs and PathfindingService — making the world walk
+description: Create non-player characters that patrol, chase, and navigate around obstacles using PathfindingService.
+sectionId: objects
+order: 5
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [npcs, pathfinding, ai, patrol, enemy]
+objectives:
+  - Create an NPC from a character model
+  - Use PathfindingService to compute a path around obstacles
+  - Move an NPC along a path with Humanoid:MoveTo
+  - Build a simple patrol loop between waypoints
+prerequisites: [characters, animations]
+keywords: [npc, pathfinding, pathfindingservice, moveto, patrol, ai, enemy, waypoint]
+---
+
+A game with only players feels empty. NPCs — non-player characters that walk around, patrol routes, or chase the player — bring the world to life. PathfindingService is the engine that lets them navigate around walls and obstacles instead of walking in a straight line into a wall.
+
+<Step>
+
+## The simplest NPC
+
+An NPC is just a character model with a Humanoid — no player attached. You can move it with `:MoveTo()`:
+
+```luau
+local npc = workspace.NPC -- a model with a Humanoid inside
+local humanoid = npc:WaitForChild("Humanoid")
+
+humanoid:MoveTo(Vector3.new(50, 0, -20))
+```
+
+`:MoveTo()` tells the Humanoid to walk to a world position. It handles turning, walking speed, and stopping when it arrives. The NPC will walk in a straight line — no obstacle avoidance yet.
+
+<FillBlank
+  prompt="The Humanoid method that makes a character walk toward a world position is ____."
+  answer="MoveTo"
+  explanation="humanoid:MoveTo(position) starts the character walking toward the given Vector3."
+/>
+
+</Step>
+
+<Step>
+
+## PathfindingService — navigation around obstacles
+
+A straight line walks through walls. PathfindingService computes a route that goes around them:
+
+```luau
+local PathfindingService = game:GetService("PathfindingService")
+
+local path = PathfindingService:CreatePath({
+    AgentRadius = 2,
+    AgentHeight = 5,
+    AgentCanJump = true,
+})
+
+path:ComputeAsync(startPosition, endPosition)
+```
+
+- `AgentRadius` / `AgentHeight` — the size of the character (must fit through gaps).
+- `AgentCanJump` — whether the NPC can jump over small obstacles.
+- `:ComputeAsync()` — calculates the path. Status tells you if it succeeded.
+
+<Note>
+PathfindingService works on the server. If you need client-side prediction (seeing the path before the server moves), compute it in a LocalScript — but the actual movement must happen server-side.
+</Note>
+
+</Step>
+
+<Step>
+
+## Following the path
+
+Once computed, extract the waypoints and walk through them:
+
+```luau
+if path.Status == Enum.PathStatus.Success then
+    local waypoints = path:GetWaypoints()
+
+    for _, waypoint in ipairs(waypoints) do
+        humanoid:MoveTo(waypoint.Position)
+        humanoid.MoveToFinished:Wait()
+
+        if waypoint.Action == Enum.PathWaypointAction.Jump then
+            humanoid.Jump = true
+        end
+    end
+end
+```
+
+Each waypoint has a `Position` and an `Action` (walk or jump). Walk to each one in order, wait for arrival, and handle jumps. The NPC smoothly navigates around walls, stairs, and gaps.
+
+<WriteCode
+  instruction="After computing a path, write a for loop that walks the NPC through each waypoint and waits for it to arrive."
+  answer={["for _, waypoint in ipairs(path:GetWaypoints()) do", "    humanoid:MoveTo(waypoint.Position)", "    humanoid.MoveToFinished:Wait()", "end"]}
+  starterCode="local waypoints = path:GetWaypoints()\n-- walk through each waypoint"
+  explanation="Loop through waypoints, MoveTo each position, and wait for arrival with MoveToFinished:Wait()."
+/>
+
+</Step>
+
+<Step>
+
+## A patrol loop
+
+Most NPCs repeat a route — patrol, chase, return. A simple loop:
+
+```luau
+local points = {
+    Vector3.new(10, 0, 10),
+    Vector3.new(50, 0, 10),
+    Vector3.new(50, 0, -20),
+    Vector3.new(10, 0, -20),
+}
+
+while true do
+    for _, pos in ipairs(points) do
+        humanoid:MoveTo(pos)
+        humanoid.MoveToFinished:Wait()
+    end
+    task.wait(1) -- pause at the end before repeating
+end
+```
+
+The NPC walks the route, pauses, and repeats. For a chase, replace the target with the player's position and recompute the path each time.
+
+<Mcq
+  question="Why do you wait for MoveToFinished before calling MoveTo again?"
+  options={[
+    "It's faster",
+    "MoveTo cancels any previous move — if you call it too soon the NPC never reaches the first point",
+    "MoveToFinished is an error handler",
+    "It saves memory",
+  ]}
+  answer={1}
+  explanation="MoveTo is instant — calling it again before arrival cancels the previous walk. Wait() ensures each leg finishes."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Computing paths on the client.** PathfindingService is server-side. Client-side paths won't replicate movement.
+- **Too-small AgentRadius.** If the NPC is wider than the path, PathfindingService can't find a route. Match the real character size.
+- **Calling MoveTo in a tight loop.** Each MoveTo cancels the last. Wait for `MoveToFinished` before the next walk.
+- **Forgetting to yield.** `ComputeAsync` doesn't block — if you read waypoints immediately, they're empty. Call `:ComputeAsync()` first, then read the result.
+- **Not checking path.Status.** If no path exists (NPC is trapped), `GetWaypoints()` returns a single point. Check `Status == Enum.PathStatus.Success`.
+
+Next: sticky notes for your objects — attributes.
+</Step>

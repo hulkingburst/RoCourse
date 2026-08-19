@@ -1,9 +1,9 @@
-ï»¿---
+---
 slug: attributes
-title: Attributes â€” sticky notes on objects
+title: Attributes — sticky notes on objects
 description: Attach your own data to any object with SetAttribute and GetAttribute, so parts describe themselves.
 sectionId: objects
-order: 5
+order: 7
 difficulty: intermediate
 estimatedMinutes: 4
 tags: [attributes, setattribute, getattribute]
@@ -15,7 +15,7 @@ prerequisites: [instances]
 keywords: [attribute, setattribute, getattribute, data]
 ---
 
-Sometimes you need to attach *your own* data to an object: "this part is a coin," "this NPC is friendly," "this door is locked." That's **attributes** â€” sticky notes that make objects describe themselves.
+Sometimes you need to attach *your own* data to an object: "this part is a coin," "this NPC is friendly," "this door is locked." That's **attributes** — sticky notes that make objects describe themselves.
 
 <Step>
 
@@ -34,7 +34,7 @@ print(part:GetAttribute("Value")) --> 10
 `SetAttribute(name, value)` sticks data on the object; `GetAttribute(name)` reads it back. The value can be a number, string, boolean, or more. It survives as long as the object does.
 
 <Note>
-Attributes are readable from anywhere â€” server or client â€” and they don't confuse the engine. They're the standard way to make objects self-describing.
+Attributes are readable from anywhere — server or client — and they don't confuse the engine. They're the standard way to make objects self-describing.
 </Note>
 
 <FillBlank
@@ -55,7 +55,7 @@ The old way to identify a part was checking its name:
 if part.Name == "Coin1" then  -- breaks with 50 coins
 ```
 
-Names can't describe 50 coins individually. Attributes can â€” and one check handles all of them:
+Names can't describe 50 coins individually. Attributes can — and one check handles all of them:
 
 ```luau
 local coin = workspace:WaitForChild("Coin")
@@ -64,7 +64,7 @@ if coin:GetAttribute("IsCoin") then
 end
 ```
 
-Any script that meets a part can look at its attributes and know what to do with it â€” no hardcoded name list, no magic strings.
+Any script that meets a part can look at its attributes and know what to do with it — no hardcoded name list, no magic strings.
 
 <Mcq
   question="Which of these stores 'this part is a coin' so any script can read it?"
@@ -84,7 +84,7 @@ Any script that meets a part can look at its attributes and know what to do with
 
 ## Building with attributes
 
-Attributes really shine when you generate objects in a loop â€” each one carries its own data:
+Attributes really shine when you generate objects in a loop — each one carries its own data:
 
 ```luau
 for i = 1, 5 do
@@ -114,9 +114,9 @@ Five coins, five different values, one attribute check to handle them all. The c
 ## Common mistakes
 
 - **Using name checks instead of attributes.** `if part.Name == "Coin1"` breaks the moment you have 50 coins. `GetAttribute("IsCoin")` works for all of them.
-- **Forgetting you set it.** Attribute data lives on the object â€” re-create the object and the attributes are gone.
+- **Forgetting you set it.** Attribute data lives on the object — re-create the object and the attributes are gone.
 - **Expecting attributes to do logic.** They store data; your scripts do the deciding. An attribute is a fact, not a behavior.
 
-Next: giving the world a voice â€” sounds.
+Next: giving the world a voice — sounds.
 
 </Step>

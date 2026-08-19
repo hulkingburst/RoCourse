@@ -72,7 +72,7 @@ export default async function FaqPage({
         name: "How long does the course take?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Around ${totalHours} hours in total across 80 short lessons, but you work at your own pace. Most lessons take 5 to 15 minutes each.`,
+          text: `Around ${totalHours} hours in total across 85 short lessons, but you work at your own pace. Most lessons take 5 to 15 minutes each.`,
         },
       },
       {
@@ -144,7 +144,7 @@ export default async function FaqPage({
 
         <h2>{t("q.howLong")}</h2>
         <p>
-          Around {totalHours} hours in total across 80 short lessons, but you
+          Around {totalHours} hours in total across 85 short lessons, but you
           work at your own pace. Most lessons take 5 to 15 minutes each, and
           your progress autosaves as you go.
         </p>

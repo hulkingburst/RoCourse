@@ -1,9 +1,9 @@
-ï»¿---
+---
 slug: raycasting
-title: Raycasting â€” asking the world what's in the way
-description: Fire an invisible ray from any point and read exactly what it hits â€” the tool behind line of sight, ground checks, and laser beams.
+title: Raycasting — asking the world what's in the way
+description: Fire an invisible ray from any point and read exactly what it hits — the tool behind line of sight, ground checks, and laser beams.
 sectionId: objects
-order: 11
+order: 14
 difficulty: intermediate
 estimatedMinutes: 6
 tags: [raycast, raycasting, world, collision]
@@ -31,9 +31,9 @@ local direction = Vector3.new(0, 0, -50) -- which way it goes, and how far (50 s
 local result = workspace:Raycast(origin, direction)
 ```
 
-- `origin` â€” a position the ray leaves from.
-- `direction` â€” a vector whose *length* is the max distance the ray travels.
-- Returns a **RaycastResult** â€” or `nil` if the ray hit nothing.
+- `origin` — a position the ray leaves from.
+- `direction` — a vector whose *length* is the max distance the ray travels.
+- Returns a **RaycastResult** — or `nil` if the ray hit nothing.
 
 <Mcq
   question="A ray travels its full distance without touching anything. What does workspace:Raycast return?"
@@ -65,9 +65,9 @@ end
 
 Three fields, three answers:
 
-- `result.Instance` â€” **what** was hit (the part).
-- `result.Position` â€” **where** the ray landed (a Vector3).
-- `result.Normal` â€” which way that surface points, useful for placing things flush against it.
+- `result.Instance` — **what** was hit (the part).
+- `result.Position` — **where** the ray landed (a Vector3).
+- `result.Normal` — which way that surface points, useful for placing things flush against it.
 
 <FillBlank
   prompt="The ray hit a wall. To find out which part it hit, read ____ on the result."
@@ -81,7 +81,7 @@ Three fields, three answers:
 
 ## Filtering the cast
 
-A raw ray hits *everything* in its path â€” including the player who fired it. Filter it with `RaycastParams` so you don't shoot yourself:
+A raw ray hits *everything* in its path — including the player who fired it. Filter it with `RaycastParams` so you don't shoot yourself:
 
 ```luau
 local rayParams = RaycastParams.new()
@@ -91,8 +91,8 @@ rayParams.FilterDescendantsInstances = { player.Character }
 local result = workspace:Raycast(origin, direction, rayParams)
 ```
 
-- `FilterType.Exclude` â€” "hit everything *except* the list below."
-- `FilterDescendantsInstances` â€” the parts to ignore (your own character model).
+- `FilterType.Exclude` — "hit everything *except* the list below."
+- `FilterDescendantsInstances` — the parts to ignore (your own character model).
 - The params go in as the **third argument** to `Raycast`.
 
 <WriteCode
@@ -116,7 +116,7 @@ rayParams.FilterDescendantsInstances = { player.Character }
 
 ## A real use: is there ground?
 
-Cast a ray straight down from the character and you can read the height of the floor below â€” for landing checks, footsteps, or keeping a camera off the ceiling:
+Cast a ray straight down from the character and you can read the height of the floor below — for landing checks, footsteps, or keeping a camera off the ceiling:
 
 ```luau
 local rayParams = RaycastParams.new()
@@ -133,7 +133,7 @@ if result then
 end
 ```
 
-Downward rays are the same recipe as any other ray â€” the trick is that the direction points *down*, and the filter keeps the ray from hitting the character itself.
+Downward rays are the same recipe as any other ray — the trick is that the direction points *down*, and the filter keeps the ray from hitting the character itself.
 
 <WriteCode
   instruction="Write the direction vector that points straight down, so the ray checks for ground below."
@@ -145,7 +145,7 @@ Downward rays are the same recipe as any other ray â€” the trick is that the dir
 
 -- point the ray straight down
 "
-  explanation="Down is negative Y: Vector3.new(0, -100, 0) â€” direction straight down, 100 studs of reach."
+  explanation="Down is negative Y: Vector3.new(0, -100, 0) — direction straight down, 100 studs of reach."
 />
 
 </Step>
@@ -154,18 +154,18 @@ Downward rays are the same recipe as any other ray â€” the trick is that the dir
 
 ## Common mistakes
 
-- **Forgetting the nil check.** A ray that misses returns `nil` â€” `result.Instance` on a miss crashes. Always guard with `if result then`.
+- **Forgetting the nil check.** A ray that misses returns `nil` — `result.Instance` on a miss crashes. Always guard with `if result then`.
 - **No filter, hit yourself.** A raw ray hits the player who fired it. Exclude your own character (or the parts you don't want).
 - **Direction as a position.** `workspace:Raycast(origin, workspace.Target.Position)` fires a ray to a *point* far away, not toward the target. The direction must be a vector from the origin.
-- **Reusing the same params forever.** One `RaycastParams` is fine for one cast. If different casts need different filters, make a new one â€” or rebuild the list.
+- **Reusing the same params forever.** One `RaycastParams` is fine for one cast. If different casts need different filters, make a new one — or rebuild the list.
 
 <FixBug
-  instruction="Type the corrected direction line â€” a ray's direction must point from the origin toward the target."
+  instruction="Type the corrected direction line — a ray's direction must point from the origin toward the target."
   fix={[
     "local direction = workspace.Target.Position - origin",
     "direction = workspace.Target.Position - origin",
   ]}
-  placeholder="local direction = â€¦"
+  placeholder="local direction = …"
   explanation="Subtract the origin from the target: workspace.Target.Position - origin is the vector that points from where the ray starts to what it should hit."
   label="The bug"
 >
@@ -179,6 +179,6 @@ local result = workspace:Raycast(origin, direction)
 
 </FixBug>
 
-Next: a bug hunt across the whole world â€” raycast bugs included.
+Next: a bug hunt across the whole world — raycast bugs included.
 
 </Step>

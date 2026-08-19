@@ -1,7 +1,7 @@
-﻿---
+---
 slug: characters
 title: Characters and Humanoids
-description: The body your player controls — when it spawns, how to grab it safely, and the Humanoid that keeps it alive.
+description: The body your player controls � when it spawns, how to grab it safely, and the Humanoid that keeps it alive.
 sectionId: objects
 order: 3
 difficulty: intermediate
@@ -15,13 +15,13 @@ prerequisites: [players, task-wait]
 keywords: [character, humanoid, health, characteradded, waitforchild]
 ---
 
-The Player is the account. Now meet the body they control: the **character** — and the **Humanoid** inside it that keeps it standing, walking, and alive.
+The Player is the account. Now meet the body they control: the **character** � and the **Humanoid** inside it that keeps it standing, walking, and alive.
 
 <Step>
 
 ## The character spawns on an event
 
-The character doesn't exist when a player joins. It appears a moment later — which is exactly what `CharacterAdded` is for:
+The character doesn't exist when a player joins. It appears a moment later � which is exactly what `CharacterAdded` is for:
 
 ```luau
 Players.PlayerAdded:Connect(function(player)
@@ -31,13 +31,13 @@ Players.PlayerAdded:Connect(function(player)
 end)
 ```
 
-Every respawn is a new character and a fresh `CharacterAdded`. If you grab `player.Character` at join time, it's nil — the body isn't there yet. **Listen for the event; grab the character in its callback.**
+Every respawn is a new character and a fresh `CharacterAdded`. If you grab `player.Character` at join time, it's nil � the body isn't there yet. **Listen for the event; grab the character in its callback.**
 
 <Mcq
   question="Why wait for CharacterAdded instead of reading player.Character directly?"
   options={[
     "CharacterAdded is faster",
-    "player.Character can be nil — the body isn't there yet at join time",
+    "player.Character can be nil � the body isn't there yet at join time",
     "Reading Character directly is illegal",
     "The character is invisible until the event fires",
   ]}
@@ -49,7 +49,7 @@ Every respawn is a new character and a fresh `CharacterAdded`. If you grab `play
 
 <Step>
 
-## WaitForChild — grab it safely
+## WaitForChild � grab it safely
 
 The character's parts load over a few frames. Asking for a child that isn't loaded yet errors:
 
@@ -60,7 +60,7 @@ local humanoid = character:WaitForChild("Humanoid")
 `WaitForChild("Humanoid")` waits patiently until the child exists, then returns it. **Use it whenever you grab children that might not exist yet.** The "Wait" in the name is the whole point.
 
 <Note>
-It's tempting to write `character.Humanoid` directly — and it works most of the time. WaitForChild removes the "most of the time" and makes the load order a non-issue.
+It's tempting to write `character.Humanoid` directly � and it works most of the time. WaitForChild removes the "most of the time" and makes the load order a non-issue.
 </Note>
 
 <FillBlank
@@ -73,7 +73,7 @@ It's tempting to write `character.Humanoid` directly — and it works most of th
 
 <Step>
 
-## The Humanoid — vital signs
+## The Humanoid � vital signs
 
 Inside every character is a **Humanoid**: the object that handles health, speed, walking, and death.
 
@@ -87,7 +87,7 @@ humanoid.Health = humanoid.Health - 10 -- damage
 humanoid.WalkSpeed = 40                -- speed boost
 ```
 
-Health runs 0 to `MaxHealth`. At 0, the character dies and respawns. WalkSpeed is how fast they move — same Humanoid, different property.
+Health runs 0 to `MaxHealth`. At 0, the character dies and respawns. WalkSpeed is how fast they move � same Humanoid, different property.
 
 <Warning>
 Health is replicated game data. Change it on the server, or the server will disagree and correct you. Damage to real players always happens server-side.
@@ -110,9 +110,9 @@ Health is replicated game data. Change it on the server, or the server will disa
 
 - **Grabbing the character before it exists.** `player.Character.Humanoid` at join time = nil error. Wait for the event, or WaitForChild.
 - **Giving health on the client.** Health is replicated game data; change it on the server.
-- **Forgetting WaitForChild.** The character's parts load over a few frames. Ask for what exists — wait for the rest.
+- **Forgetting WaitForChild.** The character's parts load over a few frames. Ask for what exists � wait for the rest.
 - **Confusing the player with the character.** Player = account/identity. Character = the body. Damage the character; save to the player.
 
-Next: building the world itself from scripts — instances.
+Next: animations — making characters move.
 
 </Step>

@@ -1,0 +1,157 @@
+---
+slug: oop-metatables
+title: OOP with metatables — building classes in Luau
+description: Use metatables to create reusable objects with constructors, methods, and inheritance — the pattern behind every Roblox API.
+sectionId: gameplay
+order: 11
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [oop, metatable, setmetatable, class, __index, object-oriented]
+objectives:
+  - Understand what a metatable is and why __index matters
+  - Build a class-like constructor with methods using metatables
+  - Add inheritance so one class extends another
+  - Know when to use OOP vs plain tables and functions
+prerequisites: [modules, tables]
+keywords: [oop, metatable, setmetatable, __index, class, constructor, method, inheritance, object-oriented]
+---
+
+Every Roblox API you've used — `Instance.new`, `:Play()`, `:WaitForChild()` — works because something is an *object* with methods. Luau doesn't have a `class` keyword, but it has **metatables** — the mechanism that makes object-oriented patterns work. If you've ever wondered how `humanoid:LoadAnimation()` works behind the scenes, this is it.
+
+<Step>
+
+## What a metatable is
+
+A metatable is a table that changes how *another* table behaves. The most important operation is `__index` — it tells Lua what to do when you look up a key that doesn't exist:
+
+```luau
+localDog = {}
+setmetatable(Dog, { __index = Dog })
+```
+
+When you ask for `Dog.Bark` and it doesn't exist, Lua checks `__index`. If `__index` is a function, it calls it. If it's a table, it looks up the key there. This is how methods get shared across many objects.
+
+<FillBlank
+  prompt="The metatable key that controls what happens when a missing key is looked up is ____."
+  answer="__index"
+  explanation="__index intercepts missing key lookups — it's the foundation of OOP in Lua."
+/>
+
+</Step>
+
+<Step>
+
+## Building a constructor
+
+A "class" in Luau is a table with a constructor function:
+
+```luau
+local Coin = {}
+Coin.__index = Coin
+
+function Coin.new(value)
+    local self = setmetatable({}, Coin)
+    self.value = value or 1
+    self.collected = false
+    return self
+end
+
+function Coin:Collect()
+    self.collected = true
+    return self.value
+end
+```
+
+- `Coin.new(value)` is the **constructor** — it creates a fresh table, gives it the Coin metatable, and returns it.
+- `Coin:Collect()` is a **method** — the colon syntax passes `self` automatically.
+- `setmetatable({}, Coin)` is the key line — it wires the new table to look up missing keys in `Coin`.
+
+```luau
+local gold = Coin.new(10)
+print(gold.value) --> 10
+local reward = gold:Collect()
+print(reward) --> 10
+```
+
+`gold` is a plain table with two values. But `gold:Collect()` works because when `Collect` isn't found on `gold`, Lua checks the metatable's `__index` (which is `Coin`) and finds it there.
+
+<Mcq
+  question="Why does Coin.__index = Coin matter?"
+  options={[
+    "It makes the constructor faster",
+    "It lets methods defined on Coin be found on instances created by Coin.new",
+    "It prevents errors",
+    "It's required by Roblox",
+  ]}
+  answer={1}
+  explanation="__index = Coin means when an instance looks up a missing key, it checks Coin — where all the methods live."
+/>
+
+</Step>
+
+<Step>
+
+## Inheritance — extending a class
+
+One class can inherit from another:
+
+```luau
+local Gem = setmetatable({}, { __index = Coin })
+Gem.__index = Gem
+
+function Gem.new(value, color)
+    local self = setmetatable(Coin.new(value), Gem)
+    self.color = color or "blue"
+    return self
+end
+
+function Gem:Glow()
+    return self.color .. " gem is glowing!"
+end
+```
+
+`Gem` inherits from `Coin` — a Gem has `.value`, `.collected`, `:Collect()`, and its own `:Glow()`. If Gem doesn't define `Collect`, it falls through to Coin via the `__index` chain.
+
+This is exactly how Roblox's class hierarchy works — `Part` inherits from `BasePart` which inherits from `PVInstance` which inherits from `Instance`.
+
+<Note>
+Don't over-inherit. Two or three levels deep is usually the sweet spot. Deep inheritance chains are hard to debug.
+</Note>
+
+</Step>
+
+<Step>
+
+## When to use OOP
+
+OOP shines when you need **many similar objects** with shared behavior:
+
+- Coins, gems, enemies — each has state (value, health) and actions (collect, takeDamage).
+- UI components — each button shares click handling but has its own label and callback.
+- Wave spawners — each wave shares logic but has different enemies and timing.
+
+OOP is overkill for:
+- A one-off utility (just use a table of functions).
+- Shared config (a plain table with `return` is enough).
+- Event handlers (a connected function is simpler).
+
+<WriteCode
+  instruction="A Enemy class has a constructor Enemy.new(name, health). Add a method TakeDamage that subtracts damage from health and returns the new health."
+  answer={["function Enemy:TakeDamage(damage)", "    self.health = self.health - damage", "    return self.health", "end"]}
+  starterCode="local Enemy = {}\nEnemy.__index = Enemy\n\nfunction Enemy.new(name, health)\n    local self = setmetatable({}, Enemy)\n    self.name = name\n    self.health = health\n    return self\nend\n\n-- add the TakeDamage method"
+  explanation="Define Enemy:TakeDamage with the colon syntax so it receives self, subtract damage, and return the new health."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Forgetting `setmetatable`.** A constructor that returns a plain table has no methods. `setmetatable({}, ClassName)` is the whole trick.
+- **Using dot syntax instead of colon for methods.** `function Coin.Collect(self)` works but is error-prone. `function Coin:Collect()` passes `self` automatically.
+- **Deep inheritance chains.** If you need three levels of inheritance, consider composition instead — give objects a `.data` table instead of inheriting from a parent class.
+- **Confusing the class table with instances.** `Coin.new()` returns an *instance*. `Coin:Collect()` is a method on the class — calling it on an instance is wrong.
+
+Next: teams — splitting players into sides.
+</Step>

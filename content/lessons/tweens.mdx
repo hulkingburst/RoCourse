@@ -1,9 +1,9 @@
-ï»¿---
+---
 slug: tweens
-title: Tweens â€” smooth movement and polish
+title: Tweens — smooth movement and polish
 description: Animate parts and UI with TweenService instead of teleporting them, and feel the difference polish makes.
 sectionId: objects
-order: 8
+order: 10
 difficulty: intermediate
 estimatedMinutes: 5
 tags: [tween, animation, tweening, polish]
@@ -15,7 +15,7 @@ prerequisites: [instances]
 keywords: [tween, tweeninfo, tweenService, smooth, animation]
 ---
 
-Teleporting a part with `part.Position = newPos` snaps it â€” instant, harsh, and cheap-feeling. Games that feel good move things *smoothly*. That's **tweening**: animating a value from what it is to what you want it to be, over time.
+Teleporting a part with `part.Position = newPos` snaps it — instant, harsh, and cheap-feeling. Games that feel good move things *smoothly*. That's **tweening**: animating a value from what it is to what you want it to be, over time.
 
 <Step>
 
@@ -35,11 +35,11 @@ tween:Play()
 
 Three pieces:
 
-- **TweenInfo** â€” how the animation behaves: duration, easing style, repetition.
-- **goals** â€” a table of the properties you want to change *to*.
-- `TweenService:Create(object, info, goals)` â€” builds the animation; `:Play()` runs it.
+- **TweenInfo** — how the animation behaves: duration, easing style, repetition.
+- **goals** — a table of the properties you want to change *to*.
+- `TweenService:Create(object, info, goals)` — builds the animation; `:Play()` runs it.
 
-The coin smoothly grows from its current size to 2Ã—2Ã—2 over half a second. No snapping.
+The coin smoothly grows from its current size to 2×2×2 over half a second. No snapping.
 
 <Mcq
   question="What is the goal table in TweenService:Create for?"
@@ -50,29 +50,29 @@ The coin smoothly grows from its current size to 2Ã—2Ã—2 over half a second. No 
     "The easing style",
   ]}
   answer={1}
-  explanation="Goals list 'property â†’ target', like { Size = Vector3.new(2,2,2) }. The engine animates toward them."
+  explanation="Goals list 'property ? target', like { Size = Vector3.new(2,2,2) }. The engine animates toward them."
 />
 
 </Step>
 
 <Step>
 
-## Easing â€” moving vs feeling
+## Easing — moving vs feeling
 
-`TweenInfo.new(0.5)` is a linear slide â€” robotic. Add an easing style and motion gets character:
+`TweenInfo.new(0.5)` is a linear slide — robotic. Add an easing style and motion gets character:
 
 ```luau
 local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 ```
 
-- `Quad, Out` â€” starts fast, eases into the goal (the classic, feels natural).
-- `Bounce` â€” overshoots and bounces at the end.
-- `Elastic` â€” rubber-band wobble.
+- `Quad, Out` — starts fast, eases into the goal (the classic, feels natural).
+- `Bounce` — overshoots and bounces at the end.
+- `Elastic` — rubber-band wobble.
 
 Matching: a coin pickup bounces with **Bounce**, a door slides with **Quad, Out**, a boss health bar drains with **Quad, In**. Easing is where the polish lives.
 
 <Note>
-For a gentle up-down bob, add the loop arguments: `TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true)` â€” repeat count 0 means forever, and `true` alternates direction.
+For a gentle up-down bob, add the loop arguments: `TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true)` — repeat count 0 means forever, and `true` alternates direction.
 </Note>
 
 <FillBlank
@@ -87,7 +87,7 @@ For a gentle up-down bob, add the loop arguments: `TweenInfo.new(1, Enum.EasingS
 
 ## CFrame vs Position
 
-Moving a rotated part with `Position` works, but the standard way is `CFrame` â€” it carries *rotation too*:
+Moving a rotated part with `Position` works, but the standard way is `CFrame` — it carries *rotation too*:
 
 ```luau
 local goals = {
@@ -148,8 +148,8 @@ A shop panel that slides out instead of teleporting is a different-feeling game 
 - **Forgetting to call :Play().** `TweenService:Create` builds the animation but does nothing until `:Play()`. The classic silent no-op.
 - **Tweening the same property from two loops.** Two tweens fighting over Size = flicker. One animation per property at a time.
 - **Using TweenInfo.new(0) with no easing thought.** Zero-duration tweens are teleports with extra steps. Give motion time.
-- **Tweening parts on the server that players need to see.** Tween CFrame is fine server-side â€” it replicates. But fancy per-player feel belongs client-side.
+- **Tweening parts on the server that players need to see.** Tween CFrame is fine server-side — it replicates. But fancy per-player feel belongs client-side.
 
-Next: taking control of the camera â€” where the view sits and where it points.
+Next: taking control of the camera — where the view sits and where it points.
 
 </Step>

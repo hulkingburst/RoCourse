@@ -50,6 +50,11 @@ export const GLOSSARY_DEFS: GlossaryDef[] = [
   { id: "proximity-prompt", match: ["proximity prompt"], lesson: "proximity-prompt" },
   { id: "pcall", match: ["pcall"], lesson: "pcall" },
   { id: "string-pattern", match: ["string pattern", "pattern matching"], lesson: "string-patterns" },
+  { id: "animation-track", match: ["animation track", "animation tracks", "anim"], lesson: "animations" },
+  { id: "pathfinding", match: ["pathfinding", "pathfind"], lesson: "npcs" },
+  { id: "lighting", match: ["lighting"], lesson: "lighting-atmosphere" },
+  { id: "metatable", match: ["metatable", "metatables"], lesson: "oop-metatables" },
+  { id: "team", match: ["team"], lesson: "teams" },
 ];
 
 function escapeRegExp(value: string): string {

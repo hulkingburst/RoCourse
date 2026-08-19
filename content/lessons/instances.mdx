@@ -1,9 +1,9 @@
-﻿---
+---
 slug: instances
-title: Instances — building the world in code
-description: Create parts at runtime, pin them with Anchored, and style them with materials — no Studio viewport required.
+title: Instances � building the world in code
+description: Create parts at runtime, pin them with Anchored, and style them with materials � no Studio viewport required.
 sectionId: objects
-order: 4
+order: 6
 difficulty: intermediate
 estimatedMinutes: 5
 tags: [instances, parts, anchored, material]
@@ -15,7 +15,7 @@ prerequisites: [modules, players]
 keywords: [instance, part, anchored, material, enum]
 ---
 
-You've made GUIs, scripts, and folders with `Instance.new`. This lesson levels up your world-building: creating parts at runtime — so your game can build its own terrain, spawn obstacles, and reshape the world while it runs.
+You've made GUIs, scripts, and folders with `Instance.new`. This lesson levels up your world-building: creating parts at runtime � so your game can build its own terrain, spawn obstacles, and reshape the world while it runs.
 
 <Step>
 
@@ -33,7 +33,7 @@ part.Material = Enum.Material.Grass
 part.Parent = workspace
 ```
 
-Same recipe as GUI: **create, set properties, parent.** A `Vector3` is a set of three numbers — here, size in studs.
+Same recipe as GUI: **create, set properties, parent.** A `Vector3` is a set of three numbers � here, size in studs.
 
 <Mcq
   question="Why do you set Anchored = true on a platform part?"
@@ -44,7 +44,7 @@ Same recipe as GUI: **create, set properties, parent.** A `Vector3` is a set of 
     "To save memory",
   ]}
   answer={1}
-  explanation="Unanchored parts obey gravity. Anchored pins the part in place — required for ground and walls."
+  explanation="Unanchored parts obey gravity. Anchored pins the part in place � required for ground and walls."
 />
 
 </Step>
@@ -53,7 +53,7 @@ Same recipe as GUI: **create, set properties, parent.** A `Vector3` is a set of 
 
 ## Anchored and moving parts
 
-`Anchored = true` pins a part in 3D space — no falling, no rolling, no physics. Ground, walls, and obstacles are anchored; coins and pickups are not.
+`Anchored = true` pins a part in 3D space � no falling, no rolling, no physics. Ground, walls, and obstacles are anchored; coins and pickups are not.
 
 ```luau
 part.Anchored = true   -- static: platforms, walls, ramps
@@ -74,7 +74,7 @@ A part that falls is just a part with `Anchored = false` (and gravity on). Want 
 
 ## Materials and Enums
 
-`Enum.Material.Grass`, `Enum.Material.Metal`, `Enum.Material.Neon` — Roblox ships thousands of named choices for materials and colors:
+`Enum.Material.Grass`, `Enum.Material.Metal`, `Enum.Material.Neon` � Roblox ships thousands of named choices for materials and colors:
 
 ```luau
 part.Material = Enum.Material.Neon
@@ -102,6 +102,6 @@ part.Color = Color3.fromRGB(255, 200, 50)
 - **Forgetting the Parent.** A part with no parent exists nowhere. Parent it into `workspace` or it never renders.
 - **Using Position on rotated parts.** Position works, but for anything rotated, `CFrame` carries the rotation too (you'll meet it in the tweens lesson).
 
-Next: sticky notes for your objects — attributes.
+Next: NPCs — spawning and navigating the world.
 
 </Step>

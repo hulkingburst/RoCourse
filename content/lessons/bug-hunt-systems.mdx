@@ -1,9 +1,9 @@
-ï»¿---
+---
 slug: bug-hunt-systems
-title: Bug hunt â€” game systems
+title: Bug hunt — game systems
 description: Find the security slips, the runaway loops, and the silent failures in your clicker, idle income, and shop.
 sectionId: gameplay
-order: 12
+order: 14
 difficulty: intermediate
 estimatedMinutes: 7
 tags: [bug-hunt, debugging, gameplay, review]
@@ -15,16 +15,16 @@ prerequisites: [modules]
 keywords: [bug-hunt, fix, clicker, shop, remote]
 ---
 
-Your game systems work â€” until one of them quietly doesn't. The classic system bugs are less about syntax and more about *who decides* and *when things run*. A price checked on the wrong computer, a loop without a breath, a function connected with parentheses. Hunt them:
+Your game systems work — until one of them quietly doesn't. The classic system bugs are less about syntax and more about *who decides* and *when things run*. A price checked on the wrong computer, a loop without a breath, a function connected with parentheses. Hunt them:
 
 <Step>
 
-## Hunt one â€” the check on the wrong computer
+## Hunt one — the check on the wrong computer
 
 The shop button dims when you can't afford something, and an exploiter just bought everything for free.
 
 ```luau
--- LocalScript â€” on the player's computer
+-- LocalScript — on the player's computer
 if player.leaderstats.Coins.Value >= 25 then
     purchaseEvent:FireServer("multiplier")
 end
@@ -33,7 +33,7 @@ end
 <Mcq
   question="What's the bug?"
   options={[
-    "The price check is on the client, where an exploiter can edit it â€” it belongs on the server",
+    "The price check is on the client, where an exploiter can edit it — it belongs on the server",
     "The button is too small",
     "coins isn't a NumberValue",
     "There's no bug",
@@ -47,9 +47,9 @@ end
 
 <Step>
 
-## Hunt two â€” the function that ran too soon
+## Hunt two — the function that ran too soon
 
-The button does nothing. No error, no click, nothing â€” and the log shows the handler fired the moment the script loaded.
+The button does nothing. No error, no click, nothing — and the log shows the handler fired the moment the script loaded.
 
 <FixBug
   instruction="Write the corrected line so the handler connects instead of running now."
@@ -69,7 +69,7 @@ button.Activated:Connect(myFunction())
 
 <Step>
 
-## Hunt three â€” the coins fountain
+## Hunt three — the coins fountain
 
 Idle income is paying out thousands of coins a second, and the game crawls.
 
@@ -95,9 +95,9 @@ end
 
 <Step>
 
-## Hunt four â€” the silent mismatch
+## Hunt four — the silent mismatch
 
-Clicks still give coins â€” the leaderboard climbs â€” but the on-screen label never moves.
+Clicks still give coins — the leaderboard climbs — but the on-screen label never moves.
 
 ```luau
 -- server script
@@ -128,7 +128,7 @@ end)
 
 <Step>
 
-## Hunt five â€” type the fix
+## Hunt five — type the fix
 
 The idle loop should pay every player one coin each second. Type the corrected loop header so it doesn't freeze the game.
 
@@ -151,7 +151,7 @@ end
 
 <Step>
 
-## Hunt six â€” arrange the purchase
+## Hunt six — arrange the purchase
 
 Put the server's checkout counter in order: reject unknowns, check the wallet, spend, tell the client.
 

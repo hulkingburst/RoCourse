@@ -853,6 +853,26 @@
       "string-pattern": {
         "title": "Patrón de Texto",
         "body": "Un mini lenguaje para buscar texto dentro de cadenas — encontrar palabras, extraer números, reemplazar partes de un mensaje usando códigos como %d (dígitos) y %a (letras)."
+      },
+      "animation-track": {
+        "title": "Pista de Animación",
+        "body": "Un objeto que reproduce una animación de Roblox en un personaje — carga desde el Animator, luego llama :Play() para hacer que el personaje se mueva."
+      },
+      "pathfinding": {
+        "title": "Búsqueda de Ruta",
+        "body": "Usar PathfindingService para calcular una ruta transitable alrededor de obstáculos para que un NPC pueda moverse del punto A al punto B."
+      },
+      "lighting": {
+        "title": "Iluminación",
+        "body": "El servicio que controla la luz global, el cielo, la niebla y los efectos de posprocesamiento — la atmósfera y el ambiente de todo tu juego."
+      },
+      "metatable": {
+        "title": "Metatabla",
+        "body": "Una tabla oculta adjunta a otra tabla que intercepta operaciones como indexación, permitiéndote crear patrones OOP — constructores, herencia y comportamiento personalizado."
+      },
+      "team": {
+        "title": "Equipo",
+        "body": "Un grupo del servicio Teams que pone a los jugadores en bandos — rojo vs azul, supervivientes vs infectados — controlando la ubicación de aparición y el marcador."
       }
     }
   },

@@ -1,9 +1,9 @@
-﻿---
+---
 slug: arrange-shop
-title: Drag and drop — the shop
+title: Drag and drop � the shop
 description: Assemble the buy button, the server's checkout counter, idle income, and the live UI updates from shuffled lines.
 sectionId: gameplay
-order: 13
+order: 15
 difficulty: intermediate
 estimatedMinutes: 6
 tags: [arrange, drag-and-drop, shop, review]
@@ -15,13 +15,13 @@ prerequisites: [bug-hunt-systems]
 keywords: [arrange, order, shop, purchase, remote]
 ---
 
-The shop is the whole security lesson in four scripts: the client asks, the server checks the bill, income flows on a timer, and the UI mirrors whatever the server recorded. Assemble each from shuffled lines — and keep the imposters out.
+The shop is the whole security lesson in four scripts: the client asks, the server checks the bill, income flows on a timer, and the UI mirrors whatever the server recorded. Assemble each from shuffled lines � and keep the imposters out.
 
 <Step>
 
 ## The buy button (client)
 
-The button reports *intent* — never a price. Assemble its click handler.
+The button reports *intent* � never a price. Assemble its click handler.
 
 <ArrangeCode
   lines={[
@@ -33,7 +33,7 @@ The button reports *intent* — never a price. Assemble its click handler.
     "purchaseEvent:FireServer(25)",
     "purchaseEvent.FireServer(\"multiplier\")",
   ]}
-  explanation="The click connects a function that fires the intent 'multiplier'. Sending a price (25) is the exploiter's dream — the server owns pricing."
+  explanation="The click connects a function that fires the intent 'multiplier'. Sending a price (25) is the exploiter's dream � the server owns pricing."
 />
 
 </Step>
@@ -97,7 +97,7 @@ Coins without clicking: a loop that pays everyone each second, guarded so new pl
 
 ## The live UI
 
-The shop panel is a mirror — it reflects whatever the server actually recorded. Assemble the receive handler.
+The shop panel is a mirror � it reflects whatever the server actually recorded. Assemble the receive handler.
 
 <ArrangeCode
   lines={[
@@ -119,7 +119,7 @@ The shop panel is a mirror — it reflects whatever the server actually recorded
 
 ## The whole loop
 
-Buy button → intent up → server checks the bill → spends → server sends the truth down → UI reflects it. Idle income feeds the same wallet, and the same UI shows it. If you can order these four pieces, you've got a complete, secure economy.
+Buy button ? intent up ? server checks the bill ? spends ? server sends the truth down ? UI reflects it. Idle income feeds the same wallet, and the same UI shows it. If you can order these four pieces, you've got a complete, secure economy.
 
 <Mcq
   question="Why does the client never send a price to the server?"
