@@ -42,7 +42,9 @@
     "chooseFinalProject": "Elegir proyecto final",
     "switchFinalProject": "Cambiar proyecto final",
     "resetProgress": "Reiniciar progreso",
-    "resetConfirm": "¿Reiniciar todo el progreso? Esto no se puede deshacer."
+    "resetConfirm": "¿Reiniciar todo el progreso? Esto no se puede deshacer.",
+    "star": "Estrella",
+    "starOnGithub": "Deja una estrella en GitHub"
   },
   "footer": {
     "about": "{courseName} — un curso práctico para crear tus primeros juegos de Roblox.",

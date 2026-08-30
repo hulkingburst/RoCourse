@@ -15,7 +15,13 @@ import {
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-export function FeedbackButton({ className }: { className?: string }) {
+export function FeedbackButton({
+  className,
+  variant = "inline",
+}: {
+  className?: string;
+  variant?: "inline" | "floating";
+}) {
   const t = useTranslations("feedback");
   const [open, setOpen] = React.useState(false);
   const [text, setText] = React.useState("");
@@ -55,11 +61,13 @@ export function FeedbackButton({ className }: { className?: string }) {
           setOpen(true);
         }}
         className={cn(
-          "flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline",
+          variant === "floating"
+            ? "fixed bottom-5 right-5 z-50 flex h-11 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-200 hover:scale-[1.04] hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-95"
+            : "flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline",
           className
         )}
       >
-        <MessageSquareText className="h-3 w-3" />
+        <MessageSquareText className={variant === "floating" ? "h-4 w-4" : "h-3 w-3"} />
         {t("button")}
       </button>
       <Dialog

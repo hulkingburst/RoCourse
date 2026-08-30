@@ -42,7 +42,9 @@
     "chooseFinalProject": "Choose final project",
     "switchFinalProject": "Switch final project",
     "resetProgress": "Reset progress",
-    "resetConfirm": "Reset all progress? This cannot be undone."
+    "resetConfirm": "Reset all progress? This cannot be undone.",
+    "star": "Star",
+    "starOnGithub": "Leave a star on GitHub"
   },
   "footer": {
     "about": "{courseName} — a hands-on course for building your first Roblox games.",

@@ -119,6 +119,7 @@ export function AppShell({
           </div>
         </footer>
       </div>
+      <FeedbackButton variant="floating" />
     </div>
   );
 }
