@@ -222,7 +222,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
         <div className="mb-1.5 flex items-baseline justify-between text-xs">
           <span className="text-muted-foreground">{t("overallProgress")}</span>
           <span className="font-mono font-medium">
-            {hydrated ? `${completed}/${total}` : "â€“/â€“"}
+            {hydrated ? `${completed}/${total}` : "–/–"}
           </span>
         </div>
         <Progress value={percent} />

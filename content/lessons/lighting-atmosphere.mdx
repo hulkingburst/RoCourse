@@ -149,7 +149,7 @@ This smoothly advances the sun across the sky. Combine with Atmosphere density c
 <WriteCode
   instruction="Write a loop that sets Lighting.ClockTime to 6, then increments it by 0.1 every frame until it reaches 18 (sunrise to sunset)."
   answer={["for t = 6, 18, 0.1 do", "    Lighting.ClockTime = t", "    task.wait(0.05)", "end"]}
-  starterCode="local Lighting = game:GetService(\"Lighting\")\n-- advance ClockTime from 6 to 18"
+  starterCode={"local Lighting = game:GetService(\"Lighting\")\n-- advance ClockTime from 6 to 18"}
   explanation="A for loop from 6 to 18, setting ClockTime each iteration with a small wait."
 />
 

@@ -7,9 +7,9 @@ import { getLearnerShowcase } from "@/lib/users";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Learner Showcase â€” RoCourse Graduates",
+  title: "Learner Showcase — RoCourse Graduates",
   description:
-    "Learners who finished the RoCourse and built a complete Roblox game. Join them â€” the course is free.",
+    "Learners who finished the RoCourse and built a complete Roblox game. Join them — the course is free.",
   alternates: { canonical: "/showcase" },
 };
 

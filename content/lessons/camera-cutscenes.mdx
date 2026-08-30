@@ -1,7 +1,7 @@
 ---
 slug: camera-cutscenes
-title: Cutscenes � directing the camera
-description: Choreograph scripted camera moves with tweens, shakes, and FOV punches � the director's toolkit for intros, reveals, and boss moments.
+title: Cutscenes — directing the camera
+description: Choreograph scripted camera moves with tweens, shakes, and FOV punches — the director's toolkit for intros, reveals, and boss moments.
 sectionId: objects
 order: 12
 difficulty: intermediate
@@ -16,7 +16,7 @@ prerequisites: [camera-control, tweens]
 keywords: [cutscene, camerashake, tween, fieldofview, scriptable]
 ---
 
-A cutscene is just a camera with a plan. Slide to one framing, hold it, slide to the next � while the player watches and, for a moment, the game runs itself. You already have the two tools: **camera control** from the last lesson and **tweens** for smooth motion. This lesson turns them into shots.
+A cutscene is just a camera with a plan. Slide to one framing, hold it, slide to the next — while the player watches and, for a moment, the game runs itself. You already have the two tools: **camera control** from the last lesson and **tweens** for smooth motion. This lesson turns them into shots.
 
 <Step>
 
@@ -37,7 +37,7 @@ local shotGoals = {
 TweenService:Create(camera, shotInfo, shotGoals):Play()
 ```
 
-Two seconds later the camera has glided from wherever it was to a low, face-on framing of the castle. Scriptable first � otherwise the mouse fights the tween the whole way.
+Two seconds later the camera has glided from wherever it was to a low, face-on framing of the castle. Scriptable first — otherwise the mouse fights the tween the whole way.
 
 <Mcq
   question="Why switch the camera to Scriptable before tweening it?"
@@ -67,7 +67,7 @@ TweenService:Create(camera, shotTwo, goalsTwo):Play()
 task.wait(2.5)
 ```
 
-The beat between shots is what lets the motion read. A cutscene is one of the few places a plain `task.wait` is the right tool � nothing else needs to happen while it runs.
+The beat between shots is what lets the motion read. A cutscene is one of the few places a plain `task.wait` is the right tool — nothing else needs to happen while it runs.
 
 <WriteCode
   instruction="The first shot has played. Write the lines that let it land, then play secondTween."
@@ -98,12 +98,12 @@ RunService.RenderStepped:Connect(function()
 end)
 ```
 
-- `shakeBase` � the CFrame you shake *around*.
-- `* CFrame.new(offset)` � CFrame multiplication composes transforms: the base, nudged a few centimeters in a random direction, every frame.
+- `shakeBase` — the CFrame you shake *around*.
+- `* CFrame.new(offset)` — CFrame multiplication composes transforms: the base, nudged a few centimeters in a random direction, every frame.
 - The smaller the offset, the subtler the shake.
 
 <FixBug
-  instruction="Type the corrected line � combining two CFrames uses * (multiply), not +."
+  instruction="Type the corrected line — combining two CFrames uses * (multiply), not +."
   fix={["camera.CFrame = shakeBase * CFrame.new(offset)"]}
   placeholder="camera.CFrame = ..."
   explanation="CFrame + CFrame is invalid. Shake composes a small displacement onto the base with *, not +."
@@ -122,7 +122,7 @@ camera.CFrame = shakeBase + CFrame.new(offset)
 
 ## The FOV punch
 
-Widen the lens and the world rushes toward the player � the classic zoom punch when a boss lands or a bomb goes off. `FieldOfView` is a property, so it tweenable like anything else:
+Widen the lens and the world rushes toward the player — the classic zoom punch when a boss lands or a bomb goes off. `FieldOfView` is a property, so it tweenable like anything else:
 
 ```luau
 camera.FieldOfView = 70 -- the normal lens
@@ -150,7 +150,7 @@ A cutscene that never ends is a locked player. When the scene is over, hand the 
 camera.CameraType = Enum.CameraType.Custom
 ```
 
-`Custom` returns the camera to the engine � character follows, mouse looks, back to normal.
+`Custom` returns the camera to the engine — character follows, mouse looks, back to normal.
 
 <Mcq
   question="After a cutscene, what gives the player their normal camera back?"
@@ -171,7 +171,7 @@ camera.CameraType = Enum.CameraType.Custom
 ## Common mistakes
 
 - **Forgetting to hand control back.** Leave it Scriptable and the player is trapped in your framing forever. `CameraType.Custom` on the way out.
-- **Shake and cutscene fighting.** A shake loop and a cutscene tween both assigning `camera.CFrame` stomp each other. End the shake before the tween � or shake the base you tween.
+- **Shake and cutscene fighting.** A shake loop and a cutscene tween both assigning `camera.CFrame` stomp each other. End the shake before the tween — or shake the base you tween.
 - **Cutscenes on the server.** The camera is per-player and client-side. Run the scene in a LocalScript and trigger it with a RemoteEvent if the server decides *when*.
 - **Waiting too little between shots.** A 2-second tween with a 0.1-second wait gets chopped off. Give the tween its time to land.
 

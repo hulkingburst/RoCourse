@@ -1,6 +1,6 @@
 ---
 slug: arrange-tween
-title: Drag and drop — polish and objects
+title: Drag and drop â€” polish and objects
 description: Assemble a tween, a safe character grab, a sound, and a coin pickup from shuffled lines.
 sectionId: objects
 order: 16
@@ -15,7 +15,7 @@ prerequisites: [bug-hunt-world]
 keywords: [arrange, order, tween, character, sound]
 ---
 
-The world-objects patterns are short — three or four lines each — but the order is everything. A tween is built before it plays, a character is grabbed before it's used, a sound is parented before it plays. Assemble each from the shuffled pile.
+The world-objects patterns are short â€” three or four lines each â€” but the order is everything. A tween is built before it plays, a character is grabbed before it's used, a sound is parented before it plays. Assemble each from the shuffled pile.
 
 <Step>
 
@@ -34,7 +34,7 @@ TweenInfo says how, goals say where, Create builds it, Play runs it. In that ord
     "tween:Stop()",
     "local goals = { Position = 5 }",
   ]}
-  explanation="Create needs info and goals, so they come first — then Create, then Play. Stop never runs the animation, and Position needs a Vector3."
+  explanation="Create needs info and goals, so they come first â€” then Create, then Play. Stop never runs the animation, and Position needs a Vector3."
 />
 
 </Step>
@@ -111,7 +111,7 @@ A touch, a character, a player, a reward. The guard keeps the coins honest.
 
 ## The polish pattern
 
-Every object you've arranged follows one rhythm: **create it, set it up, parent it, trigger it.** Tweens, sounds, and pickups are all the same shape — the details are just different properties. That rhythm is why ordering these is so natural now.
+Every object you've arranged follows one rhythm: **create it, set it up, parent it, trigger it.** Tweens, sounds, and pickups are all the same shape â€” the details are just different properties. That rhythm is why ordering these is so natural now.
 
 <Mcq
   question="What does the goals table in a tween do?"
@@ -122,7 +122,7 @@ Every object you've arranged follows one rhythm: **create it, set it up, parent 
     "Runs the tween",
   ]}
   answer={1}
-  explanation="Goals map 'property ? target' — like Size or CFrame. The engine animates toward them."
+  explanation="Goals map 'property ? target' â€” like Size or CFrame. The engine animates toward them."
 />
 
 </Step>

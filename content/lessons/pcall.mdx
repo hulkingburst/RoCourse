@@ -98,7 +98,7 @@ Three things to notice:
 <WriteCode
   instruction="Wrap a DataStore:GetAsync call in pcall. Store the result in 'success' and 'data'. If it fails or returns nil, set data to an empty table {}."
   answer={["local success, data = pcall(function()", "    return dataStore:GetAsync(player.UserId)", "end)", "if not success or not data then", "    data = {}", "end"]}
-  starterCode="local dataStore = game:GetService(\"DataStoreService\"):GetDataStore(\"PlayerData\")\n-- wrap GetAsync in pcall and handle failure"
+  starterCode={"local dataStore = game:GetService(\"DataStoreService\"):GetDataStore(\"PlayerData\")\n-- wrap GetAsync in pcall and handle failure"}
   explanation="pcall catches errors, and the if-check handles nil data from new players."
 />
 

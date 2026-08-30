@@ -161,7 +161,7 @@ The loop alternates players between teams, runs the round, and repeats. You can 
 <WriteCode
   instruction="Write a function that loops through all players and puts even-indexed players on the Red team and odd-indexed players on the Blue team."
   answer={["for i, player in ipairs(Players:GetPlayers()) do", "    if i % 2 == 0 then", "        player.Team = red", "    else", "        player.Team = blue", "    end", "end"]}
-  starterCode="local Players = game:GetService(\"Players\")\n-- assign players to teams by index"
+  starterCode={"local Players = game:GetService(\"Players\")\n-- assign players to teams by index"}
   explanation="Loop with ipairs, use modulo to alternate, and set player.Team for each."
 />
 

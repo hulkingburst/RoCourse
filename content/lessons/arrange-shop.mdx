@@ -1,6 +1,6 @@
 ---
 slug: arrange-shop
-title: Drag and drop — the shop
+title: Drag and drop â€” the shop
 description: Assemble the buy button, the server's checkout counter, idle income, and the live UI updates from shuffled lines.
 sectionId: gameplay
 order: 15
@@ -15,13 +15,13 @@ prerequisites: [bug-hunt-systems]
 keywords: [arrange, order, shop, purchase, remote]
 ---
 
-The shop is the whole security lesson in four scripts: the client asks, the server checks the bill, income flows on a timer, and the UI mirrors whatever the server recorded. Assemble each from shuffled lines — and keep the imposters out.
+The shop is the whole security lesson in four scripts: the client asks, the server checks the bill, income flows on a timer, and the UI mirrors whatever the server recorded. Assemble each from shuffled lines â€” and keep the imposters out.
 
 <Step>
 
 ## The buy button (client)
 
-The button reports *intent* — never a price. Assemble its click handler.
+The button reports *intent* â€” never a price. Assemble its click handler.
 
 <ArrangeCode
   lines={[
@@ -33,7 +33,7 @@ The button reports *intent* — never a price. Assemble its click handler.
     "purchaseEvent:FireServer(25)",
     "purchaseEvent.FireServer(\"multiplier\")",
   ]}
-  explanation="The click connects a function that fires the intent 'multiplier'. Sending a price (25) is the exploiter's dream — the server owns pricing."
+  explanation="The click connects a function that fires the intent 'multiplier'. Sending a price (25) is the exploiter's dream â€” the server owns pricing."
 />
 
 </Step>
@@ -97,7 +97,7 @@ Coins without clicking: a loop that pays everyone each second, guarded so new pl
 
 ## The live UI
 
-The shop panel is a mirror — it reflects whatever the server actually recorded. Assemble the receive handler.
+The shop panel is a mirror â€” it reflects whatever the server actually recorded. Assemble the receive handler.
 
 <ArrangeCode
   lines={[

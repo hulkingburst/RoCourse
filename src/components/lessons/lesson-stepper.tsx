@@ -210,7 +210,7 @@ export function LessonStepper({
         <div className="mb-5 text-xs font-medium text-muted-foreground">
           {t("stepOf", { current: active + 1, total })}
           {currentMeta.hasActivity && !complete && !solvedSteps[active] && (
-            <span className="ml-2">â€¢ {t("activityHint")}</span>
+            <span className="ml-2">• {t("activityHint")}</span>
           )}
         </div>
 

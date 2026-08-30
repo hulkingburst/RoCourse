@@ -15,7 +15,7 @@ import type { ActivityStatus } from "@/components/activities/activity-shell";
 interface ArrangeCodeProps {
   /** The lines in the correct order (top to bottom). They are shown shuffled. */
   lines: string[];
-  /** Wrong tokens mixed into the pool â€” the learner must leave them out. */
+  /** Wrong tokens mixed into the pool — the learner must leave them out. */
   distractors?: string[];
   instruction?: string;
   explanation?: string;
@@ -155,7 +155,7 @@ export function ArrangeCode({
                 aria-label={t("removeLine")}
                 className="shrink-0 rounded px-1.5 text-muted-foreground transition-colors hover:text-destructive"
               >
-                âœ•
+                ✕
               </button>
             )}
           </li>

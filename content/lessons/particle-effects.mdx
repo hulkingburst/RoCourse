@@ -113,7 +113,7 @@ This is how most game effects work — the emitter sits on the part, disabled by
 <WriteCode
   instruction="A coin pickup should sparkle for 2 seconds when collected. Enable the emitter, wait, then disable it."
   answer={["coin.Emitter.Enabled = true", "task.wait(2)", "coin.Emitter.Enabled = false"]}
-  starterCode="local coin = workspace.Coin\nlocal emitter = coin:WaitForChild(\"ParticleEmitter\")\n-- toggle the emitter on, wait, then off"
+  starterCode={"local coin = workspace.Coin\nlocal emitter = coin:WaitForChild(\"ParticleEmitter\")\n-- toggle the emitter on, wait, then off"}
   explanation="Enable the emitter, wait 2 seconds, then disable it."
 />
 

@@ -54,7 +54,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
             <span className="font-mono text-sm text-muted-foreground">
               {hydrated
                 ? t("ofLessons", { completed, total })
-                : t("ofLessons", { completed: "â€”", total })}
+                : t("ofLessons", { completed: "—", total })}
             </span>
           </div>
           <Progress value={percent} className="h-2" />
@@ -116,7 +116,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                 <div className="mt-4 flex items-center gap-3">
                   <Progress value={sectionPercent} className="flex-1" />
                   <span className="font-mono text-xs text-muted-foreground">
-                    {hydrated ? `${sectionCompleted}/${section.lessons.length}` : "â€“/â€“"}
+                    {hydrated ? `${sectionCompleted}/${section.lessons.length}` : "–/–"}
                   </span>
                 </div>
               </Link>
@@ -140,7 +140,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                       href={`/lessons/${lesson.slug}`}
                       className="block rounded-md px-3 py-2 text-sm transition-all duration-200 hover:bg-accent motion-reduce:transition-none hover:translate-x-0.5"
                     >
-                      <span className="text-muted-foreground">{lesson.sectionTitle} Â·</span>{" "}
+                      <span className="text-muted-foreground">{lesson.sectionTitle} ·</span>{" "}
                       {lesson.title}
                     </Link>
                   </li>
@@ -161,7 +161,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                       href={`/lessons/${lesson.slug}`}
                       className="block rounded-md px-3 py-2 text-sm transition-all duration-200 hover:bg-accent motion-reduce:transition-none hover:translate-x-0.5"
                     >
-                      <span className="text-muted-foreground">{lesson.sectionTitle} Â·</span>{" "}
+                      <span className="text-muted-foreground">{lesson.sectionTitle} ·</span>{" "}
                       {lesson.title}
                     </Link>
                   </li>
