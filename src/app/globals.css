@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -249,6 +250,90 @@
   color: var(--muted-foreground);
 }
 
+/* Lesson completion celebration animations (step-completion.tsx) */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-2rem) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(60vh) rotate(var(--drift));
+    opacity: 0;
+  }
+}
+
+.confetti-piece {
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.check-pop {
+  animation: check-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both 0.15s;
+}
+
+@keyframes check-draw {
+  0% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.check-draw {
+  animation: check-draw 0.55s ease-out both 0.35s;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.pop-in {
+  animation: pop-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Stagger the completion screen text that follows the animated checkmark. */
+.relative > .pop-in:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.relative > .pop-in:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.relative > .pop-in:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
 
 @media print {
   @page {
@@ -271,5 +356,22 @@
     top: 0;
     width: 100%;
     height: auto;
+  }
+}
+
+/* Respect users who prefer reduced motion: kill decorative animation while
+   keeping structural opacity transitions (theme, hover) intact. */
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece,
+  .check-pop,
+  .check-draw,
+  .pop-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }

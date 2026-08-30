@@ -42,7 +42,7 @@ export function Solution({
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="ml-auto flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+          className="ml-auto flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150 hover:bg-accent active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100"
         >
           {open ? t("hide") : t("showSolution")}
           <ChevronDown
@@ -53,7 +53,7 @@ export function Solution({
           type="button"
           onClick={toggleSolved}
           className={cn(
-            "flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
+            "flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100",
             solved
               ? "border-success/40 bg-success/10 text-success"
               : "hover:bg-accent"

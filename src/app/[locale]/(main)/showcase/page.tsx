@@ -7,9 +7,9 @@ import { getLearnerShowcase } from "@/lib/users";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Learner Showcase — RoCourse Graduates",
+  title: "Learner Showcase â€” RoCourse Graduates",
   description:
-    "Learners who finished the RoCourse and built a complete Roblox game. Join them — the course is free.",
+    "Learners who finished the RoCourse and built a complete Roblox game. Join them â€” the course is free.",
   alternates: { canonical: "/showcase" },
 };
 
@@ -66,7 +66,7 @@ export default async function ShowcasePage() {
             <Link
               key={`${entry.handle}-${entry.completedAt}`}
               href={`/u/${entry.handle}`}
-              className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3.5 transition-colors hover:border-border hover:bg-accent/60"
+              className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3.5 transition-all duration-200 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-border hover:bg-accent/60 hover:shadow-md"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
                 {entry.name.trim().charAt(0).toUpperCase() || "?"}

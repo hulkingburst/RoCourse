@@ -166,7 +166,7 @@ export function LessonStepper({
                 onClick={() => toggleBookmark(slug)}
                 aria-label={bookmarked ? t("removeBookmark") : t("bookmarkLesson")}
                 className={cn(
-                  "shrink-0 rounded-lg border p-2 transition-colors",
+                  "shrink-0 rounded-lg border p-2 transition-all duration-200 motion-reduce:transition-none active:scale-90 hover:scale-105",
                   bookmarked
                     ? "border-primary/40 bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-accent"
@@ -192,13 +192,15 @@ export function LessonStepper({
                   disabled={index > maxActive}
                   aria-label={t("goToStep", { step: index + 1 })}
                   className={cn(
-                    "h-1.5 flex-1 rounded-full transition-colors",
+                    "h-1.5 flex-1 rounded-full transition-all duration-300 motion-reduce:transition-none",
                     stepDone
                       ? "bg-success"
                       : index <= active
                         ? "bg-primary"
                         : "bg-muted",
-                    index <= maxActive ? "cursor-pointer hover:opacity-80" : "cursor-not-allowed opacity-40"
+                    index <= maxActive
+                      ? "cursor-pointer hover:scale-y-125 hover:opacity-80"
+                      : "cursor-not-allowed opacity-40"
                   )}
                 />
               );
@@ -208,7 +210,7 @@ export function LessonStepper({
         <div className="mb-5 text-xs font-medium text-muted-foreground">
           {t("stepOf", { current: active + 1, total })}
           {currentMeta.hasActivity && !complete && !solvedSteps[active] && (
-            <span className="ml-2">• {t("activityHint")}</span>
+            <span className="ml-2">â€¢ {t("activityHint")}</span>
           )}
         </div>
 

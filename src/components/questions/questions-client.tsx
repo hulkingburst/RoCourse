@@ -165,7 +165,7 @@ function QuestionRow({
   return (
     <Link
       href={`/questions/${question.id}`}
-      className="block rounded-xl border bg-card p-4 transition-colors hover:bg-accent/40"
+      className="block rounded-xl border bg-card p-4 transition-all duration-200 motion-reduce:transition-none hover:-translate-y-0.5 hover:bg-accent/40 hover:shadow-md"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

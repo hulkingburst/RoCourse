@@ -71,7 +71,7 @@ export function ReferenceClient({
             type="button"
             onClick={() => setCategory(cat)}
             className={cn(
-              "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+              "rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100",
               category === cat
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border text-muted-foreground hover:bg-accent hover:text-foreground"

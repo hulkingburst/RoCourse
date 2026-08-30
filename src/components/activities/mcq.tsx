@@ -79,7 +79,7 @@ export function Mcq({
               onClick={() => pick(index)}
               disabled={isCorrect}
               className={cn(
-                "flex items-start gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
+                "flex items-start gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-all duration-150 motion-reduce:transition-none active:scale-[0.99]",
                 !showState && "cursor-pointer hover:border-primary/50 hover:bg-accent",
                 showState && isAnswer && "border-success/60 bg-success/10",
                 showState && isSelected && !isAnswer && "border-destructive/60 bg-destructive/10",

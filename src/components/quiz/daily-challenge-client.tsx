@@ -56,7 +56,7 @@ function ChallengeOptions({
             onClick={() => onPick(optionIndex)}
             disabled={disabled || revealed}
             className={cn(
-              "flex items-start gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
+              "flex items-start gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-all duration-150 motion-reduce:transition-none active:scale-[0.99]",
               !revealed && !disabled &&
                 "cursor-pointer hover:border-primary/50 hover:bg-accent",
               revealed &&

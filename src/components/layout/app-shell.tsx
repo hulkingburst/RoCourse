@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { GitBranch, Heart } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,7 @@ export function AppShell({
   searchEntries: SearchEntry[];
 }) {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
+  const pathname = usePathname();
   const t = useTranslations("footer");
 
   useGuestXpReporter();
@@ -41,7 +42,12 @@ export function AppShell({
         )}
       >
         <SiteHeader sections={sections} searchEntries={searchEntries} />
-        <main className="flex-1">{children}</main>
+        <main
+          key={pathname}
+          className="flex-1 animate-in fade-in duration-200 motion-reduce:animate-none"
+        >
+          {children}
+        </main>
         <footer className="border-t py-6">
           <div className="mx-auto flex max-w-3xl flex-col items-center justify-between gap-2 px-6 text-center text-xs text-muted-foreground sm:flex-row sm:text-left">
             <p>{t("about", { courseName: process.env.NEXT_PUBLIC_COURSE_NAME ?? "RoCourse" })}</p>

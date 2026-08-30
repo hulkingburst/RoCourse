@@ -15,7 +15,7 @@ function ResultRow({ entry }: { entry: SearchEntry }) {
   return (
     <Link
       href={`/lessons/${entry.slug}`}
-      className="block rounded-lg border border-transparent px-3 py-2.5 transition-colors hover:border-border hover:bg-accent/60"
+      className="block rounded-lg border border-transparent px-3 py-2.5 transition-all duration-150 hover:border-border hover:bg-accent/60 motion-reduce:transition-none"
     >
       <div className="flex items-center gap-2">
         <span className="font-medium">{entry.title}</span>

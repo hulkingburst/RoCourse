@@ -51,7 +51,7 @@ function LessonRow({
       href={`/lessons/${lesson.slug}`}
       aria-current={current ? "page" : undefined}
       className={cn(
-        "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13.5px] leading-snug transition-colors",
+        "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13.5px] leading-snug transition-all duration-150 motion-reduce:transition-none",
         current
           ? "bg-accent font-medium text-accent-foreground"
           : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -99,7 +99,7 @@ function SidebarSection({
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm font-semibold transition-colors hover:bg-accent/60"
+        className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm font-semibold transition-all duration-200 hover:bg-accent/60 motion-reduce:transition-none"
       >
         <span className="flex-1">{section.title}</span>
         <span className="font-mono text-[11px] font-normal text-muted-foreground">
@@ -203,11 +203,11 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
 
       {lastLessonMeta && (
         <div className="px-4 pb-3">
-          <Link
-            href={`/lessons/${lastLessonMeta.slug}`}
-            className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2.5 transition-colors hover:bg-accent/60"
-          >
-            <PlayCircle className="h-4 w-4 shrink-0 text-primary" />
+<Link
+        href={`/lessons/${lastLessonMeta.slug}`}
+        className="group flex items-center gap-2 rounded-lg border bg-card px-3 py-2.5 transition-all duration-200 hover:bg-accent/60 motion-reduce:transition-none"
+      >
+        <PlayCircle className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:scale-110" />
             <div className="min-w-0">
               <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
                 {t("continueLearning")}
@@ -222,7 +222,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
         <div className="mb-1.5 flex items-baseline justify-between text-xs">
           <span className="text-muted-foreground">{t("overallProgress")}</span>
           <span className="font-mono font-medium">
-            {hydrated ? `${completed}/${total}` : "–/–"}
+            {hydrated ? `${completed}/${total}` : "â€“/â€“"}
           </span>
         </div>
         <Progress value={percent} />
@@ -250,7 +250,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           type="button"
           onClick={() => setToolsOpen((open) => !open)}
           aria-expanded={toolsOpen}
-          className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent/60 lg:hidden"
+          className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-semibold text-muted-foreground transition-all duration-200 hover:bg-accent/60 motion-reduce:transition-none lg:hidden"
         >
           <ChevronDown
             className={cn(

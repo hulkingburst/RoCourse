@@ -54,14 +54,14 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
             <span className="font-mono text-sm text-muted-foreground">
               {hydrated
                 ? t("ofLessons", { completed, total })
-                : t("ofLessons", { completed: "—", total })}
+                : t("ofLessons", { completed: "â€”", total })}
             </span>
           </div>
           <Progress value={percent} className="h-2" />
           {continueLesson ? (
             <Link
               href={`/lessons/${continueLesson.slug}`}
-              className="group mt-5 flex items-center gap-3 rounded-xl border p-4 transition-colors hover:border-primary/40 hover:bg-accent/50"
+              className="group mt-5 flex items-center gap-3 rounded-xl border p-4 transition-all duration-200 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/40 hover:bg-accent/50 hover:shadow-md"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
                 <PlayCircle className="h-5 w-5" />
@@ -99,7 +99,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
               <Link
                 key={section.id}
                 href={`/lessons#${section.id}`}
-                className="group rounded-xl border bg-card p-5 transition-colors hover:border-primary/40"
+                className="group rounded-xl border bg-card p-5 transition-all duration-200 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="font-semibold group-hover:text-primary">
@@ -116,7 +116,7 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                 <div className="mt-4 flex items-center gap-3">
                   <Progress value={sectionPercent} className="flex-1" />
                   <span className="font-mono text-xs text-muted-foreground">
-                    {hydrated ? `${sectionCompleted}/${section.lessons.length}` : "–/–"}
+                    {hydrated ? `${sectionCompleted}/${section.lessons.length}` : "â€“/â€“"}
                   </span>
                 </div>
               </Link>
@@ -138,9 +138,9 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                   <li key={lesson.slug}>
                     <Link
                       href={`/lessons/${lesson.slug}`}
-                      className="block rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+                      className="block rounded-md px-3 py-2 text-sm transition-all duration-200 hover:bg-accent motion-reduce:transition-none hover:translate-x-0.5"
                     >
-                      <span className="text-muted-foreground">{lesson.sectionTitle} ·</span>{" "}
+                      <span className="text-muted-foreground">{lesson.sectionTitle} Â·</span>{" "}
                       {lesson.title}
                     </Link>
                   </li>
@@ -159,9 +159,9 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                   <li key={lesson.slug}>
                     <Link
                       href={`/lessons/${lesson.slug}`}
-                      className="block rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+                      className="block rounded-md px-3 py-2 text-sm transition-all duration-200 hover:bg-accent motion-reduce:transition-none hover:translate-x-0.5"
                     >
-                      <span className="text-muted-foreground">{lesson.sectionTitle} ·</span>{" "}
+                      <span className="text-muted-foreground">{lesson.sectionTitle} Â·</span>{" "}
                       {lesson.title}
                     </Link>
                   </li>

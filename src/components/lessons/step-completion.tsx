@@ -126,16 +126,16 @@ export function StepCompletion({
             <Link
               href={`/lessons/${nextSlug}`}
               onClick={scrollToTop}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="group inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:scale-[1.03] hover:opacity-90 motion-reduce:transition-none motion-reduce:hover:scale-100"
             >
               {t("nextLesson", { title: nextTitle })}
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           ) : (
             <Link
               href="/lessons"
               onClick={scrollToTop}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:scale-[1.03] hover:opacity-90 motion-reduce:transition-none motion-reduce:hover:scale-100"
             >
               {t("courseFinished")}
               <BookOpen className="h-4 w-4" />
@@ -144,7 +144,7 @@ export function StepCompletion({
           {!nextSlug && (
             <Link
               href="/certificate"
-              className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
+              className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-all duration-200 hover:scale-[1.02] hover:bg-accent motion-reduce:transition-none motion-reduce:hover:scale-100"
             >
               <Award className="h-4 w-4" />
               {t("viewCertificate")}
@@ -152,7 +152,7 @@ export function StepCompletion({
           )}
           <Link
             href="/lessons"
-            className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
+            className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-all duration-200 hover:scale-[1.02] hover:bg-accent motion-reduce:transition-none motion-reduce:hover:scale-100"
           >
             {t("allLessons")}
           </Link>

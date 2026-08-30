@@ -57,7 +57,7 @@ export function LessonList({ sections }: { sections: CourseSection[] }) {
                     href={`/lessons/${lesson.slug}`}
                     aria-disabled={locked && !complete}
                     className={cn(
-                      "group flex items-center gap-3 rounded-xl border bg-card p-4 transition-colors",
+                      "group flex items-center gap-3 rounded-xl border bg-card p-4 transition-all duration-200 motion-reduce:transition-none hover:-translate-y-0.5 hover:shadow-md",
                       locked && !complete
                         ? "opacity-70 hover:border-muted hover:bg-card"
                         : "hover:border-primary/40 hover:bg-accent/40"

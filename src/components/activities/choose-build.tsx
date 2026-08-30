@@ -70,7 +70,7 @@ export function ChooseBuild() {
               onClick={() => choose(build.path)}
               aria-pressed={selected}
               className={cn(
-                "flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition-colors",
+                "flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition-all duration-200 motion-reduce:transition-none active:scale-[0.98]",
                 selected
                   ? "border-primary/60 bg-primary/5"
                   : "cursor-pointer border-muted hover:border-primary/40 hover:bg-accent"

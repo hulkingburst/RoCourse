@@ -69,7 +69,7 @@ export default async function GuidesPage({
           <Link
             key={guide.href}
             href={guide.href}
-            className="group rounded-xl border bg-card p-5 transition-colors hover:bg-accent"
+            className="group rounded-xl border bg-card p-5 transition-all duration-200 motion-reduce:transition-none hover:-translate-y-0.5 hover:bg-accent hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
