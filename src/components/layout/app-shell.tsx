@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { Heart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
 import { FeedbackButton } from "@/components/feedback/feedback-button";
@@ -24,6 +24,7 @@ export function AppShell({
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
   const pathname = usePathname();
   const t = useTranslations("footer");
+  const navT = useTranslations("nav");
 
   useGuestXpReporter();
 
@@ -109,7 +110,19 @@ export function AppShell({
           </div>
         </footer>
       </div>
-      <FeedbackButton variant="floating" />
+      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2">
+        <a
+          href="https://github.com/hulkingburst/RoCourse"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={navT("starOnGithub")}
+          className="flex h-11 items-center gap-2 rounded-full border border-border bg-card/90 px-4 text-sm font-semibold text-foreground shadow-lg backdrop-blur transition-all duration-200 hover:scale-[1.04] hover:bg-accent active:scale-95"
+        >
+          <Star className="h-4 w-4 fill-current text-amber-400" />
+          {navT("star")}
+        </a>
+        <FeedbackButton variant="floating" />
+      </div>
     </div>
   );
 }

@@ -10,7 +10,6 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  Star,
   Sun,
   Zap,
 } from "lucide-react";
@@ -187,16 +186,6 @@ export function SiteHeader({
           {levelFromXp(xp)}
         </Link>
       )}
-      <a
-        href="https://github.com/hulkingburst/RoCourse"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={t("starOnGithub")}
-        className="hidden items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-sm font-semibold transition-all duration-200 hover:border-primary/40 hover:bg-accent hover:scale-[1.02] md:inline-flex"
-      >
-        <Star className="h-4 w-4 fill-current text-amber-400" />
-        {t("star")}
-      </a>
       <AccountMenu />
       <LanguageSwitcher />
       <ThemeToggle />
