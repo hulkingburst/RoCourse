@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { GitBranch, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
 import { FeedbackButton } from "@/components/feedback/feedback-button";
@@ -95,16 +95,6 @@ export function AppShell({
               >
                 {t("questions")}
               </Link>
-              <FeedbackButton />
-              <a
-                href="https://github.com/hulkingburst/RoCourse"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-              >
-                <GitBranch className="h-3 w-3" />
-                GitHub
-              </a>
               <a
                 href="https://throne.com/hulkingburst"
                 target="_blank"
