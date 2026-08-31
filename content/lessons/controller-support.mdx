@@ -1,0 +1,183 @@
+---
+slug: controller-support
+title: Controller support — gamepads and the virtual cursor
+description: Detect gamepads, read their buttons and sticks, and let console players navigate your GUI with VirtualCursorMode.
+sectionId: gameplay
+order: 16
+difficulty: intermediate
+estimatedMinutes: 5
+tags: [input, gamepad, controller, virtualcursor, ui]
+objectives:
+  - Detect when a gamepad connects and disconnects
+  - Read gamepad buttons and thumbsticks with UserInputService
+  - Let players navigate menus with a virtual cursor
+  - Combine gamepads with ContextActionService actions
+prerequisites: [user-input-service, context-action-service, guis]
+keywords: [gamepad, controller, virtualcursormode, userinputservice, gamepadconnected]
+---
+
+Keyboards have a Space bar. Phones have touch. Consoles have a **gamepad** — and a gamepad is a very different way to control things, especially a GUI. Roblox gives you the events to read it and a ready-made **virtual cursor** so console players can click your buttons without a mouse.
+
+<Step>
+
+## Detecting a gamepad
+
+`UserInputService.GamepadEnabled` tells you if *any* gamepad is plugged in, and the `GamepadConnected` / `GamepadDisconnected` events fire as players plug in or unplug:
+
+```luau
+local UserInputService = game:GetService("UserInputService")
+
+print("Gamepad present:", UserInputService.GamepadEnabled)
+
+UserInputService.GamepadConnected:Connect(function(gamepadNumber)
+    print("Gamepad", gamepadNumber, "connected")
+end)
+
+UserInputService.GamepadDisconnected:Connect(function(gamepadNumber)
+    print("Gamepad", gamepadNumber, "disconnected")
+end)
+```
+
+`GamepadEnabled` is a snapshot — good for a one-time check. The events are better when you need to react (show a controller icon, pause, or skip the button-tutorial).
+
+<FillBlank
+  prompt="The property that tells you whether a gamepad is currently plugged in is ____."
+  answer="GamepadEnabled"
+  explanation="UserInputService.GamepadEnabled is true when a gamepad is connected. The connected/disconnected events handle changes."
+/>
+
+</Step>
+
+<Step>
+
+## Reading buttons and sticks
+
+InputBegan fires for gamepad buttons exactly like it does for keys. The trick: gamepad inputs have a `UserInputType` of `Gamepad1`, `Gamepad2`, and so on, and their `KeyCode` is the button or stick.
+
+```luau
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then
+        return
+    end
+
+    if input.UserInputType == Enum.UserInputType.Gamepad1 then
+        if input.KeyCode == Enum.KeyCode.ButtonA then
+            print("A pressed!")
+        end
+    end
+end)
+```
+
+<Note>
+Sticks aren't discrete presses — they're continuous axes. Read them every frame with `RunService` and `GetGamepadState`, or better, bind them as ContextActionService actions (next step) so movement works the same as a keyboard.
+</Note>
+
+<Mcq
+  question="When a Gamepad1 button is pressed, what is input.UserInputType?"
+  options={[
+    "Enum.UserInputType.Keyboard",
+    "Enum.UserInputType.Gamepad1",
+    "Enum.UserInputType.MouseButton1",
+    "Enum.UserInputType.Touch",
+  ]}
+  answer={1}
+  explanation="Gamepad inputs report UserInputType.Gamepad1 (or Gamepad2, etc.). The KeyCode is then the specific button or stick."
+/>
+
+</Step>
+
+<Step>
+
+## Bind actions, don't hard-code buttons
+
+Raw gamepad reading is fragile — every button name differs from a key. Prefer ContextActionService, which maps an action to *both* a key and a gamepad button:
+
+```luau
+ContextActionService:BindAction("jump", onJump, false,
+    Enum.KeyCode.Space,        -- keyboard
+    Enum.KeyCode.ButtonA       -- gamepad
+)
+```
+
+One action, two input devices, one handler. This is the clean way to support controllers — you describe the *action*, and Roblox fires it whether the player presses Space or A.
+
+<Warning>
+Hard-coding `ButtonA` in bare InputBegan code works, but breaks the moment you want keyboard + gamepad together. Bind the action once and let ContextActionService translate across devices.
+</Warning>
+
+</Step>
+
+<Step>
+
+## VirtualCursorMode — menus without a mouse
+
+A mouse moves a cursor; a gamepad doesn't. That's why console menus need a **virtual cursor** — a controller-driven highlight that moves between buttons. Enable it on **StarterGui**:
+
+```luau
+local StarterGui = game:GetService("StarterGui")
+StarterGui.VirtualCursorMode = Enum.VirtualCursorMode.Enabled
+```
+
+The property has three values:
+
+- **`Default`** (0) — let Roblox decide based on the device.
+- **`Disabled`** (1) — never show a cursor.
+- **`Enabled`** (2) — show the virtual cursor so gamepad and touch players can navigate.
+
+Turn it on and the D-pad / left stick moves the highlight, and A (gamepad) or tapping (touch) activates the focused button — your existing `Activated` handlers just work.
+
+<Mcq
+  question="Which mode makes the virtual cursor show so gamepad players can use your menus?"
+  options={[
+    "Enum.VirtualCursorMode.Default",
+    "Enum.VirtualCursorMode.Disabled",
+    "Enum.VirtualCursorMode.Enabled",
+    "Enum.VirtualCursorMode.Hidden",
+  ]}
+  answer={2}
+  explanation="Set VirtualCursorMode to Enabled to show the controller/touch driven cursor. Default lets Roblox guess, Disabled hides it."
+/>
+
+</Step>
+
+<Step>
+
+## A controller-ready menu
+
+Putting it together — detect the gamepad, bind a shared action, and enable the cursor so the same shop menu works on console:
+
+```luau
+local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
+local StarterGui = game:GetService("StarterGui")
+
+if UserInputService.GamepadEnabled or UserInputService.TouchEnabled then
+    StarterGui.VirtualCursorMode = Enum.VirtualCursorMode.Enabled
+end
+
+ContextActionService:BindAction("buy", onBuy, true,
+    Enum.KeyCode.Space, Enum.KeyCode.ButtonA, Enum.UserInputType.Touch
+)
+```
+
+<WriteCode
+  instruction="A game with controller players needs a virtual cursor. Enable VirtualCursorMode from StarterGui."
+  answer={["StarterGui.VirtualCursorMode = Enum.VirtualCursorMode.Enabled"]}
+  starterCode="local StarterGui = game:GetService(\"StarterGui\")\n-- turn on the virtual cursor"
+  explanation="Set StarterGui.VirtualCursorMode to Enabled so gamepad and touch players can navigate the UI."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Hard-coding gamepad buttons with no keyboard fallback.** Bind actions to both a key and `ButtonA`/the stick — don't lock out keyboard players.
+- **Enabling the cursor on desktop only.** A virtual cursor on a mouse machine is odd. Gate it behind `GamepadEnabled` or `TouchEnabled`.
+- **Reading sticks like buttons.** Sticks are continuous axes — poll them every frame rather than listening for a one-shot press.
+- **Forgetting the gamepad is per-player.** Gamepads attach to whoever holds them; `Gamepad1` is the first controller, and multiple players each have their own number.
+
+Next: shaping your sessions with PlayerAdded and the full lifecycle.
+
+</Step>

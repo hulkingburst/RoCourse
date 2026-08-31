@@ -1,0 +1,153 @@
+---
+slug: studio-features
+title: Built-in features — spawns, force fields, highlights
+description: Use Studio's built-in objects — SpawnLocation, ForceField, and SelectionBox — to add instant polish without re-inventing the wheel.
+sectionId: objects
+order: 17
+difficulty: beginner
+estimatedMinutes: 4
+tags: [spawn, forcefield, highlight, selectionbox, studio]
+objectives:
+  - Respawn players at a SpawnLocation
+  - Protect a player with a ForceField
+  - Outline parts with SelectionBox and Highlight
+prerequisites: [players, instances]
+keywords: [spawnlocation, forcefield, selectionbox, highlight, studio, builtin]
+---
+
+You've built a lot from scratch. But Roblox ships with ready-made objects for the most common jobs — spawning players, protecting them, and making parts stand out. Knowing these built-ins saves time and makes your game feel finished with a fraction of the code.
+
+<Step>
+
+## SpawnLocation — where players appear
+
+A **SpawnLocation** is a part that teleports a player to it when they spawn. Place it on your starter platform and you no longer manage respawn positions by hand.
+
+```luau
+local spawnLocation = Instance.new("SpawnLocation")
+spawnLocation.Position = Vector3.new(0, 5, 0)
+spawnLocation.Neutral = false      -- team-colored, spawns any team
+spawnLocation.Duration = 3         -- safety timer after respawn
+spawnLocation.Parent = workspace
+```
+
+- `Neutral` — `true` means any team spawns there; `false` colors it to the spawn's team.
+- `Duration` — helps pair with ForceField (below) so the player isn't shot the instant they appear.
+
+The engine auto-detects SpawnLocations — you don't even need a script for basic respawning. Players just appear at the nearest enabled one.
+
+<FillBlank
+  prompt="A ____ is a part that automatically respawns players at its position."
+  answer="SpawnLocation"
+  explanation="SpawnLocation is Studio's built-in spawn point. Players teleport to it on spawn without custom code."
+/>
+
+</Step>
+
+<Step>
+
+## ForceField — a bubble of protection
+
+A **ForceField** wraps a character in a translucent bubble that blocks damage. Perfect for the brief grace period after spawning.
+
+```luau
+local forceField = Instance.new("ForceField")
+forceField.Visible = true
+forceField.Parent = player.Character
+```
+
+Attach it to the character (or a spawned part) and every hit is ignored until you remove it.
+
+```luau
+task.wait(5)
+forceField:Destroy()   -- protection ends
+```
+
+<Warning>
+A ForceField only belongs on a freshly-spawned character. Leave it on forever and the player can't be hurt at all — a cheap trick that breaks combat and leaderboard deaths.
+</Warning>
+
+</Step>
+
+<Step>
+
+## SelectionBox and Highlight — making parts stand out
+
+When a player needs to *notice* an object — a clickable crate, a quest item — add an outline. Two built-ins do this.
+
+**SelectionBox** outlines a part with a wireframe box:
+
+```luau
+local box = Instance.new("SelectionBox")
+box.Transparency = 0.6
+box.Color3 = Color3.fromRGB(255, 215, 0)
+box.Adornee = crate     -- the part to outline
+box.Parent = crate
+```
+
+**Highlight** fills the whole part with a semi-transparent glow instead:
+
+```luau
+local glow = Instance.new("Highlight")
+glow.FillTransparency = 0.5
+glow.OutlineColor = Color3.fromRGB(255, 215, 0)
+glow.Adornee = crate
+glow.Parent = crate
+```
+
+SelectionBox for crisp outlines, Highlight for a softer glow — pick whichever reads better for the moment.
+
+<Mcq
+  question="Which object makes a part glow with a translucent fill?"
+  options={[
+    "SpawnLocation",
+    "SelectionBox",
+    "Highlight",
+    "ForceField",
+  ]}
+  answer={2}
+  explanation="Highlight fills the Adornee part with a translucent glow. SelectionBox only draws a wireframe outline."
+/>
+
+</Step>
+
+<Step>
+
+## Combining them — a protected respawn
+
+The pattern that ties it together. When a player spawns, they appear at the SpawnLocation inside a temporary ForceField:
+
+```luau
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        local forceField = Instance.new("ForceField")
+        forceField.Parent = character
+        task.wait(3)
+        forceField:Destroy()
+    end)
+end)
+```
+
+<WriteCode
+  instruction="On a character spawn, outline the character's 'Head' with a Highlight so it's easy to spot for 2 seconds."
+  answer={["local glow = Instance.new(\"Highlight\")", "glow.Adornee = character.Head", "glow.Parent = character.Head", "task.wait(2)", "glow:Destroy()"]}
+  starterCode="local character = player.Character or player.CharacterAdded:Wait()\n-- highlight the head for 2 seconds"
+  explanation="Create a Highlight, set its Adornee to the head, parent it, wait, then remove it."
+/>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Building a respawn system from scratch.** SpawnLocation handles it. Reach for the built-in before writing custom teleport logic.
+- **Leaving ForceField on forever.** Timing or a `:Destroy()` ends protection; a permanent bubble is a bug, not a feature.
+- **Forgetting `Adornee`.** SelectionBox and Highlight do nothing until you point them at a part.
+- **Using these on the server.** SpawnLocation and ForceField work fine there, but Highlight/SelectionBox visuals are often best kept minimal and performance-aware — too many glows tank frame rate on mobile.
+
+Next: your character's view of the world — camera control.
+
+</Step>
