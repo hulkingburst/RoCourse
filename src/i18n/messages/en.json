@@ -394,6 +394,10 @@
     "final-project": {
       "name": "Builder",
       "description": "Choose and build your final project"
+    },
+    "weekly-top-1": {
+      "name": "Weekly champion",
+      "description": "Finish at #1 on a weekly leaderboard"
     }
   },
   "activityCalendar": {

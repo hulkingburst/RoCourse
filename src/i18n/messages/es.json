@@ -394,6 +394,10 @@
     "final-project": {
       "name": "Constructor",
       "description": "Elige y construye tu proyecto final"
+    },
+    "weekly-top-1": {
+      "name": "Campeón semanal",
+      "description": "Queda en el puesto #1 de la tabla semanal"
     }
   },
   "activityCalendar": {

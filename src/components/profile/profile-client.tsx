@@ -173,6 +173,9 @@ export function ProfileClient({
     },
     totalLessons
   );
+  // Weekly-first placement is global leaderboard data served from the cloud
+  // sync, not the local progress store — merge it in from the fetch above.
+  badgeStats.weeklyFirsts = cloud?.weeklyFirsts ?? 0;
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-6 py-10">

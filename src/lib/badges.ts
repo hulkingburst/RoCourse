@@ -29,6 +29,8 @@ export interface BadgeStats {
   /** Step indices solved on the first pick across all lessons. */
   medals: number;
   challengesSolved: number;
+  /** Completed weekly leaderboards this user finished at #1 (server-sourced). */
+  weeklyFirsts: number;
 }
 
 export type BadgeTier = "bronze" | "silver" | "gold";
@@ -79,6 +81,9 @@ export function extractBadgeStats(data: unknown, totalLessons: number): BadgeSta
     finishedPath: typeof d.finishedPath === "string" ? d.finishedPath : null,
     medals,
     challengesSolved,
+    // Server-side only; the progress blob has no view of global weekly rank.
+    // Callers with DB access override this with the real count.
+    weeklyFirsts: 0,
   };
 }
 
@@ -94,6 +99,7 @@ export function emptyBadgeStats(totalLessons: number): BadgeStats {
     finishedPath: null,
     medals: 0,
     challengesSolved: 0,
+    weeklyFirsts: 0,
   };
 }
 
@@ -229,6 +235,12 @@ export const BADGES: BadgeDefinition[] = [
     icon: Rocket,
     tier: "gold",
     earned: (s) => s.finishedPath != null,
+  },
+  {
+    id: "weekly-top-1",
+    icon: Crown,
+    tier: "gold",
+    earned: (s) => s.weeklyFirsts >= 1,
   },
 ];
 

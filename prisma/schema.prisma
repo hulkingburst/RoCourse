@@ -20,6 +20,7 @@ model User {
   questions    Question[]
   answers      QuestionAnswer[]
   weeklyXp     WeeklyXp[]
+  weeklyFirsts WeeklyFirst[]
 }
 
 model ProgressProfile {
@@ -105,5 +106,18 @@ model WeeklyXp {
   @@unique([week, userId])
   @@unique([week, guestId])
   @@index([week, xp])
+  @@index([userId])
+}
+
+// Permanently records the winner of a completed weekly XP leaderboard. A row
+// is written (idempotently, once per week) after that week has fully ended,
+// so "top 1 when the week ended" becomes a lasting achievement.
+model WeeklyFirst {
+  id        String   @id @default(cuid())
+  week      String   @unique // Monday YYYY-MM-DD — one winner per completed week
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  settledAt DateTime @default(now())
+
   @@index([userId])
 }

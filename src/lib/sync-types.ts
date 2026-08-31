@@ -54,6 +54,8 @@ export interface CloudState {
   progress: ProgressSnapshot | null;
   lastUpdated: string | null;
   completions: CompletionRecord[];
+  /** Weekly leaderboards this user has finished at #1 (server-sourced). */
+  weeklyFirsts: number;
   account?: { name: string; email: string; createdAt: string } | null;
 }
 

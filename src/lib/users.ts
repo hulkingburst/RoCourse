@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { countLessons } from "@/lib/lessons";
 import { extractBadgeStats, type BadgeStats } from "@/lib/badges";
+import { getWeeklyFirstCount } from "@/lib/weekly-first";
 import { MAX_LIFETIME_XP } from "@/lib/xp";
 
 /** Public stats that are safe to show about any user, derived from the JSON
@@ -163,6 +164,7 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
   const user = await prisma.user.findUnique({
     where: { handle },
     select: {
+      id: true,
       handle: true,
       name: true,
       createdAt: true,
@@ -177,13 +179,18 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
 
   const totalLessons = countLessons();
 
+  const badgeStats = extractBadgeStats(user.progress?.data, totalLessons);
+  // Weekly-first placement is global leaderboard data, not in the progress
+  // blob — fetch it directly so the public profile shows the real count.
+  badgeStats.weeklyFirsts = await getWeeklyFirstCount(user.id);
+
   return {
     handle: user.handle ?? handle,
     name: user.name,
     createdAt: user.createdAt.toISOString(),
     totalLessons,
     stats: extractPublicStats(user.progress?.data),
-    badgeStats: extractBadgeStats(user.progress?.data, totalLessons),
+    badgeStats,
     completions: user.completions.map((completion) => ({
       courseId: completion.courseId,
       title: completion.title,
