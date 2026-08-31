@@ -6,14 +6,10 @@ import { Link, usePathname } from "@/i18n/navigation";
 import {
   Flame,
   Menu,
-  Monitor,
-  Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  Sun,
   Zap,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import * as React from "react";
 import { useProgressStore } from "@/lib/progress-store";
 import { isStreakActive } from "@/lib/streak";
@@ -30,55 +26,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { SidebarNav } from "@/components/layout/course-sidebar";
 import { AccountMenu } from "@/components/auth/account-menu";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
-
-function ThemeToggle() {
-  const t = useTranslations("theme");
-  const { resolvedTheme, setTheme } = useTheme();
-  const mounted = React.useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t("toggleTheme")}>
-          {mounted && resolvedTheme === "dark" ? (
-            <Moon className="h-4 w-4" />
-          ) : (
-            <Sun className="h-4 w-4" />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>{t("label")}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="h-4 w-4" /> {t("light")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="h-4 w-4" /> {t("dark")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="h-4 w-4" /> {t("system")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
 
 export function SiteHeader({
   sections,
@@ -188,7 +139,6 @@ export function SiteHeader({
       )}
       <AccountMenu />
       <LanguageSwitcher />
-      <ThemeToggle />
     </header>
   );
 }

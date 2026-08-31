@@ -1905,6 +1905,14 @@
     "backHome": "Back home",
     "allLessons": "All lessons"
   },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your preferences.",
+    "appearanceTitle": "Appearance",
+    "appearanceHint": "Choose how RoCourse looks on this device.",
+    "themeLabel": "Theme",
+    "comingSoon": "More settings are coming soon."
+  },
   "userProfile": {
     "notFoundTitle": "Learner not found",
     "progressTitle": "{name}'s progress",

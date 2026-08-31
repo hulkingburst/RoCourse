@@ -1905,6 +1905,14 @@
     "backHome": "Volver al inicio",
     "allLessons": "Todas las lecciones"
   },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona tus preferencias.",
+    "appearanceTitle": "Apariencia",
+    "appearanceHint": "Elige cómo se ve RoCourse en este dispositivo.",
+    "themeLabel": "Tema",
+    "comingSoon": "Próximamente llegarán más ajustes."
+  },
   "userProfile": {
     "notFoundTitle": "Estudiante no encontrado",
     "progressTitle": "Progreso de {name}",

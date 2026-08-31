@@ -3,7 +3,7 @@
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { LinkIcon, UserCircle2, LogOut, Loader2, UserPlus } from "lucide-react";
+import { LinkIcon, UserCircle2, LogOut, Loader2, UserPlus, Settings } from "lucide-react";
 import * as React from "react";
 
 import { useAuthUiStore } from "@/lib/auth-ui";
@@ -66,6 +66,10 @@ export function AccountMenu() {
           <DropdownMenuItem onSelect={() => router.push("/profile")}>
             <UserCircle2 className="h-4 w-4" />
             {t("profile")}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => router.push("/settings")}>
+            <Settings className="h-4 w-4" />
+            {t("settings")}
           </DropdownMenuItem>
           {session.user.handle ? (
             <DropdownMenuItem onSelect={() => router.push(`/u/${session.user.handle}`)}>
