@@ -1,0 +1,250 @@
+---
+slug: health-damage
+title: Health and damage — keeping score
+description: Build a fall-damage system, a reusable damage function, and a health bar that updates in real time.
+sectionId: gameplay
+order: 17
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [health, damage, fall-damage, humanoid, respawn]
+objectives:
+  - Detect when a character hits the ground hard enough to take damage
+  - Write a reusable damage function that runs on the server
+  - Build a BillboardGui health bar above the character's head
+  - Handle death and respawn cleanly
+prerequisites: [characters]
+keywords: [health, damage, fall damage, humanoid, died, respawn, billboardgui, health bar]
+---
+
+The `characters` lesson taught you how to read and change health. Now build a real system around it: characters take damage from falls, see a health bar above their head, and respawn when they die.
+
+<Step>
+
+## Detecting a hard landing
+
+When a character is falling, the Humanoid enters `Freefall` state. The moment they hit the ground, it switches to `Running`. You can watch that transition and check how long they were airborne:
+
+```luau
+local Players = game:GetService("Players")
+
+local function onCharacterAdded(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+    local fallStart = nil
+
+    humanoid.StateChanged:Connect(function(_, newState)
+        if newState == Enum.HumanoidStateType.Freefall then
+            fallStart = tick()
+        elseif newState == Enum.HumanoidStateType.Running and fallStart then
+            local duration = tick() - fallStart
+            fallStart = nil
+            if duration > 0.4 then
+                local damage = math.floor((duration - 0.4) * 40)
+                humanoid:TakeDamage(damage)
+            end
+        end
+    end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(onCharacterAdded)
+end)
+```
+
+The 0.4-second threshold means a small hop is safe. Longer falls deal escalating damage based on how long the character was in the air.
+
+<FillBlank
+  prompt="The Humanoid state that fires while a character is falling through the air is called ____"
+  answer="Freefall"
+  explanation="Enum.HumanoidStateType.Freefall fires while airborne. Watch for it to start tracking fall time."
+/>
+
+</Step>
+
+<Step>
+
+## A reusable damage function
+
+Hard-coding damage everywhere gets messy. Wrap it in one server-side function every script can call:
+
+```luau
+local function dealDamage(character, amount, source)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then return end
+
+    humanoid:TakeDamage(amount)
+
+    if humanoid.Health <= 0 then
+        print(character.Name .. " was eliminated by " .. tostring(source))
+    end
+end
+```
+
+The guard checks that the character still exists and is alive before applying anything. `source` is a string that tells you *what* killed them — useful for kill feeds or logging later.
+
+<Note>
+`TakeDamage` is the official method. Setting `humanoid.Health` directly works too, but `TakeDamage` fires the `HealthChanged` event and respects built-in damage resistances if you add them later.
+</Note>
+
+<Mcq
+  question="Why check humanoid.Health <= 0 before dealing damage?"
+  options={[
+    "To prevent damage from being applied after the character is already dead",
+    "Because TakeDamage errors on dead characters",
+    "Because the server crashes if you damage a dead character",
+    "It is not necessary — it is just a style preference",
+  ]}
+  answer={0}
+  explanation="Once health hits zero the character is dead. Applying more damage after death is pointless and can trigger duplicate death logic."
+/>
+
+</Step>
+
+<Step>
+
+## A health bar above the character
+
+A BillboardGui floats above the character's head and shows a colored bar that shrinks as health drops:
+
+```luau
+local function createHealthBar(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "HealthBar"
+    billboard.Size = UDim2.new(3, 0, 0.3, 0)
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.Adornee = rootPart
+    billboard.AlwaysOnTop = true
+    billboard.Parent = character
+
+    local background = Instance.new("Frame")
+    background.Size = UDim2.new(1, 0, 1, 0)
+    background.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    background.BorderSizePixel = 0
+    background.Parent = billboard
+
+    local fill = Instance.new("Frame")
+    fill.Name = "Fill"
+    fill.Size = UDim2.new(1, 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(76, 175, 80)
+    fill.BorderSizePixel = 0
+    fill.Parent = background
+
+    humanoid.HealthChanged:Connect(function(health)
+        local ratio = health / humanoid.MaxHealth
+        fill.Size = UDim2.new(math.clamp(ratio, 0, 1), 0, 1, 0)
+
+        if ratio > 0.5 then
+            fill.BackgroundColor3 = Color3.fromRGB(76, 175, 80)
+        elseif ratio > 0.25 then
+            fill.BackgroundColor3 = Color3.fromRGB(255, 152, 0)
+        else
+            fill.BackgroundColor3 = Color3.fromRGB(244, 67, 54)
+        end
+    end)
+end
+```
+
+The bar starts full and green. As health drops it shrinks and shifts to orange, then red — giving the player an instant visual read on how close they are to death.
+
+<WriteCode
+  instruction="The health bar fill is green when health is above half. Write the line that changes the fill to orange when health drops to 50% or below."
+  answer={["fill.BackgroundColor3 = Color3.fromRGB(255, 152, 0)"]}
+  starterCode="if ratio > 0.5 then
+    fill.BackgroundColor3 = Color3.fromRGB(76, 175, 80)
+elseif ratio > 0.25 then
+    -- set orange here
+"
+  explanation="Use Color3.fromRGB(255, 152, 0) for orange. The three branches give green, orange, and red based on health ratio."
+/>
+
+</Step>
+
+<Step>
+
+## Death and respawn
+
+When health hits zero the character dies. `Humanoid.Died` fires once — use it to trigger respawn:
+
+```luau
+humanoid.Died:Connect(function()
+    local player = Players:GetPlayerFromCharacter(character)
+    if player then
+        task.delay(3, function()
+            player:LoadCharacter()
+        end)
+    end
+end)
+```
+
+`LoadCharacter()` creates a brand-new character. The 3-second delay gives the camera time to linger on the death spot before resetting. Because `CharacterAdded` fires again on the new body, the whole system — health bar, fall damage — restarts automatically.
+
+<Note>
+If your game has a lobby or spawn selection, replace `player:LoadCharacter()` with your own respawn logic. The key point: always respond to `Died` — never leave a dead character sitting in the workspace.
+</Note>
+
+<FillBlank
+  prompt="The event that fires once when a character's Humanoid health reaches zero is called ____"
+  answer="Died"
+  explanation="Humanoid.Died fires exactly once per death. Use it to trigger respawn logic or a death screen."
+/>
+
+</Step>
+
+<Step>
+
+## Putting it together
+
+All three systems connect inside `onCharacterAdded`:
+
+```luau
+local function onCharacterAdded(character)
+    local humanoid = character:WaitForChild("Humanoid")
+
+    -- fall damage
+    local fallStart = nil
+    humanoid.StateChanged:Connect(function(_, newState)
+        if newState == Enum.HumanoidStateType.Freefall then
+            fallStart = tick()
+        elseif newState == Enum.HumanoidStateType.Running and fallStart then
+            local duration = tick() - fallStart
+            fallStart = nil
+            if duration > 0.4 then
+                humanoid:TakeDamage(math.floor((duration - 0.4) * 40))
+            end
+        end
+    end)
+
+    -- health bar
+    createHealthBar(character)
+
+    -- respawn on death
+    humanoid.Died:Connect(function()
+        local player = Players:GetPlayerFromCharacter(character)
+        if player then
+            task.delay(3, function()
+                player:LoadCharacter()
+            end)
+        end
+    end)
+end
+```
+
+Every time a character spawns, all three systems attach automatically. The `characters` lesson taught you the building blocks — this wires them into a complete gameplay loop.
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Damage on the client.** `TakeDamage` and health changes must happen on the server. Client-side damage is ignored or corrected by the server.
+- **Forgetting the alive check.** A dead character can still fire events. Guard every damage call with a health or existence check.
+- **Leaving dead characters in workspace.** Always respond to `Died` and respawn. A corpse that never leaves blocks interaction and looks broken.
+- **Setting Health instead of TakeDamage.** Direct assignment works but skips the `HealthChanged` event and any future resistance system. `TakeDamage` is the safer habit.
+
+Next: melee combat — click-to-hit with a cooldown.
+
+</Step>
