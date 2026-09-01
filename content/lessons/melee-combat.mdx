@@ -1,0 +1,211 @@
+---
+slug: melee-combat
+title: Melee combat — click-to-hit with a cooldown
+description: Build a close-range attack that uses raycasting to detect what you hit, applies damage through the server, and pauses between swings.
+sectionId: gameplay
+order: 18
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [combat, melee, raycast, cooldown, click, hit]
+objectives:
+  - Fire a raycast from the camera to detect what the player clicked on
+  - Apply damage on the server through a RemoteEvent
+  - Add a cooldown so attacks can't be spammed
+  - Distinguish between hitting a character and hitting a wall
+prerequisites: [health-damage, raycasting, remotes]
+keywords: [melee, combat, raycast, raycastparams, cooldown, remotes, click, hit, attack]
+---
+
+The health-damage lesson gave you the system to track and apply damage. Now give the player a way to deal it: click on something, fire a ray, and hit whatever the ray lands on — with a cooldown so they can't click their way through a boss fight.
+
+<Step>
+
+## Casting a ray from the camera
+
+When the player clicks, you shoot a ray from the center of the camera forward. Where it lands tells you what was hit:
+
+```luau
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local camera = workspace.CurrentCamera
+
+local function castFromCamera()
+    local origin = camera.CFrame.Position
+    local direction = camera.CFrame.LookVector * 100
+
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {}
+
+    local result = workspace:Raycast(origin, direction, params)
+    return result
+end
+```
+
+`RaycastParams` controls what the ray ignores. Start with an empty ignore list — later you'll fill it with the local player's character so you don't hit yourself.
+
+<FillBlank
+  prompt="The method on workspace that fires a single ray and returns what it hit is called ____"
+  answer="Raycast"
+  explanation="workspace:Raycast(origin, direction, params) returns a RaycastResult or nil if nothing was hit."
+/>
+
+</Step>
+
+<Step>
+
+## Identifying the target
+
+The ray might hit a Part, a MeshPart, or a limb inside a character. You need to walk up the tree to find the character model:
+
+```luau
+local function getCharacterFromResult(result)
+    local instance = result.Instance
+    while instance do
+        if instance:FindFirstChildOfClass("Humanoid") then
+            return instance
+        end
+        instance = instance.Parent
+    end
+    return nil
+end
+```
+
+If the ray hits the right arm of a character, `result.Instance` is the arm — not the character. Walking up the parent chain finds the model that owns the Humanoid. If no character is found, the ray hit scenery — a wall, the floor, a prop.
+
+<Mcq
+  question="Why walk up from result.Instance instead of using it directly?"
+  options={[
+    "Because result.Instance is always nil",
+    "Because the ray hits a specific body part, not the character model itself",
+    "Because characters have no Instance property",
+    "Because RaycastResult only stores the parent, not the hit part",
+  ]}
+  answer={1}
+  explanation="A ray that hits an arm returns the arm, not the character. Walking up the parent chain finds the model that owns the Humanoid."
+/>
+
+</Step>
+
+<Step>
+
+## Server-side damage with a cooldown
+
+The ray fires on the client, but damage must happen on the server. Send the target through a RemoteEvent and let the server decide:
+
+```luau
+-- Client: fire the attack
+local attackRemote = game.ReplicatedStorage:WaitForChild("Attack")
+local cooldown = false
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+    if cooldown then return end
+
+    local result = castFromCamera()
+    if not result then return end
+
+    local target = getCharacterFromResult(result)
+    if not target then return end
+
+    cooldown = true
+    attackRemote:FireServer(target)
+    task.delay(0.8, function()
+        cooldown = false
+    end)
+end)
+```
+
+The `cooldown` flag blocks clicks for 0.8 seconds after each swing. The `processed` check prevents attacking while typing in a chat box or GUI.
+
+<Note>
+The cooldown runs on the client to prevent the UI from showing attacks that never reach the server. A separate server-side cooldown (below) stops exploiters from bypassing the client check.
+</Note>
+
+</Step>
+
+<Step>
+
+## The server validates and applies
+
+The server never trusts the client blindly. It checks distance, applies damage, and runs its own cooldown:
+
+```luau
+-- Server
+local attackRemote = Instance.new("RemoteEvent")
+attackRemote.Name = "Attack"
+attackRemote.Parent = game.ReplicatedStorage
+
+local lastAttack = {}
+
+attackRemote.OnServerEvent:Connect(function(player, target)
+    local character = player.Character
+    if not character then return end
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then return end
+
+    -- server-side cooldown
+    local now = tick()
+    if lastAttack[player] and now - lastAttack[player] < 0.8 then
+        return
+    end
+    lastAttack[player] = now
+
+    -- distance check: must be within 8 studs
+    local root = character:FindFirstChild("HumanoidRootPart")
+    local targetRoot = target:FindFirstChild("HumanoidRootPart")
+    if not root or not targetRoot then return end
+    if (root.Position - targetRoot.Position).Magnitude > 8 then
+        return
+    end
+
+    -- deal damage
+    local targetHumanoid = target:FindFirstChildOfClass("Humanoid")
+    if targetHumanoid and targetHumanoid.Health > 0 then
+        targetHumanoid:TakeDamage(25)
+    end
+end)
+```
+
+The server tracks `lastAttack` per player, rejects clicks beyond 8 studs, and only then applies 25 damage. An exploiter who fires the remote every frame gets rate-limited server-side.
+
+<WriteCode
+  instruction="The melee attack deals 25 damage. Write the TakeDamage line that would double it to 50 instead."
+  answer={["targetHumanoid:TakeDamage(50)"]}
+  starterCode="if targetHumanoid and targetHumanoid.Health > 0 then
+    -- deal 50 damage here
+end"
+  explanation="Replace 25 with 50 in the TakeDamage call. The same structure works for any damage amount."
+/>
+
+</Step>
+
+<Step>
+
+## Putting it together
+
+The full system has three parts: client ray detection, client cooldown, and server validation. The client finds *what* to hit; the server decides *if* it's allowed.
+
+```luau
+-- Client: input + raycast + cooldown + remote
+-- Server: cooldown + distance check + TakeDamage
+```
+
+Every piece connects through the `Attack` RemoteEvent. The client sends the target character model. The server verifies the player is alive, within range, and off cooldown before dealing damage. If any check fails, nothing happens — and the exploiter learns nothing.
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Firing damage from the client.** The client detects the hit. The server applies the damage. Never trust client damage numbers.
+- **Forgetting the cooldown.** Without it, players (and exploiters) can click 60 times a second and melt any boss.
+- **Not checking distance server-side.** A client can claim it hit anything from anywhere. The server must verify the player is close enough.
+- **Using result.Instance directly.** The ray hits a body part, not the character model. Walk up the parent chain to find the Humanoid.
+- **Leaving dead characters hittable.** Check `targetHumanoid.Health > 0` before applying damage — don't let players beat a corpse.
+
+Next: inventory — collecting, storing, and equipping items.
+
+</Step>
