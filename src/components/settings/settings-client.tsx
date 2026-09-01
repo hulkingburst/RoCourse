@@ -1,13 +1,15 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Palette, Sparkles } from "lucide-react";
+import { Languages, Palette, Sparkles } from "lucide-react";
 
 import { ThemePicker } from "@/components/settings/theme-picker";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function SettingsClient() {
   const t = useTranslations("settings");
+  const lang = useTranslations("language");
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-6 py-10">
@@ -27,6 +29,20 @@ export function SettingsClient() {
         <CardContent className="flex items-center justify-between gap-4">
           <span className="text-sm font-medium">{t("themeLabel")}</span>
           <ThemePicker />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Languages className="h-5 w-5 text-primary" />
+            {lang("label")}
+          </CardTitle>
+          <CardDescription>{t("languageHint")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center justify-between gap-4">
+          <span className="text-sm font-medium">{t("languageLabel")}</span>
+          <LanguageSwitcher />
         </CardContent>
       </Card>
 

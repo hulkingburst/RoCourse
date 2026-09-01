@@ -44,7 +44,8 @@
     "resetProgress": "Reiniciar progreso",
     "resetConfirm": "¿Reiniciar todo el progreso? Esto no se puede deshacer.",
     "star": "Estrella",
-    "starOnGithub": "Deja una estrella en GitHub"
+    "starOnGithub": "Deja una estrella en GitHub",
+    "settings": "Configuración"
   },
   "footer": {
     "about": "{courseName} — un curso práctico para crear tus primeros juegos de Roblox.",
@@ -1911,6 +1912,8 @@
     "appearanceTitle": "Apariencia",
     "appearanceHint": "Elige cómo se ve RoCourse en este dispositivo.",
     "themeLabel": "Tema",
+    "languageLabel": "Idioma",
+    "languageHint": "Elige el idioma usado en todo el sitio.",
     "comingSoon": "Próximamente llegarán más ajustes."
   },
   "userProfile": {

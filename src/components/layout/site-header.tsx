@@ -8,6 +8,7 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Settings,
   Zap,
 } from "lucide-react";
 import * as React from "react";
@@ -29,7 +30,6 @@ import { Button } from "@/components/ui/button";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { SidebarNav } from "@/components/layout/course-sidebar";
 import { AccountMenu } from "@/components/auth/account-menu";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 export function SiteHeader({
   sections,
@@ -138,7 +138,13 @@ export function SiteHeader({
         </Link>
       )}
       <AccountMenu />
-      <LanguageSwitcher />
+      <Link
+        href="/settings"
+        aria-label={t("settings")}
+        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Settings className="h-4 w-4" />
+      </Link>
     </header>
   );
 }
