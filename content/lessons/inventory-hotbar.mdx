@@ -1,0 +1,237 @@
+---
+slug: inventory-hotbar
+title: Inventory and hotbar — collect, store, equip
+description: Build a slot-based hotbar UI, pick up items from the world, and equip them with a click.
+sectionId: gameplay
+order: 19
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [inventory, hotbar, slots, pickup, equip, gui]
+objectives:
+  - Store item data in a simple table on the client
+  - Build a hotbar UI with clickable slots
+  - Detect when a player touches a pickup and adds it to their inventory
+  - Equip an item by clicking a hotbar slot
+prerequisites: [characters, guis]
+keywords: [inventory, hotbar, slots, pickup, equip, screengui, frame, click, item, collect]
+---
+
+Every game with items needs a way to hold them and a way to use them. This lesson builds both: a data table that tracks what you have, a hotbar that shows it, pickups in the world to collect, and a click to equip.
+
+<Step>
+
+## The inventory data
+
+Start with a plain table. No GUI yet — just the data behind it:
+
+```luau
+local inventory = {}  -- { "Sword" = 1, "Shield" = 1 }
+local hotbar = {}     -- ordered list: { "Sword", "Shield" }
+local selectedSlot = nil
+```
+
+`inventory` is a dictionary keyed by item name. `hotbar` is an ordered array — slot 1 is the first item, slot 2 is the second. When a player picks something up, you add it to both. When they equip, you read `hotbar[selectedSlot]`.
+
+<Note>
+Keeping data separate from the UI is the whole point. The hotbar draws *from* the data — it never stores item information itself. If the UI breaks, the data survives.
+</Note>
+
+<FillBlank
+  prompt="The data structure that tracks items by name and count is called a ____"
+  answer="dictionary"
+  explanation="A dictionary (table with string keys) maps item names to quantities. The hotbar array keeps them in display order."
+/>
+
+</Step>
+
+<Step>
+
+## Building the hotbar UI
+
+A ScreenGui with a row of Frames gives you the visual slots:
+
+```luau
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Hotbar"
+screenGui.Parent = playerGui
+
+local hotbarFrame = Instance.new("Frame")
+hotbarFrame.Name = "Bar"
+hotbarFrame.Size = UDim2.new(0, 320, 0, 64)
+hotbarFrame.Position = UDim2.new(0.5, -160, 1, -80)
+hotbarFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+hotbarFrame.BorderSizePixel = 0
+hotbarFrame.Parent = screenGui
+
+local layout = Instance.new("UIListLayout")
+layout.FillDirection = Enum.FillDirection.Horizontal
+layout.Padding = UDim.new(0, 8)
+layout.Parent = hotbarFrame
+```
+
+Each slot is a child Frame inside `hotbarFrame`. The `UIListLayout` arranges them in a row. Create slots dynamically based on the hotbar data:
+
+```luau
+local function createSlot(index, itemName)
+    local slot = Instance.new("TextButton")
+    slot.Name = "Slot" .. index
+    slot.Size = UDim2.new(0, 64, 0, 64)
+    slot.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    slot.Text = itemName or ""
+    slot.TextColor3 = Color3.fromRGB(255, 255, 255)
+    slot.TextScaled = true
+    slot.Parent = hotbarFrame
+
+    slot.MouseButton1Click:Connect(function()
+        selectedSlot = index
+    end)
+
+    return slot
+end
+```
+
+A `TextButton` (not a plain Frame) so it's clickable. The click sets `selectedSlot` — that's the equip action.
+
+</Step>
+
+<Step>
+
+## Picking up items
+
+Place Parts in the workspace as pickups. When a player's character touches one, it goes into their inventory and the Part disappears:
+
+```luau
+local function onPickupTouched(hit, itemName)
+    local character = hit.Parent
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then return end
+
+    local player = Players:GetPlayerFromCharacter(character)
+    if not player then return end
+
+    -- add to inventory
+    inventory[itemName] = (inventory[itemName] or 0) + 1
+    if not table.find(hotbar, itemName) then
+        table.insert(hotbar, itemName)
+    end
+
+    -- remove the pickup from the world
+    hit.Parent:Destroy()
+end
+
+-- Example: a Sword pickup Part
+local swordPickup = workspace:WaitForChild("SwordPickup")
+swordPickup.Touched:Connect(function(hit)
+    onPickupTouched(hit, "Sword")
+end)
+```
+
+The `Touched` event fires when any body part hits the Part. The guard checks it's a living player character before adding the item. The pickup is destroyed immediately so it can't be collected twice.
+
+<Mcq
+  question="Why check GetPlayerFromCharacter before adding the item?"
+  options={[
+    "Because NPCs might touch the pickup and steal it",
+    "Because the Touched event fires for any Part — you need to confirm it is a real player",
+    "Because Destroy does not work on NPCs",
+    "Because inventory is stored per-player, not per-character",
+  ]}
+  answer={1}
+  explanation="Parts fall, doors open, and NPCs walk — all of these trigger Touched. Confirming a player owns the character prevents false pickups."
+/>
+
+</Step>
+
+<Step>
+
+## Equipping with a click
+
+When the player clicks a slot, the selected item goes into their character's hand. The simplest approach: clone a tool from ReplicatedStorage into the character:
+
+```luau
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function equipItem(itemName)
+    local character = player.Character
+    if not character then return end
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then return end
+
+    -- remove any existing tool
+    local existing = character:FindFirstChildOfClass("Tool")
+    if existing then existing:Destroy() end
+
+    -- clone the tool into the character
+    local toolTemplate = ReplicatedStorage:FindFirstChild(itemName)
+    if not toolTemplate then return end
+
+    local tool = toolTemplate:Clone()
+    tool.Parent = character
+    humanoid:EquipTool(tool)
+end
+
+-- wire up slot clicks
+local function refreshSlots()
+    for _, child in hotbarFrame:GetChildren() do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    for i, item in hotbar do
+        createSlot(i, item)
+    end
+end
+
+-- equip when a slot is clicked
+-- (inside createSlot's MouseButton1Click)
+selectedSlot = index
+equipItem(hotbar[index])
+```
+
+The tool template lives in `ReplicatedStorage` — one copy per item type. Cloning it and parenting it to the character makes it appear in the player's hand. `EquipTool` triggers the default Roblox equip animation.
+
+<Note>
+This is a starter pattern. Real games use a dedicated Tool service or a server-side equip handler to prevent exploiters from equipping items they don't own.
+</Note>
+
+<WriteCode
+  instruction="The equip function clones a tool from ReplicatedStorage. Write the line that parents the cloned tool to the character so it appears in the player's hand."
+  answer={["tool.Parent = character"]}
+  starterCode="local tool = toolTemplate:Clone()
+-- parent it to the character
+humanoid:EquipTool(tool)"
+  explanation="tool.Parent = character puts the tool into the character model, which lets EquipTool grab it."
+/>
+
+</Step>
+
+<Step>
+
+## Putting it together
+
+The full flow is: player walks into a pickup → item enters inventory and hotbar → player clicks a slot → tool equips in hand. The data layer holds the truth, the UI reflects it, and the equip function acts on it.
+
+```luau
+-- Collect: Touched → inventory + hotbar → refresh UI
+-- Equip: Click slot → clone tool → EquipTool
+-- Each layer reads from the same data tables
+```
+
+If the UI breaks or the character dies, the inventory data is still in the `inventory` and `hotbar` tables. That separation means you can rebuild the UI without losing items — and later extend the system with server-side saves, stacking, or rarity without rewriting the pickup logic.
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Putting item data inside the UI.** The Frame doesn't own the inventory — the table does. Keep them separate so one can break without the other.
+- **Not destroying the pickup.** A Part that isn't destroyed after collection can be picked up repeatedly by multiple players.
+- **Equipping on the client only.** Tools are replicated — parenting one to the character works, but a real game should validate on the server to prevent item spawning exploits.
+- **Ignoring the alive check.** A dead character has no Humanoid. Equip calls on a corpse do nothing at best and error at worst.
+
+Next: checkpoints — respawn where you left off, not where you started.
+
+</Step>
