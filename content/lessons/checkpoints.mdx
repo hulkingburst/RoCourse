@@ -1,0 +1,196 @@
+---
+slug: checkpoints
+title: Checkpoints — respawn where you left off
+description: Place checkpoint Parts that remember a player's position, then spawn them back there instead of at the start.
+sectionId: gameplay
+order: 20
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [checkpoints, respawn, spawn, position, progress, cframes]
+objectives:
+  - Store a player's last checkpoint position in a table
+  - Detect when a player touches a checkpoint and update their spawn point
+  - Set a player's spawn location on respawn
+  - Handle the first spawn before any checkpoint is reached
+prerequisites: [characters, health-damage]
+keywords: [checkpoint, respawn, spawn, position, cframes, touched, loadcharacter, spawnlocation]
+---
+
+The health-damage lesson respawns players back at the default spawn. This lesson upgrades that: place checkpoints around the map, remember where each player last passed one, and respawn them there so a fall doesn't mean restarting the whole level.
+
+<Step>
+
+## Remembering each player's checkpoint
+
+Keep a table that maps players (or their userId) to the position of their latest checkpoint:
+
+```luau
+local Players = game:GetService("Players")
+local checkpoints = {}  -- [player.UserId] = CFrame (from — profile)
+
+local function setCheckpoint(player, cframe)
+    checkpoints[player.UserId] = cframe
+end
+
+local function getCheckpoint(player)
+    return checkpoints[player.UserId]
+end
+```
+
+Keying by `UserId` (not the player object) means the data survives name changes and is easy to look up. If the player has no entry yet, that's their signal they haven't reached any checkpoint — respawn them at the start.
+
+<Note>
+`UserId` is the player's permanent, unique account number. It stays the same forever, even if they change their display name.
+</Note>
+
+<FillBlank
+  prompt="The unique, permanent number that identifies a player's account is their ____"
+  answer="UserId"
+  explanation="player.UserId never changes. It is the reliable key for storing per-player data."
+/>
+
+</Step>
+
+<Step>
+
+## Detecting a checkpoint touch
+
+A checkpoint Part in the workspace fires `Touched` when a character walks into it:
+
+```luau
+local function onCheckpointTouched(checkpoint, hit)
+    local character = hit.Parent
+    local localPlayer = Players:GetPlayerFromCharacter(character)
+    if not localPlayer then return end
+
+    local checkpointPart = checkpoint.PrimaryPart or checkpoint
+    setCheckpoint(localPlayer, checkpointPart.CFrame)
+end
+
+-- Attach to a checkpoint model
+local checkpoint = workspace:WaitForChild("Checkpoint1")
+checkpoint.Touched:Connect(function(hit)
+    onCheckpointTouched(checkpoint, hit)
+end)
+```
+
+The important detail: a checkpoint is often a **Model** (a pad plus a flag). So grab the actual part to read its CFrame with `checkpoint.PrimaryPart or checkpoint`. When the player touches it, you record that part's position as their new spawn point.
+
+<Mcq
+  question="Why confirm GetPlayerFromCharacter before saving a checkpoint?"
+  options={[
+    "Because NPCs should be able to use checkpoints too",
+    "Because anything can touch a checkpoint — you only want to save progress for real players",
+    "Because checkpoints cannot be touched by Parts",
+    "Because Touched only fires for players",
+  ]}
+  answer={1}
+  explanation="Floating props, doors, and NPCs all trigger Touched. Guarding with GetPlayerFromCharacter saves progress only for actual players."
+/>
+
+</Step>
+
+<Step>
+
+## Respawn in the right place
+
+When the character dies, spawn them at their checkpoint instead of the default:
+
+```luau
+local function spawnPlayerAtCheckpoint(player)
+    local cframe = getCheckpoint(player)
+    if cframe then
+        player:LoadCharacter()
+        local character = player.Character
+        character:PivotTo(cframe)
+    else
+        -- no checkpoint yet — use the default spawn
+        player:LoadCharacter()
+    end
+end
+```
+
+`PivotTo` sets the character model's position to the saved CFrame. There's a subtlety: `LoadCharacter()` returns instantly with a partly-loaded character, and the character may not be ready to move for a frame or two.
+
+<Note>
+A common trick is to load the character and set the position on the *next* frame, once the character has actually loaded:
+```luau
+player:LoadCharacter()
+task.wait()
+local character = player.Character
+if character then character:PivotTo(cframe) end
+```
+</Note>
+
+</Step>
+
+<Step>
+
+## Wiring it into death
+
+Connect the respawn logic to the death event, exactly like the health-damage lesson:
+
+```luau
+local function onCharacterAdded(character)
+    local humanoid = character:WaitForChild("Humanoid")
+
+    humanoid.Died:Connect(function()
+        local player = Players:GetPlayerFromCharacter(character)
+        if player then
+            task.delay(3, function()
+                spawnPlayerAtCheckpoint(player)
+            end)
+        end
+    end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(onCharacterAdded)
+end)
+```
+
+The flow: character dies → wait 3 seconds → load a new character at the player's last checkpoint. If they never touched a checkpoint, they get the default spawn. Either way, `CharacterAdded` fires for the new body and the whole system reattaches.
+
+<Note>
+If your spawn logic already handles the default case, unify it: pre-seed every player's checkpoint to the default spawn at join time. Then `spawnPlayerAtCheckpoint` needs no special-case branch — it always has a valid CFrame.
+</Note>
+
+<WriteCode
+  instruction="Inside spawnPlayerAtCheckpoint, after loading the character, write the line that moves that new character to the saved checkpoint position."
+  answer={["character:PivotTo(cframe)"]}
+  starterCode="local character = player.Character
+-- move the character to the saved checkpoint"
+  explanation="character:PivotTo(cframe) teleports the freshly-loaded character to the recorded checkpoint CFrame."
+/>
+
+</Step>
+
+<Step>
+
+## Putting it together
+
+Checkpoints are three small pieces: recording, remembering, and respawning. Touching a checkpoint saves a CFrame by UserId. Dying looks up that CFrame and pivots the new character there.
+
+```luau
+-- Touch checkpoint → setCheckpoint(player, part.CFrame)
+-- Die → getCheckpoint(player) → LoadCharacter → PivotTo
+-- No checkpoint → default spawn
+```
+
+The same pattern scales: instead of a CFrame you can save a whole "respawn state" (which room, which flag, which zone) and restore it together. The checkpoint table becomes your save-in-progress.
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Storing the player object instead of the CFrame.** You want the position, not the player. Save `checkpoint.CFrame`.
+- **Not handling the no-checkpoint case.** A brand-new player has no checkpoint. Give them the default spawn or you'll respawn them at the origin.
+- **Keying by the player object.** Use `UserId`. A `table` keyed by player object leaks memory and breaks on reconnect.
+- **Calling PivotTo before the character loads.** LoadCharacter returns early. Wait a frame (task.wait) or use CharacterAdded before moving the new body.
+- **Moving the respawn off the server.** Player positions and respawns are server-side concerns. Don't trust client movement.
+
+Next: vehicles — weld parts together and drive.
+
+</Step>
