@@ -1,0 +1,193 @@
+---
+slug: vehicles
+title: Vehicles — drive a welded model
+description: Move a multi-part vehicle forward with the keyboard by updating the model's CFrame, and steer by rotating it.
+sectionId: gameplay
+order: 21
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [vehicles, movement, cframes, input, driving, physics]
+objectives:
+  - Tie parts together so the whole model moves as one unit
+  - Read keyboard input to accelerate and steer a vehicle
+  - Move the vehicle using CFrame math instead of sliding individual parts
+  - Keep movement stable across frame rate using delta time
+prerequisites: [vector3-cframe, user-input-service]
+keywords: [vehicle, car, move, drive, cframes, wasd, steering, delta, speed, assembly]
+---
+
+A car, a boat, or a moving platform is really just a group of parts. In this lesson you'll move them all together by treating the vehicle's root part — the model — as the thing that moves, and steering with A and D while driving with W and S.
+
+<Step>
+
+## The root part drives everything
+
+Every vehicle is a Model whose position you control entirely through its root part. Moving that root moves every welded child with it:
+
+```luau
+local car = workspace:WaitForChild("Car")
+local root = car.PrimaryPart  -- the part the model pivots around
+
+-- Move the whole car forward 1 stud
+car:PivotTo(root.CFrame + root.CFrame.LookVector)
+```
+
+`PivotTo` moves the entire model by its root's CFrame. Because the body, wheels, and seats are welded under that root, they all travel together — you never move a wheel by itself.
+
+<Note>
+Make sure the vehicle's body actually is the `PrimaryPart` (`car.PrimaryPart = car.Body`), and that the child parts are welded to it. Otherwise `PivotTo` can't move them as one unit.
+</Note>
+
+<FillBlank
+  prompt="The method that moves an entire model by its root part's CFrame is ____"
+  answer="PivotTo"
+  explanation="model:PivotTo(cframe) repositions the whole model as one rigid unit around its PrimaryPart."
+/>
+
+</Step>
+
+<Step>
+
+## Reading the keyboard
+
+Drive with W/S for forward and reverse, A/D to steer. Use UserInputService so input works all the time, not only when a GUI is focused:
+
+```luau
+local UserInputService = game:GetService("UserInputService")
+local keys = {}
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        keys[input.KeyCode] = true
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        keys[input.KeyCode] = false
+    end
+end)
+
+local function isDown(key)
+    return keys[key] == true
+end
+```
+
+Tracking `keys` as a table means you can check *multiple* keys per frame — pressing W **and** D at once drives forward while turning, which is how real driving feels.
+
+<Mcq
+  question="Why record keys in a table instead of firing an event on every keypress?"
+  options={[
+    "Because InputBegan can only handle one key",
+    "Because input events fire once, but holding a key should apply every frame",
+    "Because the keyboard cannot send repeated inputs",
+    "Because W and D cannot be read separately",
+  ]}
+  answer={1}
+  explanation="InputBegan fires once when a key goes down. A keys table lets you check held keys on every frame so the car keeps moving while you hold W."
+/>
+
+</Step>
+
+<Step>
+
+## Moving a fixed distance per frame
+
+The simplest movement adds the car's LookVector to its position each frame:
+
+```luau
+local RunService = game:GetService("RunService")
+
+RunService.Heartbeat:Connect(function(dt)
+    local speed = 40  -- studs per second
+
+    if isDown(Enum.KeyCode.W) then
+        local direction = root.CFrame.LookVector
+        car:PivotTo(root.CFrame + direction * speed * dt)
+    end
+end)
+```
+
+Multiplying the direction by `speed * dt` makes the movement frame-rate independent: `dt` is the time since the last frame, so whether you run at 30 or 240 FPS, the car covers the same distance per second.
+
+<WriteCode
+  instruction="The skeleton moves forward using LookVector. Write the one line inside the loop that actually moves the car, using PivotTo, CFrame addition, and a speed of 40 times dt."
+  answer={["car:PivotTo(root.CFrame + root.CFrame.LookVector * speed * dt)"]}
+  starterCode="RunService.Heartbeat:Connect(function(dt)
+    local speed = 40
+    if isDown(Enum.KeyCode.W) then
+        -- move the car forward here
+    end
+end)"
+  explanation="car:PivotTo(root.CFrame + direction * speed * dt) adds the forward offset to the current CFrame using the delta time for steady speed."
+/>
+
+</Step>
+
+<Step>
+
+## Steering by rotation
+
+Steering is rotating the car around its own vertical axis before moving it. Use `CFrame.fromEulerAnglesYXZ` — the Y axis is up/down, so rotating around Y turns left and right:
+
+```luau
+local function steeringAngle(dt, keys)
+    local turn = 0
+    if isDown(Enum.KeyCode.A) then turn = turn + 1 end
+    if isDown(Enum.KeyCode.D) then turn = turn - 1 end
+    return turn * 2 * dt  -- about 2 rad/s
+end
+
+RunService.Heartbeat:Connect(function(dt)
+    local speed = 40
+    local turn = steeringAngle(dt)
+
+    -- build the new CFrame: rotated, then moved
+    local rotated = root.CFrame * CFrame.Angles(0, turn, 0)
+    root.CFrame = rotated
+    car:PivotTo(root.CFrame + root.CFrame.LookVector * speed * dt)
+end)
+```
+
+Multiplying two CFrames composes them: `root.CFrame * CFrame.Angles(0, turn, 0)` rotates the car around its own origin before the forward movement is applied. A positive angle turns one way, negative the other.
+
+<Note>
+Combine rotation and forward movement into a *single* `PivotTo` so the wheels don't slide sideways from a separate translation. The composed CFrame rotates around the car's own origin and then shifts it forward:
+```luau
+car:PivotTo(root.CFrame * CFrame.Angles(0, turn, 0) * CFrame.new(0, 0, -speed * dt))
+```
+Rotating around Y then moving along the (now-rotated) forward axis is exactly how a car turns a corner without drifting.
+</Note>
+
+</Step>
+
+<Step>
+
+## Putting it together
+
+Forward, reverse, and steering all funnel into one place: building a new CFrame and calling `PivotTo` once per frame.
+
+```luau
+-- W/S: forward/back along LookVector
+-- A/D: rotate around the Y axis
+-- One PivotTo with a composed CFrame per frame
+```
+
+The whole vehicle is just a welded model whose `PrimaryPart` CFrame you rewrite every frame. Physics steps in only when the wheels touch the ground — the Roblox physics engine handles resting and collision for you, so you only write the *driver*.
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Moving a child part instead of the root.** Sliding one wheel won't drag the car. Always `PivotTo` the model.
+- **Forgetting `dt`.** Movement without delta time is twice as fast at 60 FPS as at 30. Always multiply by `dt`.
+- **Applying rotation and translation separately.** Compose them in one CFrame so the car turns smoothly instead of teleporting sideways.
+- **Moving the car on the client only.** A car driven on the client drifts from the server's view. For multiplayer, the server should own movement and broadcast it.
+- **Not setting PrimaryPart.** `PivotTo` silently does nothing useful without a PrimaryPart, so set `car.PrimaryPart` explicitly.
+
+Next: teleporting — warp a player between zones and places.
+
+</Step>
