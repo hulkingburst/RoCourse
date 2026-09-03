@@ -1,0 +1,180 @@
+---
+slug: teleporting
+title: Teleporting — jump between zones and places
+description: Move a player to another part of a map or into an entirely different place with TeleportService.
+sectionId: gameplay
+order: 22
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [teleport, teleportservice, zones, places, travel, respawn]
+objectives:
+  - Teleport a player around the current map with TeleportService
+  - Teleport a player into a different Place in the same experience
+  - Read the incoming place on the destination server
+  - Carry a little data along with the teleport
+prerequisites: [players, remotes]
+keywords: [teleport, teleportservice, teleportasync, place, zone, travel, playeradded]
+---
+
+Vehicles got your player around a map under their own power. Teleporting skips the travel: one call and the player is somewhere else — either a new zone in the same place, or a totally different place whose server loads them in.
+
+<Step>
+
+## Teleporting around the same map
+
+The simplest teleport moves a player from one zone to another in the *same* Place. Both ends live on the same server, so the player just repositions:
+
+```luau
+local TeleportService = game:GetService("TeleportService")
+
+local function teleportToZone(player, zoneCFrame)
+    local character = player.Character
+    if not character then return end
+    character:PivotTo(zoneCFrame)
+end
+```
+
+Wait — this is just moving the character with `PivotTo`, the same trick from the checkpoints lesson. That works when the destination is on the **same server**. `TeleportService` only becomes necessary when you cross a server boundary — moving to a different Place.
+
+<Note>
+A "zone" you want a player to jump straight to is often just a CFrame. Reserve `TeleportService` for places that need a fresh server (different map, different game mode, a private server).
+</Note>
+
+<FillBlank
+  prompt="The service Roblox provides to move a player to another Place is called ____"
+  answer="TeleportService"
+  explanation="game:GetService('TeleportService') gives you methods like TeleportAsync to send players to another Place."
+/>
+
+</Step>
+
+<Step>
+
+## Teleporting to another Place
+
+When the destination is a different Place in the same experience, you call `TeleportAsync` with the Place ID (and optionally a game server ID):
+
+```luau
+local TeleportService = game:GetService("TeleportService")
+local DESTINATION_PLACE_ID = 123456789  -- the other Place's ID
+
+local function goToOtherPlace(player)
+    local success, err = TeleportService:TeleportAsync(DESTINATION_PLACE_ID, { player })
+
+    if not success then
+        warn("Teleport failed: " .. tostring(err))
+    end
+end
+```
+
+`TeleportAsync` takes the target Place ID and a list of player instances. The player is disconnected from this server and loaded (usually within a few seconds) onto a server running the other place. Wrapping it in a pcall-style success check means a missing or private Place ID doesn't crash your script.
+
+<Mcq
+  question="What does TeleportAsync actually do to the player?"
+  options={[
+    "It spins up a new server in the same Place",
+    "It disconnects the player from this server and loads them onto a server for the other Place",
+    "It copies the player's character to the other Place without leaving this one",
+    "It only works within a single server",
+  ]}
+  answer={1}
+  explanation="TeleportAsync moves the player to a server running the destination Place. They leave this server entirely."
+/>
+
+</Step>
+
+<Step>
+
+## Teleporting back to the same Place
+
+Going back to the place you came from teleports you to the same **Place**, but likely a **different server**. That matters because your per-server state — leaderstats, datastore data you haven't saved, in-memory variables — may not carry over.
+
+```luau
+-- teleport back to the original game
+local function goHome(player)
+    local homePlaceId = 123456780  -- the main Place
+    TeleportService:TeleportAsync(homePlaceId, { player })
+end
+```
+
+Because teleporting to a Place can land you on any server of it, always **save progress before teleporting** (write datastores or send it in the teleport data). Never assume memory on one server is visible on another.
+
+<Warning>
+Roblox reserves a small pool of servers per Place. Teleporting a large group at once can exceed it. Use `TeleportAsync` with the player list and let Roblox handle server assignment, rather than manually spawning private servers unless you need them.
+</Warning>
+
+</Step>
+
+<Step>
+
+## Sending data along with the teleport
+
+Teleport data lets the destination server know *why* the player is arriving — which checkpoint, which zone, what loadout. Pass a JSON-able dictionary as `TeleportData`:
+
+```luau
+local TeleportService = game:GetService("TeleportService")
+
+local function teleportWithData(player, zoneName, checkpointId)
+    local data = {
+        zone = zoneName,
+        checkpoint = checkpointId,
+        arrivedAt = os.time(),
+    }
+
+    TeleportService:TeleportAsync(DESTINATION_PLACE_ID, { player }, data)
+end
+```
+
+The third argument to `TeleportAsync` is data the fountain server sends to the destination. It must be JSON-serializable — strings, numbers, booleans, arrays, and nested dictionaries. Don't put instance references, functions, or datastore objects in it.
+
+<WriteCode
+  instruction="TeleportAsync takes a player list and optional teleport data. Write the call that teleports the single player to DESTINATION_PLACE_ID and carries a dictionary with a key 'level' set to 3."
+  answer={["TeleportService:TeleportAsync(DESTINATION_PLACE_ID, { player }, { level = 3 })"]}
+  starterCode="-- send the player to the destination with some data
+TeleportService:"
+  explanation="Pass the place ID, a list containing the player, and a JSON-able dictionary. The destination can read it back with Player:GetJoinData()."
+/>
+
+</Step>
+
+<Step>
+
+## Reading the data on arrival
+
+On the destination server, read the incoming player's joined data in `PlayerAdded` (or on the character being added):
+
+```luau
+game.Players.PlayerAdded:Connect(function(player)
+    local joinData = player:GetJoinData()
+    local teleportData = joinData.teleportData
+
+    if teleportData and teleportData.zone then
+        -- put them in the right zone / checkpoint
+        print("Arrived at zone:", teleportData.zone)
+    else
+        -- a brand-new player, not teleported — start them at spawn
+    end
+end)
+```
+
+`GetJoinData()` returns a table with teleport-related fields, including `teleportData` (what you sent). Use it to decide where to spawn the player. If `teleportData` is nil, the player joined normally and should go to the default spawn.
+
+<Note>
+Teleport data is visible to the client too (it ships in JoinData), so don't put secrets or authoritative choices in it. Verify anything security-relevant on the destination server.
+</Note>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Teleporting within the same server.** If both zones are on one server, just `PivotTo` the character — don't spin up a whole separate place.
+- **Forgetting to save first.** Teleporting across Places means a new server. Save datastores before you leave, or the destination won't have your progress.
+- **Trusting client-sent destinations.** Never let the client pick an arbitrary Place ID without a server-side whitelist — that's how players skip whole zones.
+- **Putting non-JSON values in TeleportData.** Functions, instances, and datastores can't serialize. Only send plain strings, numbers, booleans, and tables.
+- **Using a fake Place ID.** If the destination doesn't exist or isn't in your experience, `TeleportAsync` returns an error. Always check the return.
+
+Next: ViewportFrames — a 3D preview of a model inside a GUI.
+
+</Step>
