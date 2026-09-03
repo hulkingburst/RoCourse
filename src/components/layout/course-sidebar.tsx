@@ -187,7 +187,12 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center px-5 pb-4 pt-5">
-        <Link href="/" className="flex items-center" aria-label="RoCourse home">
+        <Link
+          href="/"
+          className="flex items-center"
+          aria-label="RoCourse home"
+          onContextMenu={(e) => e.preventDefault()}
+        >
           <Image
             src="/rocourselogo.png"
             alt="RoCourse"

@@ -84,6 +84,7 @@ export function SiteHeader({
       <Link
         href="/"
         className="flex items-center gap-2 text-sm font-bold lg:hidden"
+        onContextMenu={(e) => e.preventDefault()}
       >
         <Image
           src="/rocourselogo.png"
