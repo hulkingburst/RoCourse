@@ -191,9 +191,9 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
           <Image
             src="/rocourselogo.png"
             alt="RoCourse"
-            width={120}
+            width={200}
             height={34}
-            className="h-auto w-[120px] object-contain"
+            className="h-auto w-[200px] object-contain"
             priority
           />
         </Link>

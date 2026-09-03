@@ -88,9 +88,9 @@ export function SiteHeader({
         <Image
           src="/rocourselogo.png"
           alt="RoCourse"
-          width={90}
+          width={150}
           height={25}
-          className="h-auto w-[90px] object-contain"
+          className="h-auto w-[150px] object-contain"
           priority
         />
       </Link>
