@@ -186,18 +186,16 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 px-5 pb-4 pt-5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+      <div className="flex items-center px-5 pb-4 pt-5">
+        <Link href="/" className="flex items-center" aria-label="RoCourse home">
           <Image
-            src="/rocourse-icon.png"
+            src="/rocourselogo.png"
             alt="RoCourse"
-            width={32}
-            height={32}
-            className="h-full w-full object-contain"
+            width={120}
+            height={34}
+            className="h-auto w-[120px] object-contain"
+            priority
           />
-        </div>
-        <Link href="/" className="text-sm font-bold leading-tight">
-          {process.env.NEXT_PUBLIC_COURSE_NAME ?? "RoCourse"}
         </Link>
       </div>
 

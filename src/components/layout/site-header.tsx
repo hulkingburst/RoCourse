@@ -85,16 +85,14 @@ export function SiteHeader({
         href="/"
         className="flex items-center gap-2 text-sm font-bold lg:hidden"
       >
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md">
-          <Image
-            src="/rocourse-icon.png"
-            alt="RoCourse"
-            width={28}
-            height={28}
-            className="h-full w-full object-contain"
-          />
-        </span>
-        RoCourse
+        <Image
+          src="/rocourselogo.png"
+          alt="RoCourse"
+          width={90}
+          height={25}
+          className="h-auto w-[90px] object-contain"
+          priority
+        />
       </Link>
 
       <div className="flex-1" />
