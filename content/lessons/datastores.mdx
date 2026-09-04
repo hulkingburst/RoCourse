@@ -18,7 +18,12 @@ keywords: [datastore, dataservice, save, load, setasync, getasync]
 Right now, everything you've built dies when the game stops. Close the test and your coins are gone. Real games remember you. That memory lives in a **DataStore** — and this lesson is where your game gets a brain that survives restart.
 
 <Warning>
-DataStores only fully work in **published** games. If you test from Studio, saves won't stick around — that's expected, not a bug. You'll test the full loop once we publish.
+DataStores only fully work in **published** games — but before any store call works at all, you must enable API access in **Game Settings → Security**:
+
+- **Published game:** tick **"Enable API Access"**.
+- **Studio testing:** tick **"Enable Studio Access to API Services"**.
+
+Without the right one enabled, every `SetAsync`/`GetAsync` fails silently with an access error and your saves never happen. Flip the checkbox first — it's the most common reason "saves don't work," and it's never the code.
 </Warning>
 
 <Step>

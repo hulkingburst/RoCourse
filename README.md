@@ -49,6 +49,8 @@ are optional and exist purely to sync your progress across devices.
   workspace, tween, event, …) for a one-line definition and a link to the
   lesson that teaches it.
 - **Optional cloud sync** so your progress follows you across devices.
+- **A notifications bell** — new site updates, badges you earn, and replies to
+  your feedback all land in one place, so you never miss what changed.
 - **English and Spanish.** Every screen is localized — the interface, all
   guides, the FAQ, and the full interactive content (every quiz question,
   daily challenge, and reference entry). English lives at the root URL;
