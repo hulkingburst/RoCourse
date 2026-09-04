@@ -114,7 +114,10 @@ local text = tostring(lives)  -- 3 becomes "3"
 
 <WriteCode
   instruction="A TextBox gave you the string '7'. Convert it to a number and add 3, then print the result."
-  answer={["print(tonumber(\"7\") + 3)"]}
+  answer={[
+    "print(tonumber(typed) + 3)",
+    "print(tonumber(\"7\") + 3)",
+  ]}
   starterCode='local typed = "7"
 -- your line here
 '
