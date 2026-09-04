@@ -123,7 +123,7 @@ export function AnswerSpoiler({ answer }: { answer: string }) {
       {revealed && (
         <div className="mt-2">
           <p className="text-[13px] text-foreground/80">{t("correctAnswer")}</p>
-          <code className="mt-1 block rounded-md bg-muted px-2.5 py-1.5 font-mono text-[13px]">
+          <code className="mt-1 block whitespace-pre-wrap rounded-md bg-muted px-2.5 py-1.5 font-mono text-[13px]">
             {answer}
           </code>
         </div>

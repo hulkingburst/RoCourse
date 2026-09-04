@@ -145,7 +145,7 @@ export function ArrangeCode({
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/15 text-xs font-bold text-primary">
               {position + 1}
             </span>
-            <code className="min-w-0 flex-1 leading-relaxed">
+            <code className="min-w-0 flex-1 whitespace-pre-wrap leading-relaxed">
               {tokenText(token, lines, distractors)}
             </code>
             {!correct && (
@@ -170,7 +170,7 @@ export function ArrangeCode({
             onClick={() => takeToken(poolIndex)}
             disabled={correct}
             className={cn(
-"rounded-lg border px-3 py-1.5 font-mono text-[13.5px] transition-all duration-150 motion-reduce:transition-none active:scale-95",
+"rounded-lg border px-3 py-1.5 font-mono whitespace-pre-wrap text-[13.5px] transition-all duration-150 motion-reduce:transition-none active:scale-95",
                 "cursor-pointer hover:border-primary/50 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             )}
           >
