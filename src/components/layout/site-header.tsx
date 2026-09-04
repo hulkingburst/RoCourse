@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { SidebarNav } from "@/components/layout/course-sidebar";
 import { AccountMenu } from "@/components/auth/account-menu";
+import { NotificationBell } from "@/components/layout/notification-bell";
 
 export function SiteHeader({
   sections,
@@ -136,6 +137,7 @@ export function SiteHeader({
           {levelFromXp(xp)}
         </Link>
       )}
+      <NotificationBell />
       <AccountMenu />
       <Link
         href="/settings"

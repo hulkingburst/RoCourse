@@ -453,6 +453,17 @@
     "send": "Send",
     "sending": "Sending…"
   },
+  "notifications": {
+    "ariaLabel": "Notifications",
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "markAllRead": "Mark all read",
+    "justNow": "Just now",
+    "badgeEarned": "Badge earned",
+    "feedbackReceived": "Feedback received",
+    "feedbackClosed": "Feedback resolved",
+    "siteUpdate": "Site update"
+  },
   "difficulty": {
     "beginner": "Beginner",
     "intermediate": "Intermediate",

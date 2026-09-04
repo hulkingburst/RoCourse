@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { trustedIp } from "@/lib/auth-limiter";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 
@@ -13,6 +15,8 @@ const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const limitKey = (ip: string) => `feedback:${ip}`;
 
 export async function POST(request: Request) {
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
   const ip = trustedIp(request.headers);
 
   // DB-backed rate limit (shared across instances) so the inbox stays usable.
@@ -77,6 +81,42 @@ export async function POST(request: Request) {
   if (!response.ok) {
     // Don't echo GitHub's body (may contain hints); a generic failure is fine.
     return NextResponse.json({ ok: false }, { status: 502 });
+  }
+
+  // For signed-in users, remember the ticket and confirm with a notification
+  // so a later close (with the author's real comment) can be relayed back.
+  const created = (await response.json()) as { number?: number };
+  if (userId && typeof created.number === "number") {
+    try {
+      await prisma.$transaction([
+        prisma.feedbackTicket.upsert({
+          where: { repo_issueNumber: { repo, issueNumber: created.number } },
+          create: {
+            userId,
+            repo,
+            issueNumber: created.number,
+            title: title.slice(0, 200),
+          },
+          update: { title: title.slice(0, 200) },
+        }),
+        prisma.notification.upsert({
+          where: {
+            userId_localKey: { userId, localKey: `feedback:${created.number}` },
+          },
+          create: {
+            userId,
+            localKey: `feedback:${created.number}`,
+            type: "feedback_received",
+            title: "Feedback received",
+            body: text.slice(0, 2000),
+            link: `https://github.com/${repo}/issues/${created.number}`,
+          },
+          update: {},
+        }),
+      ]);
+    } catch {
+      // A failed backup must not take down an otherwise-successful submission.
+    }
   }
 
   await recordRateLimit(limitKey(ip));

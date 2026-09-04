@@ -10,16 +10,19 @@ import { FeedbackButton } from "@/components/feedback/feedback-button";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SidebarNav } from "@/components/layout/course-sidebar";
 import { useGuestXpReporter } from "@/lib/use-guest-xp-reporter";
+import { useNotifications } from "@/lib/use-notifications";
 import type { CourseSection, SearchEntry } from "@/lib/types";
 
 export function AppShell({
   children,
   sections,
   searchEntries,
+  totalLessons,
 }: {
   children: React.ReactNode;
   sections: CourseSection[];
   searchEntries: SearchEntry[];
+  totalLessons: number;
 }) {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
   const pathname = usePathname();
@@ -27,6 +30,7 @@ export function AppShell({
   const navT = useTranslations("nav");
 
   useGuestXpReporter();
+  useNotifications(totalLessons);
 
   return (
     <div className="min-h-screen">

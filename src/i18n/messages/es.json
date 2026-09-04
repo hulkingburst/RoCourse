@@ -453,6 +453,17 @@
     "send": "Enviar",
     "sending": "Enviando…"
   },
+  "notifications": {
+    "ariaLabel": "Notificaciones",
+    "title": "Notificaciones",
+    "empty": "Aún no hay notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "justNow": "Ahora mismo",
+    "badgeEarned": "Insignia obtenida",
+    "feedbackReceived": "Comentario recibido",
+    "feedbackClosed": "Comentario resuelto",
+    "siteUpdate": "Actualización del sitio"
+  },
   "difficulty": {
     "beginner": "Principiante",
     "intermediate": "Intermedio",

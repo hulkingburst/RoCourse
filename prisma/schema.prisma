@@ -9,18 +9,20 @@ datasource db {
 }
 
 model User {
-  id           String             @id @default(cuid())
-  email        String             @unique
-  name         String
-  handle       String?            @unique
-  passwordHash String
-  createdAt    DateTime           @default(now())
-  progress     ProgressProfile?
-  completions  CourseCompletion[]
-  questions    Question[]
-  answers      QuestionAnswer[]
-  weeklyXp     WeeklyXp[]
-  weeklyFirsts WeeklyFirst[]
+  id               String             @id @default(cuid())
+  email            String             @unique
+  name             String
+  handle           String?            @unique
+  passwordHash     String
+  createdAt        DateTime           @default(now())
+  progress         ProgressProfile?
+  completions      CourseCompletion[]
+  questions        Question[]
+  answers          QuestionAnswer[]
+  weeklyXp         WeeklyXp[]
+  weeklyFirsts     WeeklyFirst[]
+  notifications    Notification[]
+  feedbackTickets  FeedbackTicket[]
 }
 
 model ProgressProfile {
@@ -120,4 +122,47 @@ model WeeklyFirst {
   settledAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// A notification shown in the header bell. localStorage is the primary store
+// (works offline and for guests); this table is the server-side backup for
+// signed-in users and the origin of server-generated notifications (feedback
+// resolutions read from the real GitHub issue closing comment).
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Stable dedup key mirroring the local store's id (e.g. "badge:first-steps"
+  // or "update:<slug>") so backup pushes and pulls are idempotent per user.
+  localKey  String
+  // "update" | "badge" | "feedback_received" | "feedback_closed"
+  type      String
+  title     String
+  body      String?
+  link      String?
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  @@unique([userId, localKey])
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
+}
+
+// Records the GitHub issue opened for a signed-in user's feedback, so a later
+// close (with the author's real closing comment) can be relayed back to the
+// reporter as a notification instead of auto-generated text.
+model FeedbackTicket {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repo          String
+  issueNumber   Int
+  title         String
+  state         String    @default("open") // "open" | "closed"
+  closedMessage String? // the real closing comment from the issue (if any)
+  closedAt      DateTime?
+  openedAt      DateTime  @default(now())
+
+  @@unique([repo, issueNumber])
+  @@index([userId, state])
 }
