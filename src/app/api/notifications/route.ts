@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import type { AppNotification, NotificationType } from "@/lib/notification-types";
 import {
+  deleteNotifications,
   getUserNotifications,
   markNotificationsRead,
   pushNotificationBackup,
@@ -95,4 +96,28 @@ export async function POST(request: Request) {
 
   await pushNotificationBackup(session.user.id, clean);
   return NextResponse.json({ ok: true, backedUp: clean.map((n) => n.id) });
+}
+
+export async function DELETE(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  }
+
+  let body: { ids?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  }
+
+  const ids = body.ids;
+  if (!Array.isArray(ids) || ids.length > 200) {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  }
+  const clean = ids.filter(
+    (id): id is string => typeof id === "string" && id.length > 0 && id.length <= 200
+  );
+  if (clean.length > 0) await deleteNotifications(session.user.id, clean);
+  return NextResponse.json({ ok: true });
 }

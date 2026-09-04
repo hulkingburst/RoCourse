@@ -462,7 +462,11 @@
     "badgeEarned": "Insignia obtenida",
     "feedbackReceived": "Comentario recibido",
     "feedbackClosed": "Comentario resuelto",
-    "siteUpdate": "Actualización del sitio"
+    "siteUpdate": "Actualización del sitio",
+    "delete": "Eliminar",
+    "view": "Ver",
+    "done": "Hecho",
+    "noBody": "Sin detalles adicionales."
   },
   "difficulty": {
     "beginner": "Principiante",

@@ -462,7 +462,11 @@
     "badgeEarned": "Badge earned",
     "feedbackReceived": "Feedback received",
     "feedbackClosed": "Feedback resolved",
-    "siteUpdate": "Site update"
+    "siteUpdate": "Site update",
+    "delete": "Delete",
+    "view": "View",
+    "done": "Done",
+    "noBody": "No additional details."
   },
   "difficulty": {
     "beginner": "Beginner",

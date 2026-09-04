@@ -83,6 +83,17 @@ export async function markNotificationsRead(
   });
 }
 
+/** Permanently removes notifications from the DB backup (user-deleted). */
+export async function deleteNotifications(
+  userId: string,
+  ids: string[]
+): Promise<void> {
+  if (ids.length === 0) return;
+  await prisma.notification.deleteMany({
+    where: { userId, localKey: { in: ids } },
+  });
+}
+
 /** Reads the user's notification backup from the DB, newest first. */
 export async function getUserNotifications(userId: string): Promise<NotificationState> {
   const rows = await prisma.notification.findMany({

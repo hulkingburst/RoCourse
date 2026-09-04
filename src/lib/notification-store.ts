@@ -17,6 +17,8 @@ interface NotificationsState {
   earnedBadgeKeys: string[];
   /** Ids that have been pushed to the server backup (idempotency guard). */
   backedUpIds: string[];
+  /** Notification ids the user deleted — never re-added by any source. */
+  deletedIds: string[];
   /** ISO timestamp of the last local change. */
   lastUpdated: string | null;
 
@@ -51,6 +53,8 @@ interface NotificationsState {
   mergeServer: (server: AppNotification[]) => void;
   /** Marks ids as backed up so we never re-push them. */
   markBackedUp: (ids: string[]) => void;
+  /** Removes a notification (and suppresses it being re-added by any source). */
+  removeNotification: (id: string) => void;
   clearAll: () => void;
 }
 
@@ -67,23 +71,27 @@ export const useNotificationsStore = create<NotificationsState>()(
       seenUpdateIds: [],
       earnedBadgeKeys: [],
       backedUpIds: [],
+      deletedIds: [],
       lastUpdated: null,
 
       setHydrated: (value) => set({ hydrated: value }),
 
       addNotification: (id, type, title, opts) =>
-        set((state) => ({
-          notifications: upsert(state.notifications, {
-            id,
-            type,
-            title,
-            body: opts?.body ?? null,
-            link: opts?.link ?? null,
-            createdAt: nowIso(),
-            read: false,
-          }),
-          lastUpdated: nowIso(),
-        })),
+        set((state) => {
+          if (state.deletedIds.includes(id)) return state;
+          return {
+            notifications: upsert(state.notifications, {
+              id,
+              type,
+              title,
+              body: opts?.body ?? null,
+              link: opts?.link ?? null,
+              createdAt: nowIso(),
+              read: false,
+            }),
+            lastUpdated: nowIso(),
+          };
+        }),
 
       markRead: (id) =>
         set((state) => ({
@@ -105,8 +113,11 @@ export const useNotificationsStore = create<NotificationsState>()(
         set((state) => {
           const owned: AppNotification[] = [];
           const previousSeen = new Set(state.seenUpdateIds);
+          const deleted = new Set(state.deletedIds);
           for (const update of updates) {
             if (previousSeen.has(update.id)) continue;
+            const id = `update:${update.id}`;
+            if (deleted.has(id)) continue;
             owned.push({
               id: `update:${update.id}`,
               type: "update",
@@ -133,6 +144,10 @@ export const useNotificationsStore = create<NotificationsState>()(
         set((state) => {
           const key = `badge:${badgeId}`;
           if (state.earnedBadgeKeys.includes(badgeId)) return state;
+          if (state.deletedIds.includes(key)) {
+            // Still record it as awarded so a deleted badge isn't revisited.
+            return { earnedBadgeKeys: [...state.earnedBadgeKeys, badgeId] };
+          }
           return {
             earnedBadgeKeys: [...state.earnedBadgeKeys, badgeId],
             notifications: upsert(state.notifications, {
@@ -150,14 +165,16 @@ export const useNotificationsStore = create<NotificationsState>()(
 
       mergeServer: (server) =>
         set((state) => {
-          const notifications = server.reduce(upsert, state.notifications);
+          const deleted = new Set(state.deletedIds);
+          const incoming = server.filter((n) => !deleted.has(n.id));
+          const notifications = incoming.reduce(upsert, state.notifications);
           if (notifications.length === state.notifications.length) {
             return state;
           }
           // Server-created notifications (e.g. feedback resolutions) are
           // already persisted, so don't round-trip them back on the next push.
           const backedUpIds = Array.from(
-            new Set([...state.backedUpIds, ...server.map((n) => n.id)])
+            new Set([...state.backedUpIds, ...incoming.map((n) => n.id)])
           );
           return { notifications, backedUpIds, lastUpdated: nowIso() };
         }),
@@ -167,12 +184,27 @@ export const useNotificationsStore = create<NotificationsState>()(
           backedUpIds: Array.from(new Set([...state.backedUpIds, ...ids])),
         })),
 
+      removeNotification: (id) =>
+        set((state) => {
+          const exists = state.notifications.some((n) => n.id === id);
+          if (!exists && state.deletedIds.includes(id)) return state;
+          return {
+            notifications: state.notifications.filter((n) => n.id !== id),
+            deletedIds: [...state.deletedIds, id],
+            // Pop it from the backup tracker so a later re-push can't resurrect
+            // it; the server row is removed by the caller via the API.
+            backedUpIds: state.backedUpIds.filter((backedId) => backedId !== id),
+            lastUpdated: nowIso(),
+          };
+        }),
+
       clearAll: () =>
         set({
           notifications: [],
           seenUpdateIds: [],
           earnedBadgeKeys: [],
           backedUpIds: [],
+          deletedIds: [],
           lastUpdated: null,
         }),
     }),
@@ -184,6 +216,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         seenUpdateIds: state.seenUpdateIds,
         earnedBadgeKeys: state.earnedBadgeKeys,
         backedUpIds: state.backedUpIds,
+        deletedIds: state.deletedIds,
         lastUpdated: state.lastUpdated,
       }),
       onRehydrateStorage: () => (state) => {
