@@ -29,8 +29,9 @@ are optional and exist purely to sync your progress across devices.
 
 ## What's inside
 
-- **93 lessons across two complete games** — a Coin Tycoon and a collection
-  game — covering real Roblox Studio workflows and Luau fundamentals.
+- **95 lessons across two complete games** — a Coin Tycoon and a collection
+  game — covering real Roblox Studio workflows, Luau fundamentals, and an
+  Advanced Studio section on ViewportFrames rendering and plugin development.
 - **Eight activity types** that make you write, predict, fix, and arrange real
   code: multiple choice, fill-in-the-blank, write-the-code, predict-the-output,
   fix-the-bug, arrange-the-code, run-the-code, and choose-your-build.

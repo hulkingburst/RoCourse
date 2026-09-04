@@ -64,6 +64,13 @@ export const courseSections: CourseSectionConfig[] = [
       "Assemble every system into one complete, publishable clicker game — then run the playtest that proves it works.",
     order: 7,
   },
+  {
+    id: "advanced-studio",
+    title: "Advanced Studio",
+    description:
+      "Go beyond scripting the game: render live 3D previews with ViewportFrames and build your own Roblox Studio plugins.",
+    order: 8,
+  },
 ];
 
 export const courseName = "RoCourse";

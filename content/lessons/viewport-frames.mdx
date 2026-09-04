@@ -1,0 +1,256 @@
+---
+slug: viewport-frames
+title: ViewportFrames — 3D previews in your GUI
+description: Render a real 3D Roblox model inside a GUI element with ViewportFrame and a Camera, so UI can show a live preview of a vehicle, item, or character.
+sectionId: advanced-studio
+order: 1
+difficulty: advanced
+estimatedMinutes: 8
+tags: [viewportframe, camera, gui, preview, 3d]
+objectives:
+  - Create a ViewportFrame inside a ScreenGui
+  - Build and configure a Camera
+  - Clone a 3D model into the ViewportFrame
+  - Point the camera so the model is visible and rotatable
+prerequisites: [guis, udim2, instances]
+keywords: [viewportframe, camera, currentcamera, worldtoviewport, clone, gui]
+---
+
+You know how a shop shows a spinning 3D preview of the car you're about to buy? That isn't a picture — it's a real Roblox model rendered live into a GUI rectangle called a **ViewportFrame**. It lets you show genuine 3D objects inside your interface instead of a flat image. This lesson gives your UI a window into the 3D world.
+
+<Step>
+
+## What a ViewportFrame is
+
+A **ViewportFrame** is a GUI element (a `GuiObject`, just like a Frame) that renders a **separate, miniature 3D scene** inside a rectangle on screen. Whatever models you put inside it get drawn as if a second camera were watching them — completely independent of the main game camera.
+
+```
+ScreenGui
+└── ViewportFrame   ← the rectangle (size + position, like any GUI)
+    └── Model       ← a clone of the thing to preview
+    └── Camera      ← the miniature camera that sees it
+```
+
+It's the difference between a shop that shows a *photo* of an item and a shop that shows the item itself — rotating, lit, and real.
+
+<Mcq
+  question="What does a ViewportFrame draw inside a GUI rectangle?"
+  options={[
+    "A flat image from a file",
+    "A live 3D scene of the models placed inside it",
+    "The main game camera's view, mirrored",
+    "A text label",
+  ]}
+  answer={1}
+  explanation="A ViewportFrame renders its own miniature 3D scene with its own camera — not a picture, and not the main camera."
+/>
+
+</Step>
+
+<Step>
+
+## When to use it
+
+Use a ViewportFrame anywhere a UI needs a **real 3D preview**:
+
+- A shop or loadout menu showing the exact vehicle, weapon, or skin the player is considering.
+- An inventory panel displaying each of your items as a 3D icon.
+- A character creator where the avatar reacts to the player's choices live.
+- A "here's what just spawned" toast that rotates the new drop.
+
+Reach for it when a static icon loses information (angle, shape, color) and a full 3D scene would be too heavy. It's GUI-sized 3D — lightweight enough to run inline in menus.
+
+<Note>
+ViewportFrames are lightweight, but every one renders an extra scene. For a long inventory list, prefer icons or only render the frames currently visible — not dozens at once.
+</Note>
+
+</Step>
+
+<Step>
+
+## Build the frame, add a camera
+
+First, lay down the rectangle (like any GUI element — see the GUIs lesson):
+
+```luau
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+local viewport = Instance.new("ViewportFrame")
+viewport.Size = UDim2.new(0, 200, 0, 150)
+viewport.Position = UDim2.new(0.5, 0, 0.4, 0)
+viewport.AnchorPoint = Vector2.new(0.5, 0.5)
+viewport.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+viewport.Parent = screenGui
+```
+
+Now the second piece: a **Camera**. A Camera is what "sees" inside the frame. Create one, parent it to the ViewportFrame, and give it a field of view (in degrees):
+
+```luau
+local camera = Instance.new("Camera")
+camera.Parent = viewport
+camera.FieldOfView = 50
+```
+
+<FillBlank
+  prompt="A ViewportFrame renders its scene through a ____ object parented inside it."
+  answer="Camera"
+  explanation="The Camera parented to the ViewportFrame defines what the miniature scene sees (position, angle, FOV)."
+/>
+
+</Step>
+
+<Step>
+
+## Clone the model in
+
+A ViewportFrame doesn't share your Workspace — it's a **separate scene**. So you don't use the real model; you **clone** it and parent the clone inside the frame:
+
+```luau
+local garage = workspace.Garage
+local car = garage:FindFirstChild("SportsCar")   -- the model to preview
+local preview = car:Clone()
+preview.Parent = viewport
+```
+
+Cloning keeps the real car untouched — the player isn't driving the preview, they're looking at a copy. If the model has internal references, sometimes you need the clone's ImmediateParent set too; the simplest path is cloning straight into the frame as shown.
+
+<Warning>
+The model you clone must live in a place your script can see (Workspace or ReplicatedStorage). A ViewportFrame is a client-side GUI, so this preview code belongs in a **LocalScript**.
+</Warning>
+
+<WriteCode
+  instruction="Your game has a 'Potion' model in ReplicatedStorage. Write the two lines that copy it into the viewport frame."
+  answer={["local potion = ReplicatedStorage.Potion:Clone()", "potion.Parent = viewport"]}
+  starterCode="local ReplicatedStorage = game:GetService(&quot;ReplicatedStorage&quot;)\n-- copy the potion model into the viewport"
+  explanation="Clone the model, then parent the clone inside the ViewportFrame so its miniature camera can see it."
+/>
+
+</Step>
+
+<Step>
+
+## Point the camera at it
+
+Cloning the model isn't enough — the camera needs to actually *see* it. Set the camera to the frame's camera, place it a little off to the side, and aim its focus at the model's center:
+
+```luau
+viewport.CurrentCamera = camera
+camera.CFrame = CFrame.lookAt(Vector3.new(3, 1.5, 4), Vector3.new(0, 0, 0))
+```
+
+- `viewport.CurrentCamera = camera` — tells the frame which camera to render through.
+- `CFrame.lookAt(eye, target)` — positions the camera at `eye` and points it at `target`. Here it backs the camera off to the side and looks at the origin, where the cloned model sits.
+
+If the model isn't centered at the origin, aim at its actual center instead:
+
+```luau
+local center = preview:GetBoundingBox().Position
+camera.CFrame = CFrame.lookAt(center + Vector3.new(3, 1.5, 4), center)
+```
+
+`GetBoundingBox()` returns a box that encloses the whole model, so `center` is always its true middle — no more guessing.
+
+<Mcq
+  question="What does viewport.CurrentCamera = camera actually do?"
+  options={[
+    "Moves the main game camera into the viewport",
+    "Tells the ViewportFrame which camera renders its scene",
+    "Deletes the old camera",
+    "Copies the workspace into the frame",
+  ]}
+  answer={1}
+  explanation="CurrentCamera assigns the miniature camera that draws the frame's 3D content."
+/>
+
+</Step>
+
+<Step>
+
+## Make it rotate
+
+A static preview is okay; a rotating one sells it. Rotate just the model (not the camera) each frame so it spins in place:
+
+```luau
+local heart = workspace.Chest:FindFirstChild("HeartGem")
+local preview = heart:Clone()
+preview.Parent = viewport
+
+game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
+    preview:SetPrimaryPartCFrame(preview:GetPivot() * CFrame.Angles(0, deltaTime, 0))
+end)
+```
+
+`SetPrimaryPartCFrame` positions the model's primary part — rotating it by the small per-frame `deltaTime` angle gives a smooth, constant spin no matter the frame rate. Rotating the model (not the camera) keeps the lighting and framing consistent.
+
+<Note>
+`GetPivot()` returns the model's current position and rotation; multiplying by `CFrame.Angles(0, deltaTime, 0)` adds a tiny yaw each frame. Swap the middle value for a different rotation axis, or remove this entirely for a static preview.
+</Note>
+
+<WriteCode
+  instruction="Each frame, spin a preview model around the vertical axis by deltaTime. Write the SetPrimaryPartCFrame line."
+  answer={["preview:SetPrimaryPartCFrame(preview:GetPivot() * CFrame.Angles(0, deltaTime, 0))"]}
+  starterCode="game:GetService(&quot;RunService&quot;).Heartbeat:Connect(function(deltaTime)\n    -- rotate the preview around Y by deltaTime\nend)"
+  explanation="GetPivot() gives the current pose; multiply by CFrame.Angles(0, deltaTime, 0) to add a small yaw each frame."
+/>
+
+</Step>
+
+<Step>
+
+## A practical example: the shop preview
+
+Tie it together — a shop card that shows a live, rotating preview of the selected vehicle:
+
+```luau
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+local viewport = Instance.new("ViewportFrame")
+viewport.Size = UDim2.new(0, 240, 0, 160)
+viewport.Position = UDim2.new(0.5, 0, 0.35, 0)
+viewport.AnchorPoint = Vector2.new(0.5, 0.5)
+viewport.BackgroundColor3 = Color3.fromRGB(24, 26, 32)
+viewport.Parent = screenGui
+
+local camera = Instance.new("Camera")
+camera.Parent = viewport
+camera.FieldOfView = 50
+viewport.CurrentCamera = camera
+
+local preview = ReplicatedStorage.Shop.SportsCar:Clone()
+preview.Parent = viewport
+local center = preview:GetBoundingBox().Position
+camera.CFrame = CFrame.lookAt(center + Vector3.new(3, 1.5, 4), center)
+
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    preview:SetPrimaryPartCFrame(preview:GetPivot() * CFrame.Angles(0, dt, 0))
+end)
+```
+
+From frame → camera → clone → focus → spin, this is the whole ViewportFrame recipe in one place.
+
+<Challenge title="Try it">
+Add a "Buy" button under the viewport. When clicked, have it hide the preview and show a confirmation label — the classic shop flow wrapped around your new 3D window.
+</Challenge>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Using the real model instead of a clone.** Editing or moving the preview would affect the actual game object. Always clone what you preview.
+- **Forgetting `CurrentCamera`.** A frame is blank until you assign a Camera with `viewport.CurrentCamera = camera`.
+- **Camera aimed at the origin when the model isn't there.** Use `GetBoundingBox().Position` so you always aim at the model's true center.
+- **Spinning the camera, not the model.** Rotating the model keeps lighting and composition stable; spinning the camera fights the view you set up.
+- **Too many ViewportFrames.** Each one renders a separate scene — a long list with a frame per row will tank performance on mobile. Show a few, or only the visible ones.
+- **Building the preview on the server.** GUI lives on the client — write this in a LocalScript inside `player.PlayerGui`.
+
+Next: turning repetitive Studio tasks into one-button tools with **plugins**.
+
+</Step>

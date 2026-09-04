@@ -1,0 +1,258 @@
+---
+slug: plugin-basics
+title: Plugin Basics — tools that build for you
+description: Automate repetitive Roblox Studio tasks by writing your own plugins — toolbars, buttons, the Plugin API, and how to keep them safe.
+sectionId: advanced-studio
+order: 2
+difficulty: advanced
+estimatedMinutes: 8
+tags: [plugin, toolbar, studio, automation, pluginapi]
+objectives:
+  - Explain what a Studio plugin is and when to use one
+  - Create a toolbar and toolbar button
+  - Respond to button clicks with the Plugin API
+  - Automate a repetitive task and manage plugins safely
+prerequisites: [modules, studio-features]
+keywords: [plugin, pluginapi, toolbar, createbutton, pluginaction, studio, automation]
+---
+
+You've learned to script the *game*. Now script the **editor itself**. If you've ever manually renamed fifty parts, or re-colored every wall, or rebuilt the same spawn platform twenty times — a **plugin** does that for you with one click. Plugins are the power tools of Roblox Studio, and this lesson shows you how to make your own.
+
+<Step>
+
+## What a plugin is
+
+A **plugin** is a script (almost always with a GUI) that runs **inside Roblox Studio** to customize or automate the editor — it is *not* a game script. Players never see it; it's a tool for the developer.
+
+When are plugins useful?
+
+- **Repetitive edits**: rename, recolor, or re-arrange many objects in one go.
+- **Custom workflows**: a one-click "build spawn platform" or "landscape this terrain" button.
+- **Quality-of-life**: quick scene checks, auto-naming, model exporters.
+- **Team tools**: enforce a consistent setup across a whole build.
+
+If it's mindless, repeated, and rule-based, a plugin can likely do it — that's the tell.
+
+<Mcq
+  question="Where does a Roblox Studio plugin run?"
+  options={[
+    "Inside the published game, for players",
+    "Inside the Roblox Studio editor, for the developer",
+    "On the Roblox website",
+    "On the game's server",
+  ]}
+  answer={1}
+  explanation="A plugin is developer tooling that runs in the Studio editor — players never see it."
+/>
+
+</Step>
+
+<Step>
+
+## The toolbar and button
+
+Plugins present themselves through the Studio interface as a **toolbar** (a row of buttons) with one or more **buttons**. This is the plugin's face:
+
+```
+Toolbar: "My Tools"
+└── Button: "Build Platform"   ← click it → your code runs
+```
+
+Create a **Script** under a `Plugin` object in the Studio tree — Studio recognizes it as a plugin. In that script, grab the `Plugin` with `plugin`, then make a toolbar and a button:
+
+```luau
+local toolbar = plugin:CreateToolbar("My Tools")
+local button = toolbar:CreateButton("Build Platform", "Click to build a platform", "rbxassetid://1234567890")
+```
+
+`CreateToolbar(name)` makes the row. `CreateButton(name, tooltip, icon)` adds a clickable button — the tooltip shows on hover, the icon is an image of your choice.
+
+<FillBlank
+  prompt="A plugin shows its tools as a row of clickable ____ in the Studio interface."
+  answer="buttons"
+  explanation="CreateToolbar makes the row, and CreateButton (with an optional icon and tooltip) adds each clickable tool."
+/>
+
+</Step>
+
+<Step>
+
+## Respond to the click
+
+A button alone does nothing. Connect its `Clicked` event to the work you want done:
+
+```luau
+local toolbar = plugin:CreateToolbar("My Tools")
+local button = toolbar:CreateButton("Build Platform", "Builds a platform", "")
+
+local function buildPlatform()
+    local part = Instance.new("Part")
+    part.Size = Vector3.new(20, 1, 20)
+    part.Position = Vector3.new(0, 0, 0)
+    part.Anchored = true
+    part.Parent = workspace
+end
+
+button.Clicked:Connect(buildPlatform)
+```
+
+Every click runs `buildPlatform` — instant platform. This is the whole plugin pattern: **create a button, connect Clicked, run your automation.**
+
+<WriteCode
+  instruction="A plugin button should print a message when clicked. Write the line that connects the button's Clicked event to a 'hello' function."
+  answer={["button.Clicked:Connect(hello)"]}
+  starterCode="local function hello()\n    print(&quot;Hello from my plugin!&quot;)\nend\n\n-- wire the button's click to hello"
+  explanation="button.Clicked:Connect(hello) runs the hello function every time the button is clicked."
+/>
+
+</Step>
+
+<Step>
+
+## Automating a real task
+
+The payoff: a plugin that names every selected part with a prefix — the kind of mindless cleanup you'd otherwise do by hand for an hour.
+
+```luau
+local toolbar = plugin:CreateToolbar("Scene Tools")
+local rename = toolbar:CreateButton("Prefix Selection", "Prefix selected parts", "")
+
+local function prefixSelection()
+    local selection = game:GetService("Selection"):Get()
+    for _, object in ipairs(selection) do
+        if object:IsA("BasePart") then
+            object.Name = "Stage_" .. object.Name
+        end
+    end
+end
+
+rename.Clicked:Connect(prefixSelection)
+```
+
+`Selection:Get()` returns what's selected in the editor, `IsA("BasePart")` targets only parts, and a simple `..` blows away the repetition of renaming each one.
+
+<Note>
+Because `Selection` comes from a service that only exists *inside the editor*, this code can't run as a normal game script — it has to be a plugin. That's the cleanest sign you're writing plugin territory.
+</Note>
+
+<WriteCode
+  instruction="The plugin should only rename objects that are BaseParts. Write the if-line that checks an object is a BasePart."
+  answer={["if object:IsA(\"BasePart\") then"]}
+  starterCode="for _, object in ipairs(selection) do\n    -- only handle objects that are BaseParts\nend"
+  explanation="IsA(&quot;BasePart&quot;) returns true only for parts, so the loop skips anything that isn't one."
+/>
+
+</Step>
+
+<Step>
+
+## A little plugin UI
+
+For more than one button, plugins can show **PluginGui** windows (like `DockWidgetPluginGui`) — a custom panel docked in the Studio layout. A simple pattern is to fill it from a `PluginGui` with a `Frame`:
+
+```luau
+local widget = plugin:CreateDockWidgetPluginGui(
+    "PrefixPanel",
+    DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Bottom, false, false, 200, 100)
+)
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.Parent = widget
+
+local label = Instance.new("TextLabel")
+label.Text = "Select parts, then click Prefix in my toolbar."
+label.Size = UDim2.new(1, 0, 1, 0)
+label.Parent = frame
+```
+
+`DockWidgetPluginGuiInfo.new(...)` controls where the window docks and its size. Everything inside is just the GUI pattern you already know — frames, labels, buttons. The toolbar button and the dock window are two sides of the same plugin.
+
+<Note>
+Start with a single toolbar button — most automations need nothing more. Reach for a dock window only when you need settings, text input, or multiple options.
+</Note>
+
+</Step>
+
+<Step>
+
+## Security and testing
+
+Plugins have power, so treat them with care.
+
+**Safety considerations**
+- **Trust before installing.** Any plugin you install can run arbitrary code on your machine's Studio — only install from the official Roblox **Creator Hub** and from creators you trust.
+- **Code review.** Read a plugin's scripts before you depend on it. It's just code — same skills as this course.
+- **Sandbox limits.** Studio runs plugins in a sandbox, but they can still do a lot (rename, delete, move). Never run an unknown plugin blindly.
+
+**Test and manage**
+- **Run it live**: click your toolbar button in Studio and watch the result — the fastest feedback there is.
+- **Back up first**: test destructive plugins (deletes, mass renames) on a throwaway copy of your place.
+- **Manage plugins**: the **Plugins** panel (Plugin Manager in the View tab) lists installed plugins, lets you toggle them on/off, and uninstall ones you no longer need.
+
+<Warning>
+Mass operations (renaming or deleting everything) are exactly where a bug becomes a disaster. Test on a scratch copy — and know that the Edit menu's Undo (Ctrl+Z) is your best friend while a plugin is in development.
+</Warning>
+
+<Mcq
+  question="Before installing and running a plugin from the internet, you should…"
+  options={[
+    "Trust it because anyone can upload plugins",
+    "Install it from the official Creator Hub and skim its scripts",
+    "Never install any plugin, ever",
+    "Only use plugins that cost Robux",
+  ]}
+  answer={1}
+  explanation="Install from the official Creator Hub and review a plugin's code before giving it access to your projects."
+/>
+
+</Step>
+
+<Step>
+
+## A practical example: the scene cleaner
+
+A complete plugin that removes every empty Folder in the Workspace — one click, instant cleanup:
+
+```luau
+-- Get the workspace
+local dataModel = game
+
+local toolbar = plugin:CreateToolbar("Clean Up")
+local clean = toolbar:CreateButton("Remove Empty Folders", "Deletes folders with no children", "")
+
+local function removeEmptyFolders()
+    local deleted = 0
+    for _, descendant in ipairs(dataModel.Workspace:GetDescendants()) do
+        if descendant:IsA("Folder") and #descendant:GetChildren() == 0 then
+            descendant:Destroy()
+            deleted += 1
+        end
+    end
+    print("Removed", deleted, "empty folder(s).")
+end
+
+clean.Clicked:Connect(removeEmptyFolders)
+```
+
+One click, and every empty `Folder` is gone — a tiny taste of the automation plugins unlock.
+
+<Challenge title="Try it">
+Extend the cleaner to also remove empty `Model`s (no children and no parts). Save it as a plugin and test it on a scratch place.
+</Challenge>
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Writing plugin code as a game script.** Editor-only services like `Selection` and `plugin` don't exist in the game. Put the code in a plugin Script in Studio.
+- **Forgetting to connect `Clicked`.** A button renders but does nothing until you call `button.Clicked:Connect(...)`.
+- **Gone wrong on a big selection.** Mass changes are irreversible-ish — test on a copy and lean on Undo.
+- **Ignoring `IsA` checks.** A loop over a selection that assumes everything is a part will crash the moment a Folder or Model is selected.
+- **Installing untrusted plugins.** The power that makes plugins useful is exactly why you should only run code you've seen.
+
+That closes **Advanced Studio** — from 3D previews to one-click automation. Next: what to build on top of everything you've learned.
+
+</Step>
