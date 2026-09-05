@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isValidWeekKey, weekKey } from "@/lib/xp";
+import { moderateName } from "@/lib/profanity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,7 +57,9 @@ export async function GET(request: Request) {
     week,
     rows: rows.map((row) => ({
       id: row.id,
-      name: row.name,
+      // Names are re-checked on every read so rows written before moderation
+      // (or from any future bypass) can never surface a banned word.
+      name: moderateName(row.name),
       xp: row.xp,
       handle: row.user?.handle ?? null,
       guestId: row.guestId,

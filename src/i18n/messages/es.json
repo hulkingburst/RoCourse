@@ -2103,6 +2103,7 @@
     "guestNameLabel": "Únete a la clasificación",
     "guestNameHint": "Elige un nombre y tu XP se publicará de forma anónima bajo él. Puedes cambiarlo cuando quieras.",
     "guestNamePlaceholder": "p. ej. LuauRookie",
+    "guestNameBanned": "Ese nombre no está permitido. Elige otro.",
     "saveName": "Guardar nombre",
     "playingAs": "Jugando como",
     "editName": "Editar nombre"

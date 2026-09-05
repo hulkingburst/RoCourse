@@ -2103,6 +2103,7 @@
     "guestNameLabel": "Join the leaderboard",
     "guestNameHint": "Pick a name and your XP will be posted anonymously under it. You can change it anytime.",
     "guestNamePlaceholder": "e.g. LuauRookie",
+    "guestNameBanned": "That name isn't allowed. Please pick another one.",
     "saveName": "Save name",
     "playingAs": "Playing as",
     "editName": "Edit name"

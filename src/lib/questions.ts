@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { moderateName } from "@/lib/profanity";
 
 export const QUESTION_TITLE_MIN = 5;
 export const QUESTION_TITLE_MAX = 120;
@@ -36,7 +37,7 @@ export interface QuestionDetail extends QuestionListItem {
 }
 
 function authorOf(user: { name: string; handle: string | null }): QuestionAuthor {
-  return { name: user.name, handle: user.handle };
+  return { name: moderateName(user.name), handle: user.handle };
 }
 
 export function serializeQuestionListItem(

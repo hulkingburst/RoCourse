@@ -3,6 +3,7 @@ import { trustedIp } from "@/lib/auth-limiter";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import { isValidWeekKey, MAX_WEEKLY_XP, weekKey } from "@/lib/xp";
+import { moderateGuestName } from "@/lib/profanity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -73,10 +74,15 @@ export async function POST(request: Request) {
   if (typeof record.guestId !== "string" || !GUEST_ID_RE.test(record.guestId)) {
     return NextResponse.json({ error: "Invalid guest id" }, { status: 400 });
   }
-  const name = cleanName(record.name);
-  if (!name) {
+  const rawName = cleanName(record.name);
+  if (!rawName) {
     return NextResponse.json({ error: "Invalid name" }, { status: 400 });
   }
+  // Slurs and profanity never reach the board: the bad name is swapped for a
+  // stable anonymous one instead of rejecting the XP post outright, so a
+  // name that was already saved in a guest's browser still shows under a
+  // neutral label (the row is matched by guestId, not by name).
+  const name = moderateGuestName(rawName, record.guestId);
   if (typeof record.week !== "string" || !isValidWeekKey(record.week)) {
     return NextResponse.json({ error: "Invalid week" }, { status: 400 });
   }

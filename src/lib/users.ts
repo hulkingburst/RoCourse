@@ -3,6 +3,7 @@ import { countLessons } from "@/lib/lessons";
 import { extractBadgeStats, type BadgeStats } from "@/lib/badges";
 import { getWeeklyFirstCount } from "@/lib/weekly-first";
 import { MAX_LIFETIME_XP } from "@/lib/xp";
+import { moderateName } from "@/lib/profanity";
 
 /** Public stats that are safe to show about any user, derived from the JSON
  * progress blob. Never includes email or any identifying detail. */
@@ -186,7 +187,7 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
 
   return {
     handle: user.handle ?? handle,
-    name: user.name,
+    name: moderateName(user.name),
     createdAt: user.createdAt.toISOString(),
     totalLessons,
     stats: extractPublicStats(user.progress?.data),
@@ -216,7 +217,7 @@ export async function getLearnerShowcase(): Promise<ShowcaseEntry[]> {
 
   return completions.map((completion) => ({
     handle: completion.user.handle as string,
-    name: completion.user.name,
+    name: moderateName(completion.user.name),
     completedAt: completion.completedAt.toISOString(),
     courseTitle: completion.title,
     project: extractPublicStats(completion.user.progress?.data).finishedPath,

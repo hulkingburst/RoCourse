@@ -16,6 +16,7 @@ import { Link } from "@/i18n/navigation";
 import { useGuestStore } from "@/lib/guest-store";
 import { useProgressStore } from "@/lib/progress-store";
 import { weekKey } from "@/lib/xp";
+import { containsBadWord } from "@/lib/profanity";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +52,7 @@ export function LeaderboardClient() {
   const [retry, setRetry] = React.useState(0);
   const [nameInput, setNameInput] = React.useState(guestName);
   const [editing, setEditing] = React.useState(!guestName);
+  const [nameError, setNameError] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -82,6 +84,11 @@ export function LeaderboardClient() {
   const saveName = () => {
     const name = nameInput.trim();
     if (!name) return;
+    if (containsBadWord(name)) {
+      setNameError(true);
+      return;
+    }
+    setNameError(false);
     setName(name);
     setEditing(false);
   };
@@ -205,7 +212,10 @@ export function LeaderboardClient() {
             <div className="mt-3 flex gap-2">
               <Input
                 value={nameInput}
-                onChange={(event) => setNameInput(event.target.value)}
+                onChange={(event) => {
+                  setNameInput(event.target.value);
+                  setNameError(false);
+                }}
                 placeholder={t("guestNamePlaceholder")}
                 maxLength={24}
                 className="max-w-xs"
@@ -231,6 +241,9 @@ export function LeaderboardClient() {
                 {t("editName")}
               </Button>
             </div>
+          )}
+          {nameError && (
+            <p className="mt-2 text-sm text-destructive">{t("guestNameBanned")}</p>
           )}
         </section>
       )}

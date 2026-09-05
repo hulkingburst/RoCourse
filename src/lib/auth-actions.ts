@@ -11,6 +11,7 @@ import {
   trustedIp,
 } from "@/lib/auth-limiter";
 import { generateUniqueHandle } from "@/lib/users";
+import { containsBadWord } from "@/lib/profanity";
 
 export interface CreateAccountResult {
   error?: string;
@@ -50,6 +51,9 @@ export async function createAccount(
   }
   if (name.length > 40) {
     return { error: "Name must be 40 characters or fewer." };
+  }
+  if (containsBadWord(name)) {
+    return { error: "That name isn't allowed. Please choose another." };
   }
   if (!EMAIL_RE.test(email)) {
     return { error: "Enter a valid email address." };

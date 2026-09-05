@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { validateAnswerInput } from "@/lib/questions";
+import { moderateName } from "@/lib/profanity";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -82,7 +83,7 @@ export async function POST(
         id: answer.id,
         body: answer.body,
         createdAt: answer.createdAt.toISOString(),
-        author: { name: answer.author.name, handle: answer.author.handle },
+        author: { name: moderateName(answer.author.name), handle: answer.author.handle },
       },
     },
     { status: 201 }
