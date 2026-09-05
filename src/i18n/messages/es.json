@@ -1934,6 +1934,10 @@
     "dataHint": "Todo lo que has avanzado vive aquí.",
     "dataDescription": "Descarga una copia de tu progreso en JSON — lecciones, marcadores, XP, rachas y tu lista de repaso. Se queda en tu dispositivo; no se envía nada a ningún sitio.",
     "dataExportButton": "Descargar mi progreso",
+    "dataImportButton": "Importar progreso",
+    "dataImportConfirm": "¿Importar progreso? Esto reemplaza tu progreso actual en este dispositivo con la copia de seguridad.",
+    "dataImportSuccess": "Progreso importado.",
+    "dataImportError": "No se pudo leer ese archivo como una copia de progreso.",
     "comingSoon": "Próximamente llegarán más ajustes."
   },
   "review": {

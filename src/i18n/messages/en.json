@@ -1934,6 +1934,10 @@
     "dataHint": "Everything about how far you've come lives here.",
     "dataDescription": "Download a JSON backup of your progress — lessons, bookmarks, XP, streaks, and your review list. It stays on your device; nothing is sent anywhere.",
     "dataExportButton": "Download my progress",
+    "dataImportButton": "Import progress",
+    "dataImportConfirm": "Import progress? This replaces your current progress on this device with the backup.",
+    "dataImportSuccess": "Progress imported.",
+    "dataImportError": "Couldn't read that file as a progress backup.",
     "comingSoon": "More settings are coming soon."
   },
   "review": {

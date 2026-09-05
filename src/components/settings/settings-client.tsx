@@ -1,12 +1,18 @@
 "use client";
 
+import * as React from "react";
 import { useTranslations } from "next-intl";
-import { Download, Languages, Palette, Sparkles } from "lucide-react";
+import { Download, Languages, Palette, Sparkles, Upload } from "lucide-react";
 
 import { ThemePicker } from "@/components/settings/theme-picker";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { buildProgressExport, progressExportFilename } from "@/lib/export";
+import {
+  applyImportedProgress,
+  buildProgressExport,
+  parseProgressImport,
+  progressExportFilename,
+} from "@/lib/export";
 
 function downloadProgressExport() {
   const payload = buildProgressExport();
@@ -26,6 +32,31 @@ function downloadProgressExport() {
 export function SettingsClient() {
   const t = useTranslations("settings");
   const lang = useTranslations("language");
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [importStatus, setImportStatus] = React.useState<"idle" | "ok" | "error">("idle");
+
+  const handleImportFile = React.useCallback(
+    (file: File) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const raw = typeof reader.result === "string" ? reader.result : "";
+        const result = parseProgressImport(raw);
+        if (!result.ok) {
+          setImportStatus("error");
+          return;
+        }
+        if (window.confirm(t("dataImportConfirm"))) {
+          applyImportedProgress(result.progress);
+          setImportStatus("ok");
+        } else {
+          setImportStatus("idle");
+        }
+      };
+      reader.onerror = () => setImportStatus("error");
+      reader.readAsText(file);
+    },
+    [t]
+  );
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-6 py-10">
@@ -70,9 +101,9 @@ export function SettingsClient() {
           </CardTitle>
           <CardDescription>{t("dataHint")}</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-2">
+        <CardContent className="flex flex-col gap-3">
           <span className="text-sm text-muted-foreground">{t("dataDescription")}</span>
-          <div>
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={downloadProgressExport}
@@ -81,7 +112,34 @@ export function SettingsClient() {
               <Download className="h-4 w-4" />
               {t("dataExportButton")}
             </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors hover:bg-accent"
+            >
+              <Upload className="h-4 w-4" />
+              {t("dataImportButton")}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) handleImportFile(file);
+                event.target.value = "";
+              }}
+            />
           </div>
+          {importStatus !== "idle" && (
+            <p
+              aria-live="polite"
+              className={`text-sm font-medium ${importStatus === "ok" ? "text-success" : "text-destructive"}`}
+            >
+              {importStatus === "ok" ? t("dataImportSuccess") : t("dataImportError")}
+            </p>
+          )}
         </CardContent>
       </Card>
 
