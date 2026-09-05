@@ -116,6 +116,7 @@ function emptySnapshot(): ProgressSnapshot {
     lastStreakDate: null,
     xp: 0,
     weeklyXp: {},
+    missedSteps: {},
     lastUpdated: null,
   };
 }

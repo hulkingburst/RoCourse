@@ -29,6 +29,7 @@ export function getSnapshot(): ProgressSnapshot {
     lastStreakDate: state.lastStreakDate,
     xp: state.xp,
     weeklyXp: state.weeklyXp,
+    missedSteps: state.missedSteps,
     lastUpdated: state.lastUpdated,
   };
 }
@@ -93,6 +94,7 @@ export function applySnapshot(
     lastStreakDate: clean.lastStreakDate,
     xp: clean.xp,
     weeklyXp: clean.weeklyXp,
+    missedSteps: clean.missedSteps,
     lastUpdated: lastUpdated ?? clean.lastUpdated,
   });
 }
@@ -213,6 +215,9 @@ export function mergeSnapshots(
     // never be lost. Same per week, so each weekly bucket keeps its peak.
     xp: Math.max(cloud.xp, local.xp),
     weeklyXp: maxWeeklyXp(cloud.weeklyXp, local.weeklyXp),
+    // Review ledgers union across devices: a step stays queued for review
+    // until it has been solved again on every device that still had it.
+    missedSteps: unionMissedSteps(cloud.missedSteps, local.missedSteps),
     lastUpdated: cloud.lastUpdated,
   };
 }
@@ -239,6 +244,21 @@ function unionStrings(...arrays: string[][]): string[] {
         seen.add(item);
         out.push(item);
       }
+    }
+  }
+  return out;
+}
+
+function unionMissedSteps(
+  ...maps: (Record<string, number[]> | undefined)[]
+): Record<string, number[]> {
+  const out: Record<string, number[]> = {};
+  for (const map of maps) {
+    if (!map) continue;
+    for (const [slug, steps] of Object.entries(map)) {
+      const merged = new Set(out[slug] ?? []);
+      for (const step of steps) merged.add(step);
+      out[slug] = [...merged].sort((a, b) => a - b);
     }
   }
   return out;

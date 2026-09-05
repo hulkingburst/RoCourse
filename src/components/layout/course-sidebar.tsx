@@ -11,6 +11,7 @@ import {
   ChevronDown,
   Circle,
   Gamepad2,
+  History,
   ListChecks,
   LockKeyhole,
   MessageCircleQuestion,
@@ -303,6 +304,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
                 <Link href="/quiz/drills">
                   <Timer className="h-3.5 w-3.5" />
                   {t("drills")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/review">
+                  <History className="h-3.5 w-3.5" />
+                  {t("reviewMissed")}
                 </Link>
               </Button>
               <Button

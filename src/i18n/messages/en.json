@@ -45,7 +45,8 @@
     "resetConfirm": "Reset all progress? This cannot be undone.",
     "star": "Star",
     "starOnGithub": "Leave a star on GitHub",
-    "settings": "Settings"
+    "settings": "Settings",
+    "reviewMissed": "Review missed"
   },
   "footer": {
     "about": "{courseName} — a hands-on course for building your first Roblox games.",
@@ -1929,7 +1930,22 @@
     "themeLabel": "Theme",
     "languageLabel": "Language",
     "languageHint": "Choose the language used across the site.",
+    "dataTitle": "Data & progress",
+    "dataHint": "Everything about how far you've come lives here.",
+    "dataDescription": "Download a JSON backup of your progress — lessons, bookmarks, XP, streaks, and your review list. It stays on your device; nothing is sent anywhere.",
+    "dataExportButton": "Download my progress",
     "comingSoon": "More settings are coming soon."
+  },
+  "review": {
+    "title": "Review missed",
+    "subtitle": "Re-answer the activities you got wrong to lock them in.",
+    "count": "{count, plural, one {# missed activity} other {# missed activities}}",
+    "lessonCount": "{count, plural, one {# missed activity} other {# missed activities}} in this lesson",
+    "stepLabel": "Activity {step}",
+    "emptyTitle": "All caught up",
+    "emptyBody": "You have no missed activities right now — nice work!",
+    "allCaughtUpLesson": "You've solved every missed activity in this lesson.",
+    "backToList": "Back to review list"
   },
   "userProfile": {
     "notFoundTitle": "Learner not found",

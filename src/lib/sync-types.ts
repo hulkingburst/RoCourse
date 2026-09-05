@@ -32,6 +32,12 @@ export interface ProgressSnapshot {
   xp: number;
   /** Local Monday-week key (YYYY-MM-DD) → XP gained that week. */
   weeklyXp: Record<string, number>;
+  /**
+   * Lesson slug → step indices (within that lesson's `<Step>` list) answered
+   * incorrectly at least once and not yet solved again. The review surface
+   * re-renders exactly those steps so nothing else needs to be duplicated.
+   */
+  missedSteps: Record<string, number[]>;
   lastUpdated: string | null;
 }
 
@@ -61,3 +67,22 @@ export interface CloudState {
 
 /** Cloud is considered "newer" only when it exceeds this tolerance in ms. */
 export const CONFLICT_TOLERANCE_MS = 5000;
+
+/**
+ * Version of the exported progress file. Bump only when the export shape
+ * changes in a way a future importer must branch on.
+ */
+export const PROGRESS_SCHEMA_VERSION = 1;
+
+/**
+ * The learner-owned progress file produced by the "Download my progress"
+ * action. Deliberately a superset of the synced snapshot plus a version and
+ * export timestamp — and nothing else: no email, handle, password, or private
+ * account data ever reaches it.
+ */
+export interface ProgressExport {
+  schemaVersion: number;
+  exportedAt: string;
+  progress: ProgressSnapshot;
+  completions: CompletionRecord[];
+}

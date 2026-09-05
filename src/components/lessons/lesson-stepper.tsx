@@ -55,6 +55,7 @@ export function LessonStepper({
   const bookmarks = useProgressStore((state) => state.bookmarks);
   const recordView = useProgressStore((state) => state.recordView);
   const recordActivityResult = useProgressStore((state) => state.recordActivityResult);
+  const updateMissedStep = useProgressStore((state) => state.updateMissedStep);
   const markLessonComplete = useProgressStore((state) => state.markLessonComplete);
   const toggleBookmark = useProgressStore((state) => state.toggleBookmark);
   const finishedPath = useProgressStore((state) => state.finishedPath);
@@ -86,11 +87,14 @@ export function LessonStepper({
   const onResult = React.useCallback(
     (correct: boolean, firstTry?: boolean) => {
       recordActivityResult(slug, correct, correct && firstTry ? String(active) : null);
+      // Keep the review ledger in sync: a wrong answer queues this step,
+      // a correct answer resolves it.
+      updateMissedStep(slug, active, correct);
       if (correct) {
         setSolvedSteps((current) => ({ ...current, [active]: true }));
       }
     },
-    [slug, recordActivityResult, active]
+    [slug, recordActivityResult, updateMissedStep, active]
   );
 
   const goTo = (index: number) => {

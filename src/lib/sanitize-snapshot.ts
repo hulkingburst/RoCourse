@@ -43,6 +43,7 @@ export function sanitizeSnapshot(
     lastStreakDate: sanitizeDayKey(snapshot?.lastStreakDate),
     xp: Math.min(MAX_LIFETIME_XP, sanitizeCount(snapshot?.xp)),
     weeklyXp: sanitizeWeeklyXp(snapshot?.weeklyXp),
+    missedSteps: sanitizeMissedSteps(snapshot?.missedSteps),
     lastUpdated:
       typeof snapshot?.lastUpdated === "string" ? snapshot.lastUpdated : null,
   };
@@ -108,4 +109,39 @@ function sanitizeStringArray(value: unknown): string[] {
 
 function sanitizeFinishedPath(value: unknown): FinishedPath | null {
   return value === "tycoon" || value === "collector" ? value : null;
+}
+
+const MAX_MISSED_STEPS_PER_LESSON = 50;
+const MAX_LESSONS_WITH_MISSES = 200;
+
+/**
+ * Coerces the review ledger: valid step indices (non-negative ints), deduped,
+ * sorted, and capped per lesson and in total so it can never grow unbounded.
+ */
+function sanitizeMissedSteps(
+  value: unknown
+): Record<string, number[]> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const out: Record<string, number[]> = {};
+  const slugs = Object.keys(value)
+    .filter((slug) => typeof slug === "string" && slug.length > 0 && slug.length <= 200)
+    .slice(0, MAX_LESSONS_WITH_MISSES);
+  for (const slug of slugs) {
+    const raw = (value as Record<string, unknown>)[slug];
+    if (!Array.isArray(raw)) continue;
+    const steps = new Set<number>();
+    for (const step of raw) {
+      if (
+        typeof step === "number" &&
+        Number.isFinite(step) &&
+        step >= 0 &&
+        step < MAX_MISSED_STEPS_PER_LESSON
+      ) {
+        steps.add(Math.floor(step));
+      }
+    }
+    const sorted = [...steps].sort((a, b) => a - b);
+    if (sorted.length > 0) out[slug] = sorted;
+  }
+  return out;
 }

@@ -1,11 +1,27 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Languages, Palette, Sparkles } from "lucide-react";
+import { Download, Languages, Palette, Sparkles } from "lucide-react";
 
 import { ThemePicker } from "@/components/settings/theme-picker";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { buildProgressExport, progressExportFilename } from "@/lib/export";
+
+function downloadProgressExport() {
+  const payload = buildProgressExport();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = progressExportFilename();
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
 
 export function SettingsClient() {
   const t = useTranslations("settings");
@@ -43,6 +59,29 @@ export function SettingsClient() {
         <CardContent className="flex items-center justify-between gap-4">
           <span className="text-sm font-medium">{t("languageLabel")}</span>
           <LanguageSwitcher />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="h-5 w-5 text-primary" />
+            {t("dataTitle")}
+          </CardTitle>
+          <CardDescription>{t("dataHint")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2">
+          <span className="text-sm text-muted-foreground">{t("dataDescription")}</span>
+          <div>
+            <button
+              type="button"
+              onClick={downloadProgressExport}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <Download className="h-4 w-4" />
+              {t("dataExportButton")}
+            </button>
+          </div>
         </CardContent>
       </Card>
 

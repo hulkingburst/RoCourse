@@ -77,6 +77,13 @@ interface ProgressState {
   xp: number;
   /** Local Monday-week key (YYYY-MM-DD) → XP gained that week. */
   weeklyXp: Record<string, number>;
+  /**
+   * Lesson slug → step indices (within that lesson's `<Step>` list) answered
+   * incorrectly and not yet solved again. Drives the review surface; resolved
+   * automatically when the learner answers the step correctly. Never affects
+   * lesson completion, counters, XP, or streaks.
+   */
+  missedSteps: Record<string, number[]>;
 
   setHydrated: (value: boolean) => void;
   recordQuickQuizCompleted: () => void;
@@ -95,6 +102,13 @@ interface ProgressState {
     firstTryStep?: string | null
   ) => void;
   setFinishedPath: (path: FinishedPath | null) => void;
+  /**
+   * Records a single stepper-graded step attempt for the review ledger.
+   * `correct=true` removes the step (it has been solved again); `correct=false`
+   * adds it. Pure bookkeeping with no XP, counter, completion, or streak side
+   * effects.
+   */
+  updateMissedStep: (slug: string, step: number, correct: boolean) => void;
   restoreProgress: (snapshot: ProgressSnapshot) => void;
   resetProgress: () => void;
 }
@@ -159,6 +173,7 @@ export const useProgressStore = create<ProgressState>()(
       lastStreakDate: null,
       xp: 0,
       weeklyXp: {},
+      missedSteps: {},
 
       setHydrated: (value) => set({ hydrated: value }),
 
@@ -315,6 +330,24 @@ export const useProgressStore = create<ProgressState>()(
 
       setFinishedPath: (finishedPath) => set({ finishedPath, lastUpdated: nowIso() }),
 
+      updateMissedStep: (slug, step, correct) =>
+        set((state) => {
+          const current = state.missedSteps[slug] ?? [];
+          if (correct) {
+            const next = current.filter((n) => n !== step);
+            const missedSteps = { ...state.missedSteps };
+            if (next.length > 0) missedSteps[slug] = next;
+            else delete missedSteps[slug];
+            return { missedSteps, lastUpdated: nowIso() };
+          }
+          if (current.includes(step)) return state;
+          const missedSteps = {
+            ...state.missedSteps,
+            [slug]: [...current, step].sort((a, b) => a - b),
+          };
+          return { missedSteps, lastUpdated: nowIso() };
+        }),
+
       restoreProgress: (snapshot) =>
         set((state) => ({
           ...snapshot,
@@ -352,6 +385,7 @@ export const useProgressStore = create<ProgressState>()(
           lastStreakDate: null,
           xp: 0,
           weeklyXp: {},
+          missedSteps: {},
         }),
     }),
     {
@@ -375,6 +409,7 @@ export const useProgressStore = create<ProgressState>()(
         lastStreakDate: state.lastStreakDate,
         xp: state.xp,
         weeklyXp: state.weeklyXp,
+        missedSteps: state.missedSteps,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

@@ -45,7 +45,8 @@
     "resetConfirm": "¿Reiniciar todo el progreso? Esto no se puede deshacer.",
     "star": "Estrella",
     "starOnGithub": "Deja una estrella en GitHub",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "reviewMissed": "Revisar fallos"
   },
   "footer": {
     "about": "{courseName} — un curso práctico para crear tus primeros juegos de Roblox.",
@@ -1929,7 +1930,22 @@
     "themeLabel": "Tema",
     "languageLabel": "Idioma",
     "languageHint": "Elige el idioma usado en todo el sitio.",
+    "dataTitle": "Datos y progreso",
+    "dataHint": "Todo lo que has avanzado vive aquí.",
+    "dataDescription": "Descarga una copia de tu progreso en JSON — lecciones, marcadores, XP, rachas y tu lista de repaso. Se queda en tu dispositivo; no se envía nada a ningún sitio.",
+    "dataExportButton": "Descargar mi progreso",
     "comingSoon": "Próximamente llegarán más ajustes."
+  },
+  "review": {
+    "title": "Revisar fallos",
+    "subtitle": "Vuelve a responder las actividades que fallaste para afianzarlas.",
+    "count": "{count, plural, one {# actividad fallada} other {# actividades falladas}}",
+    "lessonCount": "{count, plural, one {# actividad fallada} other {# actividades falladas}} en esta lección",
+    "stepLabel": "Actividad {step}",
+    "emptyTitle": "Todo al día",
+    "emptyBody": "No tienes actividades falladas ahora mismo — ¡buen trabajo!",
+    "allCaughtUpLesson": "Has resuelto todas las actividades falladas de esta lección.",
+    "backToList": "Volver a la lista de repaso"
   },
   "userProfile": {
     "notFoundTitle": "Estudiante no encontrado",
