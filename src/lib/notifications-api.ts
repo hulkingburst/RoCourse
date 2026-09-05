@@ -169,7 +169,7 @@ export async function syncFeedbackResolutions(
       },
     });
 
-    const id = `feedback:${ticket.issueNumber}`;
+    const id = `feedback:${ticket.issueNumber}:closed`;
     const app: AppNotification = {
       id,
       type: "feedback_closed",
@@ -179,6 +179,9 @@ export async function syncFeedbackResolutions(
       createdAt: new Date().toISOString(),
       read: false,
     };
+    // Upgrade a legacy `feedback:<n>` row (which a submission previously
+    // created as "received") and keep this row typed as a resolution even if
+    // it already exists — both so the bell shows the real closing message.
     await prisma.notification.upsert({
       where: { userId_localKey: { userId, localKey: id } },
       create: {
@@ -189,7 +192,12 @@ export async function syncFeedbackResolutions(
         body: message,
         link: app.link,
       },
-      update: { body: message, link: app.link },
+      update: {
+        type: "feedback_closed",
+        title: app.title,
+        body: message,
+        link: app.link,
+      },
     });
     created.push(app);
   }

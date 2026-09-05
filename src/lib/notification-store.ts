@@ -63,6 +63,38 @@ function upsert(list: AppNotification[], item: AppNotification): AppNotification
   return [item, ...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+function sameItem(a: AppNotification, b: AppNotification): boolean {
+  return (
+    a.type === b.type &&
+    a.title === b.title &&
+    a.body === b.body &&
+    a.link === b.link &&
+    a.createdAt === b.createdAt &&
+    a.read === b.read
+  );
+}
+
+/**
+ * Merges a server-side notification in. Unlike `upsert`, a server notification
+ * REPLACES a local one with the same id — the DB backup is authoritative, and
+ * a row can be transitioned server-side (e.g. a `feedback_received` becoming
+ * `feedback_closed`) without a new id. Returns the same array reference when
+ * nothing changed so callers can skip the update.
+ */
+function replaceIncoming(
+  list: AppNotification[],
+  item: AppNotification
+): AppNotification[] {
+  const index = list.findIndex((n) => n.id === item.id);
+  if (index === -1) {
+    return [item, ...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+  if (sameItem(list[index], item)) return list;
+  const next = [...list];
+  next[index] = item;
+  return next.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
 export const useNotificationsStore = create<NotificationsState>()(
   persist(
     (set) => ({
@@ -167,8 +199,9 @@ export const useNotificationsStore = create<NotificationsState>()(
         set((state) => {
           const deleted = new Set(state.deletedIds);
           const incoming = server.filter((n) => !deleted.has(n.id));
-          const notifications = incoming.reduce(upsert, state.notifications);
-          if (notifications.length === state.notifications.length) {
+          if (incoming.length === 0) return state;
+          const notifications = incoming.reduce(replaceIncoming, state.notifications);
+          if (notifications === state.notifications) {
             return state;
           }
           // Server-created notifications (e.g. feedback resolutions) are

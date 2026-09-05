@@ -11,7 +11,9 @@ export type NotificationType =
 
 export interface AppNotification {
   /** Stable dedup key (e.g. "badge:first-steps", "update:<slug>",
-   * "feedback:<issueNumber>"). Also the server's Notification.localKey. */
+   * "feedback:<issueNumber>:received", "feedback:<issueNumber>:closed").
+   * Also the server's Notification.localKey. A ticket's two states use
+   * distinct ids so a resolution is a new notification, not an edit. */
   id: string;
   type: NotificationType;
   title: string;

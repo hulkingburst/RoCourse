@@ -101,11 +101,14 @@ export async function POST(request: Request) {
         }),
         prisma.notification.upsert({
           where: {
-            userId_localKey: { userId, localKey: `feedback:${created.number}` },
+            userId_localKey: {
+              userId,
+              localKey: `feedback:${created.number}:received`,
+            },
           },
           create: {
             userId,
-            localKey: `feedback:${created.number}`,
+            localKey: `feedback:${created.number}:received`,
             type: "feedback_received",
             title: "Feedback received",
             body: text.slice(0, 2000),
