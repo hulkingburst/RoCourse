@@ -158,7 +158,7 @@ export async function syncFeedbackResolutions(
     }
     // Fall back to the issue's own body (the reporter's submitted message) so
     // there is always real text rather than generated boilerplate.
-    if (!message) message = issue.body?.trim() || ticket.title;
+    if (!message) message = stripAccountTag(issue.body?.trim() || "") || ticket.title;
 
     await prisma.feedbackTicket.update({
       where: { id: ticket.id },
@@ -202,6 +202,18 @@ export async function syncFeedbackResolutions(
     created.push(app);
   }
   return created;
+}
+
+/**
+ * The issue body carries the reporter's account handle for the author's
+ * benefit. Strip that line before any issue text can be relayed back to the
+ * submitter (the fallback below reads the issue body when there's no comment).
+ */
+function stripAccountTag(body: string): string {
+  return body
+    .replace(/^\*\*Account:\*\*.*$/m, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function safeDate(value: string): Date {

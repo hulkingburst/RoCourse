@@ -62,6 +62,11 @@ export async function POST(request: Request) {
   const title = text.split("\n")[0].slice(0, 80);
   const lines = [text];
   if (page) lines.push("", `**Page:** \`${page}\``);
+  // Sign-in is not required, but when a signed-in account submits, record its
+  // handle in the issue so the author knows who to credit/reach — author-side
+  // only, and stripped before any issue text is ever relayed back to the user.
+  const handle = session?.user?.handle;
+  if (handle) lines.push("", `**Account:** \`@${handle}\``);
   lines.push("", `_Submitted ${new Date().toUTCString()} via the site feedback button._`);
 
   const response = await fetch(
