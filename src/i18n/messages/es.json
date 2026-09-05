@@ -192,6 +192,8 @@
   "lesson": {
     "removeBookmark": "Quitar marcador",
     "bookmarkLesson": "Marcar lección",
+    "readAloud": "Leer la lección en voz alta",
+    "stopReading": "Detener la lectura en voz alta",
     "goToStep": "Ir al paso {step}",
     "stepOf": "Paso {current} de {total}",
     "activityHint": "completa la actividad para continuar",

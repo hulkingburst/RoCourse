@@ -50,6 +50,7 @@ export function GlossaryTerm({
       <PopoverTrigger asChild>
         <button
           type="button"
+          data-glossary-term="true"
           className="inline-block cursor-help border-0 bg-transparent p-0 font-[inherit] text-[inherit] [text-align:inherit] underline decoration-dotted decoration-foreground/50 decoration-1 underline-offset-2 transition-colors hover:text-primary hover:decoration-primary focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring"
           onMouseEnter={() => {
             cancelClose();

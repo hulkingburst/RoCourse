@@ -192,6 +192,8 @@
   "lesson": {
     "removeBookmark": "Remove bookmark",
     "bookmarkLesson": "Bookmark lesson",
+    "readAloud": "Read this lesson aloud",
+    "stopReading": "Stop reading aloud",
     "goToStep": "Go to step {step}",
     "stepOf": "Step {current} of {total}",
     "activityHint": "complete the activity to continue",

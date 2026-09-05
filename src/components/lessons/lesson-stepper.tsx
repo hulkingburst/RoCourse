@@ -14,6 +14,7 @@ import {
 import { LockedLesson } from "@/components/lessons/locked-lesson";
 import { StepCompletion } from "@/components/lessons/step-completion";
 import { LessonMedalBadge } from "@/components/lessons/lesson-medal";
+import { extractProseText, ReadAloudButton, cancelSpeech } from "@/components/lessons/read-aloud";
 
 interface StepMeta {
   hasActivity: boolean;
@@ -70,6 +71,7 @@ export function LessonStepper({
   const [solvedSteps, setSolvedSteps] = React.useState<Record<number, boolean>>({});
   const [phase, setPhase] = React.useState<"steps" | "done">("steps");
   const topRef = React.useRef<HTMLDivElement>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     recordView(slug);
@@ -103,6 +105,12 @@ export function LessonStepper({
     setMaxActive((current) => Math.max(current, index));
     topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  // Each step is read independently — advancing to a new step stops any
+  // narration still playing from the previous one.
+  React.useEffect(() => {
+    cancelSpeech();
+  }, [active, phase]);
 
   const next = () => {
     if (isLast) {
@@ -163,6 +171,15 @@ export function LessonStepper({
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <ReadAloudButton
+              getText={() =>
+                extractProseText(
+                  (contentRef.current?.querySelector(`[data-step-index="${active}"]`) as
+                    | HTMLElement
+                    | null) ?? null
+                )
+              }
+            />
             <LessonMedalBadge slug={slug} activityCount={activityCount} className="h-5 w-5" />
             {mounted && (
               <button
@@ -234,10 +251,10 @@ export function LessonStepper({
           />
         ) : (
           <>
-            <div className="min-h-[220px]">
+            <div ref={contentRef} className="min-h-[220px]">
               <StepperContext.Provider value={contextValue}>
                 {React.Children.toArray(children).map((child, index) => (
-                  <div key={index} hidden={index !== active}>
+                  <div key={index} data-step-index={index} hidden={index !== active}>
                     {child}
                   </div>
                 ))}
