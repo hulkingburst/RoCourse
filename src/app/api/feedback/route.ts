@@ -12,6 +12,14 @@ const MAX_PAGE = 500;
 const LIMIT_PER_IP = 5;
 const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 
+const FEEDBACK_TYPES = new Set(["bug", "feature", "improvement", "other"]);
+const TYPE_LABELS: Record<string, string> = {
+  bug: "Bug",
+  feature: "Feature request",
+  improvement: "Improvement",
+  other: "Other",
+};
+
 const limitKey = (ip: string) => `feedback:${ip}`;
 
 export async function POST(request: Request) {
@@ -50,6 +58,9 @@ export async function POST(request: Request) {
     typeof (body as { page?: unknown })?.page === "string"
       ? ((body as { page: string }).page.trim())
       : "";
+  const rawType = (body as { type?: unknown })?.type;
+  const type =
+    typeof rawType === "string" && FEEDBACK_TYPES.has(rawType) ? rawType : "other";
 
   if (text.length === 0 || text.length > MAX_TEXT) {
     return NextResponse.json({ ok: false }, { status: 400 });
@@ -60,7 +71,7 @@ export async function POST(request: Request) {
 
   // The destination repo + token stay server-side; the client never sees them.
   const title = text.split("\n")[0].slice(0, 80);
-  const lines = [text];
+  const lines = [`**Type:** ${TYPE_LABELS[type]}`, "", text];
   if (page) lines.push("", `**Page:** \`${page}\``);
   // Sign-in is not required, but when a signed-in account submits, record its
   // handle in the issue so the author knows who to credit/reach — author-side

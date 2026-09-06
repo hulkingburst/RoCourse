@@ -454,7 +454,14 @@
     "error": "Algo salió mal. Inténtalo de nuevo en un momento.",
     "cancel": "Cancelar",
     "send": "Enviar",
-    "sending": "Enviando…"
+    "sending": "Enviando…",
+    "type": "Tipo",
+    "typeBug": "Error",
+    "typeFeature": "Solicitud de función",
+    "typeImprovement": "Mejora",
+    "typeOther": "Otro",
+    "notifySignedIn": "Te avisaremos aquí cuando el autor responda a tus comentarios.",
+    "notifyGuest": "Inicia sesión para recibir una notificación cuando respondan a tus comentarios."
   },
   "notifications": {
     "ariaLabel": "Notificaciones",

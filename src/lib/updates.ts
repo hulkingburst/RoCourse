@@ -15,6 +15,12 @@ export interface SiteUpdate {
 
 export const SITE_UPDATES: SiteUpdate[] = [
   {
+    id: "2026-09-05-typed-feedback",
+    title: "Typed feedback & reply alerts",
+    body: "Feedback now has a type picker — bug, feature request, improvement, or other — so reports land in the right place. And signed-in learners get a notification the moment the author replies. Check the bell in the header.",
+    createdAt: "2026-09-05T00:00:00.000Z",
+  },
+  {
     id: "2026-09-03-notifications",
     title: "Notifications are here",
     body: "You now have a notifications menu for new site updates, badges you earn, and replies to your feedback. Check the bell icon in the header.",

@@ -35,6 +35,12 @@ export async function generateMetadata({
     },
     description,
     keywords: ["Roblox", "Luau", "Lua", "Roblox Studio", "learn to code", "game development", "free course"],
+    // Explicit favicon: src/app/icon.png is the current brand mark. Browsers
+    // cache /icon.png, so after a logo change a refresh-plus-hard-reload
+    // (or a fresh cache) may be needed once — nothing else serves an icon.
+    icons: {
+      icon: "/icon.png",
+    },
     openGraph: {
       type: "website",
       url: SITE_URL,

@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, Loader2, MessageSquareText, XCircle } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Bell, CheckCircle2, Loader2, MessageSquareText, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuthUiStore } from "@/lib/auth-ui";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,6 +17,9 @@ import {
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+const FEEDBACK_TYPES = ["bug", "feature", "improvement", "other"] as const;
+type FeedbackType = (typeof FEEDBACK_TYPES)[number];
+
 export function FeedbackButton({
   className,
   variant = "inline",
@@ -23,12 +28,16 @@ export function FeedbackButton({
   variant?: "inline" | "floating";
 }) {
   const t = useTranslations("feedback");
+  const { status: authStatus } = useSession();
+  const openAuth = useAuthUiStore((state) => state.openDialog);
   const [open, setOpen] = React.useState(false);
   const [text, setText] = React.useState("");
+  const [type, setType] = React.useState<FeedbackType>("bug");
   const [status, setStatus] = React.useState<Status>("idle");
 
   const reset = () => {
     setText("");
+    setType("bug");
     setStatus("idle");
   };
 
@@ -41,6 +50,7 @@ export function FeedbackButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: text.trim(),
+          type,
           page: typeof window !== "undefined" ? window.location.pathname : "",
         }),
       });
@@ -96,6 +106,46 @@ export function FeedbackButton({
                 void submit();
               }}
             >
+              {authStatus !== "loading" ? (
+                authStatus === "authenticated" ? (
+                  <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                    <Bell className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    {t("notifySignedIn")}
+                  </p>
+                ) : (
+                  <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                    <Bell className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    {t.rich("notifyGuest", {
+                      signIn: (chunks) => (
+                        <button
+                          type="button"
+                          onClick={() => openAuth("signin")}
+                          className="font-medium text-primary underline underline-offset-4"
+                        >
+                          {chunks}
+                        </button>
+                      ),
+                    })}
+                  </p>
+                )
+              ) : null}
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-muted-foreground">
+                  {t("type")}
+                </span>
+                <select
+                  value={type}
+                  onChange={(event) => setType(event.target.value as FeedbackType)}
+                  aria-label={t("type")}
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {FEEDBACK_TYPES.map((value) => (
+                    <option key={value} value={value}>
+                      {t(`type${value.charAt(0).toUpperCase()}${value.slice(1)}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <textarea
                 value={text}
                 onChange={(event) => setText(event.target.value)}

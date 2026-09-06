@@ -454,7 +454,14 @@
     "error": "Something went wrong. Please try again in a moment.",
     "cancel": "Cancel",
     "send": "Send",
-    "sending": "Sending…"
+    "sending": "Sending…",
+    "type": "Type",
+    "typeBug": "Bug",
+    "typeFeature": "Feature request",
+    "typeImprovement": "Improvement",
+    "typeOther": "Other",
+    "notifySignedIn": "We'll notify you here when the author replies to your feedback.",
+    "notifyGuest": "Sign in to get a notification when your feedback gets a reply."
   },
   "notifications": {
     "ariaLabel": "Notifications",

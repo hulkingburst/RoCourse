@@ -49,9 +49,18 @@ are optional and exist purely to sync your progress across devices.
 - **Inline glossary popovers** — hover any key term in a lesson (part,
   workspace, tween, event, …) for a one-line definition and a link to the
   lesson that teaches it.
+- **A free read-aloud** (no API keys, no cost) — every lesson step can be read
+  aloud with your device's built-in text-to-speech, glossary words included,
+  stopping automatically when you move to the next step.
+- **Progress backup** — export your progress to a download any time, and import
+  a backup to restore it on any device. Guest progress lives on your device;
+  signing in syncs it to the cloud.
 - **Optional cloud sync** so your progress follows you across devices.
 - **A notifications bell** — new site updates, badges you earn, and replies to
   your feedback all land in one place, so you never miss what changed.
+- **Typed feedback** — flag a bug, request a feature, or suggest an improvement
+  straight to the course author. Signed in? A notification lands in your bell
+  the moment the author replies.
 - **English and Spanish.** Every screen is localized — the interface, all
   guides, the FAQ, and the full interactive content (every quiz question,
   daily challenge, and reference entry). English lives at the root URL;
