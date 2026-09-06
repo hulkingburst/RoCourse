@@ -17,7 +17,7 @@ export const SITE_UPDATES: SiteUpdate[] = [
   {
     id: "2026-09-06-certificates-share-resources",
     title: "Section certificates, shareable achievements & owner picks",
-    body: "You now earn a certificate for every complete section — not just the whole course — and you can share any certificate or your public profile with a single copy-link. The Resources page also has an \"Owner picks\" filter for resources the course author personally recommends. Your certificates live in the profile and on the Certificate page — no need to watch the bell for them.",
+    body: "You now earn a certificate for every complete section — not just the whole course — and you can share any certificate or your public profile with a single copy-link. The Resources page also has an \"Owner picks\" filter for resources the course author personally recommends. Your certificates live in the profile and on the Certificate page.",
     createdAt: "2026-09-06T17:00:00.000Z",
   },
   {
