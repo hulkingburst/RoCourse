@@ -109,10 +109,11 @@ export async function getUserNotifications(userId: string): Promise<Notification
 
 /**
  * Checks a signed-in user's submitted feedback issues against GitHub and, for
- * any that have since been closed, records a "feedback_closed" notification
- * whose message is the author's real closing comment from the issue (falling
- * back to the issue body when there is no comment) — never auto-generated
- * boilerplate. Idempotent: a ticket is only resolved once.
+ * any that have since been closed with a real author comment, records a
+ * "feedback_closed" notification whose message is that comment. Issues closed
+ * without a comment are left alone — relaying the reporter's own submission
+ * back to them would be noise, and leaving the ticket open means a comment
+ * added later still reaches them. Idempotent: a ticket is only resolved once.
  */
 export async function syncFeedbackResolutions(
   userId: string
@@ -128,7 +129,7 @@ export async function syncFeedbackResolutions(
 
   const created: AppNotification[] = [];
   for (const ticket of openTickets) {
-    let issue: { state?: string; body?: string | null; html_url?: string };
+    let issue: { state?: string; html_url?: string };
     try {
       const response = await fetch(
         `${GITHUB_API}/repos/${ticket.repo}/issues/${ticket.issueNumber}`,
@@ -154,11 +155,12 @@ export async function syncFeedbackResolutions(
         if (latest?.body?.trim()) message = latest.body.trim();
       }
     } catch {
-      // fall through to issue body
+      // no comment reachable — treated as "resolved without a message"
     }
-    // Fall back to the issue's own body (the reporter's submitted message) so
-    // there is always real text rather than generated boilerplate.
-    if (!message) message = stripAccountTag(issue.body?.trim() || "") || ticket.title;
+    // Resolved with no author comment: nothing real to relay, so don't notify
+    // (and don't transition the ticket — a later comment can still be picked
+    // up on the next sync).
+    if (!message) continue;
 
     await prisma.feedbackTicket.update({
       where: { id: ticket.id },
@@ -202,18 +204,6 @@ export async function syncFeedbackResolutions(
     created.push(app);
   }
   return created;
-}
-
-/**
- * The issue body carries the reporter's account handle for the author's
- * benefit. Strip that line before any issue text can be relayed back to the
- * submitter (the fallback below reads the issue body when there's no comment).
- */
-function stripAccountTag(body: string): string {
-  return body
-    .replace(/^\*\*Account:\*\*.*$/m, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
 }
 
 function safeDate(value: string): Date {
