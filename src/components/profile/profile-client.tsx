@@ -28,6 +28,8 @@ import { extractBadgeStats } from "@/lib/badges";
 import { maskEmail } from "@/lib/privacy";
 import { useProgressStore } from "@/lib/progress-store";
 import { courseTitleKey } from "@/lib/course-titles";
+import { courseRef, sectionRef } from "@/lib/certificate-refs";
+import type { CompletedSection } from "@/lib/section-completion";
 import { isStreakActive } from "@/lib/streak";
 import { levelProgress, weekKey } from "@/lib/xp";
 import { cn } from "@/lib/utils";
@@ -43,17 +45,20 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { ActivityCalendar } from "@/components/profile/activity-calendar";
 import { BadgesSection } from "@/components/profile/badges";
+import { ShareLinkButton } from "@/components/share/share-link-button";
 
 interface ProfileClientProps {
   totalLessons: number;
   lessonMap: { slug: string; title: string }[];
   handle: string | null;
+  sectionCertificates: CompletedSection[];
 }
 
 export function ProfileClient({
   totalLessons,
   lessonMap,
   handle,
+  sectionCertificates,
 }: ProfileClientProps) {
   const t = useTranslations("profile");
   const course = useTranslations("course");
@@ -206,12 +211,21 @@ export function ProfileClient({
             </button>
           </span>
           {handle ? (
-            <Link
-              href={`/u/${handle}`}
-              className="text-xs font-medium text-primary underline-offset-4 hover:underline"
-            >
-              @{handle}
-            </Link>
+            <>
+              <Link
+                href={`/u/${handle}`}
+                className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+              >
+                @{handle}
+              </Link>
+              <ShareLinkButton
+                path={`/u/${handle}`}
+                labelKey="shareProfile"
+                variant="ghost"
+                size="sm"
+                className="h-auto gap-1.5 px-1 text-xs underline-offset-4 hover:underline"
+              />
+            </>
           ) : null}
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -413,7 +427,7 @@ export function ProfileClient({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {completions.length > 0 ? (
+{completions.length > 0 ? (
               completions.map((completion) => (
                 <div
                   key={completion.courseId}
@@ -429,6 +443,15 @@ export function ProfileClient({
                     >
                       {t("certificate")}
                     </Link>
+                    {handle ? (
+                      <ShareLinkButton
+                        path={`/certificate/${handle}/${courseRef(completion.courseId)}`}
+                        labelKey="shareCertificate"
+                        size="iconSm"
+                        variant="ghost"
+                        className="h-auto w-auto p-1 text-muted-foreground"
+                      />
+                    ) : null}
                     <span className="text-xs text-muted-foreground">
                       {new Date(completion.completedAt).toLocaleDateString()}
                     </span>
@@ -443,6 +466,51 @@ export function ProfileClient({
           </CardContent>
         </Card>
       </div>
+
+      {sectionCertificates.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-primary" />
+              {t("sectionCertificates")}
+            </CardTitle>
+            <CardDescription>{t("sectionCertificatesHint")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {sectionCertificates.map((item) => (
+              <div
+                key={item.sectionId}
+                className="flex items-center justify-between gap-2"
+              >
+                <span className="flex items-center gap-2 font-medium">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+                  {item.title}
+                </span>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={`/certificate?section=${item.sectionId}`}
+                    className="text-xs font-medium text-primary underline underline-offset-4"
+                  >
+                    {t("certificate")}
+                  </Link>
+                  {handle ? (
+                    <ShareLinkButton
+                      path={`/certificate/${handle}/${sectionRef(item.sectionId)}`}
+                      labelKey="shareCertificate"
+                      size="iconSm"
+                      variant="ghost"
+                      className="h-auto w-auto p-1 text-muted-foreground"
+                    />
+                  ) : null}
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(item.completedAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

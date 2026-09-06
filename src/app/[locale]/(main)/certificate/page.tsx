@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { getCloudState } from "@/lib/sync-api";
+import { ensureHandle } from "@/lib/users";
+import { getCompletedSectionCertificates } from "@/lib/certificates";
 import { CertificateClient } from "@/components/certificate/certificate-client";
 import { CertificateEmptyState } from "@/components/certificate/certificate-empty";
 
@@ -19,17 +21,22 @@ export default async function CertificatePage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { course } = await searchParams;
+  const { course, section } = await searchParams;
   const initialCourseId = typeof course === "string" ? course : null;
+  const initialSectionId = typeof section === "string" ? section : null;
 
   const session = await auth();
   if (!session?.user?.id) {
     return <CertificateEmptyState signedIn={false} />;
   }
 
-  const state = await getCloudState(session.user.id);
+  const [state, handle] = await Promise.all([
+    getCloudState(session.user.id),
+    ensureHandle(session.user.id),
+  ]);
   const completions = state.completions ?? [];
-  if (completions.length === 0) {
+  const sections = getCompletedSectionCertificates(state.progress);
+  if (completions.length === 0 && sections.length === 0) {
     return <CertificateEmptyState signedIn />;
   }
 
@@ -46,7 +53,10 @@ export default async function CertificatePage({
         title: completion.title,
         completedAt: completion.completedAt,
       }))}
+      sections={sections}
+      handle={handle}
       initialCourseId={initialCourseId}
+      initialSectionId={initialSectionId}
     />
   );
 }

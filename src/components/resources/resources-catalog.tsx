@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Package,
   ShieldCheck,
+  Sparkles,
   User,
 } from "lucide-react";
 import { highlightCode } from "@/lib/highlighter";
@@ -51,17 +52,29 @@ function CodeViewer({ code, language }: { code: string; language: string }) {
 function ResourceCard({ resource }: { resource: Resource }) {
   const t = useTranslations("resources");
   const [open, setOpen] = React.useState(false);
+  const curated = resource.recommended;
   const downloadUrl = resource.fileUrl
     ? `${resource.fileUrl}?download=1`
     : null;
   const visitUrl = resource.url ?? null;
 
   return (
-    <article className="rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
+    <article
+      className={cn(
+        "rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md",
+        curated && "border-amber-400/50"
+      )}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">{t(`kinds.${resource.kind}`)}</Badge>
+            {curated && (
+              <Badge className="border-amber-400/50 bg-amber-500/10 text-amber-700">
+                <Sparkles className="h-3 w-3" />
+                {t("ownerPick")}
+              </Badge>
+            )}
             {resource.author && (
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <User className="h-3 w-3" />
@@ -127,17 +140,27 @@ function ResourceCard({ resource }: { resource: Resource }) {
 
 export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
   const t = useTranslations("resources");
-  const [filter, setFilter] = React.useState<ResourceKind | "all">("all");
+  const [filter, setFilter] = React.useState<
+    ResourceKind | "all" | "recommended"
+  >("all");
 
   const filtered =
     filter === "all"
       ? resources
-      : resources.filter((resource) => resource.kind === filter);
+      : filter === "recommended"
+        ? resources.filter((resource) => resource.recommended)
+        : resources.filter((resource) => resource.kind === filter);
 
   const counts = React.useMemo(() => {
-    const map = new Map<ResourceKind | "all", number>([["all", resources.length]]);
+    const map = new Map<ResourceKind | "all" | "recommended", number>([
+      ["all", resources.length],
+      ["recommended", 0],
+    ]);
     for (const resource of resources) {
       map.set(resource.kind, (map.get(resource.kind) ?? 0) + 1);
+      if (resource.recommended) {
+        map.set("recommended", (map.get("recommended") ?? 0) + 1);
+      }
     }
     return map;
   }, [resources]);
@@ -172,6 +195,18 @@ export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
             {t(`kinds.${kind.value}`)} ({counts.get(kind.value) ?? 0})
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => setFilter("recommended")}
+          className={cn(
+            "rounded-full border px-3 py-1 text-sm transition-colors",
+            filter === "recommended"
+              ? "border-primary bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-accent"
+          )}
+        >
+          {t("ownerPicks")} ({counts.get("recommended") ?? 0})
+        </button>
       </div>
 
       {filtered.length === 0 ? (
@@ -183,7 +218,9 @@ export function ResourcesCatalog({ resources }: { resources: Resource[] }) {
               ? t("noResourcesEmpty")
               : filter === "all"
                 ? t("noResourcesFiltered")
-                : t("noResourcesKind", { kind: t(`kinds.${filter}`) })}
+                : filter === "recommended"
+                  ? t("noResourcesRecommended")
+                  : t("noResourcesKind", { kind: t(`kinds.${filter}`) })}
           </p>
         </div>
       ) : (

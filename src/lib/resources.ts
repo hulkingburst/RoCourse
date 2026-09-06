@@ -10,7 +10,13 @@ import type { Resource, ResourceKind } from "@/lib/resources-shared";
 export const RESOURCES_REPO =
   process.env.RESOURCES_GITHUB_REPO || "hulkingburst/rocourse-feedback";
 
-export const RESOURCE_LABELS = ["resource", "needs-review", "accepted", "rejected"] as const;
+export const RESOURCE_LABELS = [
+  "resource",
+  "needs-review",
+  "accepted",
+  "rejected",
+  "owner-recommended",
+] as const;
 
 const GITHUB_API = "https://api.github.com";
 const headers = (token: string) => ({
@@ -23,8 +29,10 @@ const headers = (token: string) => ({
 /**
  * GitHub does not auto-create labels on issue creation, so make sure the
  * labels this feature depends on exist (idempotent, safe to call before every
- * submission). `accepted` is created up front too so the author always has it
- * available when reviewing.
+ * submission). `accepted` and `owner-recommended` are created up front too so
+ * the author always has them available when reviewing. Adding
+ * `owner-recommended` to an accepted issue marks that resource as an owner
+ * pick on the site.
  */
 export async function ensureResourceLabels(): Promise<boolean> {
   const token = process.env.FEEDBACK_GITHUB_TOKEN;
@@ -73,6 +81,7 @@ function parseResource(issue: {
   state?: string;
   closed_at?: string | null;
   html_url?: string;
+  labels?: { name?: string }[];
 }): Resource | null {
   const body = issue.body ?? "";
   const typeMatch = body.match(TYPE_RE);
@@ -143,6 +152,9 @@ function parseResource(issue: {
     code,
     codeLang,
     acceptedAt: issue.closed_at ?? "",
+    recommended:
+      issue.labels?.some((label) => label.name === "owner-recommended") ??
+      false,
   };
 }
 
@@ -173,6 +185,7 @@ export async function getAcceptedResources(): Promise<Resource[]> {
       state?: string;
       closed_at?: string | null;
       html_url?: string;
+      labels?: { name?: string }[];
     }[];
     return issues
       .filter((issue) => issue.state === "closed")

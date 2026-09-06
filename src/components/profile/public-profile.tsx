@@ -24,6 +24,7 @@ import {
 import type { PublicProfile } from "@/lib/users";
 import { courseTitleKey } from "@/lib/course-titles";
 import { levelProgress } from "@/lib/xp";
+import { ShareLinkButton } from "@/components/share/share-link-button";
 
 function Stat({
   icon,
@@ -68,7 +69,13 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
             {t("joinedAt", { handle: profile.handle, date: joined })}
           </p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center gap-3">
+          <ShareLinkButton
+            path={`/u/${profile.handle}`}
+            labelKey="shareProfile"
+            variant="outline"
+            size="sm"
+          />
           <Link
             href="/leaderboard"
             className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"

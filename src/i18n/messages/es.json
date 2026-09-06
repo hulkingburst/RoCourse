@@ -293,6 +293,8 @@
     "finalProjectCollector": "The Collector",
     "coursesCompleted": "Cursos completados",
     "certificate": "Certificado",
+    "sectionCertificates": "Certificados de sección",
+    "sectionCertificatesHint": "Termina todas las lecciones de una sección para ganar su certificado — y luego compártelo.",
     "syncing": "Sincronizando…",
     "noCoursesYet": "Aún no has terminado ningún curso — el proyecto final te espera.",
     "signInTitle": "Tu progreso, donde quieras",
@@ -414,9 +416,11 @@
     "title": "Tu certificado",
     "intro": "Te lo has ganado: elige un fondo que te guste y descárgalo como PNG de alta resolución o guárdalo como PDF.",
     "course": "Curso",
+    "sections": "Secciones",
     "background": "Fondo",
     "downloadPng": "Descargar PNG",
     "savePdf": "Guardar como PDF",
+    "viewSharedPage": "Ver página pública",
     "dpiNote": "El PNG se descarga a 3200×2200 — listo para imprimir a 300 DPI.",
     "completedOn": "Completado el {date}",
     "themes": {
@@ -430,7 +434,7 @@
       "slate": "Pizarra"
     },
     "emptyTitle": "Aún no hay certificado",
-    "emptyBody": "Consigues un certificado cuando completas el proyecto final. Vuelve al curso y termínalo — estás cerca.",
+    "emptyBody": "Consigues un certificado cuando completas el proyecto final o terminas todas las lecciones de una sección. Vuelve al curso y sigue — estás cerca.",
     "goToFinalProject": "Ir al proyecto final",
     "viewProfile": "Ver perfil",
     "signInTitle": "Inicia sesión para ver certificados",
@@ -444,6 +448,20 @@
       "team": "Equipo RoCourse",
       "aria": "Certificado de finalización para {name}"
     }
+  },
+  "certificateShare": {
+    "heading": "Certificado",
+    "intro": "Progreso compartido desde RoCourse — {name} se ganó este.",
+    "viewProfile": "Ver el perfil de {name}",
+    "startLearning": "Empieza a aprender",
+    "notFoundTitle": "Certificado no encontrado",
+    "metaTitle": "Certificado de RoCourse — {title}",
+    "metaDescription": "{name} consiguió un certificado de RoCourse por {title}."
+  },
+  "share": {
+    "shareProfile": "Compartir perfil",
+    "shareCertificate": "Compartir certificado",
+    "copied": "¡Copiado!"
   },
   "feedback": {
     "button": "Comentarios",
@@ -737,8 +755,11 @@
     "pageTitle": "Recursos",
     "pageIntro": "Recursos comunitarios seleccionados para desarrollo en Roblox. Cada elemento fue revisado por el autor del curso antes de publicarse.",
     "submitAction": "Enviar un recurso",
-    "submitPageTitle": "Enviar un recurso",
-    "submitPageIntro": "¿Hiciste algo que merezca compartirse? Envíalo y pasará a revisión del autor del curso. Los recursos aceptados aparecen en la página <link>Recursos</link>."
+"submitPageTitle": "Enviar un recurso",
+    "submitPageIntro": "¿Has creado algo que valga la pena compartir? Envíalo y pasará a revisión del autor del curso. Los recursos aceptados aparecerán en la página de <link>Recursos</link>.",
+    "ownerPicks": "Selecciones del autor",
+    "noResourcesRecommended": "Aún no hay selecciones del autor.",
+    "ownerPick": "Selección del autor"
   },
   "relativeTime": {
     "justNow": "justo ahora",

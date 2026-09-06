@@ -17,6 +17,8 @@ export interface Resource {
   code: string | null;
   codeLang: string;
   acceptedAt: string;
+  /** Marked by the course author as an owner pick (see the GitHub issue label). */
+  recommended: boolean;
 }
 
 export const RESOURCE_KINDS: { value: ResourceKind; labelKey: string }[] = [

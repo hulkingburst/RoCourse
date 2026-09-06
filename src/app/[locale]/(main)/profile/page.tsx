@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { countLessons, getCourseStructure } from "@/lib/lessons";
 import { auth } from "@/lib/auth";
+import { getCloudState } from "@/lib/sync-api";
 import { ensureHandle } from "@/lib/users";
+import { getCompletedSectionCertificates } from "@/lib/certificates";
 import { ProfileClient } from "@/components/profile/profile-client";
 
 export const metadata: Metadata = {
@@ -13,9 +15,21 @@ export const metadata: Metadata = {
 
 export default async function ProfilePage() {
   const session = await auth();
-  const handle = session?.user?.id
-    ? await ensureHandle(session.user.id)
-    : null;
+  if (!session?.user?.id) {
+    return (
+      <ProfileClient
+        totalLessons={countLessons()}
+        lessonMap={[]}
+        handle={null}
+        sectionCertificates={[]}
+      />
+    );
+  }
+
+  const [state, handle] = await Promise.all([
+    getCloudState(session.user.id),
+    ensureHandle(session.user.id),
+  ]);
 
   const lessonMap = getCourseStructure()
     .flatMap((section) => section.lessons)
@@ -26,6 +40,7 @@ export default async function ProfilePage() {
       totalLessons={countLessons()}
       lessonMap={lessonMap}
       handle={handle}
+      sectionCertificates={getCompletedSectionCertificates(state.progress)}
     />
   );
 }

@@ -2,19 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-
-export interface CertificateTheme {
-  id: string;
-  label: string;
-  /** Certificate paper background. */
-  bg: string;
-  /** Primary text / outer frame color. */
-  ink: string;
-  /** Secondary text color. */
-  muted: string;
-  /** Accent (frame, title underline, course name). */
-  gold: string;
-}
+import type { CertificateTheme } from "@/lib/certificate-themes";
 
 interface CertificateSvgProps {
   theme: CertificateTheme;

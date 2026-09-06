@@ -15,6 +15,12 @@ export interface SiteUpdate {
 
 export const SITE_UPDATES: SiteUpdate[] = [
   {
+    id: "2026-09-06-certificates-share-resources",
+    title: "Section certificates, shareable achievements & owner picks",
+    body: "You now earn a certificate for every complete section — not just the whole course — and you can share any certificate or your public profile with a single copy-link. The Resources page also has an \"Owner picks\" filter for resources the course author personally recommends. Check the bell for each new certificate you unlock.",
+    createdAt: "2026-09-06T17:00:00.000Z",
+  },
+  {
     id: "2026-09-05-typed-feedback",
     title: "Typed feedback & reply alerts",
     body: "Feedback now has a type picker — bug, feature request, improvement, or other — so reports land in the right place. And signed-in learners get a notification the moment the author replies. Check the bell in the header.",

@@ -293,6 +293,8 @@
     "finalProjectCollector": "The Collector",
     "coursesCompleted": "Courses completed",
     "certificate": "Certificate",
+    "sectionCertificates": "Section certificates",
+    "sectionCertificatesHint": "Finish all the lessons in a section to earn its certificate — then share it.",
     "syncing": "Syncing…",
     "noCoursesYet": "No courses finished yet — the capstone awaits.",
     "signInTitle": "Your progress, anywhere",
@@ -414,9 +416,11 @@
     "title": "Your certificate",
     "intro": "You earned this — pick a background that fits, then download it as a high-resolution PNG or save it as a PDF.",
     "course": "Course",
+    "sections": "Sections",
     "background": "Background",
     "downloadPng": "Download PNG",
     "savePdf": "Save as PDF",
+    "viewSharedPage": "View public page",
     "dpiNote": "The PNG downloads at 3200×2200 — print-ready at 300 DPI.",
     "completedOn": "Completed on {date}",
     "themes": {
@@ -430,7 +434,7 @@
       "slate": "Slate"
     },
     "emptyTitle": "No certificate yet",
-    "emptyBody": "You earn a certificate when you complete the final project. Head back to the course and finish it off — you're close.",
+    "emptyBody": "You earn a certificate when you complete the final project or finish every lesson in a section. Head back to the course and keep going — you're close.",
     "goToFinalProject": "Go to the final project",
     "viewProfile": "View profile",
     "signInTitle": "Sign in to view certificates",
@@ -444,6 +448,20 @@
       "team": "RoCourse Team",
       "aria": "Certificate of completion for {name}"
     }
+  },
+  "certificateShare": {
+    "heading": "Certificate",
+    "intro": "Shared progress from RoCourse — {name} earned this one.",
+    "viewProfile": "View {name}'s profile",
+    "startLearning": "Start learning",
+    "notFoundTitle": "Certificate not found",
+    "metaTitle": "RoCourse certificate — {title}",
+    "metaDescription": "{name} earned a RoCourse certificate for {title}."
+  },
+  "share": {
+    "shareProfile": "Share profile",
+    "shareCertificate": "Share certificate",
+    "copied": "Copied!"
   },
   "feedback": {
     "button": "Feedback",
@@ -738,7 +756,10 @@
     "pageIntro": "Hand-picked community assets for Roblox development. Every item here was reviewed by the course author before being published.",
     "submitAction": "Submit a resource",
     "submitPageTitle": "Submit a resource",
-    "submitPageIntro": "Made something worth sharing? Submit it and it goes to the course author for review. Accepted resources appear on the <link>Resources</link> page."
+    "submitPageIntro": "Made something worth sharing? Submit it and it goes to the course author for review. Accepted resources appear on the <link>Resources</link> page.",
+    "ownerPicks": "Owner picks",
+    "noResourcesRecommended": "No owner picks yet.",
+    "ownerPick": "Owner pick"
   },
   "relativeTime": {
     "justNow": "just now",
