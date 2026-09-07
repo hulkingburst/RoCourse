@@ -7,6 +7,7 @@ import { Bell, CheckCircle2, Loader2, MessageSquareText, XCircle } from "lucide-
 import { cn } from "@/lib/utils";
 import { useAuthUiStore } from "@/lib/auth-ui";
 import { Button } from "@/components/ui/button";
+import { SelectField } from "@/components/ui/select-field";
 import {
   Dialog,
   DialogContent,
@@ -133,18 +134,14 @@ export function FeedbackButton({
                 <span className="mb-1 block text-xs font-medium text-muted-foreground">
                   {t("type")}
                 </span>
-                <select
+                <SelectField
                   value={type}
-                  onChange={(event) => setType(event.target.value as FeedbackType)}
-                  aria-label={t("type")}
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  {FEEDBACK_TYPES.map((value) => (
-                    <option key={value} value={value}>
-                      {t(`type${value.charAt(0).toUpperCase()}${value.slice(1)}`)}
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={(option) => setType(option as FeedbackType)}
+                  options={FEEDBACK_TYPES.map((value) => ({
+                    value,
+                    label: t(`type${value.charAt(0).toUpperCase()}${value.slice(1)}`),
+                  }))}
+                />
               </label>
               <textarea
                 value={text}

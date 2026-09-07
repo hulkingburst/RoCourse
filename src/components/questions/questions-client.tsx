@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SelectField } from "@/components/ui/select-field";
 import {
   Dialog,
   DialogContent,
@@ -285,21 +286,15 @@ function AskQuestionDialog({
           </div>
           <div className="grid gap-2">
             <Label htmlFor="question-lesson">{t("lessonLabel")}</Label>
-            <select
+            <SelectField
               id="question-lesson"
               value={lessonSlug}
-              onChange={(event) => setLessonSlug(event.target.value)}
-              className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <option value="" className="bg-white text-black">
-                {t("noLesson")}
-              </option>
-              {lessons.map((lesson) => (
-                <option key={lesson.slug} value={lesson.slug} className="bg-white text-black">
-                  {lesson.title}
-                </option>
-              ))}
-            </select>
+              onValueChange={(option) => setLessonSlug(option)}
+              options={[
+                { value: "", label: t("noLesson") },
+                ...lessons.map((lesson) => ({ value: lesson.slug, label: lesson.title })),
+              ]}
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="question-body">{t("bodyLabel")}</Label>

@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select-field";
 
 type Mode = "file" | "code" | "url";
 type Status = "idle" | "uploading" | "submitting" | "success" | "error";
@@ -211,18 +212,15 @@ export function SubmitForm() {
     <div className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="rc-kind">{t("resourceType")}</Label>
-        <select
+        <SelectField
           id="rc-kind"
           value={kind}
-          onChange={(event) => setKind(event.target.value as ResourceKind)}
-          className={cn(inputClass, "h-9")}
-        >
-          {RESOURCE_KINDS.map((option) => (
-            <option key={option.value} value={option.value} className="bg-white text-black">
-              {t(`kinds.${option.labelKey}`)}
-            </option>
-          ))}
-        </select>
+          onValueChange={(option) => setKind(option as ResourceKind)}
+          options={RESOURCE_KINDS.map((option) => ({
+            value: option.value,
+            label: t(`kinds.${option.labelKey}`),
+          }))}
+        />
       </div>
 
       <div className="space-y-2">
@@ -346,17 +344,14 @@ export function SubmitForm() {
           </div>
         ) : (
           <div className="space-y-2">
-            <select
+            <SelectField
               value={codeLang}
-              onChange={(event) => setCodeLang(event.target.value)}
-              className={cn(inputClass, "h-9")}
-            >
-              {CODE_LANGS.map((language) => (
-                <option key={language} value={language} className="bg-white text-black">
-                  {language}
-                </option>
-              ))}
-            </select>
+              onValueChange={(option) => setCodeLang(option)}
+              options={CODE_LANGS.map((language) => ({
+                value: language,
+                label: language,
+              }))}
+            />
             <textarea
               value={code}
               onChange={(event) => setCode(event.target.value)}
