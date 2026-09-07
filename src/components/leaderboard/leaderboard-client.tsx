@@ -44,6 +44,15 @@ export function LeaderboardClient() {
 
   const currentWeek = React.useMemo(() => weekKey(new Date()), []);
   const [week, setWeek] = React.useState(currentWeek);
+  const [view, setView] = React.useState<"everyone" | "friends">("everyone");
+  // The friends board needs an account; drop back to the public board the
+  // moment the viewer signs out (render-time adjustment, so no 401 lingering
+  // from a stale "friends" view queued for fetch).
+  const [prevAuthStatus, setPrevAuthStatus] = React.useState(status);
+  if (prevAuthStatus !== status) {
+    setPrevAuthStatus(status);
+    if (status === "unauthenticated") setView("everyone");
+  }
   const [data, setData] = React.useState<{
     week: string;
     rows: LeaderboardRow[];
@@ -56,7 +65,7 @@ export function LeaderboardClient() {
 
   React.useEffect(() => {
     let cancelled = false;
-    fetch(`/api/leaderboard?week=${week}`, { cache: "no-store" })
+    fetch(`/api/leaderboard?week=${week}&view=${view}`, { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : Promise.reject()))
       .then((next: { rows: LeaderboardRow[] }) => {
         if (cancelled) return;
@@ -71,7 +80,7 @@ export function LeaderboardClient() {
     return () => {
       cancelled = true;
     };
-  }, [week, retry]);
+  }, [week, view, retry]);
 
   const loading = !error && (data === null || data.week !== week);
   const rows = data?.week === week ? data.rows : [];
@@ -104,29 +113,67 @@ export function LeaderboardClient() {
   return (
     <div className="space-y-6">
       <section className="rounded-xl border bg-card p-5">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">{t("thisWeek")}</h2>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setWeek(shiftWeek(week, -1))}
-              aria-label={t("prevWeek")}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="w-40 text-center text-sm font-medium">
-              {weekLabel}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setWeek(shiftWeek(week, 1))}
-              disabled={week === currentWeek}
-              aria-label={t("nextWeek")}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center gap-2">
+            {status === "authenticated" && (
+              <div
+                role="tablist"
+                aria-label={t("title")}
+                className="flex items-center gap-1 rounded-full border bg-muted/40 p-0.5"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={view === "everyone"}
+                  onClick={() => setView("everyone")}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-semibold transition-colors",
+                    view === "everyone"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {t("everyone")}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={view === "friends"}
+                  onClick={() => setView("friends")}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-semibold transition-colors",
+                    view === "friends"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {t("friends")}
+                </button>
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setWeek(shiftWeek(week, -1))}
+                aria-label={t("prevWeek")}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="w-40 text-center text-sm font-medium">
+                {weekLabel}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setWeek(shiftWeek(week, 1))}
+                disabled={week === currentWeek}
+                aria-label={t("nextWeek")}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -135,6 +182,10 @@ export function LeaderboardClient() {
             <Zap className="h-3.5 w-3.5 text-amber-500" />
             {t("yourXp", { xp: myWeeklyXp })}
           </p>
+        )}
+
+        {view === "friends" && (
+          <p className="mt-2 text-xs text-muted-foreground">{t("friendsHint")}</p>
         )}
 
         {loading ? (
@@ -151,7 +202,7 @@ export function LeaderboardClient() {
           </div>
         ) : rows.length === 0 ? (
           <p className="py-16 text-center text-sm text-muted-foreground">
-            {t("empty")}
+            {view === "friends" ? t("friendsEmpty") : t("empty")}
           </p>
         ) : (
           <ol className="mt-4 space-y-2">

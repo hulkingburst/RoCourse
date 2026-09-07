@@ -310,7 +310,13 @@
   },
   "badges": {
     "title": "Achievements",
-    "earned": "{earned} of {total} earned"
+    "earned": "{earned} of {total} earned",
+    "badgeEarned": "Badge earned!",
+    "viewAchievements": "View achievements",
+    "tierBronze": "Bronze",
+    "tierSilver": "Silver",
+    "tierGold": "Gold",
+    "close": "Dismiss"
   },
   "badge": {
     "first-steps": {
@@ -2136,6 +2142,20 @@
     "guestNameBanned": "That name isn't allowed. Please pick another one.",
     "saveName": "Save name",
     "playingAs": "Playing as",
-    "editName": "Edit name"
+    "editName": "Edit name",
+    "everyone": "Everyone",
+    "friends": "Friends",
+    "friendsHint": "Friends shows the accounts you follow plus you. Follows are one-way — people you follow aren't notified.",
+    "friendsEmpty": "No one you follow has earned XP this week yet."
+  },
+  "follow": {
+    "follow": "Follow",
+    "following": "Following",
+    "followingAria": "Unfollow {name}",
+    "signInPrompt": "Sign in to follow {name}",
+    "followersCount": "{count, plural, one {# follower} other {# followers}}",
+    "followingCount": "{count, plural, one {# following} other {# following}}",
+    "error": "Couldn't update. Please try again in a moment.",
+    "selfHint": "This is you"
   }
 }

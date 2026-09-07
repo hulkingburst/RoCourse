@@ -18,6 +18,10 @@ import type { NotificationState } from "@/lib/notification-types";
  */
 export function useNotifications(totalLessons: number): void {
   const hydrated = useNotificationsStore((s) => s.hydrated);
+  // Badge stats derive from the progress store, so we must wait for IT to
+  // hydrate too — otherwise the first effect run sees an empty snapshot and the
+  // baseline below would treat every loaded badge as "new".
+  const progressHydrated = useProgressStore((s) => s.hydrated);
   const { data: session, status } = useSession();
   const signedIn = status === "authenticated" && !!session?.user?.id;
 
@@ -73,13 +77,28 @@ export function useNotifications(totalLessons: number): void {
   // The stored "title" is the badge id — the bell UI localizes it via the i18n
   // badge catalog (badge.<id>.name), keeping the stored/synced data stable and
   // locale-independent.
+  //
+  // Celebration popups are gated behind a baseline so they only play for badges
+  // actually earned (or newly synced in) during THIS session — never as a
+  // replay of what was already loaded from localStorage or pulled from the
+  // cloud. The bell notifications still fire once for every earned badge via
+  // the persisted `earnedBadgeKeys` dedup.
+  const baselineRef = React.useRef<Set<string> | null>(null);
   React.useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || !progressHydrated) return;
     const store = useNotificationsStore.getState();
+
+    if (baselineRef.current === null) {
+      baselineRef.current = new Set(earnedBadgeKeys);
+    }
+
     for (const badgeId of earnedBadgeKeys) {
       store.awardBadge(badgeId, badgeId);
+      if (baselineRef.current.has(badgeId)) continue;
+      baselineRef.current.add(badgeId);
+      store.enqueueCelebration(badgeId);
     }
-  }, [earnedBadgeKeys, hydrated]);
+  }, [earnedBadgeKeys, hydrated, progressHydrated]);
 
   // ----- server backup for signed-in users -----
 

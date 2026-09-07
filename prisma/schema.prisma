@@ -23,6 +23,8 @@ model User {
   weeklyFirsts     WeeklyFirst[]
   notifications    Notification[]
   feedbackTickets  FeedbackTicket[]
+  following        Follow[] @relation("follows")
+  followers        Follow[] @relation("followedBy")
 }
 
 model ProgressProfile {
@@ -165,4 +167,20 @@ model FeedbackTicket {
 
   @@unique([repo, issueNumber])
   @@index([userId, state])
+}
+
+// One-way follow ("account I enjoy on this week's leaderboard"). Friendship is
+// intentionally directed: A following B does not imply B follows A. The DB
+// guarantees there's never a self-follow (CHECK constraint added in the
+// migration) and that a pair can't be followed twice (unique constraint).
+model Follow {
+  id         String   @id @default(cuid())
+  followerId String
+  follower   User     @relation("follows", fields: [followerId], references: [id], onDelete: Cascade)
+  followedId String
+  followed   User     @relation("followedBy", fields: [followedId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([followerId, followedId])
+  @@index([followedId])
 }

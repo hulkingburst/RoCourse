@@ -37,6 +37,8 @@ export interface PublicProfile {
   stats: PublicStats;
   badgeStats: BadgeStats;
   completions: PublicCompletion[];
+  followerCount: number;
+  followingCount: number;
 }
 
 /** Entry for the learner showcase — someone who finished a course. */
@@ -174,6 +176,7 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
         orderBy: { completedAt: "asc" },
         select: { courseId: true, title: true, completedAt: true },
       },
+      _count: { select: { followers: true, following: true } },
     },
   });
   if (!user) return null;
@@ -197,6 +200,8 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
       title: completion.title,
       completedAt: completion.completedAt.toISOString(),
     })),
+    followerCount: user._count.followers,
+    followingCount: user._count.following,
   };
 }
 

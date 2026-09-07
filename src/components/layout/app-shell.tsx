@@ -11,6 +11,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SidebarNav } from "@/components/layout/course-sidebar";
 import { useGuestXpReporter } from "@/lib/use-guest-xp-reporter";
 import { useNotifications } from "@/lib/use-notifications";
+import { BadgeCelebration } from "@/components/layout/badge-celebration";
 import type { CourseSection, SearchEntry } from "@/lib/types";
 
 export function AppShell({
@@ -34,6 +35,7 @@ export function AppShell({
 
   return (
     <div className="min-h-screen">
+      <BadgeCelebration />
       {!sidebarCollapsed && (
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-80 border-r bg-sidebar text-sidebar-foreground lg:block">
           <SidebarNav sections={sections} />

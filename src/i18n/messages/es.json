@@ -310,7 +310,13 @@
   },
   "badges": {
     "title": "Logros",
-    "earned": "{earned} de {total} conseguidos"
+    "earned": "{earned} de {total} conseguidos",
+    "badgeEarned": "¡Logro conseguido!",
+    "viewAchievements": "Ver logros",
+    "tierBronze": "Bronce",
+    "tierSilver": "Plata",
+    "tierGold": "Oro",
+    "close": "Cerrar"
   },
   "badge": {
     "first-steps": {
@@ -2136,6 +2142,20 @@
     "guestNameBanned": "Ese nombre no está permitido. Elige otro.",
     "saveName": "Guardar nombre",
     "playingAs": "Jugando como",
-    "editName": "Editar nombre"
+    "editName": "Editar nombre",
+    "everyone": "Todos",
+    "friends": "Amigos",
+    "friendsHint": "Amigos muestra las cuentas a las que sigues más tú. Los seguimientos son unidireccionales: las personas a las que sigues no reciben aviso.",
+    "friendsEmpty": "Nadie a quien sigues ha ganado XP esta semana todavía."
+  },
+  "follow": {
+    "follow": "Seguir",
+    "following": "Siguiendo",
+    "followingAria": "Dejar de seguir a {name}",
+    "signInPrompt": "Inicia sesión para seguir a {name}",
+    "followersCount": "{count, plural, one {# seguidor} other {# seguidores}}",
+    "followingCount": "{count, plural, one {# siguiendo} other {# siguiendo}}",
+    "error": "No se pudo actualizar. Inténtalo de nuevo en un momento.",
+    "selfHint": "Este eres tú"
   }
 }

@@ -25,6 +25,7 @@ import type { PublicProfile } from "@/lib/users";
 import { courseTitleKey } from "@/lib/course-titles";
 import { levelProgress } from "@/lib/xp";
 import { ShareLinkButton } from "@/components/share/share-link-button";
+import { ProfileFollowActions } from "@/components/profile/profile-follow-actions";
 
 function Stat({
   icon,
@@ -63,30 +64,38 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
           {initial}
         </div>
-        <div className="min-w-0">
-          <h1 className="text-3xl font-bold tracking-tight">{profile.name}</h1>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">{profile.name}</h1>
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <ProfileFollowActions
+                handle={profile.handle}
+                name={profile.name}
+                initialFollowers={profile.followerCount}
+                initialFollowing={profile.followingCount}
+              />
+              <ShareLinkButton
+                path={`/u/${profile.handle}`}
+                labelKey="shareProfile"
+                variant="outline"
+                size="sm"
+              />
+              <Link
+                href="/leaderboard"
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+              >
+                <Trophy className="h-3.5 w-3.5" />
+                {t("seeLeaderboard")}
+              </Link>
+            </div>
+          </div>
           <p className="mt-1 text-sm text-muted-foreground">
             {t("joinedAt", { handle: profile.handle, date: joined })}
           </p>
         </div>
-        <div className="ml-auto flex flex-wrap items-center gap-3">
-          <ShareLinkButton
-            path={`/u/${profile.handle}`}
-            labelKey="shareProfile"
-            variant="outline"
-            size="sm"
-          />
-          <Link
-            href="/leaderboard"
-            className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
-          >
-            <Trophy className="h-3.5 w-3.5" />
-            {t("seeLeaderboard")}
-          </Link>
-        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-3 gap-4">
         <Stat
           icon={<Zap className="h-4 w-4" />}
           label={t("statLevel")}

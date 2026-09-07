@@ -19,6 +19,12 @@ interface NotificationsState {
   backedUpIds: string[];
   /** Notification ids the user deleted — never re-added by any source. */
   deletedIds: string[];
+  /**
+   * Badge ids earned during this session, awaiting their celebration popup.
+   * Session-scoped only: never persisted (celebration is a one-shot moment, and
+   * reload/sync must not replay it). Consumed FIFO by the toast component.
+   */
+  celebrations: string[];
   /** ISO timestamp of the last local change. */
   lastUpdated: string | null;
 
@@ -55,6 +61,10 @@ interface NotificationsState {
   markBackedUp: (ids: string[]) => void;
   /** Removes a notification (and suppresses it being re-added by any source). */
   removeNotification: (id: string) => void;
+  /** Queues a badge id for the celebration popup (deduped, FIFO). */
+  enqueueCelebration: (badgeId: string) => void;
+  /** Dequeues a badge id once its celebration has been shown. */
+  removeCelebration: (badgeId: string) => void;
   clearAll: () => void;
 }
 
@@ -104,6 +114,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       earnedBadgeKeys: [],
       backedUpIds: [],
       deletedIds: [],
+      celebrations: [],
       lastUpdated: null,
 
       setHydrated: (value) => set({ hydrated: value }),
@@ -231,6 +242,17 @@ export const useNotificationsStore = create<NotificationsState>()(
           };
         }),
 
+      enqueueCelebration: (badgeId) =>
+        set((state) => {
+          if (state.celebrations.includes(badgeId)) return state;
+          return { celebrations: [...state.celebrations, badgeId] };
+        }),
+
+      removeCelebration: (badgeId) =>
+        set((state) => ({
+          celebrations: state.celebrations.filter((id) => id !== badgeId),
+        })),
+
       clearAll: () =>
         set({
           notifications: [],
@@ -238,6 +260,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           earnedBadgeKeys: [],
           backedUpIds: [],
           deletedIds: [],
+          celebrations: [],
           lastUpdated: null,
         }),
     }),
