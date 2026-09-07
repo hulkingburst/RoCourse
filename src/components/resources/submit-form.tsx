@@ -268,7 +268,7 @@ export function SubmitForm() {
 
       <div className="space-y-2">
         <Label>{t("contentLabel")}</Label>
-        <div className="inline-flex rounded-md border bg-muted/40 p-1">
+        <div className="flex w-fit rounded-md border bg-muted/40 p-1">
           {(["file", "code", "url"] as Mode[]).map((option) => (
             <button
               key={option}
