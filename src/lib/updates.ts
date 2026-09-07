@@ -15,6 +15,13 @@ export interface SiteUpdate {
 
 export const SITE_UPDATES: SiteUpdate[] = [
   {
+    id: "2026-09-07-follows-friends-board",
+    title: "Follow learners & a friends-only leaderboard",
+    body: "You can now follow any learner from their public profile, and the leaderboard has a \"Friends\" tab that shows just you and the accounts you follow. Your follower and following counts appear on your profile. Badge celebrations also get a fun pop-up the moment you earn one.",
+    link: "/leaderboard",
+    createdAt: "2026-09-07T18:00:00.000Z",
+  },
+  {
     id: "2026-09-06-certificates-share-resources",
     title: "Section certificates, shareable achievements & owner picks",
     body: "You now earn a certificate for every complete section — not just the whole course — and you can share any certificate or your public profile with a single copy-link. The Resources page also has an \"Owner picks\" filter for resources the course author personally recommends. Your certificates live in the profile and on the Certificate page.",
