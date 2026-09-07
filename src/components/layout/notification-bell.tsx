@@ -4,7 +4,7 @@ import * as React from "react";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Bell, BellRing, CheckCheck, ExternalLink, MessageSquareText, PartyPopper, Sparkles, LifeBuoy, X } from "lucide-react";
-import { useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { BADGES } from "@/lib/badges";
 import {
   useNotificationsStore,
@@ -50,7 +50,6 @@ function relativeTime(iso: string, now: number): string {
 export function NotificationBell() {
   const t = useTranslations("notifications");
   const badgeT = useTranslations("badge");
-  const router = useRouter();
   const { status } = useSession();
   const signedIn = status === "authenticated";
   const [open, setOpen] = React.useState(false);
@@ -105,13 +104,9 @@ export function NotificationBell() {
 
   const viewLink = (n: AppNotification) => {
     const url = n.link;
-    if (!url) return;
+    if (!url || url.startsWith("/")) return;
     setSelected(null);
-    if (url.startsWith("/")) {
-      router.push(url);
-    } else {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const deleteNotification = (id: string) => {
@@ -270,10 +265,19 @@ export function NotificationBell() {
                   {t("delete")}
                 </Button>
                 {selected.link ? (
-                  <Button size="sm" onClick={() => viewLink(selected)}>
-                    <ExternalLink className="h-4 w-4" />
-                    {t("view")}
-                  </Button>
+                  selected.link.startsWith("/") ? (
+                    <Button asChild size="sm" onClick={() => setSelected(null)}>
+                      <Link href={selected.link}>
+                        <ExternalLink className="h-4 w-4" />
+                        {t("view")}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button size="sm" onClick={() => viewLink(selected)}>
+                      <ExternalLink className="h-4 w-4" />
+                      {t("view")}
+                    </Button>
+                  )
                 ) : (
                   <Button size="sm" onClick={() => void deleteNotification(selected.id)}>
                     {t("done")}
