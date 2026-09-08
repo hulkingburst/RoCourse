@@ -69,10 +69,7 @@ export function NotificationBell() {
 
   const titleFor = (n: AppNotification): string => {
     if (n.type === "badge") {
-      // Stored title is the badge id — localize from the badge catalog, with a
-      // graceful fallback to the stored text if the id is unknown.
-      const known = BADGES.some((b) => b.id === n.title);
-      return known ? badgeT(`${n.title}.name`) : n.title;
+      return t("badgeUnlocked");
     }
     switch (n.type) {
       case "feedback_received":
@@ -88,8 +85,10 @@ export function NotificationBell() {
 
   const descriptionFor = (n: AppNotification): string | null => {
     if (n.type === "badge") {
+      // The stored title is the badge id — surface the localized badge name here
+      // rather than the generic "No additional details" fallback.
       const known = BADGES.some((b) => b.id === n.title);
-      return known ? badgeT(`${n.title}.description`) : (n.body ?? null);
+      return known ? badgeT(`${n.title}.name`) : (n.body ?? null);
     }
     return n.body ?? null;
   };
@@ -202,9 +201,9 @@ export function NotificationBell() {
                               {relativeTime(n.createdAt, now)}
                             </span>
                           </span>
-                          {n.body ? (
+                          {descriptionFor(n) ? (
                             <span className="mt-0.5 line-clamp-2 block text-xs text-muted-foreground">
-                              {n.body}
+                              {descriptionFor(n)}
                             </span>
                           ) : null}
                         </span>
