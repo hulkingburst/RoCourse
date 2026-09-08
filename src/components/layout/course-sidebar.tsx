@@ -15,12 +15,13 @@ import {
   ListChecks,
   LockKeyhole,
   MessageCircleQuestion,
+  Package,
+  Presentation,
   PlayCircle,
   RotateCcw,
   Terminal,
   Timer,
   Zap,
-  Package,
 } from "lucide-react";
 import * as React from "react";
 import type { CourseSection, LessonMeta } from "@/lib/types";
@@ -370,6 +371,17 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
                 <Link href="/leaderboard">
                   <Zap className="h-3.5 w-3.5" />
                   {t("leaderboard")}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="w-full justify-start text-muted-foreground"
+              >
+                <Link href="/showcase">
+                  <Presentation className="h-3.5 w-3.5" />
+                  {t("showcase")}
                 </Link>
               </Button>
               <Button

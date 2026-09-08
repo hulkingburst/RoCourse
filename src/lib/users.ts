@@ -41,15 +41,6 @@ export interface PublicProfile {
   followingCount: number;
 }
 
-/** Entry for the learner showcase — someone who finished a course. */
-export interface ShowcaseEntry {
-  handle: string;
-  name: string;
-  completedAt: string;
-  courseTitle: string;
-  project: "tycoon" | "collector" | null;
-}
-
 function clampInt(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value)
     ? Math.max(0, Math.floor(value))
@@ -203,28 +194,4 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
     followerCount: user._count.followers,
     followingCount: user._count.following,
   };
-}
-
-/** Wall-of-fame rows: learners who completed a course, newest first. Only
- * users with a public handle are listed, since each row links to a profile. */
-export async function getLearnerShowcase(): Promise<ShowcaseEntry[]> {
-  const completions = await prisma.courseCompletion.findMany({
-    where: { user: { handle: { not: null } } },
-    select: {
-      completedAt: true,
-      title: true,
-      user: {
-        select: { handle: true, name: true, progress: { select: { data: true } } },
-      },
-    },
-    orderBy: { completedAt: "desc" },
-  });
-
-  return completions.map((completion) => ({
-    handle: completion.user.handle as string,
-    name: moderateName(completion.user.name),
-    completedAt: completion.completedAt.toISOString(),
-    courseTitle: completion.title,
-    project: extractPublicStats(completion.user.progress?.data).finishedPath,
-  }));
 }
