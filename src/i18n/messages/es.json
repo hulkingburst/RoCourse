@@ -2155,7 +2155,6 @@
     "signInPrompt": "Inicia sesión para seguir a {name}",
     "followersCount": "{count, plural, one {# seguidor} other {# seguidores}}",
     "followingCount": "{count, plural, one {# siguiendo} other {# siguiendo}}",
-    "error": "No se pudo actualizar. Inténtalo de nuevo en un momento.",
-    "selfHint": "Este eres tú"
+    "error": "No se pudo actualizar. Inténtalo de nuevo en un momento."
   }
 }

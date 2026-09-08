@@ -2155,7 +2155,6 @@
     "signInPrompt": "Sign in to follow {name}",
     "followersCount": "{count, plural, one {# follower} other {# followers}}",
     "followingCount": "{count, plural, one {# following} other {# following}}",
-    "error": "Couldn't update. Please try again in a moment.",
-    "selfHint": "This is you"
+    "error": "Couldn't update. Please try again in a moment."
   }
 }

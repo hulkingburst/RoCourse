@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { BadgeCheck, Loader2, UserCheck, UserPlus, Users } from "lucide-react";
+import { Loader2, UserCheck, UserPlus, Users } from "lucide-react";
 import { useAuthUiStore } from "@/lib/auth-ui";
 import { Button } from "@/components/ui/button";
 
@@ -137,12 +137,7 @@ export function ProfileFollowActions({
         <UserCheck className="h-3.5 w-3.5" />
         {t("followingCount", { count: following })}
       </span>
-      {isSelf ? (
-        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-          <BadgeCheck className="h-3.5 w-3.5" />
-          {t("selfHint")}
-        </span>
-      ) : isGuest ? (
+      {isGuest ? (
         <Button
           type="button"
           variant="outline"
