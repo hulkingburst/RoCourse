@@ -11,11 +11,15 @@ import {
 } from "@/components/activities/activity-shell";
 import type { ActivityStatus } from "@/components/activities/activity-shell";
 import { Mcq } from "@/components/activities/mcq";
-import { isAnswerMatch } from "@/components/activities/grading";
+import {
+  isAnswerMatch,
+  answerPreview,
+  type AnswerSpec,
+} from "@/components/activities/grading";
 
 interface PredictOutputProps {
   /** What the code prints / does. Accepts several equivalent phrasings. */
-  answer: string | string[];
+  answer: AnswerSpec;
   /** When provided, prediction is multiple-choice instead of typed. */
   options?: string[];
   /** Index of the correct option. Required when `options` is set. */
@@ -99,7 +103,7 @@ function FreeTextPredict({
   };
 
   const correct = status === "correct";
-  const acceptedFirst = (Array.isArray(answer) ? answer : [answer])[0];
+  const acceptedFirst = answerPreview(answer);
 
   return (
     <ActivityCard label={resolvedLabel} icon={Brain} status={correct ? "correct" : status}>

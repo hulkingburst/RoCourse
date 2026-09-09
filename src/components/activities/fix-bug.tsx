@@ -10,7 +10,12 @@ import {
   Feedback,
 } from "@/components/activities/activity-shell";
 import type { ActivityStatus } from "@/components/activities/activity-shell";
-import { isAnswerMatch, generateHint } from "@/components/activities/grading";
+import {
+  isAnswerMatch,
+  generateHint,
+  answerPreview,
+  type AnswerSpec,
+} from "@/components/activities/grading";
 import { Mcq } from "@/components/activities/mcq";
 
 interface FixBugProps {
@@ -25,7 +30,7 @@ interface FixBugProps {
    * Type mode: the accepted fixed version(s). When provided, the learner types
    * the fix instead of picking an option.
    */
-  fix?: string | string[];
+  fix?: AnswerSpec;
   /** Type mode: the prompt shown above the editor. */
   instruction?: string;
   /**
@@ -85,7 +90,7 @@ export function FixBug({
   };
 
   const correct = status === "correct";
-  const acceptedFirst = Array.isArray(fix) ? fix[0] : fix;
+  const acceptedFirst = answerPreview(fix ?? "");
   const hint =
     status === "wrong" && isTypeMode
       ? generateHint(value, fix!, { strictLocal: requireLocal }, t)

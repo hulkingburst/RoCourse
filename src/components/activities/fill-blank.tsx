@@ -10,13 +10,17 @@ import {
   Feedback,
 } from "@/components/activities/activity-shell";
 import type { ActivityStatus } from "@/components/activities/activity-shell";
-import { isAnswerCorrect } from "@/components/activities/grading";
+import {
+  isAnswerCorrect,
+  answerPreview,
+  type AnswerSpec,
+} from "@/components/activities/grading";
 import { cn } from "@/lib/utils";
 
 interface FillBlankProps {
   /** The sentence with exactly one `____` where the input is placed. */
   prompt: string;
-  answer: string | string[];
+  answer: AnswerSpec;
   placeholder?: string;
   explanation?: string;
   label?: string;
@@ -61,7 +65,7 @@ export function FillBlank({
   };
 
   const correct = status === "correct";
-  const acceptedFirst = (Array.isArray(answer) ? answer : [answer])[0];
+  const acceptedFirst = answerPreview(answer);
 
   return (
     <ActivityCard

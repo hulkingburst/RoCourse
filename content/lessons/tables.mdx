@@ -67,7 +67,11 @@ print(#powerups)  --> 3  (# is "how many slots")
 
 <WriteCode
   instruction="Make a table named inventory and add the string 'sword' to it with table.insert."
-  answer={["local inventory = {}", "table.insert(inventory, \"sword\")"]}
+  answer={[
+    ["local inventory = {}", "table.insert(inventory, \"sword\")"],
+    ["local inventory = { \"sword\" }"],
+    ["local inventory = {}", "inventory[1] = \"sword\""],
+  ]}
   starterCode="-- build your inventory
 "
   explanation="Start with an empty {} table, then table.insert pushes 'sword' onto the end."

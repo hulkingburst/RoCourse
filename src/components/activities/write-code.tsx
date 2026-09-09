@@ -10,7 +10,12 @@ import {
   Feedback,
 } from "@/components/activities/activity-shell";
 import type { ActivityStatus } from "@/components/activities/activity-shell";
-import { isAnswerCorrect, generateHint } from "@/components/activities/grading";
+import {
+  isAnswerCorrect,
+  generateHint,
+  answerPreview,
+  type AnswerSpec,
+} from "@/components/activities/grading";
 import { runLuau } from "@/lib/luau-runtime";
 import {
   buildChecksScript,
@@ -20,7 +25,7 @@ import {
 
 interface WriteCodeProps {
   instruction: string;
-  answer: string | string[];
+  answer: AnswerSpec;
   /** Read-only context shown above the editor (e.g. the rest of the script). */
   starterCode?: string;
   /**
@@ -101,7 +106,7 @@ export function WriteCode({
   };
 
   const correct = status === "correct";
-  const acceptedFirst = (Array.isArray(answer) ? answer : [answer])[0];
+  const acceptedFirst = answerPreview(answer);
   const hint =
     status === "wrong" && !checks
       ? generateHint(value, answer, { strictLocal: requireLocal }, t)

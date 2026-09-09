@@ -4,11 +4,22 @@
  * Code answers are graded by normalising whitespace, case, semicolons and
  * comments, then comparing against one or more accepted answers. This is
  * deliberately forgiving for the one-to-a-few-line exercises in this course.
+ *
+ * An answer may be:
+ *  - a single string           -> one accepted answer;
+ *  - a flat array of strings   -> accepted as individual one-line answers AND
+ *    as one multi-line snippet, so learners who write the expected lines together
+ *    ("typed the whole thing") are accepted too;
+ *  - a nested array (string[][]) -> each inner array is its own accepted answer
+ *    and may span several lines, for steps with several equally-valid solutions.
  */
 
 import type { useTranslations } from "next-intl";
 
 export type Translator = ReturnType<typeof useTranslations>;
+
+/** A typed answer: one string, a flat list of lines, or explicit alternatives. */
+export type AnswerSpec = string | string[] | string[][];
 
 export function normalizeAnswer(input: string): string {
   return input
@@ -34,20 +45,79 @@ export interface AnswerOptions {
   strictLocal?: boolean;
 }
 
+interface AnswerVariant {
+  /** Normalized lines of one accepted answer; a snippet keeps its lines apart. */
+  lines: string[];
+}
+
+/**
+ * Splits an answer into its accepted variants, normalizing every line through
+ * `normalizeLine`. A plain string is one one-line variant; a flat array keeps
+ * today's meaning (every element is its own accepted answer) and, when it has
+ * more than one line, also becomes a single multi-line snippet; a nested array
+ * lists explicit alternatives where each inner array is its own variant.
+ */
+function answerVariants(
+  answer: AnswerSpec,
+  normalizeLine: (s: string) => string
+): AnswerVariant[] {
+  const norm = (value: string): string => normalizeLine(value).trim();
+
+  if (typeof answer === "string") {
+    const lines = [norm(answer)].filter(Boolean);
+    return lines.length ? [{ lines }] : [];
+  }
+
+  if (answer.length > 0 && Array.isArray(answer[0])) {
+    return (answer as string[][]).map((variant) => {
+      const value = Array.isArray(variant) ? variant : [variant];
+      return { lines: value.map(norm).filter(Boolean) };
+    });
+  }
+
+  const lines = (answer as string[]).map(norm).filter(Boolean);
+  if (lines.length === 0) return [];
+  const variants: AnswerVariant[] = lines.map((line) => ({ lines: [line] }));
+  if (lines.length > 1) variants.push({ lines });
+  return variants;
+}
+
+function variantMatchesInput(normalized: string, lines: string[]): boolean {
+  if (lines.length === 0 || !normalized) return false;
+  const joined = lines.join("");
+  if (normalized === joined) return true;
+
+  if (lines.length === 1) {
+    // Tolerate the single answer typed inside matching quotes.
+    const wrapped =
+      normalized.length >= 2 &&
+      normalized[0] === normalized[normalized.length - 1] &&
+      /^['"]$/.test(normalized[0]);
+    return wrapped && normalized.slice(1, -1) === joined;
+  }
+
+  // Multi-line snippet: every line must appear in order. This accepts learners
+  // who write the expected lines together with extra surrounding code.
+  let pos = 0;
+  for (const line of lines) {
+    const idx = normalized.indexOf(line, pos);
+    if (idx === -1) return false;
+    pos = idx + line.length;
+  }
+  return true;
+}
+
 export function isAnswerCorrect(
   input: string,
-  answer: string | string[],
+  answer: AnswerSpec,
   options?: AnswerOptions
 ): boolean {
-  const normalized = normalizeAnswer(input);
+  const normalize = options?.strictLocal ? normalizeAnswer : normalizeAnswerLenient;
+  const normalized = normalize(input);
   if (!normalized) return false;
-  const accepted = Array.isArray(answer) ? answer : [answer];
-  const exact = accepted.some((a) => a && normalizeAnswer(a) === normalized);
-  if (exact) return true;
-  if (options?.strictLocal) return false;
-
-  const lenient = normalizeAnswerLenient(input);
-  return accepted.some((a) => a && normalizeAnswerLenient(a) === lenient);
+  return answerVariants(answer, normalize).some((variant) =>
+    variantMatchesInput(normalized, variant.lines)
+  );
 }
 
 /** True when the input parses as a number equal to `expected`. */
@@ -58,18 +128,42 @@ export function isNumericAnswer(input: string, expected: number): boolean {
   return !Number.isNaN(parsed) && parsed === expected;
 }
 
+function singleLineAnswers(answer: AnswerSpec): string[] {
+  if (typeof answer === "string") return [answer];
+  if (answer.length > 0 && Array.isArray(answer[0])) {
+    return (answer as string[][]).map((variant) => {
+      const value = Array.isArray(variant) ? variant : [variant];
+      return String(value[0] ?? "");
+    });
+  }
+  return (answer as string[]).map(String);
+}
+
 /** Given free-text answers that may be numbers or short strings, accept any match. */
 export function isAnswerMatch(
   input: string,
-  answer: string | string[],
+  answer: AnswerSpec,
   options?: AnswerOptions
 ): boolean {
   if (isAnswerCorrect(input, answer, options)) return true;
-  const accepted = Array.isArray(answer) ? answer : [answer];
-  return accepted.some((a) => {
-    const n = Number(a.trim());
-    return !Number.isNaN(n) && isNumericAnswer(input, n);
-  });
+  for (const candidate of singleLineAnswers(answer)) {
+    const n = Number(candidate.trim());
+    if (!Number.isNaN(n) && isNumericAnswer(input, n)) return true;
+  }
+  return false;
+}
+
+/**
+ * Renders the accepted answer(s) for the reveal. A single answer is itself; a
+ * snippet (or every alternative) is shown with its lines joined.
+ */
+export function answerPreview(answer: AnswerSpec): string | undefined {
+  if (typeof answer === "string") return answer;
+  if (answer.length > 0 && Array.isArray(answer[0])) {
+    const first = answer[0] as string[] | string;
+    return (Array.isArray(first) ? first : [first]).join("\n");
+  }
+  return (answer as string[]).join("\n");
 }
 
 function cleanCode(input: string): string {
@@ -88,6 +182,19 @@ function codeTokens(input: string): string[] {
   );
 }
 
+/** Candidate strings used by the hint: every explicit alternative, joined. */
+function hintCandidates(answer: AnswerSpec): string[] {
+  if (typeof answer === "string") return [answer];
+  const outer = answer as (string | string[])[];
+  const variants =
+    outer.length > 0 && Array.isArray(outer[0])
+      ? (answer as string[][])
+      : [outer];
+  return variants.map((variant) =>
+    (Array.isArray(variant) ? variant : [variant]).join("\n")
+  );
+}
+
 /**
  * Builds a spoiler-free hint explaining what's wrong with `input`, compared
  * against the accepted answers. Returns null when the input is empty or no
@@ -96,20 +203,20 @@ function codeTokens(input: string): string[] {
  */
 export function generateHint(
   input: string,
-  answer: string | string[],
+  answer: AnswerSpec,
   options: AnswerOptions | undefined,
   t: Translator
 ): string | null {
   const trimmed = input.trim();
   if (!trimmed) return null;
-  const accepted = (Array.isArray(answer) ? answer : [answer])
+  const candidates = hintCandidates(answer)
     .map((a) => a.trim())
     .filter(Boolean);
-  if (accepted.length === 0) return null;
+  if (candidates.length === 0) return null;
   if (isAnswerCorrect(input, answer, options)) return null;
 
   const inputClean = cleanCode(input).toLowerCase();
-  const acceptedClean = accepted.map((a) => cleanCode(a).toLowerCase());
+  const acceptedClean = candidates.map((a) => cleanCode(a).toLowerCase());
 
   if (options?.strictLocal && !/^\s*local\b/.test(inputClean)) {
     return t("hintMissingLocal");
