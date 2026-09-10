@@ -12,6 +12,11 @@
  *    ("typed the whole thing") are accepted too;
  *  - a nested array (string[][]) -> each inner array is its own accepted answer
  *    and may span several lines, for steps with several equally-valid solutions.
+ *
+ * A multi-line snippet whose first line is a `local x = ...` declaration also
+ * accepts the remaining lines on their own: the declaration reads as setup that
+ * may already exist in the starter code, so learners who type just the meaningful
+ * lines are accepted.
  */
 
 import type { useTranslations } from "next-intl";
@@ -48,6 +53,12 @@ export interface AnswerOptions {
 interface AnswerVariant {
   /** Normalized lines of one accepted answer; a snippet keeps its lines apart. */
   lines: string[];
+  /**
+   * True when the variant's first line is a `local x = ...` declaration: the
+   * remaining lines are then also accepted on their own, since the declaration
+   * reads as setup that may already exist in the starter code.
+   */
+  sliceSetup: boolean;
 }
 
 /**
@@ -65,24 +76,43 @@ function answerVariants(
 
   if (typeof answer === "string") {
     const lines = [norm(answer)].filter(Boolean);
-    return lines.length ? [{ lines }] : [];
+    return lines.length ? [{ lines, sliceSetup: false }] : [];
   }
 
   if (answer.length > 0 && Array.isArray(answer[0])) {
     return (answer as string[][]).map((variant) => {
       const value = Array.isArray(variant) ? variant : [variant];
-      return { lines: value.map(norm).filter(Boolean) };
+      const lines = value.map(norm).filter(Boolean);
+      const sliceSetup =
+        value.length > 1 && LEADING_LOCAL_RE.test(String(value[0]));
+      return { lines, sliceSetup };
     });
   }
 
   const lines = (answer as string[]).map(norm).filter(Boolean);
   if (lines.length === 0) return [];
-  const variants: AnswerVariant[] = lines.map((line) => ({ lines: [line] }));
-  if (lines.length > 1) variants.push({ lines });
+  const variants: AnswerVariant[] = lines.map((line) => ({
+    lines: [line],
+    sliceSetup: false,
+  }));
+  if (lines.length > 1) {
+    const rawLines = answer as string[];
+    variants.push({
+      lines,
+      sliceSetup: LEADING_LOCAL_RE.test(String(rawLines[0])),
+    });
+  }
   return variants;
 }
 
-function variantMatchesInput(normalized: string, lines: string[]): boolean {
+/** True when a line reads as a leading `local x = ...` declaration. */
+const LEADING_LOCAL_RE = /^\s*local\s+[a-z_][a-z0-9_]*\s*=/;
+
+function variantMatchesInput(
+  normalized: string,
+  lines: string[],
+  sliceSetup: boolean
+): boolean {
   if (lines.length === 0 || !normalized) return false;
   const joined = lines.join("");
   if (normalized === joined) return true;
@@ -95,6 +125,12 @@ function variantMatchesInput(normalized: string, lines: string[]): boolean {
       /^['"]$/.test(normalized[0]);
     return wrapped && normalized.slice(1, -1) === joined;
   }
+
+  // A leading `local x = ...` line reads as setup that may already exist, so
+  // the remaining lines alone are also an accepted answer. They must match the
+  // WHOLE input, so (unlike the full-snippet group below) extra lines aren't
+  // allowed — otherwise a snippet typed in reverse order would pass.
+  if (sliceSetup && normalized === lines.slice(1).join("")) return true;
 
   // Multi-line snippet: every line must appear in order. This accepts learners
   // who write the expected lines together with extra surrounding code.
@@ -116,7 +152,7 @@ export function isAnswerCorrect(
   const normalized = normalize(input);
   if (!normalized) return false;
   return answerVariants(answer, normalize).some((variant) =>
-    variantMatchesInput(normalized, variant.lines)
+    variantMatchesInput(normalized, variant.lines, variant.sliceSetup)
   );
 }
 
