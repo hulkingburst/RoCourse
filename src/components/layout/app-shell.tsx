@@ -85,12 +85,6 @@ export function AppShell({
                 {t("guides")}
               </Link>
               <Link
-                href="/showcase"
-                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-              >
-                {t("showcase")}
-              </Link>
-              <Link
                 href="/leaderboard"
                 className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
