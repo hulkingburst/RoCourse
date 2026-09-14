@@ -10,6 +10,7 @@ import {
   GraduationCap,
   ListChecks,
   Medal,
+  MessageSquareCheck,
   Puzzle,
   Rocket,
   Target,
@@ -31,6 +32,8 @@ export interface BadgeStats {
   challengesSolved: number;
   /** Completed weekly leaderboards this user finished at #1 (server-sourced). */
   weeklyFirsts: number;
+  /** Feedback tickets this user reported that got resolved (server-sourced). */
+  feedbackResolved: number;
 }
 
 export type BadgeTier = "bronze" | "silver" | "gold";
@@ -84,6 +87,8 @@ export function extractBadgeStats(data: unknown, totalLessons: number): BadgeSta
     // Server-side only; the progress blob has no view of global weekly rank.
     // Callers with DB access override this with the real count.
     weeklyFirsts: 0,
+    // Server-side only; the progress blob has no view of GitHub issue state.
+    feedbackResolved: 0,
   };
 }
 
@@ -100,6 +105,7 @@ export function emptyBadgeStats(totalLessons: number): BadgeStats {
     medals: 0,
     challengesSolved: 0,
     weeklyFirsts: 0,
+    feedbackResolved: 0,
   };
 }
 
@@ -241,6 +247,12 @@ export const BADGES: BadgeDefinition[] = [
     icon: Crown,
     tier: "gold",
     earned: (s) => s.weeklyFirsts >= 1,
+  },
+  {
+    id: "successful-feedback",
+    icon: MessageSquareCheck,
+    tier: "silver",
+    earned: (s) => s.feedbackResolved >= 1,
   },
 ];
 

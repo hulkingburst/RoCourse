@@ -62,6 +62,8 @@ export interface CloudState {
   completions: CompletionRecord[];
   /** Weekly leaderboards this user has finished at #1 (server-sourced). */
   weeklyFirsts: number;
+  /** Feedback tickets this user reported that got resolved (server-sourced). */
+  feedbackResolved: number;
   account?: { name: string; email: string; createdAt: string } | null;
 }
 

@@ -410,6 +410,10 @@
     "weekly-top-1": {
       "name": "Campeón semanal",
       "description": "Queda en el puesto #1 de la tabla semanal"
+    },
+    "successful-feedback": {
+      "name": "Opinión realizada",
+      "description": "Logra que un error que informaste sea corregido o que se añada una idea que sugeriste"
     }
   },
   "activityCalendar": {

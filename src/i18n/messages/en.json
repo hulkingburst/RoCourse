@@ -410,6 +410,10 @@
     "weekly-top-1": {
       "name": "Weekly champion",
       "description": "Finish at #1 on a weekly leaderboard"
+    },
+    "successful-feedback": {
+      "name": "Successful feedback",
+      "description": "Get a bug you reported fixed, or an idea you suggested added"
     }
   },
   "activityCalendar": {

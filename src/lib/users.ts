@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { countLessons } from "@/lib/lessons";
 import { extractBadgeStats, type BadgeStats } from "@/lib/badges";
 import { getWeeklyFirstCount } from "@/lib/weekly-first";
+import { getFeedbackResolvedCount } from "@/lib/feedback-resolved";
 import { MAX_LIFETIME_XP } from "@/lib/xp";
 import { moderateName } from "@/lib/profanity";
 
@@ -178,6 +179,8 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
   // Weekly-first placement is global leaderboard data, not in the progress
   // blob — fetch it directly so the public profile shows the real count.
   badgeStats.weeklyFirsts = await getWeeklyFirstCount(user.id);
+  // Same deal for resolved feedback tickets.
+  badgeStats.feedbackResolved = await getFeedbackResolvedCount(user.id);
 
   return {
     handle: user.handle ?? handle,

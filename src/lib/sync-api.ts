@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getFeedbackResolvedCount } from "@/lib/feedback-resolved";
 import { sanitizeSnapshot } from "@/lib/sanitize-snapshot";
 import { getWeeklyFirstCount } from "@/lib/weekly-first";
 import { MAX_WEEKLY_XP_ENTRIES, sanitizeWeeklyXp } from "@/lib/xp";
@@ -36,6 +37,7 @@ export async function getCloudState(userId: string): Promise<CloudState> {
       completedAt: completion.completedAt.toISOString(),
     })),
     weeklyFirsts: await getWeeklyFirstCount(userId),
+    feedbackResolved: await getFeedbackResolvedCount(userId),
     account: user
       ? {
           name: user.name,
