@@ -13,6 +13,7 @@ model User {
   email            String             @unique
   name             String
   handle           String?            @unique
+  nameChangedAt    DateTime?
   passwordHash     String
   createdAt        DateTime           @default(now())
   progress         ProgressProfile?
