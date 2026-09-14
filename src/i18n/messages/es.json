@@ -498,6 +498,7 @@
     "feedbackReceived": "Comentario recibido",
     "feedbackClosed": "Comentario resuelto",
     "siteUpdate": "Actualización del sitio",
+    "usernameModerated": "Nombre de usuario moderado",
     "delete": "Eliminar",
     "view": "Ver",
     "done": "Hecho",
@@ -2006,6 +2007,8 @@
     "usernameErrorRequired": "Escribe un nombre de usuario.",
     "usernameErrorTooLong": "El nombre de usuario debe tener 40 caracteres o menos.",
     "usernameErrorBadWord": "Ese nombre no está permitido. Elige otro.",
+    "usernameErrorEmail": "Ese nombre parece una dirección de correo. Elige otro.",
+    "usernameErrorSite": "Ese nombre parece un sitio web. Elige otro.",
     "usernameErrorSame": "Ese ya es tu nombre de usuario.",
     "usernameErrorCooldown": "Podrás cambiar tu nombre de usuario de nuevo el {date}.",
     "comingSoon": "Próximamente llegarán más ajustes."

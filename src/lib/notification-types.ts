@@ -7,7 +7,8 @@ export type NotificationType =
   | "update" // site news / course update
   | "badge" // a newly earned badge
   | "feedback_received" // confirmation that feedback was submitted
-  | "feedback_closed"; // feedback was resolved with the author's real message
+  | "feedback_closed" // feedback was resolved with the author's real message
+  | "moderation"; // a name was moderated/auto-changed
 
 export interface AppNotification {
   /** Stable dedup key (e.g. "badge:first-steps", "update:<slug>",

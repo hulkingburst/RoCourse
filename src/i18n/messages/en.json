@@ -498,6 +498,7 @@
     "feedbackReceived": "Feedback received",
     "feedbackClosed": "Feedback resolved",
     "siteUpdate": "Site update",
+    "usernameModerated": "Username moderated",
     "delete": "Delete",
     "view": "View",
     "done": "Done",
@@ -2006,6 +2007,8 @@
     "usernameErrorRequired": "Enter a username.",
     "usernameErrorTooLong": "Username must be 40 characters or fewer.",
     "usernameErrorBadWord": "That name isn't allowed. Please choose another.",
+    "usernameErrorEmail": "That name looks like an email address. Please choose another.",
+    "usernameErrorSite": "That name looks like a website. Please choose another.",
     "usernameErrorSame": "That's already your username.",
     "usernameErrorCooldown": "You can change your username again on {date}.",
     "comingSoon": "More settings are coming soon."

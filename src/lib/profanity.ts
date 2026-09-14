@@ -199,9 +199,39 @@ export function containsBadWord(text: string): string | null {
   return null;
 }
 
-/** Returns `text` unchanged, or a neutral fallback when it contains a banned word. */
+// ----- email & website protection -----
+// Two extra shapes usernames are checked against (beyond profanity):
+//   - an embedded email address, so a sign-up auto-fill can't leak the user's
+//     real inbox into a public leaderboard/name,
+//   - an obvious website (a scheme, "www.", or a "word.tld" like "pearl.shop"),
+//     so names can't be used to promote sites — the usual prelude to scams.
+// Deliberately only whole domains: a plain dotted name ("sam.lee") passes.
+const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i;
+const URL_RE = /(?:^|[\s(])(?:www\.|https?:\/\/|ftp:\/\/)/i;
+const PROMOTION_TLDS =
+  "com|net|org|io|co|me|info|biz|dev|xyz|app|site|online|store|shop|club|gg|tv|ai|us|uk|link|top|work|fun|world|blog|space|cloud|pro|game|live|tech|page|team|media|news";
+const PROMOTION_RE = new RegExp(
+  `(^|[\\s(])[a-z0-9][a-z0-9-]*\\.(${PROMOTION_TLDS})(?![a-z0-9-])`,
+  "i"
+);
+
+export type ProhibitedNameReason = "badword" | "email" | "site";
+
+/**
+ * Higher-level moderation gate used everywhere a public name is accepted:
+ * returns the first rule a name trips (a banned word, an embedded email, or a
+ * website), or null when the name is fine.
+ */
+export function prohibitedNameReason(text: string): ProhibitedNameReason | null {
+  if (EMAIL_RE.test(text)) return "email";
+  if (URL_RE.test(text) || PROMOTION_RE.test(text)) return "site";
+  if (containsBadWord(text)) return "badword";
+  return null;
+}
+
+/** Returns `text` unchanged, or a neutral fallback when it trips moderation. */
 export function moderateName(text: string): string {
-  return containsBadWord(text) === null ? text : FALLBACK_DISPLAY_NAME;
+  return prohibitedNameReason(text) === null ? text : FALLBACK_DISPLAY_NAME;
 }
 
 /**
@@ -210,5 +240,7 @@ export function moderateName(text: string): string {
  * name instead of rejecting the XP post outright.
  */
 export function moderateGuestName(name: string, guestId: string): string {
-  return containsBadWord(name) === null ? name : `Guest-${guestId.slice(-4).toUpperCase()}`;
+  return prohibitedNameReason(name) === null
+    ? name
+    : `Guest-${guestId.slice(-4).toUpperCase()}`;
 }

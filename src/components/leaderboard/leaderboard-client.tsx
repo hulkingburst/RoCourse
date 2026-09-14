@@ -16,7 +16,7 @@ import { Link } from "@/i18n/navigation";
 import { useGuestStore } from "@/lib/guest-store";
 import { useProgressStore } from "@/lib/progress-store";
 import { weekKey } from "@/lib/xp";
-import { containsBadWord } from "@/lib/profanity";
+import { prohibitedNameReason } from "@/lib/profanity";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,7 +93,7 @@ export function LeaderboardClient() {
   const saveName = () => {
     const name = nameInput.trim();
     if (!name) return;
-    if (containsBadWord(name)) {
+    if (prohibitedNameReason(name)) {
       setNameError(true);
       return;
     }

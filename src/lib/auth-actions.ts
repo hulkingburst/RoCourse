@@ -11,7 +11,7 @@ import {
   trustedIp,
 } from "@/lib/auth-limiter";
 import { generateUniqueHandle } from "@/lib/users";
-import { containsBadWord } from "@/lib/profanity";
+import { prohibitedNameReason } from "@/lib/profanity";
 
 export interface CreateAccountResult {
   error?: string;
@@ -52,7 +52,14 @@ export async function createAccount(
   if (name.length > 40) {
     return { error: "Name must be 40 characters or fewer." };
   }
-  if (containsBadWord(name)) {
+  const nameReason = prohibitedNameReason(name);
+  if (nameReason === "email") {
+    return { error: "That name looks like an email address. Please choose another." };
+  }
+  if (nameReason === "site") {
+    return { error: "That name looks like a website. Please choose another." };
+  }
+  if (nameReason === "badword") {
     return { error: "That name isn't allowed. Please choose another." };
   }
   if (!EMAIL_RE.test(email)) {

@@ -3,7 +3,7 @@
 import { auth, unstable_update } from "@/lib/auth";
 import { MAX_NAME_LENGTH, NAME_CHANGE_INTERVAL_MS } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
-import { containsBadWord } from "@/lib/profanity";
+import { prohibitedNameReason } from "@/lib/profanity";
 
 export interface ChangeUsernameResult {
   /** i18n key suffix under the `settings` namespace when the change fails. */
@@ -12,6 +12,8 @@ export interface ChangeUsernameResult {
     | "required"
     | "tooLong"
     | "badWord"
+    | "email"
+    | "site"
     | "same"
     | "cooldown";
   /** ISO timestamp of when the next change is allowed, set with "cooldown". */
@@ -41,8 +43,9 @@ export async function changeUsername(
   if (name.length > MAX_NAME_LENGTH) {
     return { error: "tooLong" };
   }
-  if (containsBadWord(name)) {
-    return { error: "badWord" };
+  const nameReason = prohibitedNameReason(name);
+  if (nameReason) {
+    return { error: nameReason === "badword" ? "badWord" : nameReason };
   }
 
   const user = await prisma.user.findUnique({

@@ -17,6 +17,7 @@ const VALID_TYPES: NotificationType[] = [
   "badge",
   "feedback_received",
   "feedback_closed",
+  "moderation",
 ];
 
 function toApp(row: {

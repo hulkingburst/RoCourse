@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { Bell, BellRing, CheckCheck, ExternalLink, MessageSquareText, PartyPopper, Sparkles, LifeBuoy, X } from "lucide-react";
+import { Bell, BellRing, CheckCheck, ExternalLink, MessageSquareText, PartyPopper, ShieldAlert, Sparkles, LifeBuoy, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { BADGES } from "@/lib/badges";
 import {
@@ -31,6 +31,7 @@ const TYPE_ICONS: Record<NotificationType, typeof Bell> = {
   badge: PartyPopper,
   feedback_received: MessageSquareText,
   feedback_closed: LifeBuoy,
+  moderation: ShieldAlert,
 };
 
 function relativeTime(iso: string, now: number): string {
@@ -78,6 +79,8 @@ export function NotificationBell() {
         return t("feedbackClosed");
       case "update":
         return t("siteUpdate");
+      case "moderation":
+        return t("usernameModerated");
       default:
         return n.title;
     }
