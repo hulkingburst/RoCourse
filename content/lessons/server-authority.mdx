@@ -1,0 +1,186 @@
+---
+slug: server-authority
+title: Server authority — the server is the referee
+description: Keep every rule on the server — recompute real prices, verify ownership, and let the client only report what it wants.
+sectionId: data
+order: 11
+difficulty: intermediate
+estimatedMinutes: 8
+tags: [security, authority, validation, remotes, server]
+objectives:
+  - Explain why authority means the server owns the rules, not just the code
+  - Recompute the real values on the server instead of trusting client numbers
+  - Verify ownership and affordability before rewarding
+  - Reject silently when a request doesn't hold up
+prerequisites: [remotes, rate-limiting, data-security]
+keywords: [server, authority, trust, validate, remote, price, exploit]
+---
+
+Rate limiting already slows the flood — but a well-paced flood is still dangerous if the server believes what the client *claims*. **Server authority** is the referee that decides what each request is actually worth. The client tells you what it wants; the server looks at reality and says how it goes.
+
+<Step>
+
+## Where the rules live
+
+You already know the slogan: *clients request, servers decide.* Server authority takes it one step further — it's not just about where code runs, it's about **who owns the numbers**.
+
+Here is a coin shop where the *client* gets to state the price:
+
+```luau
+-- LocalScript (on the player's computer)
+buyButton.MouseButton1Click:Connect(function()
+    buyEvent:FireServer("Sword", 50) -- "take 50 coins, give me a sword"
+end)
+```
+
+```luau
+-- ServerScriptService (this handler runs on the server)
+buyEvent.OnServerEvent:Connect(function(player, itemName, price)
+    if price >= 50 then -- "trust the price the client reported"
+        takeCoins(player, price)
+        giveItem(player, itemName)
+    end
+end)
+```
+
+Where does the rule live in that snippet? The price, the check, the item name — every one of them was **sent by the client** and rubber-stamped by the server. The player's exploiter knows this and fires the event directly:
+
+```luau
+-- on the exploiter's machine, no button required
+buyEvent:FireServer("Sword", -1000)      -- pay negative coins?
+buyEvent:FireServer("Sword", 999999999)  -- or just claim a fortune
+buyEvent:FireServer("InfinitePower", 1)  -- invent items that don't exist
+```
+
+The server obediently awards whatever it's told. Authority means the server **owns** the price, the balance, and the catalog — so none of those arguments get to come from the client in the first place.
+
+</Step>
+
+<Step>
+
+## Send the intention, not the numbers
+
+The fix is to shrink what the client sends down to an **intention** — "the buy button was pressed" — and recompute every number that matters *on the server*.
+
+```luau
+-- LocalScript — the client only reports which button was pressed
+buyEvent:FireServer("Sword")
+```
+
+```luau
+-- ServerScriptService — the only copy of the shop rules lives here
+local SHOP = {
+    Sword = { price = 50 },
+    Potion = { price = 5 },
+}
+
+buyEvent.OnServerEvent:Connect(function(player, itemId)
+    local item = SHOP[itemId]
+    if not item then return end          -- no such thing is for sale
+    local coins = player.leaderstats.Coins
+    if coins.Value < item.price then return end -- can't afford it
+    coins.Value -= item.price
+    giveItem(player, itemId)
+end)
+```
+
+Three sources of truth, all server-side:
+
+1. **The catalog** (`SHOP`). A made-up `itemId` doesn't match any key, so it dies at `if not item`. The client can't invent items; the server decides what exists.
+2. **The price.** Taken from `item.price`, never from the request. The client can't haggle with `FireServer` arguments.
+3. **The balance.** Read from the server-replicated `leaderstats`, not from a number the client claimed. `coins.Value < item.price` is a real check against a real balance.
+
+The exploiter can still fire `"Sword"` a thousand times — rate limiting from the last lesson paces it to `COIN_COOLDOWN` — but every accepted request now pays the *real* price out of the *real* balance. The referee is in charge.
+
+</Step>
+
+<Step>
+
+## Even the check is yours
+
+Selling has the same trap. A shop that buys items from players should pay its own price for the player's *owned* items — never whatever number the client attaches:
+
+```luau
+-- LocalScript
+sellEvent:FireServer("Sword") -- "I want to sell a Sword", nothing else
+```
+
+```luau
+-- ServerScriptService
+local BUYBACK = { Sword = 25, Potion = 2 }
+
+sellEvent.OnServerEvent:Connect(function(player, itemId)
+    if not BUYBACK[itemId] then return end -- we don't buy that
+    if not ownsItem(player, itemId) then return end -- they don't own it
+    local coins = player.leaderstats.Coins
+    coins.Value += BUYBACK[itemId]
+    removeItem(player, itemId)
+end)
+```
+
+`ownsItem` here checks an inventory table on the server (built from the same DataStore that saves the game). A forged "sell 500 swords" request dies the moment the server finds the player owns zero.
+
+<WriteCode
+  instruction="The server should only sell items the player actually owns. Fill in the guard line that checks the server-side inventory table before paying out."
+  answer={["if not ownsItem(player, itemId) then return end", "if not ownsItem(player, itemId) then\n        return\n    end"]}
+  starterCode="sellEvent.OnServerEvent:Connect(function(player, itemId)
+    if not BUYBACK[itemId] then return end
+    -- only sell items the player really has
+
+    local coins = player.leaderstats.Coins
+    coins.Value += BUYBACK[itemId]
+    removeItem(player, itemId)
+end)"
+  explanation="Verify the player owns the item on the server before any coins move — the inventory check is the authority here."
+/>
+
+</Step>
+
+<Step>
+
+## Silence is the answer
+
+What should the server do when a request fails a check? **Nothing visible.** In the code above, every failed check is a bare `return` — no error message, no kick, no waves.
+
+That's deliberate. Two reasons:
+
+1. **Loud rejects become grief tools.** If a failed exploit printed a warning or kicked the player, an angry exploiter could fire the event with garbage *on purpose* to spam-warn the whole server or boot innocent people. Your punishment becomes their weapon.
+2. **Silence starves the attacker.** The more you reveal — "wrong item id," "price must be between 1 and 100" — the easier it is to guess your rules. A quiet server gives nothing away, so the only way to "win" is to play normally.
+
+<Warning>
+Never punish a rejected request. Reject and move on. The moment you add a visible consequence, you turn a cheap exploit into a tool for griefing everyone else in the game.
+</Warning>
+
+<Mcq
+  question="An exploiter sends buyEvent:FireServer('MythicBlade') and 'MythicBlade' isn't in your catalog. The best server response is…"
+  options={[
+    "Print 'invalid item' to the output",
+    "Kick the player for cheating",
+    "Silently ignore the request",
+    "Refund them free coins for trying",
+  ]}
+  answer={2}
+  explanation="A silent return gives the attacker nothing — no information, no reaction, no weapon to turn against other players."
+/>
+
+</Step>
+
+<Step>
+
+## The authority checklist
+
+Before any reward moves, run the mental checklist — every line should trace back to a number the server owns:
+
+- **The catalog:** does this item/action exist? (`SHOP[itemId]`, `BUYBACK[itemId]`)
+- **The price:** where does the number come from? (a server table, never the request)
+- **The balance:** do they have enough? (server-replicated `leaderstats`, not a client claim)
+- **The ownership:** do they really have it? (server-side inventory from the DataStore)
+- **The pace:** is this request allowed right now? (the cooldown from the rate limiting lesson)
+
+<Note>
+Rate limiting (the last lesson) paces the flood; server authority decides what each accepted request is actually worth; input validation (future) double-checks free-typed text. Each is one layer of the same wall — and this lesson is the layer that makes the coin flow hold up under attack.
+</Note>
+
+Next up: the data bug hunt — put the whole save-and-remote stack, rate limits and authority included, under attack.
+
+</Step>
