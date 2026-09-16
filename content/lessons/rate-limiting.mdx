@@ -1,0 +1,226 @@
+---
+slug: rate-limiting
+title: Rate limiting — slow down the flood
+description: Stop request spam at the server with per-player limits, and learn why a client debounce can never protect your game.
+sectionId: data
+order: 10
+difficulty: intermediate
+estimatedMinutes: 8
+tags: [ratelimit, cooldown, debounce, security, remotes]
+objectives:
+  - Explain why client-side timing can't protect your server
+  - Tell a cooldown, debounce, and rate limit apart
+  - Enforce a per-player limit in Luau on the server
+  - Clean up per-player state when the player leaves
+prerequisites: [remotes, data-security]
+keywords: [ratelimit, cooldown, debounce, throttle, remoteevent, spam]
+---
+
+The client can now *ask* via RemoteEvents — and that means it can also **keep asking forever**. A server that answers every request without a second thought hands out unlimited coins, or melts under a flood of fake clicks. Rate limiting is the bouncer that decides how often anyone gets in.
+
+<Step>
+
+## The flood
+
+Remember the secure coin flow from the RemoteEvents lesson? The server rewards every `CoinClicked` request it receives. Here is that handler with one obvious problem:
+
+```luau
+-- ServerScriptService (this handler runs on the server)
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local coinEvent = ReplicatedStorage.CoinClicked
+
+coinEvent.OnServerEvent:Connect(function(player)
+    -- trust: every single click is rewarded
+    local stats = player:WaitForChild("leaderstats")
+    stats.Coins.Value += 10
+end)
+```
+
+A human playing normally clicks maybe ten times a second — slowly enough for the tool to work. Now imagine a player's client running a loop:
+
+```luau
+-- on the exploiter's machine
+while true do
+    coinEvent:FireServer()
+end
+```
+
+Every frame, the server receives a fresh request and quietly adds 10 coins. In ten seconds an exploiter has mined more than a legitimate player earns in days — and your server did all the work for it. **An unrelenting client is a fact of Roblox, not a surprise attack.**
+
+<Mcq
+  question="An exploiter fires CoinClicked 500 times in one second. What does the unguarded server do?"
+  options={[
+    "It ignores every request after the first",
+    "It awards 10 coins for every one of the 500 requests",
+    "It bans the player automatically",
+    "It crashes from too many requests",
+  ]}
+  answer={1}
+  explanation="The handler owns no limits, so it rewards each request on its own terms — the flood is fully rewarded."
+/>
+
+</Step>
+
+<Step>
+
+## Debounce is UX, not security
+
+You may already know the classic *debounce* for buttons — a local flag that stops the same click from registering twice while a swing or a sound is playing:
+
+```luau
+-- LocalScript (on the player's computer)
+local isBusy = false
+
+button.MouseButton1Click:Connect(function()
+    if isBusy then return end
+    isBusy = true
+    coinEvent:FireServer()
+    task.wait(0.5)
+    isBusy = false
+end)
+```
+
+A debounce feels great to play with: double-clicking doesn't launch the same attack two animations at once. But look at *where* that code runs — on the player's computer, inside local memory. It only stops **that player's own hand** from clicking twice. It never runs for the server.
+
+An exploiter doesn't click the button. They call `coinEvent:FireServer()` directly from their own script, entirely outside your LocalScript. `isBusy` might as well be a different person's phone — the flood arrives at the server identically.
+
+<Tip>
+Keep the client debounce for *feel* (no double swings, no overlap), but never rely on it for *protection*. Protection has to run where the real data lives: on the server.
+</Tip>
+
+<Mcq
+  question="Where does a debounce actually stop unwanted requests?"
+  options={["In the player's browser cache", "On the server", "On the player's computer only", "In ReplicatedStorage"]}
+  answer={2}
+  explanation="A LocalScript debounce runs client-side, so it only throttles that player's own input — not direct FireServer calls."
+/>
+
+</Step>
+
+<Step>
+
+## Server-side cooldown — one per window, per player
+
+The first line of defense is a **cooldown**: at most one accepted request per player per window. Track the last accepted time for each player in a table, check it before rewarding, and update it when you do reward.
+
+```luau
+-- ServerScriptService
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local coinEvent = ReplicatedStorage.CoinClicked
+
+local COIN_COOLDOWN = 0.2 -- seconds between accepted clicks
+local lastClick = {} -- UserId -> os.clock() timestamp
+
+coinEvent.OnServerEvent:Connect(function(player)
+    local userId = player.UserId
+    local now = os.clock()
+
+    -- too soon since the last accepted click? reject silently
+    if now - (lastClick[userId] or 0) < COIN_COOLDOWN then
+        return
+    end
+    lastClick[userId] = now
+
+    local stats = player:WaitForChild("leaderstats")
+    stats.Coins.Value += 10
+end)
+```
+
+Three details do the heavy lifting:
+
+1. **Per player, not global.** `lastClick` is keyed by `UserId`, so one fast player can't drain everyone else's allowance.
+2. **`or 0` for the first click.** A brand-new player has no entry in the table; `nil` minus a number errors. `(lastClick[userId] or 0)` means "treat the past as far enough ago."
+3. **Reject, don't punish.** The flood gets quietly ignored. If you punished instead, malicious players could *force* a punishment onto themselves to spam-warn everyone.
+
+<WriteCode
+  instruction="A player's click should only be accepted once the cooldown window has passed. Fill in the missing line that records this accepted click so the next one has something to compare against."
+  answer={["lastClick[userId] = now", "lastClick[player.UserId] = now", "lastClick[userId]=now"]}
+  starterCode="if now - (lastClick[userId] or 0) < COIN_COOLDOWN then
+    return
+end
+-- record this accepted click
+"
+  explanation="Store the current timestamp under the player's key so the next request can measure the gap against it."
+/>
+
+</Step>
+
+<Step>
+
+## Clean up when players leave
+
+That `lastClick` table grows by one entry per player who ever plays, and it never shrinks — a slow memory leak. Players come and go, so clear each player's entry when they leave:
+
+```luau
+Players.PlayerRemoving:Connect(function(player)
+    lastClick[player.UserId] = nil
+end)
+```
+
+Without this, every raid that brings a hundred new players leaves a hundred entries behind forever. With it, the table only ever holds the players who are in the game right now.
+
+<Warning>
+Per-player state in a server script **must** be cleaned up in `PlayerRemoving`. Tables that track per-player times, counts, or flags — and never clear their keys — are a classic slow leak that shows up only after hours of uptime.
+</Warning>
+
+</Step>
+
+<Step>
+
+## Cooldown vs debounce vs rate limit
+
+These three get mixed up constantly, and the difference matters for what you build:
+
+- **Debounce** — client-side, for *feel*. Stops the same player's hand from double-triggering an action. No access to the server.
+- **Cooldown** — server-side. *At most one* accepted request per player per window (`0.2s` between clicks).
+- **Rate limit** — server-side. *Up to N requests* per player per window (a burst of 5 per second, say), rejecting anything beyond it.
+
+A cooldown fits actions that should be slow — one coin per click, one jump, one swing. A rate limit fits logs and quick-but-capable actions: a chat box, a stats ticker, a player who can fire 10 projectiles a second but not 10,000. Roblox even has built-in protection on some APIs (like `RemoteEvent:FireServer` rate limits and chat throttling) — but your *own* rules are your responsibility.
+
+<Mcq
+  question="Your sword lets a player swing at most 3 times per second. Inside a window, the 4th swing is ignored. This is a…"
+  options={["Debounce", "Cooldown", "Rate limit", "Cash register"]}
+  answer={2}
+  explanation="A rate limit allows a fixed number (a burst) per window and rejects the rest. A cooldown would allow only one per window."
+/>
+
+</Step>
+
+<Step>
+
+## The full hardened flow
+
+Put the pieces together and the economy survives a flood:
+
+```luau
+-- client reports a click (normal gameplay, debounce for feel only)
+coinEvent:FireServer()
+```
+
+```luau
+-- server decides: cooldown gates every reward
+coinEvent.OnServerEvent:Connect(function(player)
+    local now = os.clock()
+    if now - (lastClick[player.UserId] or 0) < COIN_COOLDOWN then
+        return -- too fast: silently ignored
+    end
+    lastClick[player.UserId] = now
+    player.leaderstats.Coins.Value += 10
+end)
+```
+
+- **Common mistakes**
+- **Global timers.** A single "last interaction at time T" for the *whole game* means one player's flood freezes everyone. Per-player keys, always.
+- **Trusting client timing.** `os.clock()` measured in a LocalScript tells you about the player's machine, not your server. Measure where you decide.
+- **Rejecting loudly.** Flooding the output or kicking players over a fast click *is* the exploit — it turns a minor abuse into a griefing tool. Silent reject beats noisy punishment.
+- **One magic constant for everything.** Picking up a coin and opening a shop deserve different windows. Give each action its own readable constant.
+
+<Note>
+Rate limiting is one gate on the road to a bulletproof economy. Next in this security path: **Server Authority** — keeping your rules in one trusted place — and **Input Validation** — double-checking everything a player types or sends before you act on it.
+</Note>
+
+Next up: the data review — put the whole save-and-remote stack, rate limits included, under attack in the data bug hunt.
+
+</Step>
