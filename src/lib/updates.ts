@@ -15,6 +15,13 @@ export interface SiteUpdate {
 
 export const SITE_UPDATES: SiteUpdate[] = [
   {
+    id: "2026-09-16-profile-pictures",
+    title: "New profile pictures available",
+    body: "You can now set a profile picture with our collection of avatar styles. Open your profile and tap the pencil on your current avatar to pick one.",
+    link: "/profile",
+    createdAt: "2026-09-16T09:00:00.000Z",
+  },
+  {
     id: "2026-09-07-follows-friends-board",
     title: "Follow learners & a friends-only leaderboard",
     body: "You can now follow any learner from their public profile, and the leaderboard has a \"Friends\" tab that shows just you and the accounts you follow. Your follower and following counts appear on your profile. Badge celebrations also get a fun pop-up the moment you earn one.",
