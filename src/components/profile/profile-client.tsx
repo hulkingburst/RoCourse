@@ -16,6 +16,7 @@ import {
   Flame,
   ListChecks,
   Loader2,
+  Lock,
   Pencil,
   ShieldCheck,
   Target,
@@ -37,8 +38,9 @@ import { isStreakActive } from "@/lib/streak";
 import { levelProgress, weekKey } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import type { CloudState } from "@/lib/sync-types";
-import { setAvatar } from "@/lib/account-actions";
+import { setAvatar, setTitle } from "@/lib/account-actions";
 import { AVATAR_OPTIONS } from "@/lib/avatar";
+import { TITLES, getTitleById } from "@/lib/titles";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -66,6 +68,8 @@ interface ProfileClientProps {
   lessonMap: { slug: string; title: string }[];
   handle: string | null;
   sectionCertificates: CompletedSection[];
+  /** Title ids the user has genuinely earned (computed server-side). */
+  unlockedTitles: string[];
 }
 
 export function ProfileClient({
@@ -73,8 +77,10 @@ export function ProfileClient({
   lessonMap,
   handle,
   sectionCertificates,
+  unlockedTitles,
 }: ProfileClientProps) {
   const t = useTranslations("profile");
+  const titleNs = useTranslations("title");
   const course = useTranslations("course");
   const home = useTranslations("home");
   const auth = useTranslations("auth");
@@ -105,6 +111,10 @@ export function ProfileClient({
     session?.user?.avatar
   );
   const [avatarSaving, setAvatarSaving] = React.useState(false);
+  const [titleOverride, setTitleOverride] = React.useState<
+    string | null | undefined
+  >(undefined);
+  const [titleSaving, setTitleSaving] = React.useState(false);
   const router = useRouter();
 
   const pickAvatar = async (id: string | null) => {
@@ -114,6 +124,17 @@ export function ProfileClient({
     setAvatarSaving(false);
     if (result.error) return;
     setAvatarPreview(result.avatar ?? null);
+    await update();
+    router.refresh();
+  };
+
+  const pickTitle = async (id: string | null) => {
+    if (titleSaving) return;
+    setTitleSaving(true);
+    const result = await setTitle(id);
+    setTitleSaving(false);
+    if (result.error) return;
+    setTitleOverride(result.title ?? null);
     await update();
     router.refresh();
   };
@@ -215,6 +236,62 @@ export function ProfileClient({
   // ticket table, served via the cloud sync.
   badgeStats.feedbackResolved = cloud?.feedbackResolved ?? 0;
 
+  const currentTitle =
+    titleOverride !== undefined ? titleOverride : session.user.title ?? null;
+  const currentTitleDef = getTitleById(currentTitle);
+
+  const titlePickerItems = () => (
+    <>
+      <DropdownMenuLabel className="text-center text-xs font-medium text-muted-foreground">
+        {t("titlePick")}
+      </DropdownMenuLabel>
+      {TITLES.map((option) => {
+        const unlocked = unlockedTitles.includes(option.id);
+        return (
+          <DropdownMenuItem
+            key={option.id}
+            onSelect={() => {
+              if (unlocked) void pickTitle(option.id);
+            }}
+            disabled={!unlocked || titleSaving}
+            className="gap-2 py-2"
+          >
+            <option.icon
+              className={cn(
+                "h-4 w-4 shrink-0",
+                unlocked ? "text-primary" : "text-muted-foreground/70"
+              )}
+            />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-sm font-medium leading-tight">
+                {titleNs(`${option.id}.name`)}
+              </span>
+              <span className="text-[11px] leading-snug text-muted-foreground">
+                {titleNs(`${option.id}.description`)}
+              </span>
+            </span>
+            {!unlocked && (
+              <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            )}
+          </DropdownMenuItem>
+        );
+      })}
+      {currentTitleDef ? (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={() => void pickTitle(null)}
+            disabled={titleSaving}
+            className="gap-2 text-destructive focus:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+            {t("titleRemove")}
+          </DropdownMenuItem>
+        </>
+      ) : null}
+    </>
+  );
+
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-6 py-10">
       <div className="flex flex-wrap items-center gap-4">
@@ -278,9 +355,61 @@ export function ProfileClient({
           </DropdownMenu>
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {session.user.name || t("learner")}
-          </h1>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {session.user.name || t("learner")}
+            </h1>
+            {currentTitleDef ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t("titlePick")}
+                    disabled={titleSaving}
+                    className="inline-flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1 text-xs font-medium transition hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  >
+                    {titleSaving ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <currentTitleDef.icon className="h-3.5 w-3.5 text-primary" />
+                    )}
+                    {titleNs(`${currentTitleDef.id}.name`)}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  side="bottom"
+                  className="w-64 p-2"
+                >
+                  {titlePickerItems()}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t("titlePick")}
+                    disabled={titleSaving}
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  >
+                    {titleSaving ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Pencil className="h-3 w-3" />
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  side="bottom"
+                  className="w-64 p-2"
+                >
+                  {titlePickerItems()}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5" />

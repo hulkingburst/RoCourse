@@ -309,7 +309,9 @@
     "joinedAt": "@{handle} · Joined {date}",
     "avatarPick": "Change profile picture",
     "avatarOption": "Avatar {n}",
-    "avatarRemove": "Remove picture"
+    "avatarRemove": "Remove picture",
+    "titlePick": "Choose a title",
+    "titleRemove": "Remove title"
   },
   "badges": {
     "title": "Achievements",
@@ -320,6 +322,24 @@
     "tierSilver": "Silver",
     "tierGold": "Gold",
     "close": "Dismiss"
+  },
+  "title": {
+    "learner": {
+      "name": "Learner",
+      "description": "Complete 5 lessons"
+    },
+    "bug-hunter": {
+      "name": "Bug Hunter",
+      "description": "Solve 10 bug-hunt challenges"
+    },
+    "feedback-builder": {
+      "name": "Feedback Builder",
+      "description": "Open 3 feedback reports"
+    },
+    "community-helper": {
+      "name": "Community Helper",
+      "description": "Answer 3 questions in Q&A"
+    }
   },
   "badge": {
     "first-steps": {

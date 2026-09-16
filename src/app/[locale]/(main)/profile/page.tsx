@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { getCloudState } from "@/lib/sync-api";
 import { ensureHandle } from "@/lib/users";
 import { getCompletedSectionCertificates } from "@/lib/certificates";
+import { getUnlockedTitleIds } from "@/lib/title-data";
 import { ProfileClient } from "@/components/profile/profile-client";
 
 export const metadata: Metadata = {
@@ -22,13 +23,15 @@ export default async function ProfilePage() {
         lessonMap={[]}
         handle={null}
         sectionCertificates={[]}
+        unlockedTitles={[]}
       />
     );
   }
 
-  const [state, handle] = await Promise.all([
+  const [state, handle, unlockedTitles] = await Promise.all([
     getCloudState(session.user.id),
     ensureHandle(session.user.id),
+    getUnlockedTitleIds(session.user.id),
   ]);
 
   const lessonMap = getCourseStructure()
@@ -41,6 +44,7 @@ export default async function ProfilePage() {
       lessonMap={lessonMap}
       handle={handle}
       sectionCertificates={getCompletedSectionCertificates(state.progress)}
+      unlockedTitles={unlockedTitles}
     />
   );
 }

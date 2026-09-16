@@ -3,6 +3,8 @@
 import { auth, unstable_update } from "@/lib/auth";
 import { MAX_NAME_LENGTH, NAME_CHANGE_INTERVAL_MS } from "@/lib/account";
 import { isValidAvatar } from "@/lib/avatar";
+import { isValidTitle } from "@/lib/titles";
+import { getUnlockedTitleIds } from "@/lib/title-data";
 import { prisma } from "@/lib/prisma";
 import { prohibitedNameReason } from "@/lib/profanity";
 
@@ -124,4 +126,52 @@ export async function setAvatar(
   await unstable_update({ user: { avatar: next } });
 
   return { avatar: next };
+}
+
+export interface SetTitleResult {
+  /** i18n key suffix under the `settings` namespace when the change fails. */
+  error?: "unauthorized" | "invalid" | "locked";
+  /** The stored title id (or null when removed) on success. */
+  title?: string | null;
+}
+
+/**
+ * Sets or removes the signed-in user's developer title. Only stable ids from
+ * the title catalogue are ever stored, and a title can only ever be chosen if
+ * the server-side eligibility check says it was earned — the client can never
+ * grant itself a title. The session token is re-signed so the new title shows
+ * immediately.
+ */
+export async function setTitle(
+  titleId: string | null | undefined
+): Promise<SetTitleResult> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return { error: "unauthorized" };
+  }
+
+  const next = titleId ? (isValidTitle(titleId) ? titleId : null) : null;
+  if (titleId && !next) {
+    return { error: "invalid" };
+  }
+
+  if (next) {
+    const unlocked = await getUnlockedTitleIds(userId);
+    if (!unlocked.includes(next)) {
+      return { error: "locked" };
+    }
+  }
+
+  const result = await prisma.user.updateMany({
+    where: { id: userId },
+    data: { title: next },
+  });
+  if (result.count === 0) {
+    return { error: "unauthorized" };
+  }
+
+  await unstable_update({ user: { title: next } });
+
+  return { title: next };
 }

@@ -309,7 +309,9 @@
     "joinedAt": "@{handle} · Miembro desde {date}",
     "avatarPick": "Cambiar foto de perfil",
     "avatarOption": "Avatar {n}",
-    "avatarRemove": "Quitar foto"
+    "avatarRemove": "Quitar foto",
+    "titlePick": "Elegir un título",
+    "titleRemove": "Quitar título"
   },
   "badges": {
     "title": "Logros",
@@ -320,6 +322,24 @@
     "tierSilver": "Plata",
     "tierGold": "Oro",
     "close": "Cerrar"
+  },
+  "title": {
+    "learner": {
+      "name": "Estudiante",
+      "description": "Completa 5 lecciones"
+    },
+    "bug-hunter": {
+      "name": "Cazador de errores",
+      "description": "Resuelve 10 desafíos de caza de errores"
+    },
+    "feedback-builder": {
+      "name": "Impulsor de feedback",
+      "description": "Envía 3 reportes de feedback"
+    },
+    "community-helper": {
+      "name": "Ayudante de la comunidad",
+      "description": "Responde 3 preguntas en Q&A"
+    }
   },
   "badge": {
     "first-steps": {

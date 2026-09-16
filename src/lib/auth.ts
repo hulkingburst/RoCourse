@@ -75,6 +75,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           name: user.name,
           handle: user.handle,
           avatar: user.avatar,
+          title: user.title,
         };
       },
     }),
@@ -84,14 +85,18 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       if (user) token.id = user.id;
       if (user && user.handle !== undefined) token.handle = user.handle;
       if (user && user.avatar !== undefined) token.avatar = user.avatar;
+      if (user && user.title !== undefined) token.title = user.title;
 
       // unstable_update() re-runs this callback with trigger "update" and the
-      // payload under `session`. Copy avatar from there so an updated choice
-      // shows immediately without a fresh sign-in.
+      // payload under `session`. Copy updated profile fields from there so an
+      // updated choice shows immediately without a fresh sign-in.
       if (trigger === "update") {
-        const updatedUser = (session as { user?: { avatar?: string | null } } | undefined)?.user;
+        const updatedUser = (session as { user?: Record<string, unknown> } | undefined)?.user;
         if (updatedUser && "avatar" in updatedUser) {
-          token.avatar = updatedUser.avatar ?? null;
+          token.avatar = (updatedUser.avatar as string | null) ?? null;
+        }
+        if (updatedUser && "title" in updatedUser) {
+          token.title = (updatedUser.title as string | null) ?? null;
         }
       }
 
@@ -116,6 +121,11 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           session.user.avatar = token.avatar;
         } else if (token.avatar === null) {
           session.user.avatar = null;
+        }
+        if (typeof token.title === "string") {
+          session.user.title = token.title;
+        } else if (token.title === null) {
+          session.user.title = null;
         }
       }
       return session;

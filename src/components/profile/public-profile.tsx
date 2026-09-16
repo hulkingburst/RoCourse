@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import type { PublicProfile } from "@/lib/users";
 import { courseTitleKey } from "@/lib/course-titles";
+import { getTitleById } from "@/lib/titles";
 import { levelProgress } from "@/lib/xp";
 import { ShareLinkButton } from "@/components/share/share-link-button";
 import { ProfileFollowActions } from "@/components/profile/profile-follow-actions";
@@ -50,8 +51,10 @@ function Stat({
 
 export function PublicProfileView({ profile }: { profile: PublicProfile }) {
   const t = useTranslations("profile");
+  const titleNs = useTranslations("title");
   const course = useTranslations("course");
   const { stats } = profile;
+  const titleDef = getTitleById(profile.title);
   const joined = new Date(profile.createdAt).toLocaleDateString(undefined, {
     year: "numeric",
     month: "long",
@@ -69,6 +72,12 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <h1 className="text-3xl font-bold tracking-tight">{profile.name}</h1>
+            {titleDef ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1 text-xs font-medium text-foreground">
+                <titleDef.icon className="h-3.5 w-3.5 text-primary" />
+                {titleNs(`${titleDef.id}.name`)}
+              </span>
+            ) : null}
             <div className="ml-auto flex flex-wrap items-center gap-2">
               <ProfileFollowActions
                 handle={profile.handle}
