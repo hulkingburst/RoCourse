@@ -2,6 +2,7 @@
 
 import { auth, unstable_update } from "@/lib/auth";
 import { MAX_NAME_LENGTH, NAME_CHANGE_INTERVAL_MS } from "@/lib/account";
+import { isValidAvatar } from "@/lib/avatar";
 import { prisma } from "@/lib/prisma";
 import { prohibitedNameReason } from "@/lib/profanity";
 
@@ -83,4 +84,44 @@ export async function changeUsername(
   await unstable_update({ user: { name } });
 
   return {};
+}
+
+export interface SetAvatarResult {
+  /** i18n key suffix under the `settings` namespace when the change fails. */
+  error?: "unauthorized" | "invalid";
+  /** The stored seed (or null when removed) on success. */
+  avatar?: string | null;
+}
+
+/**
+ * Sets or removes the signed-in user's profile picture. Only curated seeds
+ * from the allowed list are ever stored — anything else is rejected outright,
+ * so the DB can never hold a user-supplied image URL or style. The session
+ * token is re-signed so the new picture shows immediately.
+ */
+export async function setAvatar(
+  seed: string | null | undefined
+): Promise<SetAvatarResult> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return { error: "unauthorized" };
+  }
+
+  const next = seed ? (isValidAvatar(seed) ? seed : null) : null;
+  if (seed && !next) {
+    return { error: "invalid" };
+  }
+
+  const result = await prisma.user.updateMany({
+    where: { id: userId },
+    data: { avatar: next },
+  });
+  if (result.count === 0) {
+    return { error: "unauthorized" };
+  }
+
+  await unstable_update({ user: { avatar: next } });
+
+  return { avatar: next };
 }

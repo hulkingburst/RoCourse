@@ -306,7 +306,10 @@
     "recentActivityHint": "Their last week of lessons, quizzes, and daily challenges.",
     "noPublicActivity": "No public activity yet — they may have just started, or they learn without an account.",
     "privacyNote": "Public profiles show only summary stats — never personal details or email.",
-    "joinedAt": "@{handle} · Joined {date}"
+    "joinedAt": "@{handle} · Joined {date}",
+    "avatarPick": "Change profile picture",
+    "avatarOption": "Avatar {n}",
+    "avatarRemove": "Remove picture"
   },
   "badges": {
     "title": "Achievements",

@@ -33,6 +33,8 @@ export interface PublicCompletion {
 export interface PublicProfile {
   handle: string;
   name: string;
+  /** Curated avatar seed, or null when no profile picture is set. */
+  avatar: string | null;
   createdAt: string;
   totalLessons: number;
   stats: PublicStats;
@@ -162,6 +164,7 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
       id: true,
       handle: true,
       name: true,
+      avatar: true,
       createdAt: true,
       progress: { select: { data: true } },
       completions: {
@@ -185,6 +188,7 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
   return {
     handle: user.handle ?? handle,
     name: moderateName(user.name),
+    avatar: user.avatar,
     createdAt: user.createdAt.toISOString(),
     totalLessons,
     stats: extractPublicStats(user.progress?.data),

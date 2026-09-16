@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import * as React from "react";
 import {
@@ -15,9 +16,11 @@ import {
   Flame,
   ListChecks,
   Loader2,
+  Pencil,
   ShieldCheck,
   Target,
   Timer,
+  Trash2,
   Trophy,
   UserCircle2,
   Zap,
@@ -34,6 +37,8 @@ import { isStreakActive } from "@/lib/streak";
 import { levelProgress, weekKey } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import type { CloudState } from "@/lib/sync-types";
+import { setAvatar } from "@/lib/account-actions";
+import { AVATAR_OPTIONS } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -43,7 +48,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ActivityCalendar } from "@/components/profile/activity-calendar";
+import { Avatar } from "@/components/profile/avatar";
 import { BadgesSection } from "@/components/profile/badges";
 import { ShareLinkButton } from "@/components/share/share-link-button";
 
@@ -64,7 +78,7 @@ export function ProfileClient({
   const course = useTranslations("course");
   const home = useTranslations("home");
   const auth = useTranslations("auth");
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [revealEmail, setRevealEmail] = React.useState(false);
   const { openDialog } = useAuthUiStore();
   const lessons = useProgressStore((state) => state.lessons);
@@ -87,6 +101,22 @@ export function ProfileClient({
   const weeklyXp = useProgressStore((state) => state.weeklyXp);
   const [cloud, setCloud] = React.useState<CloudState | null>(null);
   const [loadingSync, setLoadingSync] = React.useState(true);
+  const [avatar, setAvatarPreview] = React.useState<string | null | undefined>(
+    session?.user?.avatar
+  );
+  const [avatarSaving, setAvatarSaving] = React.useState(false);
+  const router = useRouter();
+
+  const pickAvatar = async (id: string | null) => {
+    if (avatarSaving) return;
+    setAvatarSaving(true);
+    const result = await setAvatar(id);
+    setAvatarSaving(false);
+    if (result.error) return;
+    setAvatarPreview(result.avatar ?? null);
+    await update();
+    router.refresh();
+  };
 
   React.useEffect(() => {
     if (status !== "authenticated") return;
@@ -187,11 +217,71 @@ export function ProfileClient({
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-6 py-10">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          {session.user.name || t("learner")}
-        </h1>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="relative shrink-0">
+          <Avatar
+            seed={avatar ?? session.user.avatar}
+            name={session.user.name || t("learner")}
+            className="h-16 w-16 text-2xl"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label={t("avatarPick")}
+                disabled={avatarSaving}
+                className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow ring-1 ring-background transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+              >
+                {avatarSaving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Pencil className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" side="bottom" className="p-2">
+              <DropdownMenuLabel className="text-center text-xs font-medium text-muted-foreground">
+                {t("avatarPick")}
+              </DropdownMenuLabel>
+              <div className="grid max-h-64 grid-cols-5 gap-1.5 overflow-y-auto">
+                {AVATAR_OPTIONS.map((option, index) => (
+                  <DropdownMenuItem
+                    key={option.id}
+                    asChild
+                    onSelect={() => void pickAvatar(option.id)}
+                  >
+                    <button
+                      type="button"
+                      disabled={avatarSaving}
+                      aria-label={t("avatarOption", { n: index + 1 })}
+                      className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                    >
+                      <Avatar seed={option.id} className="h-10 w-10" />
+                    </button>
+                  </DropdownMenuItem>
+                ))}
+              </div>
+              {avatar || session.user.avatar ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => void pickAvatar(null)}
+                    disabled={avatarSaving}
+                    className="gap-2 text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {t("avatarRemove")}
+                  </DropdownMenuItem>
+                </>
+              ) : null}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {session.user.name || t("learner")}
+          </h1>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span className="font-mono">
@@ -241,6 +331,7 @@ export function ProfileClient({
               })
             : t("joinedRecently")}
         </p>
+          </div>
       </div>
 
       <Card>

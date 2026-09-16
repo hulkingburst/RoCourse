@@ -8,6 +8,8 @@ export interface UsernameChangeInfo {
   name: string;
   canChange: boolean;
   nextChangeAt: string | null;
+  /** Curated avatar seed, or null when no profile picture is set. */
+  avatar: string | null;
 }
 
 /** Whether a username change is allowed given the user's last change date. */
@@ -31,9 +33,9 @@ export async function getUsernameChangeInfo(
 ): Promise<UsernameChangeInfo | null> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { name: true, nameChangedAt: true },
+    select: { name: true, nameChangedAt: true, avatar: true },
   });
   if (!user) return null;
   const { canChange, nextChangeAt } = canChangeUsername(user.nameChangedAt);
-  return { name: user.name, canChange, nextChangeAt };
+  return { name: user.name, canChange, nextChangeAt, avatar: user.avatar };
 }

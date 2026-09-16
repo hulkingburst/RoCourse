@@ -13,6 +13,7 @@ import {
   Zap,
 } from "lucide-react";
 import { ActivityCalendar } from "@/components/profile/activity-calendar";
+import { Avatar } from "@/components/profile/avatar";
 import { BadgesSection } from "@/components/profile/badges";
 import {
   Card,
@@ -51,7 +52,6 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
   const t = useTranslations("profile");
   const course = useTranslations("course");
   const { stats } = profile;
-  const initial = profile.name.trim().charAt(0).toUpperCase() || "?";
   const joined = new Date(profile.createdAt).toLocaleDateString(undefined, {
     year: "numeric",
     month: "long",
@@ -61,9 +61,11 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-6 py-10">
       <div className="flex flex-wrap items-center gap-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-          {initial}
-        </div>
+        <Avatar
+          seed={profile.avatar}
+          name={profile.name}
+          className="h-16 w-16 text-2xl"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <h1 className="text-3xl font-bold tracking-tight">{profile.name}</h1>

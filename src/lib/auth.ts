@@ -69,14 +69,31 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         }
 
         await clearAttempts(key);
-        return { id: user.id, email: user.email, name: user.name, handle: user.handle };
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          handle: user.handle,
+          avatar: user.avatar,
+        };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) token.id = user.id;
-      if (user && user.handle) token.handle = user.handle;
+      if (user && user.handle !== undefined) token.handle = user.handle;
+      if (user && user.avatar !== undefined) token.avatar = user.avatar;
+
+      // unstable_update() re-runs this callback with trigger "update" and the
+      // payload under `session`. Copy avatar from there so an updated choice
+      // shows immediately without a fresh sign-in.
+      if (trigger === "update") {
+        const updatedUser = (session as { user?: { avatar?: string | null } } | undefined)?.user;
+        if (updatedUser && "avatar" in updatedUser) {
+          token.avatar = updatedUser.avatar ?? null;
+        }
+      }
 
       // Back-fill for sessions created before handles existed. Only happens for
       // those users and until their next sign-in, so the cost is negligible.
@@ -94,6 +111,11 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         session.user.id = token.id as string;
         if (typeof token.handle === "string") {
           session.user.handle = token.handle;
+        }
+        if (typeof token.avatar === "string") {
+          session.user.avatar = token.avatar;
+        } else if (token.avatar === null) {
+          session.user.avatar = null;
         }
       }
       return session;
