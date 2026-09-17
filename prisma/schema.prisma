@@ -16,6 +16,7 @@ model User {
   nameChangedAt    DateTime?
   avatar           String?
   title            String?
+  status           String?
   passwordHash     String
   createdAt        DateTime           @default(now())
   progress         ProgressProfile?

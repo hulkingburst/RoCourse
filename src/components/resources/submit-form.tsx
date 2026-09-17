@@ -176,8 +176,14 @@ export function SubmitForm() {
         setStatus("error");
         setError(t("errorTooMany"));
       } else {
+        let errorCode = "";
+        try {
+          errorCode = ((await response.json()) as { error?: string }).error ?? "";
+        } catch {
+          // fall through to the generic message
+        }
         setStatus("error");
-        setError(t("errorGeneric"));
+        setError(errorCode === "rejected" ? t("errorRejected") : t("errorGeneric"));
       }
     } catch {
       setStatus("error");

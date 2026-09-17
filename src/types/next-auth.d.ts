@@ -7,6 +7,7 @@ declare module "next-auth" {
       handle?: string | null;
       avatar?: string | null;
       title?: string | null;
+      status?: string | null;
     } & DefaultSession["user"];
   }
 
@@ -14,6 +15,7 @@ declare module "next-auth" {
     handle?: string | null;
     avatar?: string | null;
     title?: string | null;
+    status?: string | null;
   }
 }
 
@@ -23,5 +25,6 @@ declare module "next-auth/jwt" {
     handle?: string | null;
     avatar?: string | null;
     title?: string | null;
+    status?: string | null;
   }
 }

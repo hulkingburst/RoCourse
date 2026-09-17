@@ -3,7 +3,8 @@ import { trustedIp } from "@/lib/auth-limiter";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import { isValidWeekKey, MAX_WEEKLY_XP, weekKey } from "@/lib/xp";
-import { moderateGuestName } from "@/lib/profanity";
+import { guestFallbackName } from "@/lib/profanity";
+import { moderatePublicText } from "@/lib/moderation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -81,8 +82,12 @@ export async function POST(request: Request) {
   // Slurs and profanity never reach the board: the bad name is swapped for a
   // stable anonymous one instead of rejecting the XP post outright, so a
   // name that was already saved in a guest's browser still shows under a
-  // neutral label (the row is matched by guestId, not by name).
-  const name = moderateGuestName(rawName, record.guestId);
+  // neutral label (the row is matched by guestId, not by name). The check runs
+  // through the API-backed gate as well, so terms beyond the local list count.
+  const name =
+    (await moderatePublicText(rawName)) === null
+      ? rawName
+      : guestFallbackName(record.guestId);
   if (typeof record.week !== "string" || !isValidWeekKey(record.week)) {
     return NextResponse.json({ error: "Invalid week" }, { status: 400 });
   }

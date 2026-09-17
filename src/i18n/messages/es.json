@@ -311,7 +311,19 @@
     "avatarOption": "Avatar {n}",
     "avatarRemove": "Quitar foto",
     "titlePick": "Elegir un título",
-    "titleRemove": "Quitar título"
+    "titleRemove": "Quitar título",
+    "statusEmpty": "Pon un estado",
+    "statusEdit": "Editar estado",
+    "statusPlaceholder": "¿Qué aprendes hoy?",
+    "statusSave": "Guardar",
+    "statusCancel": "Cancelar",
+    "statusClear": "Borrar",
+    "statusSaved": "Estado guardado",
+    "statusTooLong": "El estado debe tener 80 caracteres o menos.",
+    "statusBadWord": "Ese estado no está permitido. Prueba con otro.",
+    "statusEmail": "Los estados no pueden contener direcciones de correo.",
+    "statusSite": "Los estados no pueden contener enlaces.",
+    "statusError": "No se pudo guardar tu estado. Inténtalo de nuevo."
   },
   "badges": {
     "title": "Logros",
@@ -780,6 +792,7 @@
     "errorProtocol": "Solo se permiten enlaces http y https.",
     "errorNoCode": "Pega algo de código para enviar.",
     "errorTooMany": "Has enviado demasiados recursos recientemente. Inténtalo mañana.",
+    "errorRejected": "Ese texto contiene lenguaje o enlaces no permitidos. Edítalo e inténtalo de nuevo.",
     "errorGeneric": "Algo salió mal. Inténtalo de nuevo en un momento.",
     "zipOnlyZip": "Solo se permiten archivos .zip.",
     "zipTooLarge": "Ese zip es demasiado grande (máx. {max} MB).",
@@ -1997,6 +2010,7 @@
     "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
     "errorRateLimit": "Has enviado muchos juegos últimamente. Inténtalo mañana.",
     "errorNotFinished": "Primero termina el curso y luego envía tu juego aquí.",
+    "errorRejected": "Ese texto contiene lenguaje o enlaces no permitidos. Edítalo e inténtalo de nuevo.",
     "errorUrl": "Escribe el enlace completo, comenzando por http:// o https://"
   },
   "notFound": {

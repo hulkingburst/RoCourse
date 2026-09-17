@@ -12,6 +12,7 @@ import {
 } from "@/lib/auth-limiter";
 import { generateUniqueHandle } from "@/lib/users";
 import { prohibitedNameReason } from "@/lib/profanity";
+import { moderatePublicText } from "@/lib/moderation";
 
 export interface CreateAccountResult {
   error?: string;
@@ -60,6 +61,9 @@ export async function createAccount(
     return { error: "That name looks like a website. Please choose another." };
   }
   if (nameReason === "badword") {
+    return { error: "That name isn't allowed. Please choose another." };
+  }
+  if (await moderatePublicText(name)) {
     return { error: "That name isn't allowed. Please choose another." };
   }
   if (!EMAIL_RE.test(email)) {

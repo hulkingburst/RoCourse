@@ -2,11 +2,13 @@
 
 import { auth, unstable_update } from "@/lib/auth";
 import { MAX_NAME_LENGTH, NAME_CHANGE_INTERVAL_MS } from "@/lib/account";
+import { cleanStatus, STATUS_MAX_LENGTH } from "@/lib/status";
 import { isValidAvatar } from "@/lib/avatar";
 import { isValidTitle } from "@/lib/titles";
 import { getUnlockedTitleIds } from "@/lib/title-data";
 import { prisma } from "@/lib/prisma";
 import { prohibitedNameReason } from "@/lib/profanity";
+import { moderatePublicText } from "@/lib/moderation";
 
 export interface ChangeUsernameResult {
   /** i18n key suffix under the `settings` namespace when the change fails. */
@@ -49,6 +51,9 @@ export async function changeUsername(
   const nameReason = prohibitedNameReason(name);
   if (nameReason) {
     return { error: nameReason === "badword" ? "badWord" : nameReason };
+  }
+  if (await moderatePublicText(name)) {
+    return { error: "badWord" };
   }
 
   const user = await prisma.user.findUnique({
@@ -174,4 +179,58 @@ export async function setTitle(
   await unstable_update({ user: { title: next } });
 
   return { title: next };
+}
+
+export interface SetStatusResult {
+  /** i18n key suffix under the `profile` namespace when the change fails. */
+  error?: "unauthorized" | "tooLong" | "badWord" | "email" | "site";
+  /** The stored plain-text status (or null when cleared) on success. */
+  status?: string | null;
+}
+
+/**
+ * Sets or clears the signed-in user's profile status. The value is treated as
+ * untrusted plain text: control characters are stripped, surrounding
+ * whitespace is trimmed, the length is enforced, and the same moderation gate
+ * used for names (profanity / embedded emails / promotion links) is applied —
+ * all server-side before anything is stored. Empty or whitespace-only input
+ * clears the status. Auth is scoped to the session's own user id, so no one
+ * can edit another user's status. The session token is re-signed so the new
+ * status shows immediately.
+ */
+export async function setStatus(
+  raw: string | null | undefined
+): Promise<SetStatusResult> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return { error: "unauthorized" };
+  }
+
+  const cleaned = cleanStatus(raw ?? "");
+  if (cleaned.length > STATUS_MAX_LENGTH) {
+    return { error: "tooLong" };
+  }
+  if (cleaned.length > 0) {
+    const reason = prohibitedNameReason(cleaned);
+    if (reason) {
+      return { error: reason === "badword" ? "badWord" : reason };
+    }
+    if (await moderatePublicText(cleaned)) {
+      return { error: "badWord" };
+    }
+  }
+  const next = cleaned.length > 0 ? cleaned : null;
+
+  const result = await prisma.user.updateMany({
+    where: { id: userId },
+    data: { status: next },
+  });
+  if (result.count === 0) {
+    return { error: "unauthorized" };
+  }
+
+  await unstable_update({ user: { status: next } });
+
+  return { status: next };
 }

@@ -12,6 +12,13 @@
  * caught — that level of matching would also flag innocent names and surnames
  * ("Dickinson" contains "dick") — the same false-positive problem the whole-token
  * approach exists to avoid.
+ *
+ * Beyond classic profanity the list also carries discriminatory/hateful terms
+ * that PurgoMalum's maintained list leaves out — it matches on raw substrings,
+ * so handing it "jew" would also flag "jewelry". Whole-word matching is what
+ * makes those safe to enforce here. A short list of benign phrases built from
+ * blocked words ("black box", "monkey patch", …) is stripped before matching so
+ * everyday content isn't swept up.
  */
 
 const LEET: Record<string, string> = {
@@ -160,7 +167,107 @@ const BANNED_RESERVED: string[] = [
   "wankers",
 ];
 
-const BANNED = new Set(BANNED_RESERVED);
+// Discriminatory / hateful terms. Mostly identity words PurgoMalum's list
+// omits (it substring-matches, so "jew" would flag "jewelry"); matched here as
+// whole words so the same false positives can't happen. Keep additions whole
+// words, and add any innocuous phrase they collide with to BENIGN_PHRASES.
+const DISCRIMINATORY_RESERVED: string[] = [
+  "black",
+  "blackie",
+  "blackies",
+  "blacks",
+  "cameljockey",
+  "cameljockeys",
+  "cracker",
+  "crackers",
+  "darkie",
+  "darkies",
+  "darky",
+  "gringo",
+  "gringos",
+  "gyppo",
+  "gypsies",
+  "gypsy",
+  "honkey",
+  "honkies",
+  "honky",
+  "homo",
+  "homos",
+  "injun",
+  "injuns",
+  "jew",
+  "jewed",
+  "jews",
+  "junglebunny",
+  "junglebunnies",
+  "monkey",
+  "monkeys",
+  "muzzie",
+  "muzzies",
+  "muzzy",
+  "raghead",
+  "ragheads",
+  "sandmonkey",
+  "sandmonkeys",
+  "shemale",
+  "shemales",
+  "towelhead",
+  "towelheads",
+  "whitey",
+  "whiteys",
+];
+
+const BANNED = new Set([...BANNED_RESERVED, ...DISCRIMINATORY_RESERVED]);
+
+// Innocuous phrases that contain a blocked word. Removed before tokenizing, so
+// "black box" and "monkey patch" pass while the words on their own don't.
+const BENIGN_PHRASES: string[] = [
+  "black and white",
+  "black & white",
+  "black background",
+  "black bear",
+  "black belt",
+  "black box",
+  "black cat",
+  "black clothes",
+  "black color",
+  "black colour",
+  "black friday",
+  "black hair",
+  "black hole",
+  "black image",
+  "black jack",
+  "black leather",
+  "black light",
+  "black line",
+  "black list",
+  "black market",
+  "black marker",
+  "black ops",
+  "black outline",
+  "black panther",
+  "black pixel",
+  "black screen",
+  "black sheep",
+  "black shirt",
+  "black text",
+  "black widow",
+  "black-box",
+  "blackboard",
+  "blackjack",
+  "blacklist",
+  "blackout",
+  "blacksmith",
+  "monkey bar",
+  "monkey bars",
+  "monkey business",
+  "monkey island",
+  "monkey patch",
+  "monkey see monkey do",
+  "monkey testing",
+  "monkey wrench",
+  "monkeypatch",
+];
 
 /** Fold leet substitutions and lower-case a single token. */
 export function normalizeToken(raw: string): string {
@@ -191,9 +298,18 @@ export function tokenizeName(text: string): string[] {
   return tokens;
 }
 
+/** Removes BENIGN_PHRASES so their parts aren't matched on their own. */
+export function stripBenignPhrases(text: string): string {
+  let out = text.toLowerCase();
+  for (const phrase of BENIGN_PHRASES) {
+    if (out.includes(phrase)) out = out.split(phrase).join(" ");
+  }
+  return out;
+}
+
 /** The first banned word found in `text`, or null when the name is fine. */
 export function containsBadWord(text: string): string | null {
-  for (const token of tokenizeName(text)) {
+  for (const token of tokenizeName(stripBenignPhrases(text))) {
     if (BANNED.has(token)) return token;
   }
   return null;
@@ -234,13 +350,16 @@ export function moderateName(text: string): string {
   return prohibitedNameReason(text) === null ? text : FALLBACK_DISPLAY_NAME;
 }
 
+/** Stable anonymous label for a guest whose chosen name trips moderation. */
+export function guestFallbackName(guestId: string): string {
+  return `Guest-${guestId.slice(-4).toUpperCase()}`;
+}
+
 /**
  * Guest-specific fallback tied to the guest's id, so a name already stored in
  * the browser that turns out banned still yields a stable, anonymous display
  * name instead of rejecting the XP post outright.
  */
 export function moderateGuestName(name: string, guestId: string): string {
-  return prohibitedNameReason(name) === null
-    ? name
-    : `Guest-${guestId.slice(-4).toUpperCase()}`;
+  return prohibitedNameReason(name) === null ? name : guestFallbackName(guestId);
 }

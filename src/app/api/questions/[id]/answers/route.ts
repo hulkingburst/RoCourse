@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { validateAnswerInput } from "@/lib/questions";
 import { moderateName } from "@/lib/profanity";
+import { moderatePublicText } from "@/lib/moderation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -58,6 +59,16 @@ export async function POST(
   const validated = validateAnswerInput(body);
   if (!validated.ok) {
     return NextResponse.json({ error: validated.error }, { status: 400 });
+  }
+
+  if (await moderatePublicText(validated.body)) {
+    return NextResponse.json(
+      {
+        error:
+          "That answer contains language or links that aren't allowed. Please edit it and try again.",
+      },
+      { status: 400 }
+    );
   }
 
   const answer = await prisma.questionAnswer.create({

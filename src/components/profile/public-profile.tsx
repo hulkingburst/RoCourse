@@ -100,6 +100,11 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
               </Link>
             </div>
           </div>
+          {profile.status ? (
+            <p className="mt-1 break-words text-sm text-muted-foreground">
+              {profile.status}
+            </p>
+          ) : null}
           <p className="mt-1 text-sm text-muted-foreground">
             {t("joinedAt", { handle: profile.handle, date: joined })}
           </p>

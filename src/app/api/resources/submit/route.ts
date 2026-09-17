@@ -12,6 +12,7 @@ import {
   RESOURCE_KINDS,
   type ResourceKind,
 } from "@/lib/resources-shared";
+import { moderatePublicText } from "@/lib/moderation";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -119,6 +120,16 @@ export async function POST(request: Request) {
     }
   } else if (code.length > MAX_CODE) {
     return NextResponse.json({ ok: false }, { status: 400 });
+  }
+
+  // Moderation covers the human-written fields; pasted code is skipped because
+  // it legitimately contains URLs and identifiers that would read as spam.
+  const rejected =
+    (await moderatePublicText(name)) ??
+    (await moderatePublicText(description)) ??
+    (author.length > 0 ? await moderatePublicText(author) : null);
+  if (rejected) {
+    return NextResponse.json({ ok: false, error: "rejected" }, { status: 400 });
   }
 
   const lines: string[] = [];

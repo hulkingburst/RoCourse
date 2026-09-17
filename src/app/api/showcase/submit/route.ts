@@ -5,6 +5,7 @@ import { ensureHandle } from "@/lib/users";
 import { ensureShowcaseLabels } from "@/lib/showcase";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { MAX_GAME_DESCRIPTION, MAX_GAME_NAME, MAX_GAME_URL } from "@/lib/showcase-shared";
+import { moderatePublicText } from "@/lib/moderation";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -69,6 +70,12 @@ export async function POST(request: Request) {
     if (protocol !== "http:" && protocol !== "https:") {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
+  }
+
+  const rejected =
+    (await moderatePublicText(name)) ?? (await moderatePublicText(description));
+  if (rejected) {
+    return NextResponse.json({ ok: false, error: "rejected" }, { status: 400 });
   }
 
   // Only students who actually finished the course can submit — the showcase

@@ -311,7 +311,19 @@
     "avatarOption": "Avatar {n}",
     "avatarRemove": "Remove picture",
     "titlePick": "Choose a title",
-    "titleRemove": "Remove title"
+    "titleRemove": "Remove title",
+    "statusEmpty": "Set a status",
+    "statusEdit": "Edit status",
+    "statusPlaceholder": "What are you learning today?",
+    "statusSave": "Save",
+    "statusCancel": "Cancel",
+    "statusClear": "Clear",
+    "statusSaved": "Status saved",
+    "statusTooLong": "Status must be 80 characters or fewer.",
+    "statusBadWord": "That status isn't allowed. Try something else.",
+    "statusEmail": "Statuses can't contain email addresses.",
+    "statusSite": "Statuses can't contain links.",
+    "statusError": "Couldn't save your status. Please try again."
   },
   "badges": {
     "title": "Achievements",
@@ -780,6 +792,7 @@
     "errorProtocol": "Only http and https links are allowed.",
     "errorNoCode": "Paste some code to submit.",
     "errorTooMany": "You've submitted too many resources recently. Try again tomorrow.",
+    "errorRejected": "That text contains language or links that aren't allowed. Please edit it and try again.",
     "errorGeneric": "Something went wrong. Please try again in a moment.",
     "zipOnlyZip": "Only .zip files are allowed.",
     "zipTooLarge": "That zip is too large (max {max} MB).",
@@ -1997,6 +2010,7 @@
     "errorGeneric": "Something went wrong. Please try again.",
     "errorRateLimit": "You've submitted a lot recently. Try again tomorrow.",
     "errorNotFinished": "Finish the course first, then submit your game here.",
+    "errorRejected": "That text contains language or links that aren't allowed. Please edit it and try again.",
     "errorUrl": "Enter the full link, starting with http:// or https://"
   },
   "notFound": {

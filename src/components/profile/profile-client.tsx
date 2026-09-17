@@ -38,10 +38,12 @@ import { isStreakActive } from "@/lib/streak";
 import { levelProgress, weekKey } from "@/lib/xp";
 import { cn } from "@/lib/utils";
 import type { CloudState } from "@/lib/sync-types";
-import { setAvatar, setTitle } from "@/lib/account-actions";
+import { setAvatar, setStatus, setTitle } from "@/lib/account-actions";
+import { cleanStatus, STATUS_MAX_LENGTH } from "@/lib/status";
 import { AVATAR_OPTIONS } from "@/lib/avatar";
 import { TITLES, getTitleById } from "@/lib/titles";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -115,6 +117,14 @@ export function ProfileClient({
     string | null | undefined
   >(undefined);
   const [titleSaving, setTitleSaving] = React.useState(false);
+  const [statusOverride, setStatusOverride] = React.useState<
+    string | null | undefined
+  >(undefined);
+  const [statusSaving, setStatusSaving] = React.useState(false);
+  const [statusEditing, setStatusEditing] = React.useState(false);
+  const [statusDraft, setStatusDraft] = React.useState("");
+  const [statusError, setStatusError] = React.useState<string | null>(null);
+  const [statusSaved, setStatusSaved] = React.useState(false);
   const router = useRouter();
 
   const pickAvatar = async (id: string | null) => {
@@ -239,6 +249,48 @@ export function ProfileClient({
   const currentTitle =
     titleOverride !== undefined ? titleOverride : session.user.title ?? null;
   const currentTitleDef = getTitleById(currentTitle);
+
+  const currentStatus =
+    statusOverride !== undefined ? statusOverride : session.user.status ?? null;
+
+  const saveStatus = async (raw: string | null) => {
+    if (statusSaving) return;
+    setStatusError(null);
+    const cleaned = cleanStatus(raw ?? "");
+    if (cleaned.length > STATUS_MAX_LENGTH) {
+      setStatusError(t("statusTooLong"));
+      return;
+    }
+    setStatusSaving(true);
+    const result = await setStatus(cleaned);
+    setStatusSaving(false);
+    if (result.error) {
+      setStatusError(
+        result.error === "badWord"
+          ? t("statusBadWord")
+          : result.error === "email"
+            ? t("statusEmail")
+            : result.error === "site"
+              ? t("statusSite")
+              : result.error === "tooLong"
+                ? t("statusTooLong")
+                : t("statusError")
+      );
+      return;
+    }
+    setStatusOverride(result.status ?? null);
+    setStatusEditing(false);
+    setStatusSaved(true);
+    await update();
+    router.refresh();
+  };
+
+  const beginStatusEdit = () => {
+    setStatusDraft(currentStatus ?? "");
+    setStatusError(null);
+    setStatusSaved(false);
+    setStatusEditing(true);
+  };
 
   const titlePickerItems = () => (
     <>
@@ -410,6 +462,98 @@ export function ProfileClient({
               </DropdownMenu>
             )}
           </div>
+          {!statusEditing ? (
+            currentStatus ? (
+              <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                <p className="min-w-0 flex-1 break-words text-sm text-muted-foreground">
+                  {currentStatus}
+                </p>
+                <button
+                  type="button"
+                  onClick={beginStatusEdit}
+                  aria-label={t("statusEdit")}
+                  className="inline-flex shrink-0 items-center rounded p-1 text-muted-foreground transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Pencil className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={beginStatusEdit}
+                className="mt-1 inline-flex items-center gap-1.5 rounded text-sm text-muted-foreground transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Pencil className="h-3 w-3" />
+                {t("statusEmpty")}
+              </button>
+            )
+          ) : (
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                const value = new FormData(event.currentTarget).get("status");
+                void saveStatus(typeof value === "string" ? value : "");
+              }}
+              className="mt-2 space-y-2"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  name="status"
+                  autoFocus
+                  maxLength={STATUS_MAX_LENGTH}
+                  value={statusDraft}
+                  onChange={(event) => {
+                    setStatusDraft(event.target.value);
+                    setStatusError(null);
+                  }}
+                  placeholder={t("statusPlaceholder")}
+                  aria-label={t("statusEmpty")}
+                  className={cn(
+                    "min-w-0 flex-1",
+                    statusError ? "border-destructive focus-visible:ring-destructive" : ""
+                  )}
+                />
+                <div className="flex items-center gap-2">
+                  <Button type="submit" size="sm" disabled={statusSaving}>
+                    {statusSaving ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : null}
+                    {t("statusSave")}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={statusSaving}
+                    onClick={() => {
+                      setStatusEditing(false);
+                      setStatusError(null);
+                    }}
+                  >
+                    {t("statusCancel")}
+                  </Button>
+                  {currentStatus ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      disabled={statusSaving}
+                      onClick={() => void saveStatus(null)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      {t("statusClear")}
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+              {statusError ? (
+                <p className="text-xs text-destructive">{statusError}</p>
+              ) : null}
+            </form>
+          )}
+          {statusSaved && !statusEditing ? (
+            <p className="mt-1 text-xs text-success">{t("statusSaved")}</p>
+          ) : null}
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5" />

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { serializeQuestionListItem, validateQuestionInput } from "@/lib/questions";
+import { moderatePublicText } from "@/lib/moderation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,6 +81,19 @@ export async function POST(request: Request) {
   const validated = validateQuestionInput(parsed?.title, parsed?.body);
   if (!validated.ok) {
     return NextResponse.json({ error: validated.error }, { status: 400 });
+  }
+
+  const rejected =
+    (await moderatePublicText(validated.title)) ??
+    (await moderatePublicText(validated.body));
+  if (rejected) {
+    return NextResponse.json(
+      {
+        error:
+          "That post contains language or links that aren't allowed. Please edit it and try again.",
+      },
+      { status: 400 }
+    );
   }
 
   const lessonSlug =

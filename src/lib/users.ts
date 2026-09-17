@@ -37,6 +37,8 @@ export interface PublicProfile {
   avatar: string | null;
   /** Stable developer-title id, or null when none is set. */
   title: string | null;
+  /** Short plain-text status, or null when none is set. */
+  status: string | null;
   createdAt: string;
   totalLessons: number;
   stats: PublicStats;
@@ -168,6 +170,7 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
       name: true,
       avatar: true,
       title: true,
+      status: true,
       createdAt: true,
       progress: { select: { data: true } },
       completions: {
@@ -193,6 +196,7 @@ export async function getPublicProfile(handle: string): Promise<PublicProfile | 
     name: moderateName(user.name),
     avatar: user.avatar,
     title: user.title ?? null,
+    status: user.status ?? null,
     createdAt: user.createdAt.toISOString(),
     totalLessons,
     stats: extractPublicStats(user.progress?.data),

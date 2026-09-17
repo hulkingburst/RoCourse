@@ -76,6 +76,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           handle: user.handle,
           avatar: user.avatar,
           title: user.title,
+          status: user.status,
         };
       },
     }),
@@ -86,6 +87,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       if (user && user.handle !== undefined) token.handle = user.handle;
       if (user && user.avatar !== undefined) token.avatar = user.avatar;
       if (user && user.title !== undefined) token.title = user.title;
+      if (user && user.status !== undefined) token.status = user.status;
 
       // unstable_update() re-runs this callback with trigger "update" and the
       // payload under `session`. Copy updated profile fields from there so an
@@ -97,6 +99,9 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         }
         if (updatedUser && "title" in updatedUser) {
           token.title = (updatedUser.title as string | null) ?? null;
+        }
+        if (updatedUser && "status" in updatedUser) {
+          token.status = (updatedUser.status as string | null) ?? null;
         }
       }
 
@@ -126,6 +131,11 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           session.user.title = token.title;
         } else if (token.title === null) {
           session.user.title = null;
+        }
+        if (typeof token.status === "string") {
+          session.user.status = token.status;
+        } else if (token.status === null) {
+          session.user.status = null;
         }
       }
       return session;

@@ -88,7 +88,9 @@ export function SubmitGameDialog({
           ? t("errorRateLimit")
           : errorCode === "not-finished"
             ? t("errorNotFinished")
-            : t("errorGeneric")
+            : errorCode === "rejected"
+              ? t("errorRejected")
+              : t("errorGeneric")
       );
       setStatus("error");
     } catch {
