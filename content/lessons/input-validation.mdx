@@ -1,0 +1,192 @@
+---
+slug: input-validation
+title: Input validation — never trust a string
+description: Double-check everything a player types or sends — shape, length, and control characters — before the server acts on it.
+sectionId: data
+order: 12
+difficulty: intermediate
+estimatedMinutes: 8
+tags: [validation, security, input, strings, sanitize, remotes]
+objectives:
+  - Explain why every value from a client is text you must verify, not a fact
+  - Type-check arguments that cross a remote before using them
+  - Enforce length limits and strip control characters on the server
+  - Guard free-typed text with whitelist patterns from the string patterns lesson
+prerequisites: [server-authority, rate-limiting, string-patterns]
+keywords: [validation, sanitize, input, trust, remote, tonumber, pattern, string]
+---
+
+Server authority decided what each request is *worth*, and rate limiting paces the *flood*. But the player in the lobby doesn't just push a buy button — sometimes they type. A chat message, a custom name, a scoreboard tag: free-typed text crosses the wire as **a string you did not write**. Input validation is the layer that double-checks it — shape, length, and junk — before the server acts.
+
+<Step>
+
+## It arrives as "whatever the client sent"
+
+Here's a chat handler. Looks reasonable — but `message` is whatever the client *chose* to send:
+
+```luau
+-- ServerScriptService
+chatEvent.OnServerEvent:Connect(function(player, message)
+    print(message) -- treat it as text, clean it up, show it
+end)
+```
+
+An exploiter can turn that one argument into many things:
+
+```luau
+-- on the exploiter's machine
+chatEvent:FireServer(string.rep("A", 100000)) -- a 100,000-character wall
+chatEvent:FireServer(1337)                     -- not a string at all
+chatEvent:FireServer({ text = "fake" })        -- a whole table
+chatEvent:FireServer("A\0B\r\nC")              -- strings hiding control bytes
+```
+
+The value arrives as-is. The handler should **assume nothing** — verify what it is, how big it is, and what's inside it, *before* doing anything with it.
+
+<Mcq
+  question="Your chat handler receives message from chatEvent:FireServer(...). Which of these can legally arrive in that parameter?"
+  options={[
+    "A 100,000-character string",
+    "A number instead of a string",
+    "A table",
+    "All of the above",
+  ]}
+  answer={3}
+  explanation="Remote arguments carry exactly what the client sent — any type, any size. If the handler assumes it's a short clean string, the exploiter gets to break that assumption."
+/>
+
+</Step>
+
+<Step>
+
+## Shape first: is it even a string?
+
+The cheapest check is the **type**. `typeof` is fast and has no surprises — it never errors, it just tells you what the value is:
+
+```luau
+if typeof(message) ~= "string" then return end  -- a table or number? not a message
+```
+
+One line kills every non-string payload. Do this *before* touching the value — calling `string` functions on non-strings is how a forged table turns a silent reject into a server error.
+
+<WriteCode
+  instruction="Only real text counts as a message. Fill in the guard line that drops anything that isn't a string before it reaches the broadcast."
+  answer={["if typeof(message) ~= 'string' then return end", "if typeof(message) ~= \"string\" then return end"]}
+  starterCode="chatEvent.OnServerEvent:Connect(function(player, message)
+    -- only real text counts as a message
+
+    -- ... broadcast to the lobby
+end)"
+  explanation="The typeof guard runs before any string function touches message, so a forged table or number is dropped silently."
+/>
+
+</Step>
+
+<Step>
+
+## Then size: how big is too big?
+
+A player message doesn't need 100,000 characters. A name doesn't need 500. Once you know it's a string, enforce a **length cap** with the length operator you already know:
+
+```luau
+if #message > 200 then return end  -- keep the payload human-sized
+```
+
+<FillBlank
+  prompt={`The Luau operator that returns the number of characters in message is ____.`}
+  answer={`#`}
+  explanation="The length operator — #message — counts characters, so an oversized message fails the cap and is dropped silently."
+/>
+
+<Note>
+Length is a *server* rule, not a client convenience. A `MaxLength` on a TextBox stops honest players — but an exploiter skips the UI entirely and fires the remote directly. The server cap is the one that actually counts.
+</Note>
+
+And while you're here — free-typed text can sneak in **control characters**: carriage returns, newlines, even embedded NUL bytes. They can't display, but they can break logs, trip naive parsers, and make a "short" message smuggle extra content. Strip them on the server:
+
+```luau
+message = message:gsub("[\0\r\n]", " ")  -- swap junk bytes for plain spaces
+```
+
+Now a message is bounded *and* clean before it's stored or relayed.
+
+</Step>
+
+<Step>
+
+## Numbers cross the wire as claims too
+
+Typed text isn't only strings. A player reports a **best time** or a **score** through a remote — that arrives as a value you can't trust either:
+
+```luau
+-- LocalScript
+timeEvent:FireServer(tostring(bestTime)) -- the player sends their new best
+```
+
+An exploiter can claim anything: `"999999"`, `"-5"`, `"not a number"`, or a table pretending to be a score. The server should *convert and verify* rather than store the claim:
+
+```luau
+-- ServerScriptService
+timeEvent.OnServerEvent:Connect(function(player, rawTime)
+    local seconds = tonumber(rawTime)  -- nil if it can't convert — no error
+    if not seconds then return end     -- garbage claim? drop it
+    seconds = math.clamp(seconds, 1, 600) -- and clamp to what the game allows
+    player.leaderstats.BestTime.Value = math.min(
+        player.leaderstats.BestTime.Value,
+        seconds
+    )
+end)
+```
+
+`tonumber` returns `nil` on garbage instead of erroring — so a fake claim dies quietly at the `if not seconds` check, and `math.clamp` keeps even a *real* number inside the range the game was designed for. The server owns the range; the client only proposes.
+
+</Step>
+
+<Step>
+
+## Shapes: whitelist, don't guess
+
+Length and type catch *size*. For free-typed text that has to *look like something* — a tag, a code, a name from a list — verify the **shape** with the patterns from the string patterns lesson.
+
+Allow a specific shape, and drop everything else:
+
+```luau
+local VALID_TAG = "^%w+$" -- letters and digits only, one or more
+
+tagEvent.OnServerEvent:Connect(function(player, tag)
+    if not string.match(tag, VALID_TAG) then return end
+    saveTag(player, tag)
+end)
+```
+
+The `^` anchors the start, `$` anchors the end, `%w+` requires one or more letters or digits — so a tag like `"xX_Demon_Xx"`, a tag with spaces, or an empty string all fail the whole match and are silently dropped. A whitelist says *"here is precisely what I accept"*; a blocklist tries to predict every way the input can be nasty, and misses. When you can, whitelist.
+
+<WriteCode
+  instruction="The game only allows alphanumeric tags — letters and digits, one or more characters. Fill in the guard that drops any tag that doesn't match VALID_TAG."
+  answer={["if not string.match(tag, VALID_TAG) then return end"]}
+  starterCode="local VALID_TAG = '^%w+$'
+
+tagEvent.OnServerEvent:Connect(function(player, tag)
+    -- only letters and digits are allowed here
+
+    saveTag(player, tag)
+end)"
+  explanation="string.match with the anchored whitelist pattern returns nil for any disallowed tag, so the guard drops it before saveTag ever runs."
+/>
+
+</Step>
+
+<Step>
+
+## The validation checklist
+
+Before the server stores, relays, or rewards data typed by a player, run the three-question checklist:
+
+- **Shape — is it what I claim to accept?** (`typeof` for strings, `tonumber` for numbers)
+- **Size — is it within my limits?** (`#` caps everything human-sized)
+- **Content — does it match my whitelist, and is the junk stripped?** (patterns for shapes, `gsub` for control characters)
+
+Same wall as the rest of this path: rate limiting paces the flood, server authority stays the referee over values, and input validation double-checks the *text* — alongside the type checks on every remote, they're what make the economy (and the chat box) hold up under attack.
+
+Next up: the data bug hunt — put the whole save-and-remote stack, rate limits, authority, and validation included, under attack.
+</Step>
