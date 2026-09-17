@@ -20,8 +20,15 @@ import {
 } from "@/lib/export";
 import { changeUsername, type ChangeUsernameResult } from "@/lib/account-actions";
 import type { UsernameChangeInfo } from "@/lib/account";
+import { waitForHydration } from "@/lib/sync";
 
-function downloadProgressExport() {
+/**
+ * Downloads the current progress backup. Waits for the progress store to
+ * rehydrate from localStorage first so a freshly-opened settings page can never
+ * export a partial/empty file while loading.
+ */
+async function downloadProgressExport() {
+  await waitForHydration();
   const payload = buildProgressExport();
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
@@ -72,7 +79,7 @@ export function SettingsClient({ account }: { account: UsernameChangeInfo | null
   const handleImportFile = React.useCallback(
     (file: File) => {
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         const raw = typeof reader.result === "string" ? reader.result : "";
         const result = parseProgressImport(raw);
         if (!result.ok) {
@@ -80,6 +87,7 @@ export function SettingsClient({ account }: { account: UsernameChangeInfo | null
           return;
         }
         if (window.confirm(t("dataImportConfirm"))) {
+          await waitForHydration();
           applyImportedProgress(result.progress);
           setImportStatus("ok");
         } else {
