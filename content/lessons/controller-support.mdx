@@ -163,7 +163,7 @@ ContextActionService:BindAction("buy", onBuy, true,
 <WriteCode
   instruction="A game with controller players needs a virtual cursor. Enable VirtualCursorMode from StarterGui."
   answer={["StarterGui.VirtualCursorMode = Enum.VirtualCursorMode.Enabled"]}
-  starterCode="local StarterGui = game:GetService(\"StarterGui\")\n-- turn on the virtual cursor"
+  starterCode={'local StarterGui = game:GetService("StarterGui")\n-- turn on the virtual cursor'}
   explanation="Set StarterGui.VirtualCursorMode to Enabled so gamepad and touch players can navigate the UI."
 />
 
