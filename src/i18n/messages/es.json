@@ -155,17 +155,15 @@
     "heroTitleAccent": "Desde cero absoluto.",
     "startCourse": "Empezar el curso",
     "browseLessons": "Ver todas las lecciones",
-    "statsLessons": "Lecciones",
-    "statsTime": "Tiempo total",
-    "statsProject": "Proyecto final",
-    "gamesUnit": "juego",
+    "statsLessonsCompleted": "Lecciones completadas en total",
+    "statsXpEarned": "XP ganada en total",
+    "statsLearners": "Estudiantes en total",
     "feature1Title": "Aprende lo real",
     "feature1Body": "Cada ejemplo es código de juego real, tal y como lo escriben los desarrolladores de Roblox con experiencia.",
     "feature2Title": "Construye, no memorices",
     "feature2Body": "Cada concepto aparece porque un problema real del juego lo necesita. Inténtalo antes de revelar la solución.",
     "feature3Title": "Depura como un desarrollador",
-    "feature3Body": "Scripts rotos a propósito te enseñan a leer errores — la habilidad que los tutoriales nunca enseñan.",
-    "hoursUnit": "h"
+    "feature3Body": "Scripts rotos a propósito te enseñan a leer errores — la habilidad que los tutoriales nunca enseñan."
   },
   "course": {
     "yourProgress": "Tu progreso",

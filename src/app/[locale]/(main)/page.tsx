@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, BookOpen, Cpu, Gamepad2 } from "lucide-react";
 import { courseTagline } from "@content/course";
 import { getCourseStructure } from "@/lib/lessons";
+import { getSiteStats } from "@/lib/site-stats";
 import { CourseOverview } from "@/components/home/course-overview";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL } from "@/lib/site";
+
+// The stat cards read live counters from the database, so the page must render
+// per request rather than being prerendered at build time.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -34,13 +39,13 @@ const courseJsonLd = {
 };
 
 export default async function HomePage() {
-  const t = await getTranslations("home");
+  const [t, format, stats] = await Promise.all([
+    getTranslations("home"),
+    getFormatter(),
+    getSiteStats(),
+  ]);
   const sections = getCourseStructure();
   const allLessons = sections.flatMap((section) => section.lessons);
-  const totalMinutes = allLessons.reduce(
-    (sum, lesson) => sum + lesson.estimatedMinutes,
-    0
-  );
   const firstLesson = allLessons[0];
 
   return (
@@ -72,18 +77,28 @@ export default async function HomePage() {
 
         <dl className="mt-10 grid max-w-xl grid-cols-3 gap-4">
           <div className="rounded-xl border bg-card p-4">
-            <dt className="text-xs text-muted-foreground">{t("statsLessons")}</dt>
-            <dd className="mt-1 text-2xl font-bold">{allLessons.length}</dd>
-          </div>
-          <div className="rounded-xl border bg-card p-4">
-            <dt className="text-xs text-muted-foreground">{t("statsTime")}</dt>
+            <dt className="text-xs text-muted-foreground">
+              {t("statsLessonsCompleted")}
+            </dt>
             <dd className="mt-1 text-2xl font-bold">
-              {Math.round(totalMinutes / 60)}+ {t("hoursUnit")}
+              {format.number(stats.lessonsCompleted)}
             </dd>
           </div>
           <div className="rounded-xl border bg-card p-4">
-            <dt className="text-xs text-muted-foreground">{t("statsProject")}</dt>
-            <dd className="mt-1 text-2xl font-bold">1 {t("gamesUnit")}</dd>
+            <dt className="text-xs text-muted-foreground">
+              {t("statsXpEarned")}
+            </dt>
+            <dd className="mt-1 text-2xl font-bold">
+              {format.number(stats.xpEarned)}
+            </dd>
+          </div>
+          <div className="rounded-xl border bg-card p-4">
+            <dt className="text-xs text-muted-foreground">
+              {t("statsLearners")}
+            </dt>
+            <dd className="mt-1 text-2xl font-bold">
+              {format.number(stats.learners)}
+            </dd>
           </div>
         </dl>
       </section>

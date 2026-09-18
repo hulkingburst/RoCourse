@@ -155,17 +155,15 @@
     "heroTitleAccent": "From absolute zero.",
     "startCourse": "Start the course",
     "browseLessons": "Browse all lessons",
-    "statsLessons": "Lessons",
-    "statsTime": "Total time",
-    "statsProject": "Final project",
-    "gamesUnit": "game",
+    "statsLessonsCompleted": "Total lessons completed",
+    "statsXpEarned": "Total XP earned",
+    "statsLearners": "Total learners",
     "feature1Title": "Learn the real thing",
     "feature1Body": "Every example is real game code, the way experienced Roblox developers actually write it.",
     "feature2Title": "Build, don't memorize",
     "feature2Body": "Each concept shows up because a real game problem needs it. Try before the solution is revealed.",
     "feature3Title": "Debug like a developer",
-    "feature3Body": "Deliberately broken scripts teach you to read errors — the skill tutorials never cover.",
-    "hoursUnit": "hrs"
+    "feature3Body": "Deliberately broken scripts teach you to read errors — the skill tutorials never cover."
   },
   "course": {
     "yourProgress": "Your progress",
