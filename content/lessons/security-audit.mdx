@@ -1,0 +1,218 @@
+---
+slug: security-audit
+title: Security audit — hunt the gaps in your wall
+description: Walk your game with an exploiter's checklist — every remote, every trust boundary, every free-typed value — and harden each gap before you ship.
+sectionId: data
+order: 13
+difficulty: intermediate
+estimatedMinutes: 8
+tags: [security, audit, remotes, validation, authority, review]
+objectives:
+  - Build a map of every trust boundary by inventorying your remotes
+  - Judge each handler with the three-question audit: value, rules, pace
+  - Harden the two most common findings — unchecked arguments and client-owned prices
+  - Audit free-typed text before publishing
+prerequisites: [input-validation, server-authority, rate-limiting, data-security]
+keywords: [audit, security, remote, trust, exploit, checklist, harden]
+---
+
+You've stacked the wall brick by brick: rate limiting paces the flood, server authority owns the numbers, input validation double-checks the text. But a wall only holds if every brick is in place — and the bricks are spread across your *whole game*, not one script. A **security audit** is a deliberate walk through the finished game looking for missing bricks, with an exploiter's eyes, before an exploiter finds them for you. No new features. Just a checklist and fresh eyes.
+
+<Step>
+
+## An audit is a map of trust boundaries
+
+Every place your server code accepts a value from a client is a **trust boundary** — a spot where a forged request could reach real logic. The auditor's first job is to make a map of every boundary. Every `FireServer` in a LocalScript is one; the matching `OnServerEvent` handler on the server is where it meets your code.
+
+That means the audit starts as a **search**, not an inspection: find every remote in your game (search for `FireServer(` and `OnServerEvent`), pair each call with its handler, and add it to your list. Most small games end up with a dozen or fewer boundaries. Your whole audit is checking each one against the same three questions.
+
+<Mcq
+  question="You're auditing the shop. Which line is the trust boundary?"
+  options={[
+    "buyButton.MouseButton1Click:Connect(...)",
+    "buyEvent:FireServer(\"Sword\")",
+    "local coins = player.leaderstats.Coins",
+    "print(\"shop loaded\")",
+  ]}
+  answer={1}
+  explanation="FireServer hands a value to server code that will act on it — that's the boundary. The button click itself never leaves the player's machine, and leaderstats is server-authoritative."
+/>
+
+</Step>
+
+<Step>
+
+## Three questions for every boundary
+
+For each remote on your map, run the same checklist. All three answers should be "yes":
+
+1. **Value** — is every argument verified before it's used? (shape, size, content — the input validation lesson)
+2. **Rules** — does the server own the numbers? (price, balance, inventory — the server authority lesson)
+3. **Pace** — is the flood limited per player? (the rate limiting lesson)
+
+The classic fail is answering "no" to #2. Here's the shop handler from the server authority lesson, revisited as an audit finding:
+
+```luau
+buyEvent.OnServerEvent:Connect(function(player, itemId, price)
+    if price >= 50 then            -- "trust the price the client reported"
+        takeCoins(player, price)
+        giveItem(player, itemId)
+    end
+end)
+```
+
+<Mcq
+  question="Which answer turns this audit finding into a clean pass?"
+  options={[
+    "Keep the check, but raise it to price >= 100",
+    "Look up itemId in a server-owned catalog and use its real price",
+    "Only connect the handler after the shop GUI loads",
+    "Ban any player who ever sends a price under 50",
+  ]}
+  answer={1}
+  explanation="The server should look up the real price in its own catalog and ignore the price in the request entirely — the client only reports which item it wants."
+/>
+
+</Step>
+
+<Step>
+
+## The first finding: unchecked arguments
+
+The most common audit finding in a young game is a handler that uses remote arguments without checking them. It's also the easiest to fix, because the fix is one or two lines at the top of the handler — before anything expensive happens. An `itemId` from the client that the server looks up in a table is a rule, not a fact, so the audit asks: *is the key verified against a catalog the server trusts?*
+
+<FixBug
+  question="What's the bug here?"
+  options={[
+    "The server trusts an item name it was never told exists",
+    "The server recomputes the price from its own catalog",
+    "The server checks the player's real balance",
+    "The handler silently ignores unknown items",
+  ]}
+  answer={0}
+  explanation={"An arbitrary itemId like \"MythicBlade\" is used as a rule in server code. The fix is a catalog lookup: if the id isn't in SHOP, drop the request."}
+>
+
+```luau
+buyEvent.OnServerEvent:Connect(function(player, itemId)
+    giveItem(player, itemId)     -- any id, whatever the client says
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Harden the handler
+
+The fix is the same shape every time: look the value up in the catalog. The hardened handler reads the price from that table, and every failed check is a silent `return` — nothing leaks to the attacker:
+
+```luau
+local SHOP = {
+    Sword = { price = 50 },
+    Potion = { price = 5 },
+}
+
+buyEvent.OnServerEvent:Connect(function(player, itemId)
+    local item = SHOP[itemId]
+    if not item then return end              -- no such thing is for sale
+    local coins = player.leaderstats.Coins
+    if coins.Value < item.price then return end -- can't afford it
+    coins.Value -= item.price
+    giveItem(player, itemId)
+end)
+```
+
+<FixBug
+  fix={["if not item then return end", "if item == nil then return end"]}
+  instruction="Write the guard that drops requests for items that aren't in the catalog."
+  explanation="SHOP[itemId] returns nil for a made-up id, so the guard kills the request before any coins move."
+>
+
+```luau
+buyEvent.OnServerEvent:Connect(function(player, itemId)
+    local item = SHOP[itemId]
+    local coins = player.leaderstats.Coins
+    if coins.Value < item.price then return end
+    coins.Value -= item.price
+    giveItem(player, itemId)
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## The free-typed door
+
+Handlers that receive typed text get the same treatment, with the input validation checklist on top. An audit of your chat path looks for three lines — in this order:
+
+```luau
+if typeof(message) ~= "string" then return end          -- shape first
+if #message > 200 then return end                       -- then size
+message = message:gsub("[\0\r\n]", " ")                 -- content cleaned
+if not string.match(message, "^%w+$") then return end   -- whitelist shape
+```
+
+<WriteCode
+  instruction="Your audit found the chat handler using message before any check. Add the shape guard that drops anything that isn't a string."
+  answer={["if typeof(message) ~= 'string' then return end", "if typeof(message) ~= \"string\" then return end"]}
+  starterCode="chatEvent.OnServerEvent:Connect(function(player, message)
+    -- only real text counts as a message
+
+    -- ... broadcast to the lobby
+end)"
+  explanation="typeof is fast and never errors — it just reports the value's type, so a forged table or number is dropped before any string function touches it."
+/>
+
+<Note>
+Length caps and control-character stripping are server rules. A MaxLength on a TextBox only stops honest players; the exploiter fires the remote directly, so the server cap is the one the audit cares about.
+</Note>
+
+</Step>
+
+<Step>
+
+## Pace every door
+
+The last question is pace: can a single player flood this boundary? A buy remote with no per-player cooldown lets an exploiter drain their balance into the whole inventory in one second — and lets a cheater spam millions of requests to stress the server even if every one is rejected.
+
+The audit doesn't re-litigate how to build a rate limit — that's the rate limiting lesson. It just checks that **every accepting handler has one**. The moment you find a `FireServer` whose handler has no cooldown, the finding is: *pace this boundary.* Client debounces don't count (they only stop honest players); the limit has to live on the server, next to the code that rewards.
+
+<Mcq
+  question="During your audit you find the coin remote has a debounce in the LocalScript but no server-side limit. How do you write the finding?"
+  options={[
+    "Acceptable — the debounce is enough",
+    "The debounce only stops honest players; add a server-side per-player limit",
+    "Delete the debounce; server limits alone are all that matter",
+    "Rate limits are only needed for data store writes",
+  ]}
+  answer={1}
+  explanation="A client debounce is a convenience, not a control — an exploiter bypasses it entirely. The audit finding is to add a per-player limit next to the rewarding code."
+/>
+
+</Step>
+
+<Step>
+
+## Your audit checklist
+
+Before you ship, run the audit once, cover to cover — not just over "the suspicious parts":
+
+- **Map it.** Search `FireServer(` and `OnServerEvent`; list every trust boundary.
+- **Value.** Every argument verified (shape, size, content) before use.
+- **Rules.** Every number the server acts on is server-owned, from a catalog or a balance.
+- **Pace.** Every accepting handler is rate limited per player.
+- **Text.** Free-typed input is length-capped, cleaned, and whitelist-matched.
+
+<Warning>
+The classic trap is auditing for bugs you already know about. The audit's value is the *boring* checklist: the second remote nobody remembers, the chat path without the typeof guard, the buy handler with no cooldown. The exploiter reads the boring parts first.
+</Warning>
+
+Next up: the data bug hunt — put the whole save-and-remote stack under attack, and check it against the map you just built.
+
+</Step>

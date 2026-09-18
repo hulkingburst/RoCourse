@@ -24,7 +24,7 @@ export const courseSections: CourseSectionConfig[] = [
   },
   {
     id: "data",
-    title: "Player Data",
+    title: "Player Data & Security",
     description:
       "Leaderboards, saving between visits, and why the server — never the client — is the source of truth.",
     order: 2,

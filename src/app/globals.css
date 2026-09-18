@@ -185,6 +185,17 @@
   *::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  /* Reserve the scrollbar gutter wherever content can scroll so nothing
+     shifts when a scrollbar appears or disappears. The window scrollbar is
+     covered by `html { scrollbar-gutter: stable }` above; these cover every
+     inner scroll surface (dropdowns, results lists, avatar grids, dialog
+     bodies). Horizontal-only `pre` blocks (overflow-x-auto) are left alone. */
+  [class*="overflow-y-auto"],
+  [class*="overflow-y-scroll"],
+  [class*="overflow-auto"] {
+    scrollbar-gutter: stable;
+  }
 }
 
 /* Typography (prose) mapped onto design tokens so it follows the theme */
