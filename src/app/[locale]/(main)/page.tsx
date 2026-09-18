@@ -51,7 +51,7 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-14">
       <JsonLd data={courseJsonLd} />
-      <section className="mb-14">
+      <section className="mb-4">
         <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
           {t("eyebrow")}
         </p>
@@ -75,7 +75,7 @@ export default async function HomePage() {
           </Button>
         </div>
 
-        <dl className="mt-10 grid max-w-xl grid-cols-3 gap-4">
+        <dl className="mt-10 grid grid-cols-3 gap-4">
           <div className="rounded-xl border bg-card p-4">
             <dt className="text-xs text-muted-foreground">
               {t("statsLessonsCompleted")}
