@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-20
+
+- Performance: added the Memory Leaks lesson — why things you Destroy can still stick around (a reference that never lets go), the three classic leaks (created-never-destroyed, connections that stack, lists that never let go), and cleanup habits for respawns and player leaves; renumbered the next-steps lesson to make room.
+
 ## 2026-09-18
 
 - Errors: added a custom `global-error` page so a crashing route or root layout renders an on-brand error screen instead of the bare framework page — includes a retry button and a feedback dialog that posts straight to `/api/feedback` (same flow as the site's footer button). Vercel's own platform-level crash page remains outside our control.

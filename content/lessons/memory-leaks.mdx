@@ -1,0 +1,260 @@
+---
+slug: memory-leaks
+title: Memory leaks — why dead things stick around
+description: Roblox removes what you Destroy — until a reference quietly keeps it alive. Meet the three classic leaks and learn the habits that prevent them.
+sectionId: leveling-up
+order: 5
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [memory, performance, cleanup, garbage collection]
+objectives:
+  - Explain what a memory leak is on Roblox — an instance or listener that should be gone but still has a reference
+  - Spot the three classic leaks: created-never-destroyed, connections that stack, and lists that never let go
+  - Clean up behind respawns and player leaves
+  - Read the Stats memory number to confirm a leak is real before chasing it
+prerequisites: [optimization]
+keywords: [memory, leak, garbage collection, cleanup, destroy, disconnect, stats]
+---
+
+Optimization taught you to measure, then to clean up — parts destroyed, loops throttled, listeners disconnected. This lesson is about the leak in that plan: the thing you were *sure* you cleaned up, quietly staying behind. Games don't crash from leaks — they wear down. The memory number creeps up, frames get heavier, and after an hour of play the game feels tired. A **memory leak** is the name for it, and on Roblox there are only a few ways to make one. All of them share the same signature: a reference you never let go.
+
+<Step>
+
+## A leak is a reference that never lets go
+
+Luau's garbage collector frees anything that has **no references left** — no variable, no table entry, no connection pointing at it. That's the whole rule. So a leak is never "memory doing something wrong." It's *you* (or a table you wrote) still holding a reference to something you're done with.
+
+On Roblox, the two things people hold onto by accident are:
+
+- **Instances** — parts, effects, GUIs you created and meant to disappear.
+- **Connections** — event listeners that should have been disconnected.
+
+The neat part: Roblox hands you the measuring tool for free. In **Studio Stats**, the memory number goes up as you create things and comes back down as the collector frees them. Watch it while you play. Memory that climbs forever — even after your effects finish — is a leak. Memory that climbs and settles is just the game breathing.
+
+<Mcq
+  question="A coin part was Destroy()-ed. Which situation still keeps it alive in memory?"
+  options={[
+    "Nothing references it and it isn't in the workspace",
+    "A table of active coins still holds it",
+    "It has a yellowish material",
+    "It was never anchored",
+  ]}
+  answer={1}
+  explanation="Destroy removes the part from the world, but the collector only frees things with no references. A table that still lists the coin keeps it alive in memory."
+/>
+
+</Step>
+
+<Step>
+
+## Leak 1 — created, never destroyed
+
+The classic: a script makes an instance for a moment of effect — confetti, an explosion spark, a spawn ring — and never removes it. It was fun, it's over, but every copy is still tracked:
+
+```luau
+local Debris = game:GetService("Debris")
+
+clickEvent.OnServerEvent:Connect(function(player)
+    local wedge = Instance.new("WedgePart")
+    wedge.Size = Vector3.new(1, 1, 1)
+    wedge.Position = player.Character.Head.Position
+    wedge.Parent = workspace.Effects
+end)
+```
+
+Every click drops a wedge into the world and nothing ever takes one out. Five minutes of clicking is a stack of debris the engine keeps tracking.
+
+<FixBug
+  question="What's the bug here?"
+  options={[
+    "The wedge never gets a Parent",
+    "Every click creates a wedge that is never destroyed",
+    "WedgePart isn't a real Roblox class",
+    "The effect should be a particle, not a part",
+  ]}
+  answer={1}
+  explanation="Each click adds a wedge to the world and nothing removes it. The fix is to schedule cleanup the moment the thing is born."
+/>
+
+Roblox has a service built exactly for this — **Debris**. Hand it an instance and a delay, and it removes the instance from the world after that delay:
+
+```luau
+local Debris = game:GetService("Debris")
+
+clickEvent.OnServerEvent:Connect(function(player)
+    local wedge = Instance.new("WedgePart")
+    wedge.Size = Vector3.new(1, 1, 1)
+    wedge.Position = player.Character.Head.Position
+    wedge.Parent = workspace.Effects
+    Debris:AddItem(wedge, 5)   -- scheduled cleanup: gone in 5 seconds
+end)
+```
+
+<Note>
+Debris removes an instance from the world — it can't free your *references*. If a table or a script still holds the part, it stays alive even after Debris cleans it up. `Destroy` clears the world; dropping the last reference clears the memory. Both, together, are a clean exit.
+</Note>
+
+</Step>
+
+<Step>
+
+## Leak 2 — connections that stack
+
+Listeners are memory too — each connection stores its function, its target, and a spot in the event's bookkeeping. So a connection created again and again is a leak even when each one is "tiny."
+
+The classic victim is a script that reconnects on every respawn or every activation:
+
+```luau
+-- every round, this coin activates — and gets ANOTHER listener
+local function activateCoin(coin)
+    coin.Touched:Connect(function(hit)
+        collectCoin(hit)
+    end)
+end
+```
+
+Each activation stacks another listener on top of the old ones. By round fifty that coin has fifty listeners — every one of them firing, every one of them stored.
+
+<Mcq
+  question="After ten activations, how many collectCoin listeners does the coin have?"
+  options={[
+    "One — the newest replaces the rest",
+    "Ten — each activation connected another one",
+    "Zero — Touched doesn't store connections",
+    "Exactly two, because Connect takes two arguments",
+  ]}
+  answer={1}
+  explanation="Connect always adds. Unless you disconnect, old listeners stay connected forever — so the coin fires collectCoin ten times per touch."
+/>
+
+The rule from the optimization lesson, applied to time: **connect once, or disconnect before reconnecting.** When the coin deactivates, `Disconnect` its listener; when it activates again, it starts clean:
+
+```luau
+local coinConnection
+
+local function deactivateCoin(coin)
+    if coinConnection then
+        coinConnection:Disconnect()
+        coinConnection = nil
+    end
+end
+
+local function activateCoin(coin)
+    deactivateCoin(coin)            -- clear last round's listener first
+    coinConnection = coin.Touched:Connect(function(hit)
+        collectCoin(hit)
+    end)
+end
+```
+
+</Step>
+
+<Step>
+
+## Leak 3 — lists that never let go
+
+The quietest leak is a table that only ever *grows*. Trackers are everywhere — "all active coins", "effects for player X", "recent hits" — and the natural code adds on spawn and forgets to remove on done:
+
+```luau
+local activeCoins = {}
+
+local function spawnCoin()
+    table.insert(activeCoins, makeCoin())
+end
+
+-- ...and on collect? Nothing removes the coin from the list.
+```
+
+Now the list isn't just wasting space: it's the *reference* that keeps dead coins alive (remember Leak 1's note). The fix is to treat the list like the world — remove what leaves:
+
+```luau
+local function collectCoin(coin)
+    for i, tracked in ipairs(activeCoins) do
+        if tracked == coin then
+            table.remove(activeCoins, i)
+            break
+        end
+    end
+    coin:Destroy()
+end
+```
+
+<ArrangeCode
+  lines={[
+    "local activeCoins = {}",
+    "-- every spawned coin is tracked",
+    "table.insert(activeCoins, coin)",
+    "-- when a coin is collected it must leave the list",
+    "table.remove(activeCoins, i)",
+    "-- then the part can be destroyed",
+    "coin:Destroy()",
+  ]}
+  distractors={["coin:Destroy() -- skipped, it's already gone"]}
+  instruction="Order the spawn-and-clean cycle: track the coin when it spawns, then empty the list when it's collected."
+  explanation="Insert when the coin is born, remove it from the tracking list when it's collected, then destroy the part — otherwise the list grows forever and holds dead coins alive."
+/>
+
+</Step>
+
+<Step>
+
+## Cleanup on player leave
+
+Per-player bookkeeping has the same shape: you add an entry when a player joins. If nothing ever removes it, a game running through hundreds of joins leaks an entry per join — and every entry can hold dead effects too.
+
+Roblox does clean up a big share of player stuff for you: the character, the PlayerGui, the sounds — all children of the player go away on leave. What it can't clean is **your** tables. Those you release by hand:
+
+```luau
+local playerEffects = {}
+
+game.Players.PlayerAdded:Connect(function(player)
+    playerEffects[player.UserId] = makeEffectsFor(player)
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    local effects = playerEffects[player.UserId]
+    if effects then
+        effects:Destroy()
+        playerEffects[player.UserId] = nil   -- drop the whole entry
+    end
+end)
+```
+
+`Destroy` the effects, then set the key to `nil` — that releases the entry to the collector. A table that only ever grows is a leak you can watch coming.
+
+<WriteCode
+  instruction="In onPlayerLeave, write the line that releases the player's whole entry so the table can't grow with every join."
+  answer={["playerEffects[player.UserId] = nil"]}
+  starterCode="game.Players.PlayerRemoving:Connect(function(player)
+    playerEffects[player.UserId]:Destroy()
+    -- drop the entry itself so it doesn't stay in the table
+
+end)"
+  explanation="Setting the key to nil removes the entry from the table, so the collector can free everything it held. A table that only ever grows is a leak you can watch coming."
+/>
+
+</Step>
+
+<Step>
+
+## Check your work before you chase anything
+
+Leaks are invisible until you measure — same rule as the optimization lesson. Open **Studio Stats** and play your game for a few minutes:
+
+- Memory climbs while effects, coins, and switches run — **normal**, that's the game working.
+- Memory stays high after they stop — the collector didn't get the references back. You're holding something.
+- Memory climbs forever, even with nothing happening — a list is growing, or connections are stacking. That's your leak.
+
+The three habits that close all three leaks:
+
+- **Destroy what you create.** Effects and one-shots get `Debris` or `Destroy` at birth.
+- **Connect once, disconnect when done.** Every listener you can't name is a listener you might be stacking.
+- **Clear your lists.** Any table that tracks things must remove them when they're done.
+
+<Warning>
+Don't leak-hunt by reading. Find a real symptom first — the memory number that never settles — then hunt the list, connection, or creation site feeding it. Most memory goes back home by itself; the leak is the one thing that doesn't.
+</Warning>
+
+Next: the map of everything you've learned — pulling the whole course into one picture before the final project.
+
+</Step>
