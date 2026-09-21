@@ -42,6 +42,8 @@
     "moreTools": "More",
     "chooseFinalProject": "Choose final project",
     "switchFinalProject": "Switch final project",
+    "finalProjectTycoon": "Coin Tycoon",
+    "finalProjectCollector": "The Collector",
     "resetProgress": "Reset progress",
     "resetConfirm": "Reset all progress? This cannot be undone.",
     "star": "Star",
