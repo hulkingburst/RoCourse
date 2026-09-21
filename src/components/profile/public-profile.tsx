@@ -71,6 +71,21 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <ShareLinkButton
+              path={`/u/${profile.handle}`}
+              labelKey="shareProfile"
+              variant="outline"
+              size="sm"
+            />
+            <Link
+              href="/leaderboard"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+            >
+              <Trophy className="h-3.5 w-3.5" />
+              {t("seeLeaderboard")}
+            </Link>
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
             <h1 className="text-3xl font-bold tracking-tight">{profile.name}</h1>
             {titleDef ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1 text-xs font-medium text-foreground">
@@ -78,27 +93,16 @@ export function PublicProfileView({ profile }: { profile: PublicProfile }) {
                 {titleNs(`${titleDef.id}.name`)}
               </span>
             ) : null}
-            <div className="ml-auto flex flex-wrap items-center gap-2">
-              <ProfileFollowActions
-                handle={profile.handle}
-                name={profile.name}
-                initialFollowers={profile.followerCount}
-                initialFollowing={profile.followingCount}
-              />
-              <ShareLinkButton
-                path={`/u/${profile.handle}`}
-                labelKey="shareProfile"
-                variant="outline"
-                size="sm"
-              />
-              <Link
-                href="/leaderboard"
-                className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
-              >
-                <Trophy className="h-3.5 w-3.5" />
-                {t("seeLeaderboard")}
-              </Link>
-            </div>
+            <span
+              aria-hidden
+              className="hidden h-5 w-px bg-border sm:block"
+            />
+            <ProfileFollowActions
+              handle={profile.handle}
+              name={profile.name}
+              initialFollowers={profile.followerCount}
+              initialFollowing={profile.followingCount}
+            />
           </div>
           {profile.status ? (
             <p className="mt-1 break-words text-sm text-muted-foreground">
