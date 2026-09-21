@@ -46,6 +46,9 @@ dev-server.log
 *.tsbuildinfo
 next-env.d.ts
 
+# stray locked debug artifact
+$log
+
 .vercel
 .env*
 

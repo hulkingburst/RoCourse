@@ -2,7 +2,11 @@
 
 ## 2026-09-20
 
+- Errors: rebuilt the Luau sandbox WASM from the Luau source tree with a growable heap (64 MiB initial, up to 2 GiB, previously a hard 16 MiB), so Try it / RunCode / the playground no longer abort with `Aborted(OOM)` on scripts that allocate past the old ceiling; the wrapper and rebuild script live in `tools/luau-sandbox/`.
 - Performance: added the Memory Leaks lesson — why things you Destroy can still stick around (a reference that never lets go), the three classic leaks (created-never-destroyed, connections that stack, lists that never let go), and cleanup habits for respawns and player leaves; renumbered the next-steps lesson to make room.
+- Quality: added the Refactoring lesson — the five smells (unclear names, magic values, deep nesting, giant functions, repetition), safe one-step-at-a-time rules, named constants, guard clauses, and extracting responsibilities out of a giant handler — with a sandbox exercise proving behavior survives a cleanup.
+- Quality: added the Testing Fundamentals lesson — one test as a claim with a verdict, the four cases (happy path, edge, invalid, failure), self-explaining assertions, pure functions vs live-game systems, the red-green fix loop with a sandboxed wallet exercise, and regression tests that lock in fixes.
+- Content: renumbered the next-steps lesson (6 → 8) to keep the new Refactoring and Testing Fundamentals lessons before the course map; README lesson count updated to 102.
 
 ## 2026-09-18
 
