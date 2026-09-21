@@ -1,0 +1,273 @@
+---
+slug: testing-fundamentals
+title: Testing fundamentals — claims that prove code works
+description: Turn "I think it works" into a claim the machine checks every run — cover happy paths, edge cases, and invalid input, and lock in every fix with a regression test.
+sectionId: leveling-up
+order: 7
+difficulty: intermediate
+estimatedMinutes: 9
+tags: [testing, assertions, regression, verification, quality]
+objectives:
+  - Say exactly what one passing test proves — and what it still doesn't
+  - Cover happy paths, edge cases, invalid input, and failure cases
+  - Write assertions whose failure messages explain themselves
+  - Test pure functions in isolation, and plan how to verify systems that depend on Instances and events
+  - Turn a bug fix into a regression test that never lets the bug return
+prerequisites: [debugging, refactoring]
+keywords: [testing, test, assertion, check, regression, edge case, verification]
+---
+
+The refactoring lesson promised you could change code and keep behavior identical. But *proving* it by watching once lets bugs slip through — the same way "I tested it in Studio once" has fooled every developer who ever shipped. A **test** is a claim about your code written down in a form the computer can judge, on every run, forever. Not vibes, not memory — a verdict.
+
+<Step>
+
+## A test is a claim with a verdict
+
+One test asserts one claim: *given this input, the code produces this output.* You've been meeting them all course — the `check(condition, message)` calls the sandbox grading throughout this course are tests:
+
+```luau
+check(addCoins(40, 10) == 50, "addCoins(40, 10) should return 50")
+```
+
+Read it as a sentence: "when I call `addCoins` with 40 and 10, I claim the result is 50." The machine runs it, and the verdict is binary — the claim holds, or it doesn't. No "kind of worked", no "looks right to me".
+
+So what does a passing test actually *prove*? Exactly and only this: **that specific input produced that result, on that run.** It is strong evidence about one case, not a certificate for the whole game. `addCoins` behaving on `(40, 10)` says nothing about whether the save loop restores correctly, or whether the shop buttons are wired up — those need their own claims.
+
+<Mcq
+  question="Your test suite passes check(addCoins(40, 10) == 50). What is exactly proven?"
+  options={[
+    "The whole economy is bug-free",
+    "That exact input returns 50, on this run",
+    "No player can ever lose coins",
+    "The save system works too",
+  ]}
+  answer={1}
+  explanation="One passing test is evidence about one input, now. Real confidence comes from covering many inputs with many small claims — not from one green line."
+/>
+
+Multiply that: a handful of claims about each function, dozens across a feature, and 'it works' stops being a feeling and becomes a stack of machine-checked facts.
+
+</Step>
+
+<Step>
+
+## The four cases
+
+Where do you point your claims? For almost any function, four classes of inputs cover the interesting ground:
+
+1. **Happy path** — normal, valid input. `addCoins(40, 10)` → `50`.
+2. **Edge case** — the boundaries of the range: zero, one, the maximum, `nil`, an empty list. `addCoins(95, 10)` at a cap of 100 should clamp, not overflow.
+3. **Invalid input** — values the function should never accept: a negative deposit, a `nil` price, an item id that isn't in the shop. The function should reject them, and you can test that it does.
+4. **Failure case** — an input where the *failure itself* has to behave predictably: `lookupPrice("InventedSword")` must return `nil`, not crash and not return a price.
+
+Happy paths catch the obvious stuff; edges and invalid inputs catch the bugs that actually reach players — the withdraw that goes negative, the cap that overflows, the crafted id that slips past the lookup. When a beginner asks "where do I even start testing", the answer is: *start with case one, never stop at it.*
+
+<FillBlank
+  prompt="Depositing the smallest valid amount — a single coin into a fresh wallet — tests the boundary of the function's range. That's an ___ case."
+  answer={["edge", "edge case", "an edge case", "boundary", "boundary case"]}
+  explanation="Edge cases sit at the limits of what's valid: zero, one, the maximum, the minimum. Boundaries are exactly where off-by-one and clamp bugs live."
+/>
+
+</Step>
+
+<Step>
+
+## Assertions that explain themselves
+
+A failing test is only as good as its message. A test that fails with `ok` tells you something is wrong and nothing about what. A test that fails with a real sentence tells you what broke and where to look:
+
+```luau
+-- the message that files its own bug report:
+check(addCoins(40, 10) == 50, "addCoins(40, 10) should return 50")
+```
+
+When that check fails, the output line *is* a bug report: the function, the inputs, the expected result. You don't re-create the scenario in your head — it's already printed. Compare that to a tautology like `check(true, "ok")`, which can only ever pass and teaches nothing.
+
+You can even see the pattern without a full harness — a self-verifying `print` that states the expectation in its fail branch:
+
+<PredictOutput
+  answer={["pass"]}
+  explanation="The expression is true, so the and-branch wins and prints pass. Had the math been wrong, the or-branch would have printed a failure message naming the function, the inputs, and the expectation — exactly what a good assertion message does."
+>
+
+```luau
+local function addCoins(current, amount)
+    return current + amount
+end
+
+print(addCoins(8, 4) == 12 and "pass" or "fail: addCoins(8, 4) should be 12")
+```
+
+</PredictOutput>
+
+That `and`/`or` trick is a handy one-line assertion: `condition and "pass" or "fail: <what and why>"`. The message half exists precisely so that when the day comes that it's wrong, whoever reads the output knows instantly what was supposed to happen.
+
+</Step>
+
+<Step>
+
+## Pure functions are the friendliest to test
+
+Some code is a joy to test, and some is nearly impossible — and the difference is **purity**. A pure function:
+
+- returns the same result for the same arguments, every single time;
+- touches nothing outside itself — no Instances, no globals, no printing, no saved state.
+
+That's exactly what the sandbox can run. `addCoins`, `salePrice`, `lookupPrice` — provable in isolation, instantly.
+
+Code that reads and writes the live game is a different story. A `Touched` handler, a `RemoteEvent` listener, `leaderstats`, a save loop — testing those means either running the whole game or stubbing out Roblox itself. The datastore and playtesting lessons showed you the real-world way to check those: a real run in Studio. You can't drop every system into a sandbox.
+
+The winning move is the one from your refactoring pass: **keep the decision math pure, and keep the shell that touches the world thin.** The part that decides gets tested; the part that connects gets kept small enough to see:
+
+```luau
+-- ServerScriptService: thin shell — touched, finds the player, delegates
+sellButton.Touched:Connect(function(hit)
+    local player = Players:GetPlayerFromCharacter(hit.Parent)
+    if player then
+        applySale(player.leaderstats.Coins, priceFor("Sword"))
+    end
+end)
+```
+
+```luau
+-- in a ModuleScript: pure decision, testable everywhere
+local function applySale(coins, price)
+    if coins < price then
+        return false -- can't afford: no sale
+    end
+    return coins - price
+end
+```
+
+<Mcq
+  question="Why does moving applySale out of the Touched handler make it testable?"
+  options={[
+    "ModuleScripts run faster than event handlers",
+    "The decision touches no Instances or events — same input, same answer",
+    "Touched stops firing once the logic moves to a ModuleScript",
+    "Modules are executed three times, proving the answer twice",
+  ]}
+  answer={1}
+  explanation="applySale depends only on its arguments, so the sandbox can call it with any coins and price. The Touched shell is left unchangeable-airport-beige: small, obvious, and the only part that needs a running game."
+/>
+
+Extract the pure core (refactoring), test the core (this lesson), eyeball the shell. That pairing is how a real game gets covered without inventing a Roblox simulator.
+
+</Step>
+
+<Step>
+
+## Red, green, done — write the test before the fix
+
+The most valuable test you'll ever write is the one you write *before* a fix. Here's the rhythm — it's called **red, green**:
+
+1. **Write the claims for correct behavior first** — including the edge case you suspect is broken.
+2. **Run.** The broken case fails (red). Good — you've just proven the bug exists *on record*, not just in your gut.
+3. **Fix the code.**
+4. **Run again.** Everything passes (green).
+5. **Keep the tests.** They're now your permanent witnesses that this bug never comes back.
+
+Below is the wallet with two bugs: deposits can slip past the cap, and withdrawals can dip below zero. Your job: write your own claims about what *should* happen, run to see the red, then fix `add` and `remove` so every claim — yours and the hidden suite — goes green.
+
+<RunCode
+  instruction="Working in the editor, first write at least three check() calls that describe correct behavior — a normal deposit and withdraw, a deposit that passes the cap, and a withdraw that passes the balance. Run: your cap and floor claims should fail on the buggy wallet. Then fix add() and remove() — clamp deposits at MAX_COINS and withdrawals at 0 — until every check passes. Keep the function names wallet:add and wallet:remove."
+  starterCode="-- The coin wallet, with two bugs: deposits can slip past
+-- the cap, withdrawals can dip below zero.
+local MAX_COINS = 100
+
+local wallet = {
+    coins = 0,
+}
+
+function wallet:add(n)
+    self.coins = self.coins + n -- no cap
+end
+
+function wallet:remove(n)
+    self.coins = self.coins - n -- no floor
+end
+
+-- Your turn: write at least three check() calls below
+-- describing CORRECT behavior. Run first, watch the
+-- cap and floor claims fail, then fix the functions."
+  checks={`wallet.coins = 0
+wallet:add(40)
+check(wallet.coins == 40, "adding 40 lands in the wallet")
+wallet:add(0)
+check(wallet.coins == 40, "adding 0 changes nothing")
+wallet:add(500)
+check(wallet.coins == 100, "adding past the cap clamps at 100")
+wallet:remove(10)
+check(wallet.coins == 90, "a within-bounds withdraw works")
+wallet:remove(0)
+check(wallet.coins == 90, "removing 0 changes nothing")
+wallet:remove(500)
+check(wallet.coins == 0, "withdrawing past the balance clamps at 0")
+wallet:remove(10)
+check(wallet.coins == 0, "stays clamped below zero")`}
+  hint="A deposit above the cap should land at exactly 100; a withdraw beyond the balance should stop at exactly 0. Those two rules are the fix."
+  explanation="Fixing the wallet means clamping at both ends: math.min(MAX_COINS, ...) for deposits, math.max(0, ...) for withdrawals. Your own checks that failed on the buggy wallet now pass — and they stay in the suite as regression tests for the next time someone edits this code."
+/>
+
+Notice the order you did the work in: claims first, *then* the fix. That order is what makes the test trustworthy — it failed on the bug, passes on the fix, and will scream the moment the bug sneaks back.
+
+</Step>
+
+<Step>
+
+## Regression tests lock in fixes
+
+A **regression** is a bug that returns after you fixed it. The classic way it happens: you harden a system, move on, and a month later an "improvement" quietly re-introduces the flaw. The Input Validation lesson ended with your shop handler rejecting item ids that aren't in the catalog:
+
+```luau
+local SHOP = {
+    Sword = 50,
+    Potion = 5,
+}
+
+local function lookupPrice(itemId)
+    local price = SHOP[itemId]
+    if price then
+        return price
+    end
+    return nil -- forged ids: no price, no sale
+end
+```
+
+The day after the fix, everything worked. The dangerous question is *next month*: does it still? A **regression test** is the answer — the claim you write *after* a fix, and keep forever, that asserts the fixed behavior. If a future refactor deletes the `nil` return (maybe "cleaning up" that `if`), the suite turns red before any player ever meets the bug:
+
+<WriteCode
+  instruction="Write the regression check that proves a made-up item id is still rejected — it must return nil, never a price."
+  answer={[
+    'check(lookupPrice("MythicBlade") == nil, "invented items must be rejected")',
+    "check(lookupPrice('MythicBlade') == nil, 'invented items must be rejected')",
+    'check(lookupPrice("MythicBlade") == nil)',
+    "check(lookupPrice('MythicBlade') == nil)",
+  ]}
+  starterCode="-- the hardened lookup from the Input Validation lesson
+local SHOP = {
+    Sword = 50,
+    Potion = 5,
+}
+
+local function lookupPrice(itemId)
+    local price = SHOP[itemId]
+    if price then
+        return price
+    end
+    return nil -- forged ids: no price, no sale
+end
+
+-- add your regression check below"
+  explanation="This check documents the rejection rule and enforces it on every run. Delete the nil path in a future edit, and this test turns red before the game ever ships the bug — that's a regression test doing its job."
+/>
+
+This is the refactoring lesson's promise fulfilled: you can change code fearlessly when a suite of claims watches the behavior. Unclear names, extracted functions, flattened nesting — safe, because every step that changes behavior is caught the instant it runs.
+
+<Note>
+Your course has come a long way: two games fully built, an economy hardened against floods, saves that survive restarts, and code you can now clean and verify with confidence. The next lesson — **Next Steps** — pulls the whole course into one picture before you launch your next project.
+</Note>
+
+Next: the map of everything you've learned — one full-system picture before the final project.
+
+</Step>

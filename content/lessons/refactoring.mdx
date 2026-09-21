@@ -1,0 +1,319 @@
+---
+slug: refactoring
+title: Refactoring — same game, cleaner code
+description: Read a messy script, spot the smells, and restructure it in small safe steps until the code matches the plan — without changing a single pixel of gameplay.
+sectionId: leveling-up
+order: 6
+difficulty: intermediate
+estimatedMinutes: 8
+tags: [refactoring, code quality, clean code, maintainability]
+objectives:
+  - Recognize the five smells: unclear names, magic values, deep nesting, giant functions, and repetition
+  - Explain what makes a refactor safe, and why one small step at a time is non-negotiable
+  - Rename and restructure to remove unclear names and magic values
+  - Flatten nested conditionals with guard clauses
+  - Extract responsibilities out of a giant handler into small functions
+  - Clean up a script and prove the behavior came through unchanged
+prerequisites: [debugging]
+keywords: [refactor, refactoring, clean code, magic value, guard clause, nesting, extract, code quality]
+---
+
+Debugging taught you how to read an *error* and trace back to the code that caused it. That's much easier when the code between errors is worth reading. **Refactoring** is the skill of cleaning up working code — renaming, extracting, flattening — without changing what the player experiences. It never adds a feature and never fixes a bug; it only makes the next feature and the next bug easier to deal with.
+
+<Step>
+
+## Same game, different code
+
+A refactor changes *how* the code is written, never *what* it does. The player clicking the coin sees the same +10. The server still saves the same wallet. Only the shape of the Luau underneath is different — and that difference is the whole point: code that's easy to read is code that's easy to change without breaking.
+
+Three rules make a refactor safe:
+
+1. **One small step at a time.** Rename a variable, extract one function, flatten one `if`. Never try to "fix the whole script" in a single edit.
+2. **Verify between steps.** Run the game (or your tests — coming in the next lesson) and confirm nothing changed before you take the next step.
+3. **Never mix a refactor with a feature or a bug fix.** A renamed coin handler with a 2× shop upgrade in the same commit is two changes in one — when something breaks, you won't know which one did it.
+
+<Mcq
+  question="Which of these is a good, safe refactor?"
+  options={[
+    "Rewriting the save loop from scratch to 'modernize' it",
+    "Renaming a function's parameters to describe their meaning, then running the game",
+    "Adding a double-speed upgrade while renaming the click handler",
+    "Deleting the save loop because it looks slow",
+  ]}
+  answer={1}
+  explanation="One small change, no behavior change, and it was verified before moving on. Rewrites, mixed features, and deletions change behavior — those are ships, not refactors."
+/>
+
+</Step>
+
+<Step>
+
+## The smell catalog
+
+Here is the new-player setup handler from the Coin Tycoon's first messy version. It works — every player gets stats, some gifts, and their saved coins back. But it smells:
+
+```luau
+local Players = game:GetService("Players")
+local CoinStore = require(game.ServerStorage.CoinStore)
+
+Players.PlayerAdded:Connect(function(p)
+    local s = p:WaitForChild("leaderstats")
+    local c = Instance.new("IntValue")
+    c.Name = "Coins"
+    c.Value = 0
+    c.Parent = s
+
+    if p.UserId == 0000000 then -- special dev reward
+        c.Value = 99999
+    end
+
+    local x = 1
+    while x <= 3 do
+        local gift = Instance.new("IntValue")
+        gift.Name = "Gift" .. x
+        gift.Value = 10 * x
+        gift.Parent = s
+        x += 1
+    end
+
+    if p:GetAttribute("returning") then
+        local d = CoinStore:Load(p.UserId)
+        if d.Coins ~= nil then
+            if d.Coins > 0 then
+                if d.Coins < 10000 then
+                    c.Value = d.Coins
+                else
+                    c.Value = 10000
+                end
+            end
+        end
+    end
+end)
+```
+
+The five smells:
+
+- **Unclear names.** `p`, `s`, `c`, `x`, `d` — none of them say what they hold. Reading this is decoding, not reading.
+- **Magic values.** `99999`, `3`, `10`, `10000` appear out of nowhere. Where does `10000` come from? Why is it in two places?
+- **Deep nesting.** The restore block sits four `if`s deep. The `else c.Value = 10000` at the bottom belongs to an `if` three levels up — easy to misread, easy to misindent.
+- **A giant function.** One handler builds stats, grants a dev reward, spawns gifts, and restores savings. Four jobs, one unnamed function.
+- **Repetition.** The `10000` cap is spelled twice — once in the condition, once in the assignment. Two copies of one rule is two chances to update only one of them.
+
+<Mcq
+  question="Which smell makes the restore block hardest to reason about?"
+  options={[
+    "It has too many comments",
+    "The logic is nested four ifs deep",
+    "The gifts loop uses a while loop",
+    "The script is missing local p and s declarations",
+  ]}
+  answer={1}
+  explanation="Four levels of if-inside-if bury the assignment. Deep nesting forces you to track four conditions in your head before you can see what a line actually does."
+/>
+
+We'll fix every one of these, in order, one small step at a time.
+
+</Step>
+
+<Step>
+
+## Names you can trust
+
+First pass: make the names say what they hold — `p` becomes `player`, `s` becomes `stats`, `c` becomes `coins`, `d` becomes `saved`. Renaming is the cheapest refactor and the most underrated: it converts three-letter hieroglyphs into prose you can read on Monday morning.
+
+While renaming `x`, notice what it really is: a counter that starts at 1, bumps on every trip, and stops at 3. Luau already has a shape for "count from 1 to 3" that needs no mutable counter at all:
+
+```luau
+for giftIndex = 1, 3 do
+    local gift = Instance.new("IntValue")
+    gift.Name = "Gift" .. giftIndex
+    gift.Value = 10 * giftIndex
+    gift.Parent = stats
+end
+```
+
+`x` was **unnecessary state** — a variable you changed to drive a loop. The `for` loop hands `giftIndex` to each trip ready-made, so the counter variable disappears entirely. Less state means fewer things that can drift out of sync.
+
+<FixBug
+  instruction="Replace the manual counter with a for loop that names its index."
+  fix={['for giftIndex = 1, 3 do']}
+  explanation="A numeric for loop hands each pass its own index, so the hand-rolled counter — and its x += 1 — can be deleted entirely."
+>
+
+```luau
+local x = 1
+while x <= 3 do
+    local gift = Instance.new("IntValue")
+    gift.Name = "Gift" .. x
+    gift.Value = 10 * x
+    gift.Parent = s
+    x += 1
+end
+```
+
+</FixBug>
+
+Renamed, the same block reads like the plan: "for each of the three gifts, make an IntValue named GiftN worth 10 times its number, place it in the stats."
+
+</Step>
+
+<Step>
+
+## Kill the magic values
+
+`10000` floats in the middle of the restore block. `3` only makes sense next to the gifts. The `99999` dev reward looks like a typo. Magic values are decisions hidden in arithmetic — and decisions belong at the top of the script where they can be seen, changed, and named:
+
+```luau
+local GIFT_COUNT = 3      -- one value, one place
+local GIFT_VALUE = 10
+local MAX_COINS = 10000
+local DEV_REWARD = 99999  -- the dev account's hello balance
+local DEV_USER_ID = 0     -- the developer's player id
+```
+
+Now the code can say *what* it means instead of reciting a number:
+
+```luau
+for giftIndex = 1, GIFT_COUNT do
+    gift.Value = GIFT_VALUE * giftIndex
+end
+```
+
+And the cap gets its second pass: the rule "never restore more than the cap, never set a balance below zero" is one line with `math.min` and `math.max` — which also deletes the duplicated `10000` and the `> 0` check, because a clamped value can never be negative:
+
+```luau
+coins.Value = math.max(0, math.min(saved.Coins, MAX_COINS))
+```
+
+<WriteCode
+  instruction="Using the named constants, write the single line that restores saved coins clamped between 0 and MAX_COINS."
+  answer={["coins.Value = math.max(0, math.min(saved.Coins, MAX_COINS))"]}
+  starterCode="-- constants live at the top of the script
+local MAX_COINS = 10000
+
+-- inside the restore block, saved.Coins was just loaded
+if saved.Coins then
+    coins.Value = -- cap the restored amount, never negative
+end"
+  explanation="math.min pulls the amount down to the cap, math.max lifts anything at or below zero up to 0. One line replaces the if/else and the > 0 check — with no magic 10000 left in the middle of the logic."
+/>
+
+</Step>
+
+<Step>
+
+## Flatten the nesting with guard clauses
+
+The restore block is still four `if`s deep. Deep nesting isn't just ugly — it's *expensive to read*: every `if` adds a branch you have to track, and the real action hides at the bottom. The fix is another cheap, powerful pattern: **guard clauses**.
+
+A guard clause checks a condition *early* and returns. Instead of wrapping the entire restore in `if player:GetAttribute("returning") then`, we bail out when the player *isn't* returning:
+
+```luau
+if player:GetAttribute("returning") ~= true then
+    return
+end
+
+local saved = CoinStore:Load(player.UserId)
+if not saved.Coins then
+    return
+end
+
+coins.Value = math.max(0, math.min(saved.Coins, MAX_COINS))
+```
+
+Three flat lines instead of a pyramid. Each guard answers one question — "are they returning?", "did they save anything?" — and leaves the code after it able to assume the answer is "yes". Four levels of `if` became zero.
+
+<ArrangeCode
+  lines={[
+    'if player:GetAttribute("returning") ~= true then return end',
+    "local saved = CoinStore:Load(player.UserId)",
+    "if not saved.Coins then return end",
+    "coins.Value = math.max(0, math.min(saved.Coins, MAX_COINS))",
+  ]}
+  distractors={[
+    "if saved.Coins > 0 then",
+    "coins.Value = 0",
+  ]}
+  instruction="Assemble the flat restore block: bail early when the player isn't returning, load their data, bail when nothing is saved, then restore the clamped value."
+  explanation="Guard clauses check one condition and return, so each remaining line can assume the previous guard passed. No nesting, no ambiguity about which if owns the else."
+/>
+
+</Step>
+
+<Step>
+
+## Split the giant into pieces
+
+Last smell: one `PlayerAdded` handler doing four jobs. The fix is **extracting functions** — moving each job into its own named function so the handler becomes a table of contents:
+
+```luau
+local function createStats(player)
+    local coins = Instance.new("IntValue")
+    coins.Name = "Coins"
+    coins.Value = 0
+    coins.Parent = player:WaitForChild("leaderstats")
+    return coins
+end
+
+local function applySpawnGifts(stats)
+    for giftIndex = 1, GIFT_COUNT do
+        local gift = Instance.new("IntValue")
+        gift.Name = "Gift" .. giftIndex
+        gift.Value = GIFT_VALUE * giftIndex
+        gift.Parent = stats
+    end
+end
+
+local function restoreCoins(coins, player)
+    if player:GetAttribute("returning") ~= true then return end
+    local saved = CoinStore:Load(player.UserId)
+    if not saved.Coins then return end
+    coins.Value = math.max(0, math.min(saved.Coins, MAX_COINS))
+end
+
+Players.PlayerAdded:Connect(function(player)
+    local coins = createStats(player)
+    applySpawnGifts(coins.Parent)
+    if player.UserId == DEV_USER_ID then
+        coins.Value = DEV_REWARD
+    end
+    restoreCoins(coins, player)
+end)
+```
+
+The handler is now four lines of "what happens", and each *how* lives in a small function with a name. Want to change the gift pattern? `applySpawnGifts`. Curious how savings get restored? `restoreCoins`. You never read forty lines to answer a two-line question again.
+
+<RunCode
+  instruction="The damage math from the sword fight works, but it was written in a hurry. Clean it up: give the parameters real names, rewrite it readably, and introduce a named MINIMUM_DAMAGE constant. Do not change how it calculates — the checks expect identical results. Keep the function name damage so the checks can find it."
+  starterCode={`local function dmg(b, a, h)
+    local p = a
+    if h then
+        p = a * 2
+    end
+    if b then
+        p = p * 0.5
+    end
+    if p < 1 then
+        return 1
+    end
+    return p
+end`}
+  hint="A headshot doubles, a block halves, and the result never drops below 1 — those three rules must survive the cleanup."
+  checks={`check(dmg(false, 10, false) == 10, "plain hit deals full damage")
+check(dmg(true, 10, false) == 5, "a block halves the damage")
+check(dmg(false, 10, true) == 20, "a headshot doubles the damage")
+check(dmg(true, 4, true) == 4, "a blocked headshot deals only 4")
+check(dmg(false, 0, false) == 1, "damage never drops below 1")
+check(dmg(true, 1, true) == 1, "minimum damage wins even over halving")`}
+  explanation="The math comes through unchanged — blocked halves, headshots double, and the 1-damage floor holds everywhere. What changed is that the formulas now read like rules, with a named constant for the floor. Behavior preserved, code transformed: that's a refactor."
+/>
+
+Renaming the parameters, clearing the clutter, and extracting the constant was the whole game — the outcome stayed identical while the code became something you'd actually enjoy opening. That is the refactor in miniature.
+
+<Note>
+This is why testing matters so much: once refactors get bigger than one function, "I ran it and it felt fine" stops being enough. **Testing fundamentals** is next — turning 'same game, cleaner code' from a hope into a machine-checked claim.
+</Note>
+
+Next up: **Testing Fundamentals** — claims that prove code works, in a form the computer can verify on every single run.
+
+</Step>
