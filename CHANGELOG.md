@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-22
+
+- Content: added the UI Menus lesson after the shop panel — Visible as the on/off switch, one-button toggling with `not`, an idempotent close (X) button, the Escape key via UserInputService with the `gameProcessed` guard, a click-outside backdrop that closes together with the panel so it can't block clicks, and routing every open/close through one `setMenu(open)` function — with 4 multiple-choice, 1 write-code, and 1 fill-in-the-blank activity; renumbered the rest of the Game Systems section (modules and later) to make room; README lesson count updated to 104.
+- Structure: added a new **UI & Screens** section (before Game Systems) so interface work is its own category — moved the GUI basics, both input-service lessons, the shop panel, and UI menus into it (guis, UDim2, gui-styling, UserInputService, ContextActionService, shop-ui, ui-menus); Game Systems now starts at the clicker lesson and the seven new-section lessons sit between Player Data & Security and the clicker game.
+
 ## 2026-09-21
 
 - Performance: added the Client Performance lesson — the 16 ms frame budget, Heartbeat vs RenderStepped per-frame work, the four client costs (unnecessary loops and repeated Instance searches, allocation churn, expensive UI updates, frame-budget overload), measuring with View → Performance and the MicroProfiler before optimizing, bottleneck vs micro-optimization — with a sandbox exercise that rebuilds a label only when its value changes; renumbered memory-leaks (5 → 6), refactoring (6 → 7), testing-fundamentals (7 → 8), and next-steps (8 → 9) to slot it right after optimization.

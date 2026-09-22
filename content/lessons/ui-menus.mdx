@@ -1,0 +1,235 @@
+﻿---
+slug: ui-menus
+title: UI menus — toggling panels open and closed
+description: Turn the shop panel into a real menu with a toggle button, a close button, the Escape key, and a click-outside backdrop.
+sectionId: ui-screens
+order: 7
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [menu, gui, toggle, visible, button, ui]
+objectives:
+  - Hide and show a panel with the Visible property
+  - Toggle a panel open and closed with one button
+  - Close a menu with a close button and the Escape key
+  - Close a menu by clicking outside it — and keep the backdrop from blocking the game
+prerequisites: [shop-ui, user-input-service]
+keywords: [menu, toggle, visible, escape, userinputservice, backdrop, button, ui]
+---
+
+A shop that's glued to the screen is a billboard, not a menu. A menu *appears* when you ask it to and *goes away* when you're done — and it never eats clicks when it's not up. In the last lesson you built the panel. This lesson gives it the behaviors every interface needs: a button that opens it, a button that closes it, the Escape key, and a click-outside backdrop.
+
+<Step>
+
+## Visible is the on/off switch
+
+Every GUI element has a `Visible` property. `false` makes it — and everything inside it — invisible, unclickable, and skipped when rendering. Crucially, it stays **built**: flip `Visible` back to `true` and the menu reappears exactly as it was, with all its labels and buttons intact.
+
+```luau
+shopPanel.Visible = false   -- start the game with the menu closed
+
+shopButton.Activated:Connect(function()
+    shopPanel.Visible = true   -- open on demand
+end)
+```
+
+<Mcq
+  question="You want to keep a menu around so it can be reopened many times. What is the right way to close it?"
+  options={[
+    "Hide it with Visible = false so it stays built and ready to show",
+    "Destroy it, and build it again from scratch every time it opens",
+    "Move it far off screen but leave it visible",
+    "Set its BackgroundTransparency to 1",
+  ]}
+  answer={0}
+  explanation="Visible = false keeps the menu in memory, off the screen, and out of the click path. Rebuilding every open is slower and throws away the panel's state."
+/>
+
+</Step>
+
+<Step>
+
+## One button that toggles
+
+A **toggle button** reads the panel's current state and flips it. The same button opens the menu when it's closed and closes it when it's open — no bookkeeping, no separate handlers.
+
+```luau
+shopButton.Activated:Connect(function()
+    shopPanel.Visible = not shopPanel.Visible
+end)
+```
+
+`not` flips a boolean: `not true` is `false`, `not false` is `true`. That one word turns "open" and "close" into a single line.
+
+<WriteCode
+  instruction="Make the shop button flip the menu's state, so the same button both opens and closes it."
+  answer={["not shopPanel.Visible", "shopPanel.Visible = not shopPanel.Visible"]}
+  starterCode="local function toggleMenu()
+    shopPanel.Visible = 
+"
+  placeholder="not shopPanel.Visible"
+  explanation="Reading the current value with not makes the one button an on/off switch — it opens when closed and closes when open."
+/>
+
+</Step>
+
+<Step>
+
+## The close button (X)
+
+A menu also gets a **close button** — the familiar X in the corner. Its job is simple and one-way:
+
+```luau
+closeButton.Activated:Connect(function()
+    shopPanel.Visible = false
+end)
+```
+
+Close is *idempotent*: pressing it when the menu is already closed changes nothing. The toggle is not — a stray click while the menu is in a weird state can re-open it. That's why menus use a dedicated close button: it can never disagree with reality.
+
+<Mcq
+  question="Close buttons are 'idempotent'. What does that mean in practice?"
+  options={[
+    "It always closes the menu, whether it's open or already closed",
+    "It can only ever run once",
+    "It closes the menu slowly on purpose",
+    "It opens the menu instead",
+  ]}
+  answer={0}
+  explanation="Setting Visible = false when it's already false is a safe no-op. A close button can't get the menu stuck open, because its meaning never depends on the current state."
+/>
+
+</Step>
+
+<Step>
+
+## Escape closes it too
+
+Some players live on the keyboard — pressing **Escape** should always be able to bail out of a menu. You've seen UserInputService; this is the shape of the handler:
+
+```luau
+local uis = game:GetService("UserInputService")
+uis.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Escape and shopPanel.Visible then
+        shopPanel.Visible = false
+    end
+end)
+```
+
+Two guards matter. `gameProcessed` says "the UI already swallowed this input" — like typing in a TextBox — so you skip it. And `input.KeyCode == Enum.KeyCode.Escape` checks *which* key, because InputBegan fires for every key on the keyboard.
+
+<FillBlank
+  prompt="The Escape handler should only close a menu that is currently ____."
+  answer="Visible"
+  explanation="The 'and shopPanel.Visible' guard makes Escape a no-op when the menu is already closed — so the key never does anything surprising."
+/>
+
+</Step>
+
+<Step>
+
+## Click outside to close — the backdrop
+
+The friendliest way to close a menu is to click anywhere *outside* it. That needs a **backdrop**: a full-screen, invisible button sitting *behind* the panel. Because GUI elements drawn later sit on top, create the backdrop first, then the panel — that puts the panel in front.
+
+```luau
+local backdrop = Instance.new("TextButton")
+backdrop.Size = UDim2.new(1, 0, 1, 0)        -- whole screen
+backdrop.BackgroundTransparency = 1         -- invisible
+backdrop.Text = ""                          -- no label
+backdrop.Parent = screenGui                 -- created BEFORE the panel, so it sits behind
+
+backdrop.Activated:Connect(function()
+    shopPanel.Visible = false
+    backdrop.Visible = false
+end)
+```
+
+An invisible backdrop that stays **Visible = true** is a silent click-blocker: the menu looks closed, but the button underneath is eating every click on screen. This is one of the most common "why won't my game respond?" bugs in Roblox — and it's fixed by hiding the backdrop together with the panel.
+
+<Mcq
+  question="The menu is closed. Which line must also run so the invisible backdrop doesn't block the game?"
+  options={[
+    "backdrop.Visible = false",
+    "backdrop.BackgroundTransparency = 1",
+    "backdrop.ZIndex = 0",
+    "backdrop.Size = UDim2.new(0, 0, 0, 0)",
+  ]}
+  answer={0}
+  explanation="An invisible button that is still Visible = true is still in the click path. Hiding it clears the path so clicks pass through to the game again."
+/>
+
+</Step>
+
+<Step>
+
+## One function to rule them all
+
+By now the menu has four ways to change state: the toggle, the X, Escape, and the backdrop. If each one sets `Visible` on its own, they can disagree — and the moment two flags get out of sync is the moment the bug appears.
+
+Route every change through **one function** that decides what "open" means:
+
+```luau
+local function setMenu(open)
+    shopPanel.Visible = open
+    backdrop.Visible = open
+end
+
+shopButton.Activated:Connect(function() setMenu(not shopPanel.Visible) end)
+closeButton.Activated:Connect(function() setMenu(false) end)
+backdrop.Activated:Connect(function() setMenu(false) end)
+
+uis.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Escape then setMenu(false) end
+end)
+```
+
+Now there is exactly one place that knows how to open and close the whole menu — the panel and the backdrop can't drift apart, and Escape, the X, and the backdrop all call the same close.
+
+<Mcq
+  question="Why is it better to route every open/close through one setMenu function?"
+  options={[
+    "Every way of closing hides the same things, so they can never disagree",
+    "Roblox requires one function per menu",
+    "It makes each script one line shorter",
+    "It lets the server control the menu's visibility",
+  ]}
+  answer={0}
+  explanation="A single source of truth for 'is the menu open' keeps the panel and backdrop in sync. Extra lines that each set Visible their own way are where bugs live."
+/>
+
+</Step>
+
+<Step>
+
+## Common menu mistakes
+
+- **Backdrop left visible.** The menu looks closed but an invisible button is still eating clicks — the panel and backdrop must be hidden together.
+- **Rebuilding the panel on every open.** Building the frame, labels, and buttons from scratch each time is slow and throws away state. Build once, hide with `Visible`.
+- **Hiding from the server.** `Visible` is a client GUI property — menus are built and toggled in LocalScripts, on the player's own screen.
+- **Forgetting the `gameProcessed` guard.** Skipping it means Escape also fires while the player is typing in a TextBox, kicking them out of the menu mid-keystroke.
+
+<Mistake
+  title="Build the menu in a LocalScript"
+>
+Menus are pure client UI. Building or toggling them in a server Script either does nothing or errors — always build into PlayerGui from a LocalScript.
+</Mistake>
+
+</Step>
+
+<Step>
+
+## The checklist on your toolbelt
+
+A menu is just a frame that knows how to show and hide:
+
+- Build it once and start it with `Visible = false`.
+- A toggle button flips its own state with `not`.
+- The X and the Escape key always close — close can't get stuck.
+- A backdrop closes on click-outside and hides *with* the panel.
+- Route every entry point through one `setMenu(open)` function.
+
+Run these five habits and any panel — shop, settings, pause menu — behaves like a real interface instead of a billboard.
+
+</Step>

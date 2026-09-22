@@ -30,46 +30,53 @@ export const courseSections: CourseSectionConfig[] = [
     order: 2,
   },
   {
+    id: "ui-screens",
+    title: "UI & Screens",
+    description:
+      "Build the player's interface from scratch — frames, text, cuts, input, shop panels, and menus that open and close.",
+    order: 3,
+  },
+  {
     id: "gameplay",
     title: "Game Systems",
     description:
-      "Build a working clicker game: GUIs, currency, upgrades, and the client-server bridge that keeps it secure.",
-    order: 3,
+      "Build a working clicker game: currency, upgrades, and the client-server bridge that keeps it secure.",
+    order: 4,
   },
   {
     id: "objects",
     title: "World & Players",
     description:
       "Parts, attributes, sounds, players and their characters, and smooth tweens that make the world feel alive.",
-    order: 4,
+    order: 5,
   },
   {
     id: "publishing",
     title: "Publishing & Testing",
     description:
       "Put your game online, enable real data store saves, and run the full persistence loop.",
-    order: 5,
+    order: 6,
   },
   {
     id: "leveling-up",
     title: "Leveling Up",
     description:
       "Read errors like a pro, debug systematically, and map what comes after this course.",
-    order: 6,
+    order: 7,
   },
   {
     id: "final-project",
     title: "Final Project",
     description:
       "Assemble every system into one complete, publishable clicker game — then run the playtest that proves it works.",
-    order: 7,
+    order: 8,
   },
   {
     id: "advanced-studio",
     title: "Advanced Studio",
     description:
       "Go beyond scripting the game: render live 3D previews with ViewportFrames and build your own Roblox Studio plugins.",
-    order: 8,
+    order: 9,
   },
 ];
 
