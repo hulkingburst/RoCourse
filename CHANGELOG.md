@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-21
+
+- Performance: added the Client Performance lesson — the 16 ms frame budget, Heartbeat vs RenderStepped per-frame work, the four client costs (unnecessary loops and repeated Instance searches, allocation churn, expensive UI updates, frame-budget overload), measuring with View → Performance and the MicroProfiler before optimizing, bottleneck vs micro-optimization — with a sandbox exercise that rebuilds a label only when its value changes; renumbered memory-leaks (5 → 6), refactoring (6 → 7), testing-fundamentals (7 → 8), and next-steps (8 → 9) to slot it right after optimization.
+- Responsive: fixed the highest-impact narrow-viewport issues — leaderboard controls and guest rows now wrap, the lesson header lets controls wrap under the title, the week label reads `w-32 sm:w-40`, search results let titles shrink instead of crowding badges, sidebar lesson titles keep their icons (min-w-0), code-block header buttons show text only on sm+, activity-calendar cells share width instead of overflowing narrow cards, the glossary popover is capped to the viewport, and the site header tightens its gutter and logo under 640 px.
+
 ## 2026-09-20
 
 - Errors: rebuilt the Luau sandbox WASM from the Luau source tree with a growable heap (64 MiB initial, up to 2 GiB, previously a hard 16 MiB), so Try it / RunCode / the playground no longer abort with `Aborted(OOM)` on scripts that allocate past the old ceiling; the wrapper and rebuild script live in `tools/luau-sandbox/`.

@@ -1,0 +1,249 @@
+---
+slug: client-performance
+title: Client performance — running smooth on the player's machine
+description: Performance is measured on the player's machine — learn the frame budget, the per-frame work that eats it, and how to measure before you optimize.
+sectionId: leveling-up
+order: 5
+difficulty: intermediate
+estimatedMinutes: 6
+tags: [performance, client, fps, frame time]
+objectives:
+  - Explain the frame budget and why per-frame work matters
+  - Use Heartbeat and RenderStepped without making them expensive
+  - Avoid unnecessary loops, repeated Instance searches, allocation churn, and pricey UI updates
+  - Measure a suspected bottleneck before touching code
+  - Tell a real bottleneck from a micro-optimization
+prerequisites: [optimization, debugging]
+keywords: [performance, fps, frame time, RenderStepped, Heartbeat, profiling, allocation, instance search]
+---
+
+Your server code might be perfect, but if the player's own machine drops frames, your game feels broken to them. Client performance lives and dies by one number: how long each frame spends doing your work.
+
+<Step>
+
+## Smooth is measured on the player's machine
+
+There are two kinds of lag, and they have different causes:
+
+- **Server lag** — the server's scripts take too long, so things feel delayed for *everyone*.
+- **Client lag** — the player's own machine can't render and run scripts fast enough, so *that one player* drops frames even when the game runs fine for everyone else.
+
+You only see server lag from the server side. You *feel* client lag on your own screen — but so does every player on their own hardware, no matter how fast your server is.
+
+A game that plays well must stay under its per-frame budget **on the weakest player's machine you care about**, not on your gaming PC.
+
+<Mcq
+  question="Your game runs at 120 FPS on your computer but drops to 30 on a phone. Where is the problem?"
+  options={[
+    "The server is processing too slowly",
+    "The client is doing too much work per frame on that device",
+    "The database save is too slow",
+    "There is nothing wrong — the server is fine",
+  ]}
+  answer={1}
+  explanation="The same simulation is running, but the phone's client has less power per frame. Performance has to fit inside the frame budget on the weakest machine you support."
+/>
+</Step>
+
+<Step>
+
+## The 16 millisecond frame budget
+
+One frame — one picture on screen — happens 60 times a second at 60 FPS. That gives each frame about **16 milliseconds** to fit in everything: physics, scripts, and rendering.
+
+Two timers drive per-frame script work:
+
+- **Heartbeat** fires once per frame, after physics steps.
+- **RenderStepped** fires once per frame, just before rendering — the last place your script runs before the picture is drawn.
+
+Work in either timer is work **every single frame**. Ten lines of code in a timer is ten lines × 60 frames = 600 lines of work a second, forever, as long as it runs. That's fine when the work is cheap — it's a disaster when each frame does searching, building, or timing that doesn't need to happen.
+
+The frame budget doesn't care why the frame is slow. Cross 16 ms and frames drop.
+
+<FillBlank
+  prompt="At 60 FPS, each frame has about ____ milliseconds to do all its work."
+  answer="16"
+  explanation="1000 ms ÷ 60 frames ≈ 16 ms per frame. Everything the client does — physics, scripts, rendering — must fit inside it."
+/>
+</Step>
+
+<Step>
+
+## Continued work is expensive work
+
+A per-frame loop is a promise: "I have something important to do every frame." Most per-frame loops break that promise immediately.
+
+```luau
+-- RenderStepped: runs before the render, every single frame
+local function onRender(dt)
+    local icon = workspace.UI.Icon          -- searching every frame
+    local label = workspace.UI.MoneyLabel   -- searching every frame
+    MoneyLabel.Text = "Coins: " .. counts   -- rebuilding + re-laying out UI every frame
+end
+RunService.RenderStepped:Connect(onRender)
+
+-- Heartbeat: runs after physics, every frame
+local function onHeartbeat(dt)
+    updateEverything()   -- is this really needed every frame?
+end
+RunService.Heartbeat:Connect(onHeartbeat)
+```
+
+The rule for both timers: **do in the timer only what must happen this frame.** Cache anything that doesn't change, and skip the work entirely on frames where the result would be identical.
+
+<Mcq
+  question="RenderStepped fires before the render — which of these is a legitimate use?"
+  options={[
+    "Changing the money label only when the amount changes",
+    "Rotating a decorative part that never moves",
+    "Searching for a part inside the timer every frame",
+    "Logging to the Output window every frame",
+  ]}
+  answer={0}
+  explanation="Per-frame work should be the smallest work that still produces that frame's result. If nothing changed, the frame doesn't need the work — that's the whole point of caching and guards."
+/>
+</Step>
+
+<Step>
+
+## The four costs beginner clients pay
+
+Most client lag comes from the same four habits, one per section below.
+
+**1. Unnecessary loops and repeated searches.** Searching the data model inside a per-frame loop re-walks the entire hierarchy every frame:
+
+```luau
+-- ❌ searches the whole workspace 60 times a second
+RunService.RenderStepped:Connect(function()
+    local coin = workspace:FindFirstChild("Coin")
+    if coin then coin.CFrame = coin.CFrame * offset end
+end)
+
+-- ✅ one search, one reference, reused forever
+local coin = workspace:FindFirstChild("Coin")
+RunService.RenderStepped:Connect(function()
+    if coin then coin.CFrame = coin.CFrame * offset end
+end)
+```
+
+Caching a reference — grabbing it once when the script starts — is the single highest-value client optimization beginners can learn.
+
+**2. Allocation churn.** Building strings, tables, or instances every frame makes the garbage collector run constantly. Reusing a string or a table instead of rebuilding it is free performance.
+
+**3. Expensive UI updates.** Setting `.Text` every frame forces a layout + redraw of the label, even when the text is identical. Update a label only when its value actually changed.
+
+**4. Frame-budget overload.** Add cheap work and nothing breaks. Add it to a timer that's already near 16 ms, and every small addition drops a frame. This is why measuring first matters.
+
+<Note>
+The four costs aren't enemies to avoid at all costs — they're a checklist. When the game feels slow, open this list and hunt the *timer* first, the *search* second, the *allocation* third, and the *UI write* fourth.
+</Note>
+</Step>
+
+<Step>
+
+## Measure before you optimize
+
+Never rewrite code on vibes. Roblox ships the tools to see the frame budget with your own eyes:
+
+- **View → Performance** opens the FPS meter and a set of frame-time graphs (render vs script vs physics) live while you play. A script-time graph that spikes is a script problem; a render graph that spikes is a rendering problem.
+- The **MicroProfiler** (Ctrl + F6 in Studio) shows individual script tasks and their millisecond cost per frame.
+- `debug.profilebegin("name")` / `debug.profileend()` mark a section of your own code in the profiler, so you can time exactly one function.
+
+The golden rule of the frame budget: **a real bottleneck shows up in the numbers before you touch any code.** If the profile says script time is 2 ms out of 16, squabbling over micro-optimizations in a loop that runs three times a frame is polishing a donut while the render side is maxed out.
+
+<Mcq
+  question="Your frame-time graph shows render time at 14 ms and script time at 1 ms. Where should you look first?"
+  options={[
+    "Micro-optimize the Lua in the timer loops",
+    "Reduce what is being rendered on the screen",
+    "Rewrite the save system on the server",
+    "Increase the frame rate cap",
+  ]}
+  answer={1}
+  explanation="The graph points straight at rendering — 14 ms of the 16 ms budget. Spending hours tightening scripts to save 0.5 ms would not fix the frame drops."
+/>
+</Step>
+
+<Step>
+
+## A measured fix, start to finish
+
+Here's the classic slow-client pattern, then the measured fix. The label is updated every frame even when nothing changed — and the icon is searched-for every frame:
+
+```luau
+-- ❌ before: searches + rebuilds + re-lays-out, 60 frames a second
+local icon = nil
+RunService.RenderStepped:Connect(function()
+    if not icon then icon = workspace.UI.Icon end    -- search on frame 1 only
+    MoneyLabel.Text = "Coins: " .. game.ReplicatedStorage.Coins.Value   -- rebuild every frame
+end)
+```
+
+Even this "improved" version rebuilds the label string every frame. The measured fix watches the value and only repaints when it actually changed:
+
+```luau
+-- ✅ after: reads the displayed value, updates only when it changes
+local coins = game.ReplicatedStorage.Coins.Value
+local lastText = nil
+RunService.RenderStepped:Connect(function()
+    local text = "Coins: " .. coinCount
+    if text ~= lastText then
+        MoneyLabel.Text = text
+        lastText = text
+    end
+end)
+```
+
+The output is identical to the player. The cost per frame is: no search, no string build unless the value changed, no UI layout unless the text changed.
+
+<Note>
+Notice the difference between a **bottleneck** and a **micro-optimization**: the fix above removed per-frame searching, per-frame allocation, and per-frame UI work — the three things the profiler would show eating script time. Changing `local text = "Coins: " ` to `"Coins:" .. ` would have been a micro-optimization — nothing measurable.
+</Note>
+</Step>
+
+<Step>
+
+## Now fix it yourself
+
+Here's a per-frame loop riddled with the exact costs from this lesson. Read it, spot the waste, then fix it: the loop pretends to be a frame timer, and inside it the number is read, a string is rebuilt every "frame", and the (imaginary) label would redraw every frame.
+
+<RunCode
+  instruction="Make the loop rebuild the label string only when the coins value actually changes — not on every one of the 60 frames. Keep the same final label value, and keep every frame reading the current coins value (it can change while the loop runs). The hidden checks count how many times buildLabel is called."
+  starterCode={`local currentCoins = 12 -- could change between frames
+local totalBuilds = 0
+local lastBuilt = "<nothing>"
+
+local function buildLabel(value)
+    totalBuilds += 1
+    return "Coins: " .. value
+end
+
+-- renders 60 times a second, like a frame timer
+for _ = 1, 60 do
+    -- your code runs once per "frame" here
+end`}
+  hint="Watch the value before building. If the value you're about to show is the same as the last one you built, the frame needs no label work at all."
+  checks={`check(totalBuilds == 1, "the label string should be built once, not 60 times")
+check(lastBuilt == "Coins: 12", "the label still shows the right value")
+for frame = 1, 60 do
+    check(currentCoins == 12, "the coins value is untouched")
+end`}
+  explanation="Reading `currentCoins` every frame is fine — the point is you only build the string (and, in real life, touch the UI) when the value changed. One build, guarded by a comparison, gives the same player-visible result at a fraction of the cost."
+/>
+</Step>
+
+<Step>
+
+## The checklist on your toolbelt
+
+Client performance is a budget, not a mystery:
+
+1. **Know the budget** — 16 ms per frame at 60 FPS.
+2. **Time the work** — Heartbeat and RenderStepped run every frame; minimal work belongs there.
+3. **Cache references** — never search the data model inside a per-frame loop.
+4. **Skip unchanged work** — don't rebuild strings or relayout UI when the value didn't move.
+5. **Measure first** — let the FPS meter and profiler point at the real bottleneck before spending an hour on a micro-optimization.
+
+Next: the flip side of performance — why things you thought were gone can stick around, and the three habits that keep dead code dead.
+
+</Step>
