@@ -18,7 +18,7 @@ function ResultRow({ entry }: { entry: SearchEntry }) {
       className="block rounded-lg border border-transparent px-3 py-2.5 transition-all duration-150 hover:border-border hover:bg-accent/60 motion-reduce:transition-none"
     >
       <div className="flex items-center gap-2">
-        <span className="font-medium">{entry.title}</span>
+        <span className="min-w-0 flex-1 font-medium">{entry.title}</span>
         <span className="ml-auto flex shrink-0 items-center gap-1.5">
           <Badge variant="secondary" className="px-2 py-0 text-[10px]">
             {entry.sectionTitle}

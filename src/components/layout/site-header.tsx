@@ -60,7 +60,7 @@ export function SiteHeader({
   const streakActive = isStreakActive(lastStreakDate);
 
   return (
-    <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
+    <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-1.5 border-b bg-background/80 px-3 backdrop-blur sm:gap-2 sm:px-4">
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label={t("openMenu")}>
@@ -92,7 +92,7 @@ export function SiteHeader({
           alt="RoCourse"
           width={150}
           height={25}
-          className="h-auto w-[150px] object-contain"
+          className="h-auto w-[120px] object-contain sm:w-[150px]"
           priority
         />
       </Link>

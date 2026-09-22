@@ -70,7 +70,7 @@ export function ActivityCalendar({
           return (
             <div
               key={cell.key}
-              className="flex w-10 flex-col items-center gap-1.5"
+              className="flex min-w-0 flex-1 flex-col items-center gap-1.5"
               title={`${cell.date.toLocaleDateString(undefined, {
                 weekday: "short",
                 month: "short",

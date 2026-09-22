@@ -137,7 +137,8 @@ export function CodeBlock({
               className="flex items-center gap-1 rounded-md px-2 py-1 font-mono text-xs text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100"
               aria-label={t("runThisCode")}
             >
-              <Play className="h-3.5 w-3.5" /> {t("tryIt")}
+              <Play className="h-3.5 w-3.5" />{" "}
+              <span className="hidden sm:inline">{t("tryIt")}</span>
             </button>
           )}
           <button
@@ -148,11 +149,13 @@ export function CodeBlock({
           >
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5 text-emerald-400" /> {t("copied")}
+                <Check className="h-3.5 w-3.5 text-emerald-400" />{" "}
+                <span className="hidden sm:inline">{t("copied")}</span>
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5" /> {t("copy")}
+                <Copy className="h-3.5 w-3.5" />{" "}
+                <span className="hidden sm:inline">{t("copy")}</span>
               </>
             )}
           </button>

@@ -63,7 +63,7 @@ export function GlossaryTerm({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-80"
+        className="w-80 max-w-[calc(100vw-2rem)]"
         align="start"
         onMouseEnter={cancelClose}
         onMouseLeave={scheduleClose}

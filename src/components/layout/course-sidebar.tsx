@@ -67,7 +67,7 @@ function LessonRow({
       ) : (
         <Circle className="h-4 w-4 shrink-0 text-muted-foreground/30" />
       )}
-      <span className="flex-1">{lesson.title}</span>
+      <span className="min-w-0 flex-1">{lesson.title}</span>
       <LessonMedalBadge slug={lesson.slug} activityCount={lesson.activityCount} className="h-3.5 w-3.5 shrink-0" />
       {bookmarked && <Bookmark className="h-3 w-3 shrink-0 fill-primary text-primary" />}
     </Link>

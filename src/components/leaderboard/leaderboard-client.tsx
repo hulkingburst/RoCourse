@@ -115,7 +115,7 @@ export function LeaderboardClient() {
       <section className="rounded-xl border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">{t("thisWeek")}</h2>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {status === "authenticated" && (
               <div
                 role="tablist"
@@ -161,7 +161,7 @@ export function LeaderboardClient() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="w-40 text-center text-sm font-medium">
+              <span className="w-32 text-center text-sm font-medium sm:w-40">
                 {weekLabel}
               </span>
               <Button
@@ -260,7 +260,7 @@ export function LeaderboardClient() {
           <h2 className="text-lg font-semibold">{t("guestNameLabel")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{t("guestNameHint")}</p>
           {editing ? (
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 flex flex-wrap gap-2">
               <Input
                 value={nameInput}
                 onChange={(event) => {
@@ -276,7 +276,7 @@ export function LeaderboardClient() {
               </Button>
             </div>
           ) : (
-            <div className="mt-3 flex items-center gap-2 text-sm">
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
               <span>
                 {t("playingAs")} <span className="font-semibold">{guestName}</span>
               </span>
