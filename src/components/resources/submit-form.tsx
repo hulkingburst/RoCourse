@@ -111,15 +111,20 @@ export function SubmitForm() {
         return;
       }
       setStatus("uploading");
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 45_000);
       try {
         const blob = await upload(file.name, file, {
           access: "public",
           handleUploadUrl: "/api/resources/upload",
+          abortSignal: controller.signal,
         });
         await post({ fileUrl: blob.url });
       } catch {
         setStatus("error");
         setError(t("errorUploadFailed"));
+      } finally {
+        window.clearTimeout(timeoutId);
       }
     } else if (mode === "url") {
       const trimmed = url.trim();
