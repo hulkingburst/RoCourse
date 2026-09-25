@@ -14,6 +14,22 @@ import { useNotifications } from "@/lib/use-notifications";
 import { BadgeCelebration } from "@/components/layout/badge-celebration";
 import type { CourseSection, SearchEntry } from "@/lib/types";
 
+const MOBILE_VIEWPORT_QUERY = "(max-width: 639px)";
+
+function subscribeToMobileViewport(onStoreChange: () => void) {
+  const mediaQuery = window.matchMedia(MOBILE_VIEWPORT_QUERY);
+  mediaQuery.addEventListener("change", onStoreChange);
+  return () => mediaQuery.removeEventListener("change", onStoreChange);
+}
+
+function getMobileViewportSnapshot() {
+  return window.matchMedia(MOBILE_VIEWPORT_QUERY).matches;
+}
+
+function getServerMobileViewportSnapshot() {
+  return false;
+}
+
 export function AppShell({
   children,
   sections,
@@ -29,6 +45,35 @@ export function AppShell({
   const pathname = usePathname();
   const t = useTranslations("footer");
   const navT = useTranslations("nav");
+  const footerRef = React.useRef<HTMLElement>(null);
+  const [footerVisible, setFooterVisible] = React.useState(false);
+  const isMobile = React.useSyncExternalStore(
+    subscribeToMobileViewport,
+    getMobileViewportSnapshot,
+    getServerMobileViewportSnapshot
+  );
+  const footerObserverAvailable =
+    typeof window !== "undefined" && "IntersectionObserver" in window;
+
+  // Hide the fixed actions only when the footer is actually in view on
+  // narrow screens. Browsers without IntersectionObserver get Option 1's
+  // bottom clearance instead.
+  React.useEffect(() => {
+    if (!isMobile || !footerObserverAvailable) return;
+
+    const footer = footerRef.current;
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterVisible(entry.isIntersecting),
+      { threshold: 0.01 }
+    );
+    observer.observe(footer);
+
+    return () => observer.disconnect();
+  }, [footerObserverAvailable, isMobile]);
+
+  const hideFloatingControls = isMobile && footerVisible;
 
   useGuestXpReporter();
   useNotifications(totalLessons);
@@ -55,7 +100,13 @@ export function AppShell({
         >
           {children}
         </main>
-        <footer className="border-t py-6">
+        <footer
+          ref={footerRef}
+          className={cn(
+            "border-t",
+            isMobile && footerObserverAvailable === false ? "pt-6 pb-24" : "py-6"
+          )}
+        >
           <div className="mx-auto flex max-w-3xl flex-col items-center justify-between gap-2 px-6 text-center text-xs text-muted-foreground sm:flex-row sm:text-left">
             <p>{t("about", { courseName: process.env.NEXT_PUBLIC_COURSE_NAME ?? "RoCourse" })}</p>
             <p className="font-mono">{t("tagline")}</p>
@@ -117,7 +168,14 @@ export function AppShell({
           </div>
         </footer>
       </div>
-      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2">
+      <div
+        className={cn(
+          "fixed bottom-5 right-5 z-50 flex items-center gap-2 transition-[opacity,transform] duration-200 motion-reduce:transition-none",
+          hideFloatingControls && "pointer-events-none translate-y-2 opacity-0"
+        )}
+        aria-hidden={hideFloatingControls}
+        inert={hideFloatingControls}
+      >
         <a
           href="https://github.com/hulkingburst/RoCourse"
           target="_blank"
