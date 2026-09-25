@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25
+
+- Contact: added a localized contact page with the business email, a mailto action, and a themed contact button in the footer; the page is included in the sitemap.
+
 ## 2026-09-22
 
 - Content: added the UI Menus lesson after the shop panel — Visible as the on/off switch, one-button toggling with `not`, an idempotent close (X) button, the Escape key via UserInputService with the `gameProcessed` guard, a click-outside backdrop that closes together with the panel so it can't block clicks, and routing every open/close through one `setMenu(open)` function — with 4 multiple-choice, 1 write-code, and 1 fill-in-the-blank activity; renumbered the rest of the Game Systems section (modules and later) to make room; README lesson count updated to 104.

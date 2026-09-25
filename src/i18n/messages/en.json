@@ -60,6 +60,7 @@
     "guides": "Guides",
     "leaderboard": "Leaderboard",
     "questions": "Questions",
+    "contact": "Contact",
     "donate": "Donate",
     "donateAria": "Donate to support RoCourse"
   },
@@ -2102,6 +2103,15 @@
     "noWarranty": "No warranty, no liability",
     "changes": "Changes",
     "contact": "Contact"
+  },
+  "contact": {
+    "metadataTitle": "Contact RoCourse",
+    "metadataDescription": "Get in touch with the RoCourse team about questions, feedback, or support.",
+    "title": "Contact RoCourse",
+    "intro": "Have a question, feedback, or an idea for RoCourse? Send us a message and we’ll get back to you.",
+    "emailLabel": "Business email",
+    "emailButton": "Email us",
+    "responseNote": "We usually reply within a few business days."
   },
   "guides": {
     "metadataTitle": "Guides — Learn Luau & Roblox Development",
