@@ -29,6 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/quiz/daily`, changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${SITE_URL}/privacy`, priority: 0.2 },
     { url: `${SITE_URL}/terms`, priority: 0.2 },
+    { url: `${SITE_URL}/contact`, priority: 0.2 },
     ...lessonUrls,
   ];
 }
