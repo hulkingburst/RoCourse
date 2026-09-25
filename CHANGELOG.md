@@ -3,6 +3,7 @@
 ## 2026-09-25
 
 - Contact: added a localized contact page with the business email, a mailto action, and a themed contact button in the footer; the page is included in the sitemap.
+- Mobile: the fixed Star and Feedback controls now fade out while the footer is visible on narrow screens, with extra footer clearance as a fallback when IntersectionObserver is unavailable.
 
 ## 2026-09-22
 
