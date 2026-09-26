@@ -5,6 +5,17 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const isDev = process.env.NODE_ENV === "development";
 
+// Analytics hosts for the CSP. Default build keeps the Vercel Analytics hosts;
+// a Cloudflare build sets NEXT_PUBLIC_ANALYTICS=cloudflare and swaps in the
+// Cloudflare Web Analytics hosts instead.
+const usesCloudflareAnalytics = process.env.NEXT_PUBLIC_ANALYTICS === "cloudflare";
+const analyticsScriptSrc = usesCloudflareAnalytics
+  ? "https://static.cloudflareinsights.com"
+  : "https://va.vercel-scripts.com";
+const analyticsConnectSrc = usesCloudflareAnalytics
+  ? "https://cloudflareinsights.com"
+  : "https://va.vercel-scripts.com https://vitals.vercel-insights.com";
+
 // Static, build-time CSP. No per-request nonce: by keeping the header here the
 // content pages stay statically rendered (a nonce-based policy forces every
 // page to re-render per request, which burns Fluid Compute). 'unsafe-inline'
@@ -13,11 +24,12 @@ const isDev = process.env.NODE_ENV === "development";
 // else remains strict. In development React needs 'unsafe-eval'.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' ${analyticsScriptSrc}${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://vercel.com https://*.public.blob.vercel-storage.com https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.r2.cloudflarestorage.com https://*.r2.dev",
+  "connect-src 'self' https://vercel.com https://*.public.blob.vercel-storage.com " +
+    `${analyticsConnectSrc} https://*.r2.cloudflarestorage.com https://*.r2.dev`,
   "worker-src 'self'",
   "frame-ancestors 'self'",
   "base-uri 'self'",

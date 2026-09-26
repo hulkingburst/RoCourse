@@ -121,8 +121,21 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
   vars, and test an upload.
 - **Phase 2 — DB:** `@prisma/adapter-pg-worker` + Hyperdrive; verify all
   queries/rate limits.
-- **Phase 3 — runtime compat:** `CF-Connecting-IP` in `trustedIp`; Cloudflare
-  Web Analytics + CSP; confirm `next/image`.
+- **Phase 2 — DB (blocked on a Cloudflare/Hyperdrive binding):** switch to
+  `@prisma/adapter-pg-worker` behind a Cloudflare Hyperdrive binding (needs to
+  be created in the Cloudflare dashboard and tested); verify all queries/rate
+  limits. Alternatively `@prisma/adapter-neon` (HTTP driver, no TCP sockets)
+  also removes the pg dependency and works on both platforms — pick during the
+  Phase 4 preview build.
+- **Phase 3 — runtime compat (implemented, gated):** `trustedIp()`
+  (`src/lib/auth-limiter.ts`) now prefers **`CF-Connecting-IP`** first
+  (additive: Vercel sends it only if proxied through Cloudflare, otherwise the
+  old `x-real-ip` / `x-forwarded-for` fallback applies, so production is
+  unchanged). Analytics is swap-ready via baked `NEXT_PUBLIC_ANALYTICS`
+  (`cloudflare` loads the Cloudflare Web Analytics beacon through the new
+  `CloudflareAnalytics` client component and swaps the CSP hosts;
+  anything else keeps Vercel Analytics and its CSP hosts). `next/image` is
+  left as-is pending the OpenNext preview in Phase 4.
 - **Phase 4 — Pages pipeline:** OpenNext build config + `wrangler`; migrate
   env vars; deploy to a preview host (e.g. `rocourse.pages.dev`) and diff
   against `ro-course.vercel.app`.
