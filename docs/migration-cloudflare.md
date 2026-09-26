@@ -1,7 +1,8 @@
 # Cloudflare Migration Plan
 
-Branch-only assessment. `main` and the production site at `ro-course.vercel.app`
-are unaffected. No application code has been changed; this document records the
+Branch-only work — this branch carries Cloudflare-prep code, all of it gated
+(env-driven) so `main` and the production site at `ro-course.vercel.app` behave
+identically until a phase is explicitly activated. This document records the
 findings and the phased plan.
 
 ## Current state
@@ -39,20 +40,26 @@ rate limiting. On Cloudflare these become **Pages Functions**.
 
 ### Storage / database
 
-- **Neon Postgres** via `pg` + `@prisma/adapter-pg`. Neon is unchanged; the
-  adapter becomes `@prisma/adapter-pg-worker` behind **Cloudflare Hyperdrive**
-  (Workers cannot open raw TCP sockets; Hyperdrive provides the tunnel + pooling).
+- **Neon Postgres** via `pg` + `@prisma/adapter-pg`. For Cloudflare the chosen
+  path (Phase 2) is `@prisma/adapter-neon`'s **`PrismaNeonHTTP`** driver
+  (pure HTTPS, no TCP/WebSocket sockets) behind `PRISMA_ADAPTER=neon` — no
+  Hyperdrive binding or paid plan needed, and it also runs on Vercel.
+  `@prisma/adapter-pg-worker` + Hyperdrive remains available but requires a
+  Cloudflare paid plan + a binding created in the dashboard.
 - **Vercel Blob** (v2.7) is the most coupled piece. Flow: browser calls
   `upload()` -> `/api/resources/upload` issues control-plane token via
   `handleUpload` -> browser `PUT`s to Blob. Server deletes invalid files with
   `del()`. Replace with **R2 presigned uploads** (same UX, same 50 MB zip /
-  entry / extension checks survive server-side).
+  entry / extension checks survive server-side). **Caveat:** Cloudflare
+  requires a payment-verified account even for R2's free tier, so R2 stays
+  dormant (default `FILE_STORAGE=vercel`) until/unless that's possible.
 
 ### Environment variables
 
 | Var | Role | On Cloudflare |
 |---|---|---|
-| `DATABASE_URL` / `DATABASE_URL_UNPOOLED` | runtime (Prisma) | same, via Hyperdrive |
+| `DATABASE_URL` / `DATABASE_URL_UNPOOLED` | runtime (Prisma) | same; choose driver via `PRISMA_ADAPTER` |
+| `PRISMA_ADAPTER` | runtime (driver select) | `pg` (default) or `neon` (HTTP, no sockets) |
 | `AUTH_SECRET` | runtime (JWT signing) | same |
 | `AUTH_TRUST_HOST` | runtime (next-auth) | same |
 | `FEEDBACK_GITHUB_TOKEN` | runtime (GitHub API) | same |
@@ -65,9 +72,12 @@ rate limiting. On Cloudflare these become **Pages Functions**.
 
 ### Cloudflare-incompatible items (and the fix for each)
 
-1. `@vercel/blob` upload/token/del flow -> R2 presigned. Largest work item.
-2. `@prisma/adapter-pg` + `pg` sockets -> `@prisma/adapter-pg-worker` +
-   Hyperdrive + `nodejs_compat`.
+1. `@vercel/blob` upload/token/del flow -> R2 presigned. Largest work item;
+   implemented gated (Phase 1) but stays dormant — R2 needs a payment-verified
+   Cloudflare account, so Vercel Blob remains the active path for now.
+2. `@prisma/adapter-pg` + `pg` sockets -> **`PrismaNeonHTTP`** via
+   `PRISMA_ADAPTER=neon` (pure HTTPS, no sockets; free tier). `pg-worker` +
+   Hyperdrive is the alternative if a paid plan/binding exists.
 3. `@vercel/analytics` + CSP `script-src`/`connect-src` entries
    (`va.vercel-scripts.com`, `vitals.vercel-insights.com`,
    `*.public.blob.vercel-storage.com`) -> Cloudflare Web Analytics; CSP updated
@@ -96,7 +106,10 @@ rate limiting. On Cloudflare these become **Pages Functions**.
 ## Recommended deployment model
 
 **Cloudflare Pages with the OpenNext adapter** (`@opennextjs/cloudflare`):
-- R2 for blob storage, Neon + Hyperdrive for Postgres.
+- Neon + `PrismaNeonHTTP` (`PRISMA_ADAPTER=neon`) for Postgres — no Hyperdrive
+  binding or paid plan required.
+- Blob storage on R2 when it becomes viable (needs a payment-verified account);
+  until then Vercel Blob stays the active upload path even after hosting moves.
 - ~20 dynamic endpoints become a small Pages Functions surface (free tier:
   100k function requests/day).
 - App Router, next-intl, next-auth, middleware, and static pages are preserved,
@@ -107,26 +120,25 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
 ## Phases
 
 - **Phase 0 (this doc):** branch + plan only. `main` untouched.
-- **Phase 1 — storage swap (implemented, gated):** R2 presigned-PUT flow added
-  behind `FILE_STORAGE=r2` + `R2_*` vars; default stays `vercel` so production
-  is unaffected until the creds exist. Client probes the backend at
+- **Phase 1 — storage swap (implemented, gated, on hold):** R2 presigned-PUT
+  flow added behind `FILE_STORAGE=r2` + `R2_*` vars; default stays `vercel` so
+  production is unaffected. Client probes the backend at
   `/api/resources/upload` (`{ probe: true }`), uploads straight to R2, then
   verifies via `/api/resources/verify` (server re-checks the ZIP magic and
   deletes the object on failure). `BLOB_HOST_RE` replaced by
   `isAllowedFileHost()` (accepts Vercel Blob always, and exactly
   `R2_PUBLIC_HOST` when set) in both the submit route and the read-time
   parser. CSP `connect-src` extended with the R2 S3 endpoint and `r2.dev`.
-  To activate: create the bucket, set `R2_PUBLIC_HOST` (a `pub-*.r2.dev` host
-  or custom domain with public access), set `FILE_STORAGE=r2` + the `R2_*`
-  vars, and test an upload.
-- **Phase 2 — DB:** `@prisma/adapter-pg-worker` + Hyperdrive; verify all
-  queries/rate limits.
-- **Phase 2 — DB (blocked on a Cloudflare/Hyperdrive binding):** switch to
-  `@prisma/adapter-pg-worker` behind a Cloudflare Hyperdrive binding (needs to
-  be created in the Cloudflare dashboard and tested); verify all queries/rate
-  limits. Alternatively `@prisma/adapter-neon` (HTTP driver, no TCP sockets)
-  also removes the pg dependency and works on both platforms — pick during the
-  Phase 4 preview build.
+  **On hold:** Cloudflare requires a payment-verified account even for R2's
+  free tier; until that's possible, `FILE_STORAGE` stays unset and Vercel Blob
+  remains the active upload path (works on either host).
+- **Phase 2 — DB (implemented, gated):** `src/lib/prisma.ts` now selects the
+  driver via `PRISMA_ADAPTER` — `pg` (default, unchanged `@prisma/adapter-pg`)
+  or `neon` (`PrismaNeonHTTP` from `@prisma/adapter-neon` over the Neon
+  serverless HTTP driver, no sockets). Live-tested locally against the real
+  Neon DB with both drivers (leaderboard/questions GETs OK, no errors). Set
+  `PRISMA_ADAPTER=neon` on the Cloudflare build; re-validate during the Phase 4
+  preview, then consider making neon the permanent default on both hosts.
 - **Phase 3 — runtime compat (implemented, gated):** `trustedIp()`
   (`src/lib/auth-limiter.ts`) now prefers **`CF-Connecting-IP`** first
   (additive: Vercel sends it only if proxied through Cloudflare, otherwise the
