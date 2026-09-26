@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
@@ -68,11 +67,6 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  // The proxy (src/proxy.ts) stamps a fresh nonce onto every page view. It is
-  // forwarded to next-themes so its inline theme script carries the same
-  // nonce and passes the strict Content-Security-Policy.
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
-
   return (
     <html
       lang={locale}
@@ -86,7 +80,6 @@ export default async function LocaleLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
-            nonce={nonce}
           >
             <AuthProvider>
               {children}
