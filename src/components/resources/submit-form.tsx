@@ -71,6 +71,47 @@ function validateZip(
   })();
 }
 
+/**
+ * Uploads the validated zip through whichever storage backend the server is
+ * running. The probe tells us the backend without issuing a Blob token; on R2
+ * the same call returns a presigned PUT and we upload directly, then verify
+ * the object so a non-zip can be rejected and cleaned up before submission.
+ */
+async function uploadResourceFile(file: File, signal: AbortSignal): Promise<string> {
+  const probe = await fetch("/api/resources/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ probe: true, networkFilename: file.name }),
+    signal,
+  });
+  if (!probe.ok) throw new Error("probe");
+  const info = (await probe.json()) as {
+    ok?: boolean;
+    storage?: string;
+    uploadUrl?: string;
+    fileUrl?: string;
+  };
+  if (info.storage === "r2") {
+    if (!info.uploadUrl || !info.fileUrl) throw new Error("probe");
+    const result = await fetch(info.uploadUrl, { method: "PUT", body: file, signal });
+    if (!result.ok) throw new Error("upload");
+    const verify = await fetch("/api/resources/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fileUrl: info.fileUrl }),
+      signal,
+    });
+    if (!verify.ok) throw new Error("verify");
+    return info.fileUrl;
+  }
+  const blob = await upload(file.name, file, {
+    access: "public",
+    handleUploadUrl: "/api/resources/upload",
+    abortSignal: signal,
+  });
+  return blob.url;
+}
+
 export function SubmitForm() {
   const t = useTranslations("resources");
   const [kind, setKind] = React.useState<ResourceKind>("script");
@@ -114,12 +155,8 @@ export function SubmitForm() {
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), 45_000);
       try {
-        const blob = await upload(file.name, file, {
-          access: "public",
-          handleUploadUrl: "/api/resources/upload",
-          abortSignal: controller.signal,
-        });
-        await post({ fileUrl: blob.url });
+        const fileUrl = await uploadResourceFile(file, controller.signal);
+        await post({ fileUrl });
       } catch {
         setStatus("error");
         setError(t("errorUploadFailed"));

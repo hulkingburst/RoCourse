@@ -57,7 +57,8 @@ rate limiting. On Cloudflare these become **Pages Functions**.
 | `AUTH_TRUST_HOST` | runtime (next-auth) | same |
 | `FEEDBACK_GITHUB_TOKEN` | runtime (GitHub API) | same |
 | `FEEDBACK_GITHUB_REPO`, `RESOURCES_GITHUB_REPO` | runtime, optional | same |
-| `BLOB_READ_WRITE_TOKEN` | runtime (upload route only) | drop; use `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` |
+| `BLOB_READ_WRITE_TOKEN` | runtime (Vercel upload path only) | drop on R2; use `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_HOST` |
+| `FILE_STORAGE` | runtime (upload backend switch) | `vercel` (default) or `r2`; additive, dormant until set |
 | `NEXT_PUBLIC_COURSE_NAME` | build-time | same |
 | `NEXT_PUBLIC_SITE_URL` | build-time (metadata base) | set to new host at cutover |
 | `VERCEL_OIDC_TOKEN` | Vercel-only | drop |
@@ -106,10 +107,18 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
 ## Phases
 
 - **Phase 0 (this doc):** branch + plan only. `main` untouched.
-- **Phase 1 — storage swap:** R2 bucket; presigned-PUT upload flow replacing
-  `handleUpload`/`del`; `BLOB_HOST_RE` updated in both locations; CSP
-  `connect-src`. Vercel path kept working via env flag so production is
-  unaffected.
+- **Phase 1 — storage swap (implemented, gated):** R2 presigned-PUT flow added
+  behind `FILE_STORAGE=r2` + `R2_*` vars; default stays `vercel` so production
+  is unaffected until the creds exist. Client probes the backend at
+  `/api/resources/upload` (`{ probe: true }`), uploads straight to R2, then
+  verifies via `/api/resources/verify` (server re-checks the ZIP magic and
+  deletes the object on failure). `BLOB_HOST_RE` replaced by
+  `isAllowedFileHost()` (accepts Vercel Blob always, and exactly
+  `R2_PUBLIC_HOST` when set) in both the submit route and the read-time
+  parser. CSP `connect-src` extended with the R2 S3 endpoint and `r2.dev`.
+  To activate: create the bucket, set `R2_PUBLIC_HOST` (a `pub-*.r2.dev` host
+  or custom domain with public access), set `FILE_STORAGE=r2` + the `R2_*`
+  vars, and test an upload.
 - **Phase 2 — DB:** `@prisma/adapter-pg-worker` + Hyperdrive; verify all
   queries/rate limits.
 - **Phase 3 — runtime compat:** `CF-Connecting-IP` in `trustedIp`; Cloudflare

@@ -17,7 +17,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.public.blob.vercel-storage.com https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+  "connect-src 'self' https://vercel.com https://*.public.blob.vercel-storage.com https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.r2.cloudflarestorage.com https://*.r2.dev",
   "worker-src 'self'",
   "frame-ancestors 'self'",
   "base-uri 'self'",
