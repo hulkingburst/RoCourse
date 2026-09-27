@@ -2105,12 +2105,14 @@
     "contact": "Contact"
   },
   "contact": {
-    "metadataTitle": "Contact RoCourse",
-    "metadataDescription": "Get in touch with the RoCourse team about questions, feedback, or support.",
+    "metadataTitle": "Contact RoCourse — Business Inquiries",
+    "metadataDescription": "Business inquiries, partnerships, and support for RoCourse. Reach us by business email or DM on X (Twitter).",
     "title": "Contact RoCourse",
-    "intro": "Have a question, feedback, or an idea for RoCourse? Send us a message and we’ll get back to you.",
+    "intro": "RoCourse is open to business inquiries — partnerships, collaborations, advertising, or licensing. Reach us by business email, or DM us on X (Twitter).",
     "emailLabel": "Business email",
     "emailButton": "Email us",
+    "xLabel": "DMs on X (Twitter)",
+    "xButton": "DM on X",
     "responseNote": "We usually reply within a few business days."
   },
   "guides": {
