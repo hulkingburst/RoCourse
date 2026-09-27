@@ -132,13 +132,16 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
   **On hold:** Cloudflare requires a payment-verified account even for R2's
   free tier; until that's possible, `FILE_STORAGE` stays unset and Vercel Blob
   remains the active upload path (works on either host).
-- **Phase 2 — DB (implemented, gated):** `src/lib/prisma.ts` now selects the
-  driver via `PRISMA_ADAPTER` — `pg` (default, unchanged `@prisma/adapter-pg`)
-  or `neon` (`PrismaNeonHTTP` from `@prisma/adapter-neon` over the Neon
-  serverless HTTP driver, no sockets). Live-tested locally against the real
-  Neon DB with both drivers (leaderboard/questions GETs OK, no errors). Set
-  `PRISMA_ADAPTER=neon` on the Cloudflare build; re-validate during the Phase 4
-  preview, then consider making neon the permanent default on both hosts.
+- **Phase 2 — DB driver ladders (implemented, gated):** `src/lib/prisma.ts`
+  selects the driver via `PRISMA_ADAPTER` — `pg` (default, unchanged
+  `@prisma/adapter-pg`) or `neon` (`PrismaNeonHTTP` from `@prisma/adapter-neon`
+  over the Neon serverless HTTP driver, no sockets). **Superseded for
+  Cloudflare:** a scratch worker proved workerd bans
+  `WebAssembly.instantiate()` outright (the Prisma `engineType = "client"`
+  WASM engine is refused, and native engines are x64/ELF), so *no* Prisma
+  adapter can run on Cloudflare. The Cloudflare build therefore bypasses
+  Prisma entirely via the Phase 4 neon SQL layer; `PRISMA_ADAPTER` remains the
+  tuning knob for the Vercel/Node path only.
 - **Phase 3 — runtime compat (implemented, gated):** `trustedIp()`
   (`src/lib/auth-limiter.ts`) now prefers **`CF-Connecting-IP`** first
   (additive: Vercel sends it only if proxied through Cloudflare, otherwise the
@@ -148,8 +151,35 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
   `CloudflareAnalytics` client component and swaps the CSP hosts;
   anything else keeps Vercel Analytics and its CSP hosts). `next/image` is
   left as-is pending the OpenNext preview in Phase 4.
-- **Phase 4 — Pages pipeline:** OpenNext build config + `wrangler`; migrate
-  env vars; deploy to a preview host (e.g. `rocourse.pages.dev`) and diff
-  against `ro-course.vercel.app`.
+- **Phase 4 — Pages pipeline + DB layer (implemented, validated):**
+  - **DB:** `src/lib/db/neon.ts` is a raw `@neondatabase/serverless` SQL layer
+    covering the whole data model (find/update/upsert/count/aggregate/
+    deleteMany/relations/`_count`/`$queryRaw`/`$transaction`, PG→Prisma error
+    mapping so `err.code === "P2002"` checks keep working). `src/lib/prisma.ts`
+    gates on `NEXT_PUBLIC_ANALYTICS === "cloudflare"` at server runtime:
+    Cloudflare exports `neonDb` cast as `PrismaClient`, everything else keeps
+    the real `PrismaClient` (call sites unchanged and still typecheck). All
+    24 prisma importers were converted to work through the gate.
+  - **Build/runtime:** `open-next.config.ts` + `wrangler.jsonc` +
+    `npm run cf-build` (builds `.open-next`; `NEXT_PUBLIC_ANALYTICS=cloudflare`
+    must be set in the build shell). `wrangler dev` needs `.dev.vars` (DB
+    URLs via `DATABASE_URL_UNPOOLED ?? DATABASE_URL`, `AUTH_SECRET`, blob
+    token) — `.dev.vars` is local-only and gitignored, never commit it.
+  - **Validated locally against the real Neon DB under `wrangler dev`:**
+    `/api/leaderboard`, `/api/questions`, `/api/questions/[id]` → 200;
+    `POST /api/guest-xp` valid → 200 and the row persists in Postgres,
+    invalid → 400; `POST /api/questions` / `showcase/submit` / `sync` → 401
+    (auth-gated before DB); `POST /api/feedback` → 503 without
+    `FEEDBACK_GITHUB_TOKEN` (correct guard). `$queryRaw` site-stats JSONB
+    aggregates verified against Postgres.
+  - **Known open items (not blockers for this phase):**
+    - OpenNext serves from a read-only bundle (`/bundle`), so dynamic/SSR
+      pages that read `content/lessons` from disk with `fs` (e.g. the home
+      page via `getCourseStructure`) 500 with `ENOENT`. Static assets are
+      fine. Needs a content-into-bundle strategy before a full cutover.
+    - R2 stays blocked (payment-verified account); Vercel Blob remains the
+      upload path.
+    - `engineType = "client"` (working tree) removes the binary engine from
+      Vercel functions and runs green locally.
 - **Phase 5 — cutover:** only with explicit approval. DNS/domain changes are
   out of scope until then.

@@ -5,14 +5,16 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const isDev = process.env.NODE_ENV === "development";
 
-// Analytics hosts for the CSP. Default build keeps the Vercel Analytics hosts;
-// a Cloudflare build sets NEXT_PUBLIC_ANALYTICS=cloudflare and swaps in the
-// Cloudflare Web Analytics hosts instead.
-const usesCloudflareAnalytics = process.env.NEXT_PUBLIC_ANALYTICS === "cloudflare";
-const analyticsScriptSrc = usesCloudflareAnalytics
+// Signals a Cloudflare build (set NEXT_PUBLIC_ANALYTICS=cloudflare on the CF
+// side). Default builds keep Vercel Analytics hosts; the CF build swaps in the
+// Cloudflare Web Analytics hosts and disables the next/image optimizer (the
+// site only uses next/image on two local logos, so unoptimized URLs are fine
+// and avoid needing the paid Cloudflare Images binding).
+const isCloudflareBuild = process.env.NEXT_PUBLIC_ANALYTICS === "cloudflare";
+const analyticsScriptSrc = isCloudflareBuild
   ? "https://static.cloudflareinsights.com"
   : "https://va.vercel-scripts.com";
-const analyticsConnectSrc = usesCloudflareAnalytics
+const analyticsConnectSrc = isCloudflareBuild
   ? "https://cloudflareinsights.com"
   : "https://va.vercel-scripts.com https://vitals.vercel-insights.com";
 
@@ -41,6 +43,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  ...(isCloudflareBuild ? { images: { unoptimized: true } } : {}),
   async headers() {
     return [
       {
