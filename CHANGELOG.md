@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-27
+
+- Polls: added feature polls so learners can vote on what gets built next, before it is built. A poll arrives in the notifications bell as a new "Feature vote" type, opens into the question with its options, and tallies server-side — counts and percentages appear once you've voted, your own pick stays highlighted, and picking a different option replaces your vote rather than adding a second ballot. Results are deliberately hidden until you vote so early answers don't set the crowd's mind. Polls are authored in code (`src/lib/polls.ts`); the question and option text is localized in both languages, so shipping a new poll is a one-file change with no migration.
+- Polls: votes work with or without an account — a signed-in learner's vote follows their account, and a guest votes under the same anonymous id the weekly leaderboard already uses. Every poll id and option id is validated against the authored catalog server-side, and the vote endpoint is rate-limited per IP.
+- Polls: added a dev-only test poll that never appears in a production build or seeds a notification outside `next dev`.
+
 ## 2026-09-25
 
 - Contact: added a localized contact page with the business email, a mailto action, and a themed contact button in the footer; the page is included in the sitemap.

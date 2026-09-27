@@ -6,17 +6,24 @@
 export type NotificationType =
   | "update" // site news / course update
   | "badge" // a newly earned badge
+  | "poll" // a feature poll open for votes
   | "feedback_received" // confirmation that feedback was submitted
   | "feedback_closed" // feedback was resolved with the author's real message
   | "moderation"; // a name was moderated/auto-changed
 
 export interface AppNotification {
   /** Stable dedup key (e.g. "badge:first-steps", "update:<slug>",
-   * "feedback:<issueNumber>:received", "feedback:<issueNumber>:closed").
+   * "poll:<pollId>", "feedback:<issueNumber>:received",
+   * "feedback:<issueNumber>:closed").
    * Also the server's Notification.localKey. A ticket's two states use
    * distinct ids so a resolution is a new notification, not an edit. */
   id: string;
   type: NotificationType;
+  /**
+   * For `badge` and `poll` types this is the badge / poll id, not display
+   * text — the bell resolves it through the i18n catalog so the stored and
+   * synced data stays locale-independent.
+   */
   title: string;
   body?: string | null;
   link?: string | null;

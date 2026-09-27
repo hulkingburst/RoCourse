@@ -6,11 +6,13 @@ import { BADGES, extractBadgeStats } from "@/lib/badges";
 import { useNotificationsStore } from "@/lib/notification-store";
 import { useProgressStore } from "@/lib/progress-store";
 import { SITE_UPDATES } from "@/lib/updates";
+import { POLLS } from "@/lib/polls";
 import type { NotificationState } from "@/lib/notification-types";
 
 /**
  * Drives the notifications system from the client:
  *  - seeds one-time site-update notifications,
+ *  - seeds one-time notifications for open feature polls,
  *  - fires a one-time notification whenever a badge is newly earned,
  *  - for signed-in users, pulls the server DB backup (which also runs the
  *    feedback-close sync) and idempotently pushes any local-only notifications
@@ -71,6 +73,7 @@ export function useNotifications(totalLessons: number): void {
     if (!hydrated || hydratedRef.current) return;
     hydratedRef.current = true;
     useNotificationsStore.getState().seedUpdates(SITE_UPDATES);
+    useNotificationsStore.getState().seedPolls(POLLS);
   }, [hydrated]);
 
   // ----- fire one-time badge notifications on transitions -----

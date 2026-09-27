@@ -174,6 +174,33 @@ model FeedbackTicket {
   @@index([userId, state])
 }
 
+// A single vote cast on a feature poll. The poll itself (question, options,
+// open/close window) is authored in code in `src/lib/polls.ts`, so shipping a
+// new poll is a one-file change with no migration — only the tally needs to
+// live in the database.
+//
+// `voterKey` is a namespaced identity rather than a User foreign key:
+// "user:<userId>" for a signed-in learner, "guest:<guestId>" for the
+// client-generated anonymous id from `src/lib/guest-store.ts` (the same one
+// the weekly XP leaderboard uses). A FK would exclude every guest from a
+// feature vote on a course that is deliberately account-free, and would
+// cascade-delete a real learner's votes if they removed their account.
+//
+// The unique (pollId, voterKey) pair is what makes a vote re-castable (an
+// upsert moves it to another option) while still one-per-voter, and is the
+// same race-safe shape used by WeeklyXp.
+model PollVote {
+  id        String   @id @default(cuid())
+  pollId    String
+  voterKey  String
+  optionId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([pollId, voterKey])
+  @@index([pollId])
+}
+
 // One-way follow ("account I enjoy on this week's leaderboard"). Friendship is
 // intentionally directed: A following B does not imply B follows A. The DB
 // guarantees there's never a self-follow (CHECK constraint added in the
