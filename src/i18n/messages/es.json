@@ -2105,12 +2105,14 @@
     "contact": "Contacto"
   },
   "contact": {
-    "metadataTitle": "Contacta con RoCourse",
-    "metadataDescription": "Ponte en contacto con el equipo de RoCourse para hacer preguntas, enviar comentarios o pedir ayuda.",
+    "metadataTitle": "Contacta con RoCourse — Consultas comerciales",
+    "metadataDescription": "Consultas comerciales, colaboraciones y soporte para RoCourse. Escríbenos por correo comercial o por DM en X (Twitter).",
     "title": "Contacta con RoCourse",
-    "intro": "¿Tienes una pregunta, comentarios o una idea para RoCourse? Envíanos un mensaje y te responderemos.",
+    "intro": "RoCourse está abierta a consultas comerciales: colaboraciones, publicidad o licencias. Contáctanos por correo comercial o por DM en X (Twitter).",
     "emailLabel": "Correo electrónico comercial",
     "emailButton": "Enviar correo",
+    "xLabel": "DMs en X (Twitter)",
+    "xButton": "DM en X",
     "responseNote": "Normalmente respondemos en pocos días hábiles."
   },
   "guides": {

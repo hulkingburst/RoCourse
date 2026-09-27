@@ -4,3 +4,6 @@ export const SITE_URL =
 export const SITE_NAME = "RoCourse";
 
 export const CONTACT_EMAIL = "rocoursesbusiness@gmail.com";
+
+export const CONTACT_X_URL = "https://x.com/Hulkingburst_";
+export const CONTACT_X_HANDLE = "@Hulkingburst_";
