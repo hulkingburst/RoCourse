@@ -1,0 +1,305 @@
+---
+slug: funnel-analysis
+title: Funnel analysis — find where players leave
+description: Use player drop-off data to find where players leave or get stuck, then fix the one leak that costs you the most players.
+sectionId: data
+order: 15
+difficulty: intermediate
+estimatedMinutes: 10
+tags: [analytics, funnel, retention, metrics, data]
+objectives:
+  - Define a funnel as the ordered stages one player passes through
+  - Count each stage once per player, on the server
+  - Read a funnel as step-to-step percentages instead of raw counts
+  - Tell a drop-off (they left) from a stall (they stayed and got stuck)
+  - Fix one leak, then re-measure, instead of tuning three things at once
+prerequisites: [save-loop, player-added, server-authority]
+keywords: [funnel, analytics, drop-off, retention, metrics, telemetry, conversion, cohort]
+---
+
+Your game is live. The front page is getting clicks, players are joining — and then something is eating them between minute one and minute five. You have no bug report, no angry comment, just a hunch. **Funnel analysis** turns the hunch into a number: a list of the stages every player passes through, a count at each stage, and the drop between them. The biggest drop is not a feeling — it's the place your game is losing people.
+
+<Step>
+
+## A session is a sequence of stages
+
+Write down what a player does, in order, from the moment they join to the moment they close the tab. For a clicker that is roughly: **joined → first coin → first upgrade → first shop buy → came back tomorrow.** That ordered list is your **funnel**, and the count of players who never reach stage *n+1* is the **drop-off** at stage *n*.
+
+One rule decides whether a stage is worth counting: it must be something the **server already decided happened**. "The server awarded a first coin" is a fact. "The player clicked the button" is a claim — and a client that reports its own progress is a claim anyone can fake. Stage names come from the code you already wrote.
+
+<Mcq
+  question="You're picking the stages for a clicker's funnel. Which list is one you can actually act on?"
+  options={[
+    "joined, earned a first coin, bought the first upgrade, came back the next day",
+    "joined, saw the shop, felt good about it, came back later",
+    "clicked, bought, played",
+    "reached level 1, reached level 5, reached level 10",
+  ]}
+  answer={0}
+  explanation="A stage has to be a countable fact the server already records. The others mix feelings, vague verbs, and levels nobody has a data set for."
+/>
+
+</Step>
+
+<Step>
+
+## Count each stage once
+
+The whole funnel is two tables. `counts` holds how many players reached each stage; `seen` holds which stages a given player already reached, so a player who clicks the coin button fifty times still counts as **one** first coin. Without that second table your funnel measures enthusiasm, not players.
+
+```luau
+local counts = {
+    joined = 0,
+    firstCoin = 0,
+    firstUpgrade = 0,
+    shopBought = 0,
+}
+local seen = {}                         -- stage -> true, keyed by player
+
+local function mark(player, stage)
+    local reached = seen[player] or {}   -- empty the first time
+    if reached[stage] then return end    -- already counted it once
+    reached[stage] = true
+    seen[player] = reached               -- remember it for this player
+    counts[stage] += 1
+end
+```
+
+<FillBlank
+  prompt="counts is a fresh table with no keys yet. Complete the increment so the first player to reach a stage makes it 1: counts[stage] = (counts[stage] or ____) + 1"
+  answer="0"
+  explanation="Indexing a missing key gives nil, and nil + 1 errors. Default it to 0 so the first hit counts as one."
+/>
+
+<Note>
+Read `seen[player] or {}` and `counts[stage] or 0` as the same idea: "the value we have, or a fresh one if this is the first time." The `or 0` default is the one that saved your coin saves in the DataStores lesson — new player, no value yet. Drop either default and the first player through `mark` errors on a nil index.
+</Note>
+
+<Mcq
+  question="You drop the seen table and count every click as a first coin. What does the funnel say?"
+  options={[
+    "Almost everyone got their first coin, so there's no leak",
+    "The first-coin stage inflates to whatever the keenest player clicked, hiding the real drop",
+    "The later stages get larger than the first one",
+    "Nothing changes — the counts are still per-player",
+  ]}
+  answer={1}
+  explanation="A stage means 'reached at least once'. Counting repeats turns a player into fifty rows, so the stage looks healthy while the real drop-off hides underneath it."
+/>
+
+</Step>
+
+<Step>
+
+## The counter lives on the server
+
+Here is the version that gets you ratio-banned. A client reports its own progress, and the server believes it:
+
+```luau
+progressEvent.OnServerEvent:Connect(function(player, stage)
+    counts[stage] += 1
+end)
+```
+
+An exploiter fires that remote ten thousand times and your funnel says you have the best retention in the platform. It isn't a security bug you have to patch later — it's the same trust boundary from the security audit lesson, showing up as *bad data* instead of free coins.
+
+<FixBug
+  instruction="Delete the remote and the handler, and replace them with a single line that counts from the server's own reward code."
+  fix={["mark(player, \"shopBought\")"]}
+  placeholder="-- no remote: the server marks its own progress"
+  explanation="mark() has to be called where the server already decided the event happened — inside the purchase handler, right after the balance check. The client never reports progress."
+/>
+
+Every call site is a line the server was going to write anyway: the join handler, the award-a-coin handler, the purchase handler. A funnel is a by-product of a game that already works, not a second version of your game.
+
+</Step>
+
+<Step>
+
+## Flush on a timer, not on every mark
+
+Counting in memory is free. Writing is not: Roblox throttles DataStore traffic hard, and the same key can only be written about once every six seconds. A `mark()` on every click is a locked-out key and a warning in the output — the exact failure the pcall lesson warned you about, arriving through the front door.
+
+So the counters live in memory and a timer writes them out:
+
+```luau
+local DataStoreService = game:GetService("DataStoreService")
+local funnelStore = DataStoreService:GetDataStore("FunnelCounts")
+
+local function flush()
+    local ok, err = pcall(function()
+        funnelStore:UpdateAsync("daily", function(old)
+            -- add today's counts on top of what is already stored
+            local stored = old or {}
+            for stage, n in counts do
+                stored[stage] = (stored[stage] or 0) + n
+            end
+            return stored
+        end)
+    end)
+    if not ok then warn("funnel flush failed: " .. tostring(err)) end
+end
+
+task.spawn(function()
+    while true do
+        task.wait(30)
+        flush()
+    end
+end)
+
+game:BindToClose(flush)   -- the last write of the session
+```
+
+<WriteCode
+  instruction="Write the line that runs flush() every 30 seconds, forever, without freezing the server."
+  answer={["while true do task.wait(30) flush() end", "while true do\n    task.wait(30)\n    flush()\nend"]}
+  starterCode="task.spawn(function()
+    -- your loop here
+end)"
+  explanation="A while true with a task.wait inside is a background loop: it yields every 30 seconds, so the server keeps serving players while the flush runs."
+/>
+
+<Note>
+`UpdateAsync` and not `SetAsync`: the read-modify-write happens on Roblox's side, so two servers flushing at the same moment add up instead of overwriting each other. Never flush a count table with SetAsync — you just lost the other server's numbers.
+</Note>
+
+</Step>
+
+<Step>
+
+## Read it as percentages, not counts
+
+Here is the trap that makes people argue about numbers that both look fine. Raw counts always slope downward, because there are fewer players at every stage — the first stage has the most players by definition, and a big absolute drop there is just a wide top, not a leak. What tells you where the game breaks is the **step conversion**: this stage as a share of the one before it.
+
+```luau
+local STAGES = { "joined", "firstCoin", "firstUpgrade", "shopBought" }
+
+local function report(counts)
+    local base = counts[STAGES[1]]
+    for _, stage in STAGES do
+        local n = counts[stage] or 0
+        print(string.format("%-14s %5d  %5.1f%%", stage, n, n / base * 100))
+    end
+end
+```
+
+<RunCode
+  instruction="Write report(stages, counts) so it prints one line per stage: the stage name, its count, and that count as a percentage of the first stage, formatted to one decimal (12.0%). Four stages in, four lines out."
+  starterCode={`local STAGES = { "joined", "firstCoin", "firstUpgrade", "shopBought" }
+
+local counts = {
+    joined = 1000,
+    firstCoin = 940,
+    firstUpgrade = 120,
+    shopBought = 15,
+}
+
+-- Print one line per stage: name, count, and the share of
+-- players who reached it compared to the first stage.
+function report(stages, counts)
+    -- your code here
+end
+
+report(STAGES, counts)`}
+  checks={`local function line(i)
+    return __log[i] or ""
+end
+check(#__log == 4, "print one line per stage — there are 4 of them")
+check(line(1):find("joined") ~= nil, "line 1 should be the joined stage")
+check(line(2):find("firstCoin") ~= nil, "line 2 should be the firstCoin stage")
+check(line(3):find("firstUpgrade") ~= nil, "line 3 should be the firstUpgrade stage")
+check(line(4):find("shopBought") ~= nil, "line 4 should be the shopBought stage")
+check(line(3):find("12.0%%") ~= nil, "120 out of 1000 should read as 12.0%")
+check(line(4):find("1.5%%") ~= nil, "15 out of 1000 should read as 1.5%")`}
+  explanation="Divide by the first stage's count, not the previous one, and the whole funnel becomes comparable at a glance. string.format with %.1f and %% prints the number and the percent sign."
+/>
+
+<Mcq
+  question="The report reads: joined 1000 (100.0%), firstCoin 940 (94.0%), firstUpgrade 120 (12.0%), shopBought 15 (1.5%). Where is the leak?"
+  options={[
+    "Between firstCoin and firstUpgrade — 820 players left there",
+    "Between joined and firstCoin — 60 players left there",
+    "Everywhere equally; a funnel always slopes down",
+    "Between firstUpgrade and shopBought — that is only 105 players",
+  ]}
+  answer={0}
+  explanation="Compare stage to stage, not to the top. 94% to 12% is a cliff: seven in eight players who get their first coin never buy an upgrade. That is one bug, one confusing screen, or one price that makes no sense — and it is the whole game right now."
+/>
+
+</Step>
+
+<Step>
+
+## Left or stuck: two different problems
+
+A drop-off tells you who **left**. It says nothing about the players who stayed, opened the shop, and then stood there for six minutes buying nothing. That second group is **stuck** — and the fix is never the same. A leak needs a reason to keep going; a wall needs to be crossed.
+
+You cannot see a stall in a funnel that only counts milestones, because the player never *failed* a stage — they hovered inside one. So split the step into its two halves and count both:
+
+```luau
+-- the two halves of the shop step
+shopOpened.OnServerEvent:Connect(function(player) mark(player, "shopOpened") end)
+-- ...inside the purchase handler, after the balance check
+mark(player, "shopBought")
+```
+
+800 players who opened the shop and 41 who bought one is not a drop-off problem. Everyone arrived; 95% of them hit a wall. Move the price, add a preview of what the upgrade does, or put the first affordable item where they land.
+
+<FillBlank
+  prompt="To separate 'left' from 'stuck', count both halves of the step: mark(player, 'shopOpened') when the panel opens, and mark(player, '____') inside the purchase handler."
+  answer="shopBought"
+  explanation="The gap between the two halves is the wall. The gap between one step and the next is the leak — different number, different fix."
+/>
+
+<Mcq
+  question="200 players reach the shop, 180 buy something, 20 leave instead. Which is it?"
+  options={[
+    "A stall — 180 of 200 are stuck at the purchase",
+    "A drop-off — 20 players left before buying",
+    "Both, and both need the same fix",
+    "Neither — a 10% drop is always fine",
+  ]}
+  answer={1}
+  explanation="Most players converted, so the shop is not the wall. 20 players leaving before they buy is an ordinary drop-off, and at that size it is not the thing to fix this week."
+/>
+
+</Step>
+
+<Step>
+
+## Fix one leak, then look again
+
+A funnel turns a hunch into a claim, and a claim is only worth something if you can lose it. Write the hypothesis down before you touch the code — one line, with a number in it:
+
+> Players leave between firstCoin and firstUpgrade because the upgrade panel is behind a menu they never find. I will move the upgrade button to the main HUD and watch the 12.0% figure.
+
+Then change **one** thing. Not the price, the panel, *and* the tutorial — with three changes and one metric, a number that moves tells you nothing about why. This is the same discipline as the red-green loop in the testing lesson: one claim, one change, one number, checked again.
+
+<Warning>
+Twenty players is a rumor, not a data set. Day-one numbers swing wildly, a small sample makes a 5% swing look like a trend, and a stage you can only count once a week cannot tell you about the change you shipped on Tuesday. Read the shape of the funnel early, act on the big cliffs, and make real decisions once the counts are in the hundreds. Roblox's own analytics page will do this for you for free — your funnel's job is to tell you *which* stage to go look at.
+</Warning>
+
+<WriteCode
+  instruction="Write your hypothesis in one line: which stage you think loses players, what you think is causing it, and the number you will watch to find out."
+  answer={["between firstCoin and firstUpgrade because the upgrade panel is hidden; watch the 12%"]}
+  starterCode="-- Players leave ____ because ____. I will watch ____."
+  explanation="If you cannot name the stage, the cause, and the number, you are not ready to change anything yet."
+/>
+
+Your funnel checklist, before you trust the numbers:
+
+- **Ordered stages.** Each one is a fact the server decided, not a click a client claims.
+- **Once per player.** A stage means "reached at least once".
+- **Server-side counting.** No remote reports progress.
+- **Flushed on a timer.** Thirty seconds and `BindToClose`, never every mark.
+- **Read as percentages.** Step-to-step, not against the top.
+- **Both halves of a step.** Otherwise a wall looks like a player who just left.
+- **One change, one number.** Otherwise the result proves nothing.
+
+<Note>
+None of this needs a new system. Every `mark()` call is a line inside code you already wrote, the counters ride in the same DataStore habit as your saves, and the report is a twenty-line module. Measuring a game well is a by-product of a game that is already easy to read.
+</Note>
+
+Next up: the save loop, assembled end to end from shuffled lines — because a funnel counts a session that only lasts if the save is right.
+
+</Step>
