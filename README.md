@@ -61,7 +61,10 @@ are optional and exist purely to sync your progress across devices.
 - **A notifications bell** — new site updates, badges you earn, and replies to
   your feedback all land in one place, so you never miss what changed.
 - **Feature polls** — vote on what should be built next. Polls arrive in the
-  bell, tally live, and no account is needed to cast a ballot.
+  bell, tally live, and no account is needed to cast a ballot. Each poll closes
+  after a set number of days, shows its final results to everyone, files the
+  outcome as an issue in the feedback repo, and retires its bell entry a day
+  later so the bell only shows what's still open.
 - **Typed feedback** — flag a bug, request a feature, or suggest an improvement
   straight to the course author. Signed in? A notification lands in your bell
   the moment the author replies.

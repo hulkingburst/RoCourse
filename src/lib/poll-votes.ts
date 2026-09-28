@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import {
   getPoll,
   isPollClosed,
+  isPollRetired,
+  pollClosesAt,
   pollOptionIds,
   type PollDef,
   type PollTally,
@@ -59,12 +61,19 @@ export function cleanGuestId(value: unknown): string | null {
 export async function getTallies(
   polls: PollDef[],
   voterKey: string | null,
-  now: number = Date.now()
+  now: number = Date.now(),
+  /**
+   * pollId -> results issue URL, from `src/lib/poll-results.ts`. Passed in
+   * rather than read here so tallying stays a single query and callers that
+   * don't render a link (e.g. the vote response) don't pay for the lookup.
+   */
+  resultsUrls?: Map<string, string> | null
 ): Promise<PollTally[]> {
   const tallies = new Map<string, PollTally>(
     polls.map((poll) => {
       const counts: Record<string, number> = {};
       for (const optionId of pollOptionIds(poll)) counts[optionId] = 0;
+      const closes = pollClosesAt(poll);
       return [
         poll.id,
         {
@@ -73,6 +82,9 @@ export async function getTallies(
           total: 0,
           yourVote: null,
           closed: isPollClosed(poll, now),
+          closesAt: closes ? closes.toISOString() : null,
+          retired: isPollRetired(poll, now),
+          resultsUrl: resultsUrls?.get(poll.id) ?? null,
         },
       ];
     })

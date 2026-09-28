@@ -273,7 +273,12 @@ export const useNotificationsStore = create<NotificationsState>()(
           if (!exists && state.deletedIds.includes(id)) return state;
           return {
             notifications: state.notifications.filter((n) => n.id !== id),
-            deletedIds: [...state.deletedIds, id],
+            // Kept a set, not a log: the poll retire sweep names ids the user
+            // may have dismissed by hand already, and re-appending those would
+            // grow localStorage for no behavioural gain.
+            deletedIds: state.deletedIds.includes(id)
+              ? state.deletedIds
+              : [...state.deletedIds, id],
             // Pop it from the backup tracker so a later re-push can't resurrect
             // it; the server row is removed by the caller via the API.
             backedUpIds: state.backedUpIds.filter((backedId) => backedId !== id),

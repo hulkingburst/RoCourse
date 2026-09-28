@@ -9,10 +9,18 @@ import {
   getTallies,
   resolveVoterKey,
 } from "@/lib/poll-votes";
+import {
+  getResultsUrls,
+  pruneRetiredPollNotifications,
+  reportClosedPolls,
+} from "@/lib/poll-results";
 import type { PollTalliesResponse } from "@/lib/polls";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// The close sweep files a GitHub issue from this route the first time anyone
+// reads a poll after it ends; the read itself never waits on more than that.
+export const maxDuration = 15;
 
 // Anyone can vote — the course has no sign-up wall — so this is the abuse
 // surface. Generous enough for a learner changing their mind a few times,
@@ -31,7 +39,16 @@ export async function GET(request: Request) {
   const guestId = cleanGuestId(new URL(request.url).searchParams.get("guestId"));
   const voterKey = resolveVoterKey(session?.user?.id, guestId);
 
-  const polls = await getTallies(POLLS, voterKey);
+  // Polls end on a clock and nothing here runs on one, so the poll read is
+  // where a close gets noticed: the first read after a poll's window ends files
+  // its results issue and retires the notification backup. Both steps are
+  // idempotent, and in the steady state they cost one indexed query each.
+  // Neither is allowed to fail the read the learner actually asked for.
+  await reportClosedPolls();
+  await pruneRetiredPollNotifications(POLLS).catch(() => null);
+
+  const resultsUrls = await getResultsUrls(POLLS.map((poll) => poll.id));
+  const polls = await getTallies(POLLS, voterKey, Date.now(), resultsUrls);
   const body: PollTalliesResponse = { polls };
   return NextResponse.json(body);
 }

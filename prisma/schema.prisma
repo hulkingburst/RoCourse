@@ -10,26 +10,26 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(cuid())
-  email            String             @unique
-  name             String
-  handle           String?            @unique
-  nameChangedAt    DateTime?
-  avatar           String?
-  title            String?
-  status           String?
-  passwordHash     String
-  createdAt        DateTime           @default(now())
-  progress         ProgressProfile?
-  completions      CourseCompletion[]
-  questions        Question[]
-  answers          QuestionAnswer[]
-  weeklyXp         WeeklyXp[]
-  weeklyFirsts     WeeklyFirst[]
-  notifications    Notification[]
-  feedbackTickets  FeedbackTicket[]
-  following        Follow[] @relation("follows")
-  followers        Follow[] @relation("followedBy")
+  id              String             @id @default(cuid())
+  email           String             @unique
+  name            String
+  handle          String?            @unique
+  nameChangedAt   DateTime?
+  avatar          String?
+  title           String?
+  status          String?
+  passwordHash    String
+  createdAt       DateTime           @default(now())
+  progress        ProgressProfile?
+  completions     CourseCompletion[]
+  questions       Question[]
+  answers         QuestionAnswer[]
+  weeklyXp        WeeklyXp[]
+  weeklyFirsts    WeeklyFirst[]
+  notifications   Notification[]
+  feedbackTickets FeedbackTicket[]
+  following       Follow[]           @relation("follows")
+  followers       Follow[]           @relation("followedBy")
 }
 
 model ProgressProfile {
@@ -199,6 +199,28 @@ model PollVote {
 
   @@unique([pollId, voterKey])
   @@index([pollId])
+}
+
+// A closed poll's final tally, plus the GitHub issue that reports it.
+//
+// Polls are authored in code, so this table is the only durable record that a
+// poll was reported — which is what makes the report idempotent. The unique
+// pollId is the guard: the close sweep INSERTs the row first to claim the poll
+// and only then calls GitHub, so two concurrent readers can't both file the
+// same results. `issueUrl` stays null while a claim is in flight or after a
+// failed attempt, and `attempts` bounds how often a broken token is retried.
+model PollResult {
+  id        String   @id @default(cuid())
+  pollId    String   @unique
+  closesAt  DateTime
+  total     Int      @default(0)
+  winnerId  String?
+  issueUrl  String?
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([issueUrl])
 }
 
 // One-way follow ("account I enjoy on this week's leaderboard"). Friendship is

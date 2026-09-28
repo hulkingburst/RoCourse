@@ -3,16 +3,19 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 import { BADGES, extractBadgeStats } from "@/lib/badges";
+import { useGuestStore } from "@/lib/guest-store";
 import { useNotificationsStore } from "@/lib/notification-store";
 import { useProgressStore } from "@/lib/progress-store";
 import { SITE_UPDATES } from "@/lib/updates";
-import { POLLS } from "@/lib/polls";
+import { POLLS, isPollRetired, type PollTally } from "@/lib/polls";
 import type { NotificationState } from "@/lib/notification-types";
 
 /**
  * Drives the notifications system from the client:
  *  - seeds one-time site-update notifications,
  *  - seeds one-time notifications for open feature polls,
+ *  - runs the poll close sweep and retires notifications for polls whose grace
+ *    window has passed,
  *  - fires a one-time notification whenever a badge is newly earned,
  *  - for signed-in users, pulls the server DB backup (which also runs the
  *    feedback-close sync) and idempotently pushes any local-only notifications
@@ -73,7 +76,12 @@ export function useNotifications(totalLessons: number): void {
     if (!hydrated || hydratedRef.current) return;
     hydratedRef.current = true;
     useNotificationsStore.getState().seedUpdates(SITE_UPDATES);
-    useNotificationsStore.getState().seedPolls(POLLS);
+    // A poll whose grace window is already over must not be seeded at all —
+    // otherwise a first-time visitor is handed a bell entry for a poll that
+    // closed before they ever arrived, and then watches it vanish.
+    useNotificationsStore
+      .getState()
+      .seedPolls(POLLS.filter((poll) => !isPollRetired(poll)));
   }, [hydrated]);
 
   // ----- fire one-time badge notifications on transitions -----
@@ -102,6 +110,47 @@ export function useNotifications(totalLessons: number): void {
       store.enqueueCelebration(badgeId);
     }
   }, [earnedBadgeKeys, hydrated, progressHydrated]);
+
+  // ----- poll close sweep -----
+  //
+  // A poll ending is a real-world event nothing local can observe, so the
+  // server notices it on the next poll read and tells us which polls are done
+  // (see src/lib/poll-results.ts). This is the read that makes that happen for
+  // every visitor rather than only the ones who open a poll, and the response
+  // is what retires the stale bell entries.
+  //
+  // Once per mount: a learner who leaves the tab open across a close picks it
+  // up on their next visit, and the server side is idempotent either way. The
+  // ref lives as long as the layout does, so client-side navigations within a
+  // session don't re-fire it.
+  const sweepStartedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!hydrated || sweepStartedRef.current) return;
+    sweepStartedRef.current = true;
+    let cancelled = false;
+    void (async () => {
+      const query = new URLSearchParams({
+        guestId: useGuestStore.getState().guestId,
+      });
+      const response = await fetch(`/api/polls?${query}`, {
+        cache: "no-store",
+      }).catch(() => null);
+      if (cancelled || !response?.ok) return;
+      const data = (await response.json().catch(() => null)) as {
+        polls?: PollTally[];
+      } | null;
+      if (cancelled || !data) return;
+      const store = useNotificationsStore.getState();
+      for (const poll of data.polls ?? []) {
+        // `removeNotification` also records the id as deleted, so neither the
+        // seed above nor a later server merge can bring it back.
+        if (poll.retired) store.removeNotification(`poll:${poll.pollId}`);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated]);
 
   // ----- server backup for signed-in users -----
 

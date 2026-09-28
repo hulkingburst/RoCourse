@@ -2,9 +2,14 @@
 
 ## 2026-09-27
 
+- Polls: polls now end on their own. A poll carries a `durationDays` (7 by default) measured from its `createdAt`, and an explicit `closesAt` can still override it for a one-off. When the window passes the API refuses further votes while continuing to serve the tally.
+- Polls: when a poll closes, the final tally is filed automatically as an issue in `hulkingburst/rocourse-feedback` — a results table with counts and percentages, the winner called out, and a Spanish version under a disclosure so the report reads correctly in both course languages. Reporting is idempotent: a poll is claimed in a new `PollResult` row *before* the GitHub call, so two people opening the site at the same moment can never file the results twice. A failed attempt is recorded and retried on a later read, capped at five so a deploy with a bad token can't retry forever.
+- Polls: a closed poll shows its final standing to everyone, not just people who voted. While a poll is open the tally still stays hidden until you vote, so early answers can't set the crowd's mind — but once voting is over the result is final and there's nothing left to sway.
+- Polls: the poll's bell entry now retires 24 hours after the poll closes. The grace window is the point: someone who was away over the close still finds the result waiting, and a day later the bell is back to being a list of things still worth doing. Retired polls are never seeded for new visitors, are dropped from the notification backup for every account, and keep serving their tally — only the nudge disappears.
+- Polls: closing a poll has no scheduler to run on (the Cloudflare build emits no cron handler), so it's noticed lazily on the next poll read, which every visitor already makes. In the steady state the sweep costs one indexed query and no outbound calls.
 - Polls: added feature polls so learners can vote on what gets built next, before it is built. A poll arrives in the notifications bell as a new "Feature vote" type, opens into the question with its options, and tallies server-side — counts and percentages appear once you've voted, your own pick stays highlighted, and picking a different option replaces your vote rather than adding a second ballot. Results are deliberately hidden until you vote so early answers don't set the crowd's mind. Polls are authored in code (`src/lib/polls.ts`); the question and option text is localized in both languages, so shipping a new poll is a one-file change with no migration.
 - Polls: votes work with or without an account — a signed-in learner's vote follows their account, and a guest votes under the same anonymous id the weekly leaderboard already uses. Every poll id and option id is validated against the authored catalog server-side, and the vote endpoint is rate-limited per IP.
-- Polls: added a dev-only test poll that never appears in a production build or seeds a notification outside `next dev`.
+- Polls: added dev-only test polls covering all three lifecycle states — open, closed-but-not-yet-retired, and retired — none of which appear in a production build or seed a notification outside `next dev`.
 
 ## 2026-09-25
 

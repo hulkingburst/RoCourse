@@ -552,6 +552,7 @@
     "yourVote": "Your vote: {option}",
     "changeVote": "Pick another option to change your vote.",
     "closed": "Voting closed",
+    "resultsReport": "See the full results report",
     "unavailable": "This poll is no longer available.",
     "polls": {
       "2026-09-27-next-feature": {
@@ -571,6 +572,22 @@
           "alpha": "Option A",
           "beta": "Option B",
           "gamma": "Option C"
+        }
+      },
+      "dev-closed-poll": {
+        "question": "Dev test poll — already closed",
+        "body": "This poll closed several hours ago. Voting is off and the final tally is visible to everyone, but the notification stays in the bell for the rest of the grace window.",
+        "options": {
+          "one": "Option One",
+          "two": "Option Two"
+        }
+      },
+      "dev-expired-poll": {
+        "question": "Dev test poll — closed days ago",
+        "body": "This poll closed longer ago than the grace window. Its notification is never seeded and is removed on sight; the tally below is still served.",
+        "options": {
+          "red": "Option Red",
+          "blue": "Option Blue"
         }
       }
     }

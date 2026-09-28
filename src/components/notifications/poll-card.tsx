@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { Check, Lock, Loader2 } from "lucide-react";
+import { Check, ExternalLink, Lock, Loader2 } from "lucide-react";
 import { getPoll } from "@/lib/polls";
 import { usePollVotes } from "@/lib/use-poll-votes";
 import { cn } from "@/lib/utils";
@@ -16,11 +16,12 @@ import { cn } from "@/lib/utils";
  * translations degrade to a plain untranslated fallback rather than throwing,
  * so a half-translated poll never breaks the bell.
  *
- * Results stay hidden until the learner has voted, then the tally appears.
- * A "what should we build next" poll is only meaningful if the first answers
+ * While a poll is OPEN the tally stays hidden until the learner has voted. A
+ * "what should we build next" poll is only meaningful if the first answers
  * don't set the crowd's mind: an always-visible tally makes later voters
- * follow the early leader instead of their own preference. To reveal the
- * standing to everyone, drop the `showResults` guard below.
+ * follow the early leader instead of their own preference. Once the poll
+ * CLOSES the standing is final, so it is revealed to everyone — that reveal is
+ * the last thing the notification is for, before it retires.
  */
 export function PollCard({ pollId }: { pollId: string }) {
   const t = useTranslations("poll");
@@ -46,9 +47,12 @@ export function PollCard({ pollId }: { pollId: string }) {
   const total = tally?.total ?? 0;
   const yourVote = tally?.yourVote ?? null;
   const closed = tally?.closed ?? false;
+  const resultsUrl = tally?.resultsUrl ?? null;
   const disabled = closed || voting;
-  // The standing is only revealed once this learner has a ballot on record.
-  const showResults = yourVote !== null;
+  // Open: the standing is only revealed once this learner has a ballot on
+  // record. Closed: the votes can no longer move, so there is nothing left to
+  // sway — show the final result to everyone.
+  const showResults = closed || yourVote !== null;
 
   return (
     <div className="space-y-3">
@@ -120,11 +124,15 @@ export function PollCard({ pollId }: { pollId: string }) {
         ) : showResults ? (
           <>
             <span>{t("total", { count: total })}</span>
-            <span className="text-primary">{t("yourVote", { option: labelFor(yourVote) })}</span>
+            {yourVote ? (
+              <span className="text-primary">
+                {t("yourVote", { option: labelFor(yourVote) })}
+              </span>
+            ) : null}
             {!closed ? <span>{t("changeVote")}</span> : null}
           </>
         ) : (
-          <span>{closed ? t("total", { count: total }) : t("pickToSee")}</span>
+          <span>{t("pickToSee")}</span>
         )}
         {closed ? (
           <span className="inline-flex items-center gap-1">
@@ -133,6 +141,18 @@ export function PollCard({ pollId }: { pollId: string }) {
           </span>
         ) : null}
       </div>
+
+      {closed && resultsUrl ? (
+        <a
+          href={resultsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary underline-offset-4 hover:underline"
+        >
+          <ExternalLink className="h-3 w-3" />
+          {t("resultsReport")}
+        </a>
+      ) : null}
 
       {error ? (
         <p role="alert" className="text-xs text-destructive">

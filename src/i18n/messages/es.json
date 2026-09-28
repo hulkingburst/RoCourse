@@ -552,6 +552,7 @@
     "yourVote": "Tu voto: {option}",
     "changeVote": "Elige otra opción para cambiar tu voto.",
     "closed": "Votación cerrada",
+    "resultsReport": "Ver el informe completo de resultados",
     "unavailable": "Esta encuesta ya no está disponible.",
     "polls": {
       "2026-09-27-next-feature": {
@@ -571,6 +572,22 @@
           "alpha": "Opción A",
           "beta": "Opción B",
           "gamma": "Opción C"
+        }
+      },
+      "dev-closed-poll": {
+        "question": "Encuesta de prueba — ya cerrada",
+        "body": "Esta encuesta cerró hace varias horas. El voto está cerrado y el recuento final es visible para todos, pero la notificación sigue en la campana durante el resto del periodo de gracia.",
+        "options": {
+          "one": "Opción Uno",
+          "two": "Opción Dos"
+        }
+      },
+      "dev-expired-poll": {
+        "question": "Encuesta de prueba — cerrada hace días",
+        "body": "Esta encuesta cerró hace más tiempo del periodo de gracia. Su notificación nunca se crea y se elimina al instante; el recuento de abajo sigue disponible.",
+        "options": {
+          "red": "Opción Roja",
+          "blue": "Opción Azul"
         }
       }
     }
