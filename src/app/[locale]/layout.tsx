@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/react";
+import { CloudflareAnalytics } from "@/components/analytics/cloudflare-analytics";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -87,7 +88,11 @@ export default async function LocaleLayout({
             </AuthProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
-        <Analytics />
+        {process.env.NEXT_PUBLIC_ANALYTICS === "cloudflare" ? (
+          <CloudflareAnalytics />
+        ) : (
+          <Analytics />
+        )}
       </body>
     </html>
   );

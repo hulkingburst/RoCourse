@@ -7,12 +7,16 @@ export const SIGNUP_MAX_ATTEMPTS = 10;
 let lastPruneAt = 0;
 
 /**
- * Trusted client IP. Prefer x-real-ip (set by the edge proxy, so not spoofable
- * by the client), then fall back to the rightmost x-forwarded-for entry, which
- * is the one appended by the nearest trusted proxy. The leftmost entry is
- * client-supplied and must never be trusted for rate limiting.
+ * Trusted client IP. Prefer CF-Connecting-IP when present (set by Cloudflare
+ * at the edge, not spoofable by the client), then x-real-ip (set by the edge
+ * proxy, so not spoofable by the client), then fall back to the rightmost
+ * x-forwarded-for entry, which is the one appended by the nearest trusted
+ * proxy. The leftmost entry is client-supplied and must never be trusted for
+ * rate limiting.
  */
 export function trustedIp(headers: { get(name: string): string | null }): string {
+  const cf = headers.get("cf-connecting-ip")?.trim();
+  if (cf) return cf;
   const real = headers.get("x-real-ip")?.trim();
   if (real) return real;
   const forwarded = headers.get("x-forwarded-for");
@@ -24,9 +28,10 @@ export function trustedIp(headers: { get(name: string): string | null }): string
     const last = parts[parts.length - 1];
     if (last) return last;
   }
-  // On Vercel x-real-ip is always set, so "unknown" only surfaces in local/dev
-  // where there's no proxy. It's a shared bucket then, which merely throttles
-  // local traffic together — not a real risk.
+  // On Vercel x-real-ip is always set; behind Cloudflare cf-connecting-ip is
+  // always set, so "unknown" only surfaces in local/dev where there's no
+  // proxy. It's a shared bucket then, which merely throttles local traffic
+  // together — not a real risk.
   return "unknown";
 }
 

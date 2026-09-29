@@ -13,6 +13,8 @@ interface NotificationsState {
   notifications: AppNotification[];
   /** Set of update ids already surfaced (dedup site updates across sessions). */
   seenUpdateIds: string[];
+  /** Set of poll ids already surfaced (dedup feature polls across sessions). */
+  seenPollIds: string[];
   /** Set of badge ids whose "earned" notification already fired. */
   earnedBadgeKeys: string[];
   /** Ids that have been pushed to the server backup (idempotency guard). */
@@ -49,6 +51,13 @@ interface NotificationsState {
       createdAt: string;
     }[]
   ) => void;
+  /**
+   * Seeds poll notifications for unseen polls and records them as seen so they
+   * only surface once. The stored `title` is the poll id: the bell resolves
+   * the question and options through the i18n catalog, so the synced data stays
+   * locale-independent.
+   */
+  seedPolls: (polls: { id: string; createdAt: string }[]) => void;
   /** Fires a badge notification if it hasn't been fired before. */
   awardBadge: (
     badgeId: string,
@@ -111,6 +120,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       hydrated: false,
       notifications: [],
       seenUpdateIds: [],
+      seenPollIds: [],
       earnedBadgeKeys: [],
       backedUpIds: [],
       deletedIds: [],
@@ -183,6 +193,35 @@ export const useNotificationsStore = create<NotificationsState>()(
           };
         }),
 
+      seedPolls: (polls) =>
+        set((state) => {
+          const previousSeen = new Set(state.seenPollIds);
+          const deleted = new Set(state.deletedIds);
+          const owned: AppNotification[] = [];
+          for (const poll of polls) {
+            if (previousSeen.has(poll.id)) continue;
+            const id = `poll:${poll.id}`;
+            if (deleted.has(id)) continue;
+            owned.push({
+              id,
+              type: "poll",
+              // The poll id, not the question — localized by the bell UI.
+              title: poll.id,
+              body: null,
+              link: null,
+              createdAt: poll.createdAt,
+              read: false,
+            });
+          }
+          const notifications = owned.reduce(upsert, state.notifications);
+          const seenPollIds = [...state.seenPollIds, ...polls.map((p) => p.id)];
+          return {
+            notifications,
+            seenPollIds,
+            lastUpdated: owned.length > 0 ? nowIso() : state.lastUpdated,
+          };
+        }),
+
       awardBadge: (badgeId, title, opts) =>
         set((state) => {
           const key = `badge:${badgeId}`;
@@ -234,7 +273,12 @@ export const useNotificationsStore = create<NotificationsState>()(
           if (!exists && state.deletedIds.includes(id)) return state;
           return {
             notifications: state.notifications.filter((n) => n.id !== id),
-            deletedIds: [...state.deletedIds, id],
+            // Kept a set, not a log: the poll retire sweep names ids the user
+            // may have dismissed by hand already, and re-appending those would
+            // grow localStorage for no behavioural gain.
+            deletedIds: state.deletedIds.includes(id)
+              ? state.deletedIds
+              : [...state.deletedIds, id],
             // Pop it from the backup tracker so a later re-push can't resurrect
             // it; the server row is removed by the caller via the API.
             backedUpIds: state.backedUpIds.filter((backedId) => backedId !== id),
@@ -257,6 +301,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         set({
           notifications: [],
           seenUpdateIds: [],
+          seenPollIds: [],
           earnedBadgeKeys: [],
           backedUpIds: [],
           deletedIds: [],
@@ -270,6 +315,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       partialize: (state) => ({
         notifications: state.notifications,
         seenUpdateIds: state.seenUpdateIds,
+        seenPollIds: state.seenPollIds,
         earnedBadgeKeys: state.earnedBadgeKeys,
         backedUpIds: state.backedUpIds,
         deletedIds: state.deletedIds,

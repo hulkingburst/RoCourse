@@ -542,7 +542,55 @@
     "delete": "Eliminar",
     "view": "Ver",
     "done": "Hecho",
-    "noBody": "Sin detalles adicionales."
+    "noBody": "Sin detalles adicionales.",
+    "poll": "Votación de features"
+  },
+  "poll": {
+    "total": "{count, plural, =0 {Aún no hay votos} one {# voto} other {# votos}}",
+    "pickToSee": "Elige una opción para ver los resultados.",
+    "saving": "Guardando tu voto…",
+    "yourVote": "Tu voto: {option}",
+    "changeVote": "Elige otra opción para cambiar tu voto.",
+    "closed": "Votación cerrada",
+    "resultsReport": "Ver el informe completo de resultados",
+    "unavailable": "Esta encuesta ya no está disponible.",
+    "polls": {
+      "2026-09-27-next-feature": {
+        "question": "¿Qué deberíamos construir a continuación?",
+        "body": "Esta encuesta decide qué se hace después, así que elige lo que de verdad usarías. El ganador se construye primero.",
+        "options": {
+          "a": "Más lecciones de Advanced Studio",
+          "b": "Un curso completo de guardado con DataStore",
+          "c": "Proyectos de práctica con código inicial",
+          "d": "Modo oscuro y un certificado más bonito"
+        }
+      },
+      "dev-test-poll": {
+        "question": "Encuesta de prueba — ¿funciona el voto?",
+        "body": "Esta encuesta solo existe en desarrollo local. Ábrela, elige una opción y comprueba que el total se actualiza.",
+        "options": {
+          "alpha": "Opción A",
+          "beta": "Opción B",
+          "gamma": "Opción C"
+        }
+      },
+      "dev-closed-poll": {
+        "question": "Encuesta de prueba — ya cerrada",
+        "body": "Esta encuesta cerró hace varias horas. El voto está cerrado y el recuento final es visible para todos, pero la notificación sigue en la campana durante el resto del periodo de gracia.",
+        "options": {
+          "one": "Opción Uno",
+          "two": "Opción Dos"
+        }
+      },
+      "dev-expired-poll": {
+        "question": "Encuesta de prueba — cerrada hace días",
+        "body": "Esta encuesta cerró hace más tiempo del periodo de gracia. Su notificación nunca se crea y se elimina al instante; el recuento de abajo sigue disponible.",
+        "options": {
+          "red": "Opción Roja",
+          "blue": "Opción Azul"
+        }
+      }
+    }
   },
   "difficulty": {
     "beginner": "Principiante",
@@ -804,7 +852,7 @@
     "pageTitle": "Recursos",
     "pageIntro": "Recursos comunitarios seleccionados para desarrollo en Roblox. Cada elemento fue revisado por el autor del curso antes de publicarse.",
     "submitAction": "Enviar un recurso",
-"submitPageTitle": "Enviar un recurso",
+    "submitPageTitle": "Enviar un recurso",
     "submitPageIntro": "¿Has creado algo que valga la pena compartir? Envíalo y pasará a revisión del autor del curso. Los recursos aceptados aparecerán en la página de <link>Recursos</link>.",
     "ownerPicks": "Selecciones del autor",
     "noResourcesRecommended": "Aún no hay selecciones del autor.",

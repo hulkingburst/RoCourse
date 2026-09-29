@@ -4,6 +4,7 @@ import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limi
 import { ensureResourceLabels } from "@/lib/resources";
 import {
   CODE_LANGS,
+  isAllowedFileHost,
   MAX_AUTHOR,
   MAX_CODE,
   MAX_DESCRIPTION,
@@ -21,9 +22,6 @@ const LIMIT_PER_IP = 5;
 const LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const limitKey = (ip: string) => `resource-submit:${ip}`;
-
-// Only accept blobs that came from this project's Vercel Blob store.
-const BLOB_HOST_RE = /(^|\.)public\.blob\.vercel-storage\.com$/;
 
 const clean = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
 const cleanLine = (value: unknown): string => clean(value).replace(/[\r\n]+/g, " ");
@@ -104,7 +102,7 @@ export async function POST(request: Request) {
     } catch {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
-    if (!BLOB_HOST_RE.test(hostname)) {
+    if (!isAllowedFileHost(hostname)) {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
   } else if (hasUrl) {

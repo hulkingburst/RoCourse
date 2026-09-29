@@ -72,3 +72,14 @@ export const ZIP_ALLOWED_EXTENSIONS = new Set([
   "rbxm",
   "rbxmx",
 ]);
+
+/**
+ * Hosts the app accepts as a submission's file URL. Vercel Blob is the default
+ * store; when running on Cloudflare, R2_PUBLIC_HOST (a pub-*.r2.dev host) is
+ * enforced exactly, while legacy blob-hosted files keep validating.
+ */
+export function isAllowedFileHost(hostname: string): boolean {
+  if (/(^|\.)public\.blob\.vercel-storage\.com$/.test(hostname)) return true;
+  const r2Host = process.env.R2_PUBLIC_HOST;
+  return Boolean(r2Host) && hostname === r2Host;
+}

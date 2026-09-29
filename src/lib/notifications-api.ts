@@ -1,16 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { GITHUB_API, githubHeaders } from "@/lib/github-api";
 import type {
   AppNotification,
   NotificationState,
   NotificationType,
 } from "@/lib/notification-types";
-
-const GITHUB_API = "https://api.github.com";
-const githubHeaders = (token: string) => ({
-  Authorization: `Bearer ${token}`,
-  Accept: "application/vnd.github+json",
-  "X-GitHub-Api-Version": "2022-11-28",
-});
 
 const VALID_TYPES: NotificationType[] = [
   "update",

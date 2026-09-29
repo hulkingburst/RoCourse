@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated deploy output. ESLint does not read .gitignore, so without
+    // these a bare `eslint` walks ~2300 bundled chunks and dies with a V8
+    // heap OOM instead of linting the app.
+    ".open-next/**",
+    ".worker-next/**",
+    ".wrangler/**",
+    ".vercel/**",
     // Static assets served as-is (including the vendored Luau WASM glue).
     "public/**",
     // Plain Node scripts run outside the Next.js/TypeScript toolchain.

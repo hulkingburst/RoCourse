@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { Bell, BellRing, CheckCheck, ExternalLink, MessageSquareText, PartyPopper, ShieldAlert, Sparkles, LifeBuoy, X } from "lucide-react";
+import { Bell, BellRing, CheckCheck, ExternalLink, MessageSquareText, PartyPopper, ShieldAlert, Sparkles, LifeBuoy, Vote, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { BADGES } from "@/lib/badges";
 import {
@@ -11,6 +11,7 @@ import {
   unreadCount,
 } from "@/lib/notification-store";
 import type { AppNotification, NotificationType } from "@/lib/notification-types";
+import { PollCard } from "@/components/notifications/poll-card";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,7 @@ import {
 const TYPE_ICONS: Record<NotificationType, typeof Bell> = {
   update: Sparkles,
   badge: PartyPopper,
+  poll: Vote,
   feedback_received: MessageSquareText,
   feedback_closed: LifeBuoy,
   moderation: ShieldAlert,
@@ -51,6 +53,7 @@ function relativeTime(iso: string, now: number): string {
 export function NotificationBell() {
   const t = useTranslations("notifications");
   const badgeT = useTranslations("badge");
+  const pollT = useTranslations("poll");
   const { status } = useSession();
   const signedIn = status === "authenticated";
   const [open, setOpen] = React.useState(false);
@@ -73,6 +76,12 @@ export function NotificationBell() {
       return t("badgeUnlocked");
     }
     switch (n.type) {
+      case "poll":
+        // A poll's stored title is the poll id — surface the localized
+        // question here rather than a bare id in the list.
+        return pollT.has(`polls.${n.title}.question`)
+          ? pollT(`polls.${n.title}.question`)
+          : t("poll");
       case "feedback_received":
         return t("feedbackReceived");
       case "feedback_closed":
@@ -87,6 +96,9 @@ export function NotificationBell() {
   };
 
   const descriptionFor = (n: AppNotification): string | null => {
+    // A poll renders its own interactive body, so the reader shows the poll
+    // instead of this text.
+    if (n.type === "poll") return null;
     if (n.type === "badge") {
       // The stored title is the badge id — surface the localized badge name here
       // rather than the generic "No additional details" fallback.
@@ -249,7 +261,9 @@ export function NotificationBell() {
                 </DialogDescription>
               </DialogHeader>
               <div className="max-h-[45vh] overflow-y-auto">
-                {descriptionFor(selected) ? (
+                {selected.type === "poll" ? (
+                  <PollCard pollId={selected.title} />
+                ) : descriptionFor(selected) ? (
                   <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground">
                     {descriptionFor(selected)}
                   </p>
@@ -281,7 +295,10 @@ export function NotificationBell() {
                     </Button>
                   )
                 ) : (
-                  <Button size="sm" onClick={() => void deleteNotification(selected.id)}>
+                  // A poll stays in the bell when dismissed so the learner can
+                  // change their vote later; the explicit Delete is the only
+                  // thing that removes it.
+                  <Button size="sm" onClick={closeReader}>
                     {t("done")}
                   </Button>
                 )}

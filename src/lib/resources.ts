@@ -1,4 +1,5 @@
 import type { Resource, ResourceKind } from "@/lib/resources-shared";
+import { isAllowedFileHost } from "@/lib/resources-shared";
 
 /**
  * Submissions are filed as GitHub issues in the private feedback repo (one
@@ -127,7 +128,7 @@ function parseResource(issue: {
     } catch {
       return null;
     }
-    if (!/(^|\.)public\.blob\.vercel-storage\.com$/.test(hostname)) return null;
+    if (!isAllowedFileHost(hostname)) return null;
   }
   if (url) {
     let protocol: string;

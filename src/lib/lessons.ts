@@ -1,128 +1,64 @@
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
 import { courseSections } from "@content/course";
-import { slugify } from "@/lib/utils";
-import { countActivitySteps } from "@/lib/steps";
-import type {
-  CourseSection,
-  Heading,
-  Lesson,
-  LessonFrontmatter,
-  LessonMeta,
-  SearchEntry,
-} from "@/lib/types";
+import { CONTENT_SNAPSHOT } from "@/lib/content-snapshot";
+import {
+  listLessonFiles,
+  readLesson,
+  readLessonMetas,
+  readSearchEntries,
+  toSearchEntry,
+} from "@/lib/lesson-content";
+import type { CourseSection, Lesson, LessonMeta, SearchEntry } from "@/lib/types";
 
-const CONTENT_DIR = path.join(process.cwd(), "content", "lessons");
-
+/**
+ * The course content API. Everything the app asks about lessons comes through
+ * here, and it answers from one of two sources:
+ *
+ * - the lesson files on disk, which is what Vercel, `next dev` and
+ *   `next start` use; or
+ * - the snapshot baked into the bundle at build time, which is the only option
+ *   on Cloudflare Workers (OpenNext serves a read-only bundle, so `content/`
+ *   is simply not there and every disk read fails).
+ *
+ * The filesystem is preferred wherever it exists, so editing a lesson is picked
+ * up immediately and the committed snapshot can never serve stale content.
+ * See `src/lib/content-snapshot.ts`.
+ *
+ * All parsing lives in `src/lib/lesson-content.ts` — both sources derive from
+ * the same functions, so they cannot drift apart.
+ */
 const cache = new Map<string, unknown>();
 
-function listLessonFiles(): string[] {
-  return fs
-    .readdirSync(CONTENT_DIR)
-    .filter((file) => file.endsWith(".mdx"))
-    .sort();
-}
+/**
+ * Whether the lesson files are readable from this runtime. Probed once: on
+ * Workers the read throws (no filesystem), and a directory that exists but
+ * holds no `.mdx` files is treated the same way rather than reporting zero
+ * lessons.
+ */
+const hasLessonFiles = detectLessonFiles();
 
-function parseFrontmatter(raw: string): Record<string, unknown> {
-  const { data } = matter(raw);
-  return data;
-}
-
-function normalizeMeta(data: Record<string, unknown>, fileName: string): LessonFrontmatter {
-  const section = courseSections.find((s) => s.id === data.sectionId);
-  if (!section) {
-    throw new Error(
-      `Lesson "${fileName}" references unknown sectionId "${String(data.sectionId)}". ` +
-        `Valid sections: ${courseSections.map((s) => s.id).join(", ")}.`
+function detectLessonFiles(): boolean {
+  try {
+    if (listLessonFiles().length > 0) return true;
+    console.warn(
+      "[lessons] no lesson files on disk; serving the content snapshot baked at build time."
+    );
+  } catch (error) {
+    // Expected on Cloudflare, where the bundle carries no readable filesystem.
+    // Logged once per isolate so an operator can tell which source is live.
+    console.warn(
+      "[lessons] lesson files are unreadable in this runtime; serving the " +
+        "content snapshot baked at build time:",
+      error instanceof Error ? error.message : error
     );
   }
-  if (!data.slug || !data.title) {
-    throw new Error(
-      `Lesson "${fileName}" is missing required frontmatter fields "slug" or "title".`
-    );
-  }
-
-  return {
-    slug: String(data.slug),
-    title: String(data.title),
-    description: String(data.description ?? ""),
-    sectionId: section.id,
-    order: Number(data.order ?? 0),
-    difficulty: (data.difficulty as LessonMeta["difficulty"]) ?? "beginner",
-    estimatedMinutes: Number(data.estimatedMinutes ?? 10),
-    tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-    objectives: Array.isArray(data.objectives) ? data.objectives.map(String) : [],
-    prerequisites: Array.isArray(data.prerequisites)
-      ? data.prerequisites.map(String)
-      : [],
-    keywords: Array.isArray(data.keywords) ? data.keywords.map(String) : [],
-  };
-}
-
-function readLessonFile(slug: string): { raw: string; fileName: string } | null {
-  // Slugs come from the URL; keep them strictly safe so a crafted value can
-  // never escape CONTENT_DIR (defense-in-depth beyond dynamicParams = false).
-  if (!/^[a-z0-9-]+$/i.test(slug)) return null;
-  const fileName = `${slug}.mdx`;
-  const filePath = path.join(CONTENT_DIR, fileName);
-  if (!fs.existsSync(filePath)) return null;
-  return { raw: fs.readFileSync(filePath, "utf8"), fileName };
-}
-
-function stripFencedBlocks(source: string): string {
-  return source.replace(/```[\s\S]*?```/g, "");
-}
-
-export function extractHeadings(source: string): Heading[] {
-  const stripped = stripFencedBlocks(source);
-  const headings: Heading[] = [];
-  const seen = new Map<string, number>();
-  const pattern = /^(#{1,3})\s+(.+)$/gm;
-  let match: RegExpExecArray | null;
-
-  while ((match = pattern.exec(stripped)) !== null) {
-    const level = match[1].length;
-    const rawText = match[2]
-      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-      .replace(/`([^`]+)`/g, "$1")
-      .replace(/\*\*/g, "")
-      .trim();
-    let id = slugify(rawText) || "section";
-    const count = seen.get(id) ?? 0;
-    seen.set(id, count + 1);
-    if (count > 0) id = `${id}-${count + 1}`;
-    headings.push({ id, text: rawText, level });
-  }
-
-  return headings;
-}
-
-function toMeta(
-  data: Record<string, unknown>,
-  fileName: string,
-  source: string
-): LessonMeta {
-  const base = normalizeMeta(data, fileName);
-  const section = courseSections.find((s) => s.id === base.sectionId)!;
-  return {
-    ...base,
-    sectionTitle: section.title,
-    sectionOrder: section.order,
-    activityCount: countActivitySteps(source),
-  };
+  return false;
 }
 
 export function getLessonMeta(slug: string): LessonMeta | null {
   const cached = cache.get(`meta:${slug}`);
   if (cached !== undefined) return cached as LessonMeta | null;
 
-  const file = readLessonFile(slug);
-  if (!file) {
-    cache.set(`meta:${slug}`, null);
-    return null;
-  }
-  const meta = toMeta(parseFrontmatter(file.raw), file.fileName, file.raw);
+  const meta = getAllLessonMetas().find((entry) => entry.slug === slug) ?? null;
   cache.set(`meta:${slug}`, meta);
   return meta;
 }
@@ -131,15 +67,7 @@ export function getAllLessonMetas(): LessonMeta[] {
   const cached = cache.get("all:metas");
   if (cached) return cached as LessonMeta[];
 
-  const metas = listLessonFiles()
-    .map((fileName) => {
-      const raw = fs.readFileSync(path.join(CONTENT_DIR, fileName), "utf8");
-      return toMeta(parseFrontmatter(raw), fileName, raw);
-    })
-    .sort((a, b) =>
-      a.sectionOrder === b.sectionOrder ? a.order - b.order : a.sectionOrder - b.sectionOrder
-    );
-
+  const metas = hasLessonFiles ? readLessonMetas() : CONTENT_SNAPSHOT.metas;
   cache.set("all:metas", metas);
   return metas;
 }
@@ -162,23 +90,24 @@ export function getCourseStructure(): CourseSection[] {
   return structure;
 }
 
+/**
+ * One lesson's raw MDX, meta, and headings. Only statically generated routes
+ * may call this: it needs the lesson source, which the Cloudflare bundle does
+ * not carry (see the `ContentSnapshot` note on why raw MDX is excluded).
+ */
 export function getLesson(slug: string): Lesson | null {
+  if (!hasLessonFiles) {
+    throw new Error(
+      `Lesson source for "${slug}" is unavailable: this runtime has no lesson ` +
+        `files (Cloudflare serves a read-only bundle). Routes that render lesson ` +
+        `bodies must be statically generated — see src/lib/content-snapshot.ts.`
+    );
+  }
+
   const cached = cache.get(`lesson:${slug}`);
   if (cached !== undefined) return cached as Lesson | null;
 
-  const file = readLessonFile(slug);
-  if (!file) {
-    cache.set(`lesson:${slug}`, null);
-    return null;
-  }
-
-  const { content } = matter(file.raw);
-  const meta = toMeta(parseFrontmatter(file.raw), file.fileName, file.raw);
-  const lesson: Lesson = {
-    meta,
-    content,
-    headings: extractHeadings(file.raw),
-  };
+  const lesson = readLesson(slug);
   cache.set(`lesson:${slug}`, lesson);
   return lesson;
 }
@@ -199,22 +128,14 @@ export function getSearchIndex(): SearchEntry[] {
   const cached = cache.get("all:search");
   if (cached) return cached as SearchEntry[];
 
-  const entries = listLessonFiles().map((fileName) => {
-    const raw = fs.readFileSync(path.join(CONTENT_DIR, fileName), "utf8");
-    const meta = toMeta(parseFrontmatter(raw), fileName, raw);
-    return {
-      slug: meta.slug,
-      title: meta.title,
-      description: meta.description,
-      sectionId: meta.sectionId,
-      sectionTitle: meta.sectionTitle,
-      difficulty: meta.difficulty,
-      estimatedMinutes: meta.estimatedMinutes,
-      tags: meta.tags,
-      keywords: meta.keywords ?? [],
-      headings: extractHeadings(raw).map((h) => h.text),
-    } satisfies SearchEntry;
-  });
+  // The disk path yields entries in file-name order; the snapshot path sorts by
+  // slug to match (a lesson's file is always `<slug>.mdx`), so search ranks
+  // results identically on both hosting targets.
+  const entries = hasLessonFiles
+    ? readSearchEntries()
+    : [...CONTENT_SNAPSHOT.metas]
+        .sort((a, b) => (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0))
+        .map((meta) => toSearchEntry(meta, CONTENT_SNAPSHOT.headings[meta.slug] ?? []));
 
   cache.set("all:search", entries);
   return entries;

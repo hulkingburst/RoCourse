@@ -1,10 +1,28 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { compileLesson } from "@/lib/mdx";
-import { getLesson, getLessonMeta } from "@/lib/lessons";
+import { getCourseStructure, getLesson, getLessonMeta } from "@/lib/lessons";
 import { splitLessonSource } from "@/lib/steps";
 import { LessonProvider } from "@/components/lessons/lesson-provider";
 import { ReviewLesson } from "@/components/review/review-lesson";
+import { routing } from "@/i18n/routing";
+
+/**
+ * Pre-rendered like `/lessons/[slug]`: the page renders a lesson's steps and
+ * the client picks out the missed ones from local progress, so there is nothing
+ * per-request about it. Staying static is also what keeps the Cloudflare build
+ * working — reading lesson source at request time is impossible there (see
+ * `src/lib/content-snapshot.ts`).
+ */
+export function generateStaticParams() {
+  return getCourseStructure()
+    .flatMap((section) => section.lessons)
+    .flatMap((lesson) =>
+      routing.locales.map((locale) => ({ locale, slug: lesson.slug }))
+    );
+}
+
+export const dynamicParams = false;
 
 type ReviewLessonParams = Promise<{ locale: string; slug: string }>;
 

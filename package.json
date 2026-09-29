@@ -9,9 +9,17 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "vercel-build": "node scripts/vercel-build.js"
+    "content:snapshot": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-content-snapshot.mjs",
+    "vercel-build": "node scripts/vercel-build.js",
+    "cf-build": "npm run content:snapshot && opennextjs-cloudflare build && opennextjs-cloudflare populateCache local",
+    "cf-preview": "npm run cf-build && opennextjs-cloudflare preview",
+    "cf-deploy": "npm run cf-build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1141.0",
+    "@aws-sdk/s3-request-presigner": "^3.1141.0",
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-neon": "^6.19.3",
     "@prisma/adapter-pg": "^6.19.3",
     "@prisma/client": "^6.19.3",
     "@radix-ui/react-dialog": "^1.1.23",
@@ -45,6 +53,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.6",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^20",
@@ -55,7 +64,8 @@
     "eslint-config-next": "16.3.0",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.141.0"
   },
   "overrides": {
     "nanoid": "3.3.18",
