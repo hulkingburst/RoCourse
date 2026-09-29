@@ -14,4 +14,10 @@ if (process.env.DATABASE_URL) {
   }
 }
 
+// Rebuild the committed lesson snapshot first. The app reads the lesson files
+// directly wherever a filesystem exists (so this changes nothing about what
+// Vercel serves), but refreshing it here keeps the no-filesystem fallback that
+// the Cloudflare build relies on from ever drifting away from the content.
+execSync("npm run content:snapshot", { stdio: "inherit", shell: true });
+
 execSync("npx next build", { stdio: "inherit", shell: true });

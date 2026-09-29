@@ -1,0 +1,6366 @@
+{
+  "metas": [
+    {
+      "slug": "welcome",
+      "title": "Welcome — how this course works",
+      "description": "What this course is, who it's for, and how to get the most out of it.",
+      "sectionId": "getting-started",
+      "order": 0,
+      "difficulty": "beginner",
+      "estimatedMinutes": 3,
+      "tags": [
+        "course",
+        "overview"
+      ],
+      "objectives": [
+        "Know what you'll be able to build by the end",
+        "Know how the stepped lessons work",
+        "Know the one habit that makes the course work"
+      ],
+      "prerequisites": [],
+      "keywords": [],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 1
+    },
+    {
+      "slug": "installing-studio",
+      "title": "Install Roblox Studio",
+      "description": "Download Roblox Studio, sign in, and open a fresh Baseplate project.",
+      "sectionId": "getting-started",
+      "order": 1,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "install",
+        "studio",
+        "setup"
+      ],
+      "objectives": [
+        "Install Roblox Studio and sign in",
+        "Create and save a Baseplate project",
+        "Reopen your place from the home page"
+      ],
+      "prerequisites": [],
+      "keywords": [],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 1
+    },
+    {
+      "slug": "studio-interface",
+      "title": "Finding your way around Studio",
+      "description": "The Explorer, Properties, and Output panels — the three places you'll live in as a developer.",
+      "sectionId": "getting-started",
+      "order": 2,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "studio",
+        "interface",
+        "explorer",
+        "properties",
+        "output"
+      ],
+      "objectives": [
+        "Identify the Explorer, Properties, and Output panels",
+        "Explain what each panel is for",
+        "Show and hide panels from the View menu"
+      ],
+      "prerequisites": [
+        "installing-studio"
+      ],
+      "keywords": [
+        "explorer",
+        "properties",
+        "output",
+        "panel",
+        "ui"
+      ],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 1
+    },
+    {
+      "slug": "workspace-parts",
+      "title": "The Workspace and parts",
+      "description": "Build your first objects — parts in the Workspace, and the three numbers that place anything in 3D space.",
+      "sectionId": "getting-started",
+      "order": 3,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "workspace",
+        "parts",
+        "building",
+        "properties"
+      ],
+      "objectives": [
+        "Understand that the Workspace holds everything visible in a game",
+        "Insert, move, resize, and recolor parts",
+        "Read and change Position and Size in Properties"
+      ],
+      "prerequisites": [
+        "studio-interface"
+      ],
+      "keywords": [
+        "parts",
+        "workspace",
+        "position",
+        "studio build"
+      ],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 1
+    },
+    {
+      "slug": "play-testing",
+      "title": "Playtesting and your first script",
+      "description": "Press Play, run your first script, and learn why test changes don't stick around.",
+      "sectionId": "getting-started",
+      "order": 4,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "playtest",
+        "output",
+        "print",
+        "scripts"
+      ],
+      "objectives": [
+        "Playtest and stop a place safely",
+        "Understand what happens to changes made during a test",
+        "Run a tiny script that prints a message"
+      ],
+      "prerequisites": [
+        "workspace-parts"
+      ],
+      "keywords": [
+        "play",
+        "playtest",
+        "print",
+        "script"
+      ],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 1
+    },
+    {
+      "slug": "output-errors",
+      "title": "The Output window and errors",
+      "description": "Read error messages like a pro — which script, which line, and what went wrong.",
+      "sectionId": "getting-started",
+      "order": 5,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "output",
+        "error",
+        "debugging"
+      ],
+      "objectives": [
+        "[object Object]",
+        "Create an error on purpose and understand it",
+        "Adopt the habit of checking Output first"
+      ],
+      "prerequisites": [
+        "play-testing"
+      ],
+      "keywords": [
+        "output",
+        "error",
+        "print",
+        "debugging"
+      ],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 2
+    },
+    {
+      "slug": "bug-hunt-first",
+      "title": "Bug hunt — your first fixes",
+      "description": "A calm first hunt — read the red text, spot the typo, fix the line, and press Play again.",
+      "sectionId": "getting-started",
+      "order": 6,
+      "difficulty": "beginner",
+      "estimatedMinutes": 6,
+      "tags": [
+        "bug-hunt",
+        "debugging",
+        "errors",
+        "review"
+      ],
+      "objectives": [
+        "Read an error and find its line",
+        "Spot typos in a script",
+        "Fix a broken line and retest"
+      ],
+      "prerequisites": [
+        "output-errors"
+      ],
+      "keywords": [
+        "bug-hunt",
+        "fix",
+        "error",
+        "output"
+      ],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 5
+    },
+    {
+      "slug": "recap-studio",
+      "title": "Recap — a quick tour of the start",
+      "description": "A short refresher over Studio, parts, playtesting, and reading errors before the real coding begins.",
+      "sectionId": "luau-basics",
+      "order": 0,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "recap",
+        "review",
+        "getting-started",
+        "studio"
+      ],
+      "objectives": [
+        "Remember the Explorer, Properties, and Output panels",
+        "Remember how Play and Stop work",
+        "Remember how to read an error message"
+      ],
+      "prerequisites": [
+        "output-errors"
+      ],
+      "keywords": [
+        "recap",
+        "review",
+        "explorer",
+        "play",
+        "output"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "scripts",
+      "title": "Scripts — where code lives and runs",
+      "description": "What a script actually is, the difference between Scripts and LocalScripts, and how instructions run top to bottom.",
+      "sectionId": "luau-basics",
+      "order": 1,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "scripts",
+        "localscript",
+        "server",
+        "client"
+      ],
+      "objectives": [
+        "Explain the difference between a Script and a LocalScript",
+        "Read a script as a list of instructions that runs top to bottom",
+        "Know how to find where a script is running from (script.Parent)"
+      ],
+      "prerequisites": [
+        "play-testing"
+      ],
+      "keywords": [
+        "script",
+        "localscript",
+        "server",
+        "client",
+        "roblox scripting"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "variables",
+      "title": "Variables — remembering things",
+      "description": "Store a number, a word, or an object in a named box called a variable, and change what's inside it.",
+      "sectionId": "luau-basics",
+      "order": 2,
+      "difficulty": "beginner",
+      "estimatedMinutes": 8,
+      "tags": [
+        "variables",
+        "assignment",
+        "naming"
+      ],
+      "objectives": [
+        "Declare a variable with local and give it a value",
+        "Reassign a variable's value later in the script",
+        "Name variables clearly so code reads like English"
+      ],
+      "prerequisites": [
+        "scripts"
+      ],
+      "keywords": [
+        "variable",
+        "local",
+        "assignment",
+        "naming",
+        "luau"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 4
+    },
+    {
+      "slug": "variable-naming",
+      "title": "Naming variables well",
+      "description": "The naming rules every variable follows, the camelCase style Roblox uses, and why good names beat good luck.",
+      "sectionId": "luau-basics",
+      "order": 3,
+      "difficulty": "beginner",
+      "estimatedMinutes": 3,
+      "tags": [
+        "variables",
+        "naming",
+        "style"
+      ],
+      "objectives": [
+        "[object Object]",
+        "Use camelCase for multi-word variable names",
+        "Name variables after what they are"
+      ],
+      "prerequisites": [
+        "variables"
+      ],
+      "keywords": [
+        "naming",
+        "camelcase",
+        "identifier",
+        "variables"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 2
+    },
+    {
+      "slug": "types",
+      "title": "Types — numbers, strings, and booleans",
+      "description": "The kinds of values you can put in a variable, why \"1\" is not 1, and how to convert between them.",
+      "sectionId": "luau-basics",
+      "order": 4,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "types",
+        "numbers",
+        "strings",
+        "booleans",
+        "nil"
+      ],
+      "objectives": [
+        "Distinguish numbers, strings, booleans, and nil",
+        "Convert between text and numbers with tostring and tonumber",
+        "Explain why \"1\" + 1 is an error but 1 + 1 is not"
+      ],
+      "prerequisites": [
+        "variables"
+      ],
+      "keywords": [
+        "types",
+        "number",
+        "string",
+        "boolean",
+        "nil",
+        "tostring",
+        "tonumber"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "numbers",
+      "title": "Numbers and math",
+      "description": "Add, subtract, multiply, divide, and find remainders — the arithmetic your game does a thousand times a day.",
+      "sectionId": "luau-basics",
+      "order": 5,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "numbers",
+        "math",
+        "arithmetic"
+      ],
+      "objectives": [
+        "Use the five arithmetic operators",
+        "Combine operators with parentheses",
+        "Write a score that goes up by more than one at a time"
+      ],
+      "prerequisites": [
+        "types"
+      ],
+      "keywords": [
+        "numbers",
+        "math",
+        "operators",
+        "arithmetic",
+        "modulo"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 2
+    },
+    {
+      "slug": "strings",
+      "title": "Strings — text in code",
+      "description": "Quotes, concatenation with .., and building messages that include numbers — text is how your game talks to players.",
+      "sectionId": "luau-basics",
+      "order": 6,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "strings",
+        "concatenation",
+        "text"
+      ],
+      "objectives": [
+        "Write strings with single or double quotes",
+        "Glue strings and numbers together with ..",
+        "Build a message that changes as the game changes"
+      ],
+      "prerequisites": [
+        "types"
+      ],
+      "keywords": [
+        "string",
+        "concatenation",
+        "quotes",
+        "text",
+        "luau"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 2
+    },
+    {
+      "slug": "string-patterns",
+      "title": "String patterns — finding and replacing text",
+      "description": "Search inside strings, extract parts, and swap text with pattern matching — the tools that turn raw text into useful data.",
+      "sectionId": "luau-basics",
+      "order": 7,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "string",
+        "pattern",
+        "gmatch",
+        "gsub",
+        "find"
+      ],
+      "objectives": [
+        "Use string.find to locate text inside a string",
+        "Use string.gsub to replace matches in a string",
+        "Use string.match to pull specific parts out of text",
+        "Understand basic pattern characters like %d and %a"
+      ],
+      "prerequisites": [
+        "strings"
+      ],
+      "keywords": [
+        "string",
+        "pattern",
+        "gmatch",
+        "gsub",
+        "find",
+        "match",
+        "replace",
+        "text",
+        "luau"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "booleans",
+      "title": "Booleans — yes, no, maybe",
+      "description": "True and false, comparing values with == and friends, and combining questions with and / or.",
+      "sectionId": "luau-basics",
+      "order": 8,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "booleans",
+        "comparison",
+        "logic"
+      ],
+      "objectives": [
+        "Compare values with ==, ~=, <, >, <=, >=",
+        "Combine conditions with and / or",
+        "Store a yes-or-no answer in a boolean variable"
+      ],
+      "prerequisites": [
+        "types"
+      ],
+      "keywords": [
+        "boolean",
+        "comparison",
+        "and",
+        "or",
+        "true",
+        "false"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "functions",
+      "title": "Functions — reusable instructions",
+      "description": "Wrap a job in a named function, give it inputs, and call it whenever you need that job done.",
+      "sectionId": "luau-basics",
+      "order": 9,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "functions",
+        "parameters",
+        "arguments"
+      ],
+      "objectives": [
+        "Define a function with function name() ... end",
+        "Pass inputs through parameters",
+        "Call a function whenever you need that job done"
+      ],
+      "prerequisites": [
+        "types"
+      ],
+      "keywords": [
+        "function",
+        "parameter",
+        "argument",
+        "luau"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "function-returns",
+      "title": "Getting answers back — return",
+      "description": "A function that computes a result and hands it to you with return — so calls become values.",
+      "sectionId": "luau-basics",
+      "order": 10,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "functions",
+        "return",
+        "output"
+      ],
+      "objectives": [
+        "Send a result out of a function with return",
+        "Use the call site as a value in a larger expression",
+        "Explain what happens after a function hits return"
+      ],
+      "prerequisites": [
+        "functions",
+        "numbers"
+      ],
+      "keywords": [
+        "return",
+        "function",
+        "output",
+        "value"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "conditionals",
+      "title": "Conditionals — if this, then that",
+      "description": "Make your scripts decide things — check a condition, and run different code depending on the answer.",
+      "sectionId": "luau-basics",
+      "order": 11,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "conditionals",
+        "if",
+        "else",
+        "elseif"
+      ],
+      "objectives": [
+        "Write if, elseif, and else branches",
+        "Explain that only one branch runs",
+        "Check a condition with and / or"
+      ],
+      "prerequisites": [
+        "booleans"
+      ],
+      "keywords": [
+        "if",
+        "else",
+        "elseif",
+        "comparison",
+        "luau"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "loops",
+      "title": "Loops — doing things over and over",
+      "description": "Run code forever, or until a condition changes — the heartbeat of every game.",
+      "sectionId": "luau-basics",
+      "order": 12,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "loops",
+        "while",
+        "repeat",
+        "task.wait"
+      ],
+      "objectives": [
+        "Write a while loop that runs forever with a wait between iterations",
+        "Write a while loop whose condition eventually turns false",
+        "Avoid the infinite loop that freezes your game"
+      ],
+      "prerequisites": [
+        "conditionals"
+      ],
+      "keywords": [
+        "while",
+        "repeat",
+        "task.wait",
+        "infinite loop"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "for-loops",
+      "title": "Counting with for loops",
+      "description": "When you know how many times to run, let for keep the counter — reward every player, spawn 5 obstacles, print 1 to 10.",
+      "sectionId": "luau-basics",
+      "order": 13,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "loops",
+        "for",
+        "counter"
+      ],
+      "objectives": [
+        "Write a for loop that runs a set number of times",
+        "Use the loop's counter variable inside the body",
+        "Count backward and in steps"
+      ],
+      "prerequisites": [
+        "loops"
+      ],
+      "keywords": [
+        "for",
+        "loop",
+        "counter",
+        "numeric for"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "tables",
+      "title": "Tables — boxes that hold many things",
+      "description": "List values in one box, count them, and pull values out by number — your first data structure.",
+      "sectionId": "luau-basics",
+      "order": 14,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "tables",
+        "arrays",
+        "data"
+      ],
+      "objectives": [
+        "Build a table with {} and read values with [n]",
+        "Add to a table with table.insert",
+        "Loop through a table with ipairs"
+      ],
+      "prerequisites": [
+        "variables",
+        "for-loops"
+      ],
+      "keywords": [
+        "table",
+        "array",
+        "ipairs",
+        "table.insert"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "task-wait",
+      "title": "Timing — task.wait and friends",
+      "description": "Pause a script, schedule work for later, and run two things at once — the clock behind every animation.",
+      "sectionId": "luau-basics",
+      "order": 15,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "task",
+        "wait",
+        "timing",
+        "coroutine"
+      ],
+      "objectives": [
+        "Pause a script with task.wait",
+        "Delay a single action with task.delay",
+        "Explain the difference between pausing and delaying"
+      ],
+      "prerequisites": [
+        "loops",
+        "functions"
+      ],
+      "keywords": [
+        "task",
+        "wait",
+        "delay",
+        "spawn",
+        "timing"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 2
+    },
+    {
+      "slug": "comments",
+      "title": "Comments — notes for your future self",
+      "description": "Leave plain-English notes in your code with -- so you and anyone else can understand what a script does.",
+      "sectionId": "luau-basics",
+      "order": 16,
+      "difficulty": "beginner",
+      "estimatedMinutes": 3,
+      "tags": [
+        "comments",
+        "readability",
+        "style"
+      ],
+      "objectives": [
+        "Write single-line comments with --",
+        "Comment the why, not the what",
+        "Keep comments true when you edit code"
+      ],
+      "prerequisites": [
+        "scripts"
+      ],
+      "keywords": [
+        "comments",
+        "readability",
+        "double dash"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 2
+    },
+    {
+      "slug": "events",
+      "title": "Events — reacting to the world",
+      "description": "Instead of watching and waiting, let Roblox call your code when something happens — a touch, a click, a player joining.",
+      "sectionId": "luau-basics",
+      "order": 17,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "events",
+        "connect",
+        "touched",
+        "clickdetector"
+      ],
+      "objectives": [
+        "Hook up a function to an event with .Connect",
+        "Use the .Touched event of a part",
+        "Use a ClickDetector for a part you can click"
+      ],
+      "prerequisites": [
+        "functions",
+        "task-wait"
+      ],
+      "keywords": [
+        "event",
+        "connect",
+        "touched",
+        "clickdetector",
+        "callback"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 3
+    },
+    {
+      "slug": "bug-hunt-basics",
+      "title": "Bug hunt — the language core",
+      "description": "Hunt down real bugs in variables, conditionals, loops, and functions — and type the one-line fixes.",
+      "sectionId": "luau-basics",
+      "order": 18,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "bug-hunt",
+        "debugging",
+        "luau",
+        "review"
+      ],
+      "objectives": [
+        "Spot missing locals and wrong comparisons",
+        "Explain why an infinite loop freezes a game",
+        "Type one-line fixes for the classic core bugs"
+      ],
+      "prerequisites": [
+        "events"
+      ],
+      "keywords": [
+        "bug-hunt",
+        "fix",
+        "variable",
+        "loop",
+        "function"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 6
+    },
+    {
+      "slug": "arrange-code-basics",
+      "title": "Drag and drop — arrange the code",
+      "description": "Assemble working scripts from shuffled lines — functions, choices, loops, and events — without typing a thing.",
+      "sectionId": "luau-basics",
+      "order": 19,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "arrange",
+        "drag-and-drop",
+        "review",
+        "luau"
+      ],
+      "objectives": [
+        "Assemble a function and its call in the right order",
+        "Order a conditional's branches correctly",
+        "Arrange a loop and an event connect"
+      ],
+      "prerequisites": [
+        "bug-hunt-basics"
+      ],
+      "keywords": [
+        "arrange",
+        "order",
+        "drag",
+        "drop",
+        "review"
+      ],
+      "sectionTitle": "Luau Basics",
+      "sectionOrder": 1,
+      "activityCount": 5
+    },
+    {
+      "slug": "recap-basics",
+      "title": "Recap — the Luau toolbox",
+      "description": "Refresh variables, functions, conditionals, loops, tables, and events — the parts of the language you'll use all course long.",
+      "sectionId": "data",
+      "order": 0,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "recap",
+        "review",
+        "luau",
+        "basics"
+      ],
+      "objectives": [
+        "Remember how to store and change values with variables",
+        "Remember how functions and conditionals work",
+        "Remember how loops, tables, and events fit together"
+      ],
+      "prerequisites": [
+        "events"
+      ],
+      "keywords": [
+        "recap",
+        "review",
+        "variables",
+        "functions",
+        "events"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 4
+    },
+    {
+      "slug": "leaderstats",
+      "title": "leaderstats — the player leaderboard",
+      "description": "Show each player's stats at the top-right of the screen, and update them from scripts.",
+      "sectionId": "data",
+      "order": 1,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "leaderstats",
+        "leaderboard",
+        "stats"
+      ],
+      "objectives": [
+        "Create the Leaderstats folder for a player",
+        "Add and update number stats",
+        "Trigger it with PlayerAdded"
+      ],
+      "prerequisites": [
+        "events",
+        "variables"
+      ],
+      "keywords": [
+        "leaderstats",
+        "leaderboard",
+        "playeradded",
+        "stats"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 3
+    },
+    {
+      "slug": "player-added",
+      "title": "Players — who is in your game",
+      "description": "The Players service, the PlayerAdded event that greets everyone who joins, and why the server knows who's asking.",
+      "sectionId": "data",
+      "order": 2,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "players",
+        "playeradded",
+        "service"
+      ],
+      "objectives": [
+        "Grab a service with game:GetService",
+        "Greet every joining player with PlayerAdded",
+        "Recognize LocalPlayer on the client side"
+      ],
+      "prerequisites": [
+        "events"
+      ],
+      "keywords": [
+        "players",
+        "playeradded",
+        "localplayer",
+        "service"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 3
+    },
+    {
+      "slug": "user-id",
+      "title": "UserId — the permanent key",
+      "description": "Player names change and get recycled — UserId is the number that identifies one person forever.",
+      "sectionId": "data",
+      "order": 3,
+      "difficulty": "beginner",
+      "estimatedMinutes": 3,
+      "tags": [
+        "userid",
+        "identity",
+        "keys"
+      ],
+      "objectives": [
+        "Read a player's UserId",
+        "Explain why UserId beats player.Name as a key",
+        "Use UserId to address one specific player"
+      ],
+      "prerequisites": [
+        "leaderstats"
+      ],
+      "keywords": [
+        "userid",
+        "key",
+        "identity",
+        "datastore"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 2
+    },
+    {
+      "slug": "datastores",
+      "title": "DataStores — saving between visits",
+      "description": "Give your game a real memory with DataStoreService, so a player's coins survive the game closing.",
+      "sectionId": "data",
+      "order": 4,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "datastore",
+        "save",
+        "load",
+        "persistence"
+      ],
+      "objectives": [
+        "Get a DataStore with GetDataStore",
+        "Save with SetAsync and load with GetAsync",
+        "Explain the key / value shape of a store"
+      ],
+      "prerequisites": [
+        "leaderstats",
+        "user-id"
+      ],
+      "keywords": [
+        "datastore",
+        "dataservice",
+        "save",
+        "load",
+        "setasync",
+        "getasync"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 3
+    },
+    {
+      "slug": "pcall",
+      "title": "pcall — running code that might fail",
+      "description": "Wrap risky calls in pcall so a single DataStore error doesn't crash your entire game — the safety net every data script needs.",
+      "sectionId": "data",
+      "order": 5,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "pcall",
+        "error",
+        "protected call",
+        "datastore",
+        "safety"
+      ],
+      "objectives": [
+        "Wrap a DataStore call in pcall to catch errors without crashing",
+        "Read the success flag and error message from pcall's return values",
+        "Use pcall for any operation that might fail at runtime"
+      ],
+      "prerequisites": [
+        "datastores"
+      ],
+      "keywords": [
+        "pcall",
+        "protected call",
+        "error handling",
+        "datastores",
+        "safety",
+        "luau"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 2
+    },
+    {
+      "slug": "loading-data",
+      "title": "Loading a player's data",
+      "description": "Pull a player's save on join, default brand-new players to zero, and hand the number to leaderstats.",
+      "sectionId": "data",
+      "order": 6,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "loading",
+        "getasync",
+        "nil"
+      ],
+      "objectives": [
+        "Load saved data inside PlayerAdded",
+        "Handle the nil case for brand-new players",
+        "Pass the loaded value into leaderstats"
+      ],
+      "prerequisites": [
+        "datastores",
+        "user-id"
+      ],
+      "keywords": [
+        "getasync",
+        "loading",
+        "nil",
+        "defaults"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 3
+    },
+    {
+      "slug": "data-security",
+      "title": "Data security — never trust the player",
+      "description": "Why the server is the only one who can give out coins, and what happens when you forget.",
+      "sectionId": "data",
+      "order": 7,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "security",
+        "exploiters",
+        "server",
+        "authority"
+      ],
+      "objectives": [
+        "Explain why the server must be the source of truth",
+        "Recognize the exploit where clients give themselves rewards",
+        "Understand what players can and can't change from their own computer"
+      ],
+      "prerequisites": [
+        "datastores",
+        "events"
+      ],
+      "keywords": [
+        "security",
+        "exploiter",
+        "server authority",
+        "trust"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 4
+    },
+    {
+      "slug": "save-loop",
+      "title": "The save loop and autosave",
+      "description": "Save on leave, and back that up with periodic autosaves so a crash can't wipe an hour of progress.",
+      "sectionId": "data",
+      "order": 8,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "saving",
+        "playerremoving",
+        "autosave"
+      ],
+      "objectives": [
+        "Save a player's data on PlayerRemoving",
+        "Run a periodic autosave with task.spawn",
+        "Explain why saving only on leave is risky"
+      ],
+      "prerequisites": [
+        "loading-data",
+        "task-wait"
+      ],
+      "keywords": [
+        "save",
+        "playerremoving",
+        "autosave",
+        "task.spawn"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 3
+    },
+    {
+      "slug": "remotes",
+      "title": "RemoteEvents — the client asks, the server decides",
+      "description": "The secure bridge between player and server, and the pattern that keeps your economy safe.",
+      "sectionId": "data",
+      "order": 9,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "remoteevent",
+        "fireclient",
+        "fireallclients",
+        "communication"
+      ],
+      "objectives": [
+        "Create a RemoteEvent shared between client and server",
+        "Fire from the client with FireServer and handle it on the server",
+        "Send updates from the server with FireClient / FireAllClients"
+      ],
+      "prerequisites": [
+        "data-security",
+        "events"
+      ],
+      "keywords": [
+        "remoteevent",
+        "fireclient",
+        "fireallclients",
+        "fireserver",
+        "networking"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 4
+    },
+    {
+      "slug": "rate-limiting",
+      "title": "Rate limiting — slow down the flood",
+      "description": "Stop request spam at the server with per-player limits, and learn why a client debounce can never protect your game.",
+      "sectionId": "data",
+      "order": 10,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "ratelimit",
+        "cooldown",
+        "debounce",
+        "security",
+        "remotes"
+      ],
+      "objectives": [
+        "Explain why client-side timing can't protect your server",
+        "Tell a cooldown, debounce, and rate limit apart",
+        "Enforce a per-player limit in Luau on the server",
+        "Clean up per-player state when the player leaves"
+      ],
+      "prerequisites": [
+        "remotes",
+        "data-security"
+      ],
+      "keywords": [
+        "ratelimit",
+        "cooldown",
+        "debounce",
+        "throttle",
+        "remoteevent",
+        "spam"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 4
+    },
+    {
+      "slug": "server-authority",
+      "title": "Server authority — the server is the referee",
+      "description": "Keep every rule on the server — recompute real prices, verify ownership, and let the client only report what it wants.",
+      "sectionId": "data",
+      "order": 11,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "security",
+        "authority",
+        "validation",
+        "remotes",
+        "server"
+      ],
+      "objectives": [
+        "Explain why authority means the server owns the rules, not just the code",
+        "Recompute the real values on the server instead of trusting client numbers",
+        "Verify ownership and affordability before rewarding",
+        "Reject silently when a request doesn't hold up"
+      ],
+      "prerequisites": [
+        "remotes",
+        "rate-limiting",
+        "data-security"
+      ],
+      "keywords": [
+        "server",
+        "authority",
+        "trust",
+        "validate",
+        "remote",
+        "price",
+        "exploit"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 2
+    },
+    {
+      "slug": "input-validation",
+      "title": "Input validation — never trust a string",
+      "description": "Double-check everything a player types or sends — shape, length, and control characters — before the server acts on it.",
+      "sectionId": "data",
+      "order": 12,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "validation",
+        "security",
+        "input",
+        "strings",
+        "sanitize",
+        "remotes"
+      ],
+      "objectives": [
+        "Explain why every value from a client is text you must verify, not a fact",
+        "Type-check arguments that cross a remote before using them",
+        "Enforce length limits and strip control characters on the server",
+        "Guard free-typed text with whitelist patterns from the string patterns lesson"
+      ],
+      "prerequisites": [
+        "server-authority",
+        "rate-limiting",
+        "string-patterns"
+      ],
+      "keywords": [
+        "validation",
+        "sanitize",
+        "input",
+        "trust",
+        "remote",
+        "tonumber",
+        "pattern",
+        "string"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 4
+    },
+    {
+      "slug": "security-audit",
+      "title": "Security audit — hunt the gaps in your wall",
+      "description": "Walk your game with an exploiter's checklist — every remote, every trust boundary, every free-typed value — and harden each gap before you ship.",
+      "sectionId": "data",
+      "order": 13,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "security",
+        "audit",
+        "remotes",
+        "validation",
+        "authority",
+        "review"
+      ],
+      "objectives": [
+        "Build a map of every trust boundary by inventorying your remotes",
+        "[object Object]",
+        "Harden the two most common findings — unchecked arguments and client-owned prices",
+        "Audit free-typed text before publishing"
+      ],
+      "prerequisites": [
+        "input-validation",
+        "server-authority",
+        "rate-limiting",
+        "data-security"
+      ],
+      "keywords": [
+        "audit",
+        "security",
+        "remote",
+        "trust",
+        "exploit",
+        "checklist",
+        "harden"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 6
+    },
+    {
+      "slug": "bug-hunt-data",
+      "title": "Bug hunt — player data",
+      "description": "Hunt down the classic save-and-load bugs — swapped keys, missing defaults, and a leaderboard that never appears.",
+      "sectionId": "data",
+      "order": 14,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "bug-hunt",
+        "debugging",
+        "data",
+        "review"
+      ],
+      "objectives": [
+        "Spot swapped key/value arguments in SetAsync",
+        "Remember the or 0 default for new players",
+        "Recognize misspelled leaderstats and wrong save timing"
+      ],
+      "prerequisites": [
+        "remotes"
+      ],
+      "keywords": [
+        "bug-hunt",
+        "fix",
+        "datastore",
+        "leaderstats",
+        "save"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 6
+    },
+    {
+      "slug": "funnel-analysis",
+      "title": "Funnel analysis — find where players leave",
+      "description": "Use player drop-off data to find where players leave or get stuck, then fix the one leak that costs you the most players.",
+      "sectionId": "data",
+      "order": 15,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 10,
+      "tags": [
+        "analytics",
+        "funnel",
+        "retention",
+        "metrics",
+        "data"
+      ],
+      "objectives": [
+        "Define a funnel as the ordered stages one player passes through",
+        "Count each stage once per player, on the server",
+        "Read a funnel as step-to-step percentages instead of raw counts",
+        "Tell a drop-off (they left) from a stall (they stayed and got stuck)",
+        "Fix one leak, then re-measure, instead of tuning three things at once"
+      ],
+      "prerequisites": [
+        "save-loop",
+        "player-added",
+        "server-authority"
+      ],
+      "keywords": [
+        "funnel",
+        "analytics",
+        "drop-off",
+        "retention",
+        "metrics",
+        "telemetry",
+        "conversion",
+        "cohort"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 7
+    },
+    {
+      "slug": "arrange-save-loop",
+      "title": "Drag and drop — the save loop",
+      "description": "Assemble load-on-join, save-on-leave, autosave, and the secure click flow from shuffled lines.",
+      "sectionId": "data",
+      "order": 16,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "arrange",
+        "drag-and-drop",
+        "data",
+        "review"
+      ],
+      "objectives": [
+        "Order the load-on-join handler",
+        "Order the save-on-leave handler",
+        "Assemble the autosave loop and secure click flow"
+      ],
+      "prerequisites": [
+        "bug-hunt-data"
+      ],
+      "keywords": [
+        "arrange",
+        "order",
+        "save",
+        "load",
+        "datastore"
+      ],
+      "sectionTitle": "Player Data & Security",
+      "sectionOrder": 2,
+      "activityCount": 5
+    },
+    {
+      "slug": "guis",
+      "title": "GUIs — building interfaces in code",
+      "description": "Create ScreenGui, Frame, and TextButton elements from a script, and lay out a simple on-screen button.",
+      "sectionId": "ui-screens",
+      "order": 1,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "gui",
+        "screenui",
+        "frame",
+        "textbutton",
+        "ui"
+      ],
+      "objectives": [
+        "Create UI elements with Instance.new",
+        "Name the GUI family tree",
+        "Wire a TextButton's Activated event"
+      ],
+      "prerequisites": [
+        "remotes",
+        "leaderstats"
+      ],
+      "keywords": [
+        "gui",
+        "screenui",
+        "textbutton",
+        "anchorpoint",
+        "ui",
+        "interface"
+      ],
+      "sectionTitle": "UI & Screens",
+      "sectionOrder": 3,
+      "activityCount": 3
+    },
+    {
+      "slug": "udim2",
+      "title": "UDim2 — sizing and placing GUI",
+      "description": "The scale-and-offset coordinate system that keeps GUIs on the right spot at every screen size.",
+      "sectionId": "ui-screens",
+      "order": 2,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "udim2",
+        "position",
+        "anchorpoint",
+        "layout"
+      ],
+      "objectives": [
+        "[object Object]",
+        "Set an element's Size and Position",
+        "Center an element with AnchorPoint"
+      ],
+      "prerequisites": [
+        "guis"
+      ],
+      "keywords": [
+        "udim2",
+        "scale",
+        "offset",
+        "anchorpoint",
+        "vector2"
+      ],
+      "sectionTitle": "UI & Screens",
+      "sectionOrder": 3,
+      "activityCount": 3
+    },
+    {
+      "slug": "gui-styling",
+      "title": "Making GUIs look good",
+      "description": "Colors, text styling, rounded corners, and transparency — the properties that turn boxes into an interface.",
+      "sectionId": "ui-screens",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "gui",
+        "styling",
+        "color",
+        "corner",
+        "text"
+      ],
+      "objectives": [
+        "Set a GUI element's background and text colors",
+        "Round corners with a UICorner",
+        "Tune text size and boldness"
+      ],
+      "prerequisites": [
+        "guis",
+        "udim2"
+      ],
+      "keywords": [
+        "guicolor",
+        "uicorner",
+        "transparency",
+        "textsize"
+      ],
+      "sectionTitle": "UI & Screens",
+      "sectionOrder": 3,
+      "activityCount": 3
+    },
+    {
+      "slug": "user-input-service",
+      "title": "UserInputService — reading the keyboard and mouse",
+      "description": "React to raw input from the keyboard, mouse, touch, and gamepad with UserInputService events.",
+      "sectionId": "ui-screens",
+      "order": 4,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "input",
+        "keyboard",
+        "mouse",
+        "userinputservice"
+      ],
+      "objectives": [
+        "Get the UserInputService singleton",
+        "React to key presses with InputBegan",
+        "Read which key with KeyCode and what kind with UserInputType",
+        "Ignore inputs the UI already handled"
+      ],
+      "prerequisites": [
+        "events",
+        "conditionals"
+      ],
+      "keywords": [
+        "input",
+        "userinputservice",
+        "inputbegan",
+        "inputended",
+        "keycode",
+        "userinputtype"
+      ],
+      "sectionTitle": "UI & Screens",
+      "sectionOrder": 3,
+      "activityCount": 3
+    },
+    {
+      "slug": "context-action-service",
+      "title": "ContextActionService — one action, every device",
+      "description": "Bind game actions to keys with ContextActionService so the same code works on keyboard, touch, and gamepad.",
+      "sectionId": "ui-screens",
+      "order": 5,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "input",
+        "keyboard",
+        "touch",
+        "contextactionservice"
+      ],
+      "objectives": [
+        "Bind an action to input types with BindAction",
+        "Name actions after the game action, not the key",
+        "Let the engine handle touch and gamepad automatically",
+        "Unbind actions when the context ends"
+      ],
+      "prerequisites": [
+        "user-input-service",
+        "conditionals"
+      ],
+      "keywords": [
+        "contextactionservice",
+        "bindaction",
+        "unbindaction",
+        "action"
+      ],
+      "sectionTitle": "UI & Screens",
+      "sectionOrder": 3,
+      "activityCount": 3
+    },
+    {
+      "slug": "shop-ui",
+      "title": "The shop panel — a frame full of buttons",
+      "description": "Build the upgrade shop's interface — a panel frame, a buy button, and a label that mirrors the server's data.",
+      "sectionId": "ui-screens",
+      "order": 6,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "shop",
+        "gui",
+        "panel",
+        "frame",
+        "ui"
+      ],
+      "objectives": [
+        "Lay out a shop with a Frame, labels, and a button",
+        "Position children inside a frame",
+        "Reflect server state in the UI"
+      ],
+      "prerequisites": [
+        "upgrades",
+        "gui-styling"
+      ],
+      "keywords": [
+        "shop",
+        "panel",
+        "frame",
+        "textbutton",
+        "layout"
+      ],
+      "sectionTitle": "UI & Screens",
+      "sectionOrder": 3,
+      "activityCount": 3
+    },
+    {
+      "slug": "ui-menus",
+      "title": "UI menus — toggling panels open and closed",
+      "description": "Turn the shop panel into a real menu with a toggle button, a close button, the Escape key, and a click-outside backdrop.",
+      "sectionId": "ui-screens",
+      "order": 7,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "menu",
+        "gui",
+        "toggle",
+        "visible",
+        "button",
+        "ui"
+      ],
+      "objectives": [
+        "Hide and show a panel with the Visible property",
+        "Toggle a panel open and closed with one button",
+        "Close a menu with a close button and the Escape key",
+        "Close a menu by clicking outside it — and keep the backdrop from blocking the game"
+      ],
+      "prerequisites": [
+        "shop-ui",
+        "user-input-service"
+      ],
+      "keywords": [
+        "menu",
+        "toggle",
+        "visible",
+        "escape",
+        "userinputservice",
+        "backdrop",
+        "button",
+        "ui"
+      ],
+      "sectionTitle": "UI & Screens",
+      "sectionOrder": 3,
+      "activityCount": 6
+    },
+    {
+      "slug": "recap-data",
+      "title": "Recap — player data and trust",
+      "description": "Refresh leaderstats, saving with DataStores, and the rule that the server decides — before you build your first real game systems.",
+      "sectionId": "gameplay",
+      "order": 0,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "recap",
+        "review",
+        "data",
+        "security"
+      ],
+      "objectives": [
+        "Remember how the leaderboard is built",
+        "Remember the load / save loop with DataStores",
+        "Remember why the server must decide"
+      ],
+      "prerequisites": [
+        "remotes"
+      ],
+      "keywords": [
+        "recap",
+        "review",
+        "leaderstats",
+        "datastore",
+        "remotes"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 4
+    },
+    {
+      "slug": "clicker",
+      "title": "The clicker game — clicks become coins",
+      "description": "Build your first playable loop — click a big button, earn coins, watch your balance climb, all through the secure client-server bridge.",
+      "sectionId": "gameplay",
+      "order": 1,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "clicker",
+        "game",
+        "loop",
+        "gui",
+        "coins"
+      ],
+      "objectives": [
+        "Wire a click button through a RemoteEvent to server-awarded coins",
+        "Show the player's coins on their screen via FireClient",
+        "Put the whole secure loop together in one working game"
+      ],
+      "prerequisites": [
+        "guis",
+        "remotes",
+        "udim2"
+      ],
+      "keywords": [
+        "clicker",
+        "coins",
+        "game loop",
+        "gameplay"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 4
+    },
+    {
+      "slug": "idle-loop",
+      "title": "Idle income — coins without clicking",
+      "description": "A server loop that pays every player every second — your first passive mechanic and a classic idle-game heart.",
+      "sectionId": "gameplay",
+      "order": 2,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "idle",
+        "loop",
+        "income",
+        "task"
+      ],
+      "objectives": [
+        "Loop over all players with Players:GetPlayers",
+        "Award passive income on the server",
+        "Push every update through the same FireClient"
+      ],
+      "prerequisites": [
+        "clicker"
+      ],
+      "keywords": [
+        "idle",
+        "income",
+        "while true",
+        "getplayers"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "upgrades",
+      "title": "Upgrades — spending coins with the server checking the bill",
+      "description": "Build a shop where players buy click multipliers, and the server verifies the price before anything changes.",
+      "sectionId": "gameplay",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "upgrades",
+        "shop",
+        "economy",
+        "purchase"
+      ],
+      "objectives": [
+        "Store an upgrade level per player",
+        "Buy upgrades through a RemoteEvent with the price checked on the server",
+        "Apply the upgrade to the click reward"
+      ],
+      "prerequisites": [
+        "clicker",
+        "conditionals"
+      ],
+      "keywords": [
+        "upgrade",
+        "shop",
+        "purchase",
+        "multiplier",
+        "economy"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 4
+    },
+    {
+      "slug": "modules",
+      "title": "ModuleScripts — organizing your code",
+      "description": "Split one giant script into reusable, readable pieces with ModuleScripts and require.",
+      "sectionId": "gameplay",
+      "order": 4,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "modulescript",
+        "require",
+        "organization",
+        "refactoring"
+      ],
+      "objectives": [
+        "Create a ModuleScript that returns useful values",
+        "Load it from another script with require",
+        "Move shared data into a module"
+      ],
+      "prerequisites": [
+        "upgrades",
+        "functions"
+      ],
+      "keywords": [
+        "modulescript",
+        "require",
+        "module",
+        "organization",
+        "luau"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 4
+    },
+    {
+      "slug": "oop-metatables",
+      "title": "OOP with metatables — building classes in Luau",
+      "description": "Use metatables to create reusable objects with constructors, methods, and inheritance — the pattern behind every Roblox API.",
+      "sectionId": "gameplay",
+      "order": 5,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "oop",
+        "metatable",
+        "setmetatable",
+        "class",
+        "__index",
+        "object-oriented"
+      ],
+      "objectives": [
+        "Understand what a metatable is and why __index matters",
+        "Build a class-like constructor with methods using metatables",
+        "Add inheritance so one class extends another",
+        "Know when to use OOP vs plain tables and functions"
+      ],
+      "prerequisites": [
+        "modules",
+        "tables"
+      ],
+      "keywords": [
+        "oop",
+        "metatable",
+        "setmetatable",
+        "__index",
+        "class",
+        "constructor",
+        "method",
+        "inheritance",
+        "object-oriented"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "teams",
+      "title": "Teams — splitting players into sides",
+      "description": "Use the Teams service to assign players to teams, show team colors, and build round-based gameplay with scores.",
+      "sectionId": "gameplay",
+      "order": 6,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "teams",
+        "team",
+        "teamcolor",
+        "assign",
+        "round",
+        "pvp"
+      ],
+      "objectives": [
+        "Create teams and assign players to them",
+        "Use TeamColor to visually distinguish teams",
+        "Build a round system that picks teams automatically",
+        "Track and compare team scores"
+      ],
+      "prerequisites": [
+        "players",
+        "leaderstats"
+      ],
+      "keywords": [
+        "team",
+        "teams",
+        "teamcolor",
+        "assign",
+        "round",
+        "pvp",
+        "intermission",
+        "scoreboard"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "proximity-prompt",
+      "title": "ProximityPrompt — walk up and interact",
+      "description": "The modern way to let players interact with objects — a floating E prompt that works on every device, no ClickDetector needed.",
+      "sectionId": "gameplay",
+      "order": 7,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "proximityprompt",
+        "interaction",
+        "prompt",
+        "input"
+      ],
+      "objectives": [
+        "Add a ProximityPrompt to a part to create an interaction trigger",
+        "Handle the Triggered event to run code when the player interacts",
+        "Customize the prompt's text, hold duration, and keyboard/gamepad icons",
+        "Understand when to use ProximityPrompt vs ClickDetector vs ContextActionService"
+      ],
+      "prerequisites": [
+        "context-action-service"
+      ],
+      "keywords": [
+        "proximityprompt",
+        "interaction",
+        "trigger",
+        "prompt",
+        "hold",
+        "e key",
+        "interaction"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 2
+    },
+    {
+      "slug": "bug-hunt-systems",
+      "title": "Bug hunt — game systems",
+      "description": "Find the security slips, the runaway loops, and the silent failures in your clicker, idle income, and shop.",
+      "sectionId": "gameplay",
+      "order": 8,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "bug-hunt",
+        "debugging",
+        "gameplay",
+        "review"
+      ],
+      "objectives": [
+        "Spot client-side checks that belong on the server",
+        "Recognize runaway loops and mistimed connects",
+        "Fix mismatched remote names and missing calls"
+      ],
+      "prerequisites": [
+        "modules"
+      ],
+      "keywords": [
+        "bug-hunt",
+        "fix",
+        "clicker",
+        "shop",
+        "remote"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 6
+    },
+    {
+      "slug": "arrange-shop",
+      "title": "Drag and drop — the shop",
+      "description": "Assemble the buy button, the server's checkout counter, idle income, and the live UI updates from shuffled lines.",
+      "sectionId": "gameplay",
+      "order": 9,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "arrange",
+        "drag-and-drop",
+        "shop",
+        "review"
+      ],
+      "objectives": [
+        "Order the client's buy request",
+        "Order the server's checkout counter",
+        "Assemble idle income and the live UI updates"
+      ],
+      "prerequisites": [
+        "bug-hunt-systems"
+      ],
+      "keywords": [
+        "arrange",
+        "order",
+        "shop",
+        "purchase",
+        "remote"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 5
+    },
+    {
+      "slug": "controller-support",
+      "title": "Controller support — gamepads and the virtual cursor",
+      "description": "Detect gamepads, read their buttons and sticks, and let console players navigate your GUI with VirtualCursorMode.",
+      "sectionId": "gameplay",
+      "order": 10,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "input",
+        "gamepad",
+        "controller",
+        "virtualcursor",
+        "ui"
+      ],
+      "objectives": [
+        "Detect when a gamepad connects and disconnects",
+        "Read gamepad buttons and thumbsticks with UserInputService",
+        "Let players navigate menus with a virtual cursor",
+        "Combine gamepads with ContextActionService actions"
+      ],
+      "prerequisites": [
+        "user-input-service",
+        "context-action-service",
+        "guis"
+      ],
+      "keywords": [
+        "gamepad",
+        "controller",
+        "virtualcursormode",
+        "userinputservice",
+        "gamepadconnected"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 4
+    },
+    {
+      "slug": "health-damage",
+      "title": "Health and damage — keeping score",
+      "description": "Build a fall-damage system, a reusable damage function, and a health bar that updates in real time.",
+      "sectionId": "gameplay",
+      "order": 11,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "health",
+        "damage",
+        "fall-damage",
+        "humanoid",
+        "respawn"
+      ],
+      "objectives": [
+        "Detect when a character hits the ground hard enough to take damage",
+        "Write a reusable damage function that runs on the server",
+        "Build a BillboardGui health bar above the character's head",
+        "Handle death and respawn cleanly"
+      ],
+      "prerequisites": [
+        "characters"
+      ],
+      "keywords": [
+        "health",
+        "damage",
+        "fall damage",
+        "humanoid",
+        "died",
+        "respawn",
+        "billboardgui",
+        "health bar"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 4
+    },
+    {
+      "slug": "melee-combat",
+      "title": "Melee combat — click-to-hit with a cooldown",
+      "description": "Build a close-range attack that uses raycasting to detect what you hit, applies damage through the server, and pauses between swings.",
+      "sectionId": "gameplay",
+      "order": 12,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "combat",
+        "melee",
+        "raycast",
+        "cooldown",
+        "click",
+        "hit"
+      ],
+      "objectives": [
+        "Fire a raycast from the camera to detect what the player clicked on",
+        "Apply damage on the server through a RemoteEvent",
+        "Add a cooldown so attacks can't be spammed",
+        "Distinguish between hitting a character and hitting a wall"
+      ],
+      "prerequisites": [
+        "health-damage",
+        "raycasting",
+        "remotes"
+      ],
+      "keywords": [
+        "melee",
+        "combat",
+        "raycast",
+        "raycastparams",
+        "cooldown",
+        "remotes",
+        "click",
+        "hit",
+        "attack"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "inventory-hotbar",
+      "title": "Inventory and hotbar — collect, store, equip",
+      "description": "Build a slot-based hotbar UI, pick up items from the world, and equip them with a click.",
+      "sectionId": "gameplay",
+      "order": 13,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "inventory",
+        "hotbar",
+        "slots",
+        "pickup",
+        "equip",
+        "gui"
+      ],
+      "objectives": [
+        "Store item data in a simple table on the client",
+        "Build a hotbar UI with clickable slots",
+        "Detect when a player touches a pickup and adds it to their inventory",
+        "Equip an item by clicking a hotbar slot"
+      ],
+      "prerequisites": [
+        "characters",
+        "guis"
+      ],
+      "keywords": [
+        "inventory",
+        "hotbar",
+        "slots",
+        "pickup",
+        "equip",
+        "screengui",
+        "frame",
+        "click",
+        "item",
+        "collect"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "checkpoints",
+      "title": "Checkpoints — respawn where you left off",
+      "description": "Place checkpoint Parts that remember a player's position, then spawn them back there instead of at the start.",
+      "sectionId": "gameplay",
+      "order": 14,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "checkpoints",
+        "respawn",
+        "spawn",
+        "position",
+        "progress",
+        "cframes"
+      ],
+      "objectives": [
+        "Store a player's last checkpoint position in a table",
+        "Detect when a player touches a checkpoint and update their spawn point",
+        "Set a player's spawn location on respawn",
+        "Handle the first spawn before any checkpoint is reached"
+      ],
+      "prerequisites": [
+        "characters",
+        "health-damage"
+      ],
+      "keywords": [
+        "checkpoint",
+        "respawn",
+        "spawn",
+        "position",
+        "cframes",
+        "touched",
+        "loadcharacter",
+        "spawnlocation"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "vehicles",
+      "title": "Vehicles — drive a welded model",
+      "description": "Move a multi-part vehicle forward with the keyboard by updating the model's CFrame, and steer by rotating it.",
+      "sectionId": "gameplay",
+      "order": 15,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "vehicles",
+        "movement",
+        "cframes",
+        "input",
+        "driving",
+        "physics"
+      ],
+      "objectives": [
+        "Tie parts together so the whole model moves as one unit",
+        "Read keyboard input to accelerate and steer a vehicle",
+        "Move the vehicle using CFrame math instead of sliding individual parts",
+        "Keep movement stable across frame rate using delta time"
+      ],
+      "prerequisites": [
+        "vector3-cframe",
+        "user-input-service"
+      ],
+      "keywords": [
+        "vehicle",
+        "car",
+        "move",
+        "drive",
+        "cframes",
+        "wasd",
+        "steering",
+        "delta",
+        "speed",
+        "assembly"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "teleporting",
+      "title": "Teleporting — jump between zones and places",
+      "description": "Move a player to another part of a map or into an entirely different place with TeleportService.",
+      "sectionId": "gameplay",
+      "order": 16,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "teleport",
+        "teleportservice",
+        "zones",
+        "places",
+        "travel",
+        "respawn"
+      ],
+      "objectives": [
+        "Teleport a player around the current map with TeleportService",
+        "Teleport a player into a different Place in the same experience",
+        "Read the incoming place on the destination server",
+        "Carry a little data along with the teleport"
+      ],
+      "prerequisites": [
+        "players",
+        "remotes"
+      ],
+      "keywords": [
+        "teleport",
+        "teleportservice",
+        "teleportasync",
+        "place",
+        "zone",
+        "travel",
+        "playeradded"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 3
+    },
+    {
+      "slug": "recap-gameplay",
+      "title": "Recap — your first game systems",
+      "description": "Refresh GUIs, the clicker loop, idle income, upgrades, and modules before you start building the world around them.",
+      "sectionId": "objects",
+      "order": 0,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "recap",
+        "review",
+        "gameplay",
+        "gui",
+        "modules"
+      ],
+      "objectives": [
+        "Remember how GUIs are built in code",
+        "Remember the clicker's client-server loop",
+        "Remember how modules organize code"
+      ],
+      "prerequisites": [
+        "modules"
+      ],
+      "keywords": [
+        "recap",
+        "review",
+        "gui",
+        "clicker",
+        "modules"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 4
+    },
+    {
+      "slug": "vector3-cframe",
+      "title": "Vector3 and CFrame — points in 3D space",
+      "description": "The two types that put anything anywhere in the world — position with Vector3, and position plus rotation with CFrame.",
+      "sectionId": "objects",
+      "order": 1,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "vector3",
+        "cframe",
+        "position",
+        "rotation",
+        "coordinate"
+      ],
+      "objectives": [
+        "Create a Vector3 to describe a point or direction in 3D space",
+        "Read and change a part's Position with Vector3",
+        "Use CFrame to place and rotate an object in one step",
+        "Convert between CFrame and position with CFrame.new"
+      ],
+      "prerequisites": [
+        "recap-objects"
+      ],
+      "keywords": [
+        "vector3",
+        "cframe",
+        "position",
+        "rotation",
+        "coordinate",
+        "3d space",
+        "vector"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "players",
+      "title": "Players — the people in your game",
+      "description": "Meet the Player object — the account behind the name — and the two facts about it that matter most.",
+      "sectionId": "objects",
+      "order": 2,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "players",
+        "playeradded",
+        "identity"
+      ],
+      "objectives": [
+        "Get all players with Players:GetPlayers()",
+        "Listen for PlayerAdded",
+        "Distinguish the Player from the character"
+      ],
+      "prerequisites": [
+        "events",
+        "leaderstats"
+      ],
+      "keywords": [
+        "player",
+        "playeradded",
+        "character",
+        "identity"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "characters",
+      "title": "Characters and Humanoids",
+      "description": "The body your player controls — when it spawns, how to grab it safely, and the Humanoid that keeps it alive.",
+      "sectionId": "objects",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "characters",
+        "humanoid",
+        "health",
+        "characteradded"
+      ],
+      "objectives": [
+        "React to a character spawning with CharacterAdded",
+        "Grab children safely with WaitForChild",
+        "Read and change a character's health"
+      ],
+      "prerequisites": [
+        "players",
+        "task-wait"
+      ],
+      "keywords": [
+        "character",
+        "humanoid",
+        "health",
+        "characteradded",
+        "waitforchild"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "animations",
+      "title": "Animations — making characters move",
+      "description": "Load and play AnimationTracks so your characters run, jump, attack, and emote — not just stand around.",
+      "sectionId": "objects",
+      "order": 4,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "animations",
+        "animationtrack",
+        "animate",
+        "humanoid"
+      ],
+      "objectives": [
+        "Load an Animation onto a Humanoid and play the AnimationTrack",
+        "Adjust animation speed and stop animations from code",
+        "Use AnimationLoaded and Stopped events to sequence actions"
+      ],
+      "prerequisites": [
+        "characters"
+      ],
+      "keywords": [
+        "animation",
+        "animationtrack",
+        "loadanimation",
+        "animate",
+        "plays animation",
+        "rig"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "npcs",
+      "title": "NPCs and PathfindingService — making the world walk",
+      "description": "Create non-player characters that patrol, chase, and navigate around obstacles using PathfindingService.",
+      "sectionId": "objects",
+      "order": 5,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "npcs",
+        "pathfinding",
+        "ai",
+        "patrol",
+        "enemy"
+      ],
+      "objectives": [
+        "Create an NPC from a character model",
+        "Use PathfindingService to compute a path around obstacles",
+        "Move an NPC along a path with Humanoid:MoveTo",
+        "Build a simple patrol loop between waypoints"
+      ],
+      "prerequisites": [
+        "characters",
+        "animations"
+      ],
+      "keywords": [
+        "npc",
+        "pathfinding",
+        "pathfindingservice",
+        "moveto",
+        "patrol",
+        "ai",
+        "enemy",
+        "waypoint"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "instances",
+      "title": "Instances — building the world in code",
+      "description": "Create parts at runtime, pin them with Anchored, and style them with materials — no Studio viewport required.",
+      "sectionId": "objects",
+      "order": 6,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "instances",
+        "parts",
+        "anchored",
+        "material"
+      ],
+      "objectives": [
+        "Create and configure a part from a script",
+        "Pin static parts with Anchored",
+        "Use Enums for materials and options"
+      ],
+      "prerequisites": [
+        "modules",
+        "players"
+      ],
+      "keywords": [
+        "instance",
+        "part",
+        "anchored",
+        "material",
+        "enum"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "attributes",
+      "title": "Attributes — sticky notes on objects",
+      "description": "Attach your own data to any object with SetAttribute and GetAttribute, so parts describe themselves.",
+      "sectionId": "objects",
+      "order": 7,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "attributes",
+        "setattribute",
+        "getattribute"
+      ],
+      "objectives": [
+        "Write data to an object with SetAttribute",
+        "Read it back with GetAttribute",
+        "Use attributes instead of fragile name checks"
+      ],
+      "prerequisites": [
+        "instances"
+      ],
+      "keywords": [
+        "attribute",
+        "setattribute",
+        "getattribute",
+        "data"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "sounds",
+      "title": "Sounds — giving the world a voice",
+      "description": "Add Sound objects, load audio with a SoundId, and play effects where the player can actually hear them.",
+      "sectionId": "objects",
+      "order": 8,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "sounds",
+        "soundid",
+        "audio",
+        "effect"
+      ],
+      "objectives": [
+        "Create a Sound object and set its SoundId",
+        "Play and stop sounds from a script",
+        "Play feel-effects on the client"
+      ],
+      "prerequisites": [
+        "instances"
+      ],
+      "keywords": [
+        "sound",
+        "soundid",
+        "play",
+        "audio"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "particle-effects",
+      "title": "Particle effects — making the world feel alive",
+      "description": "Sparkle, smoke, and glow — add ParticleEmitters to parts so your game looks as good as it plays.",
+      "sectionId": "objects",
+      "order": 9,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "particles",
+        "emitter",
+        "effects",
+        "sparkle",
+        "smoke",
+        "visual"
+      ],
+      "objectives": [
+        "Create a ParticleEmitter and attach it to a part",
+        "Control emission rate, lifetime, and speed",
+        "Change color and size over a particle's lifetime",
+        "Toggle effects on and off from a script"
+      ],
+      "prerequisites": [
+        "sounds"
+      ],
+      "keywords": [
+        "particle",
+        "emitter",
+        "effect",
+        "sparkle",
+        "smoke",
+        "trail",
+        "visual",
+        "polish"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "tweens",
+      "title": "Tweens — smooth movement and polish",
+      "description": "Animate parts and UI with TweenService instead of teleporting them, and feel the difference polish makes.",
+      "sectionId": "objects",
+      "order": 10,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "tween",
+        "animation",
+        "tweening",
+        "polish"
+      ],
+      "objectives": [
+        "Create a TweenInfo and tween a part's position or size",
+        "Tween a UI element",
+        "Know the difference between CFrame and Position for moving parts"
+      ],
+      "prerequisites": [
+        "instances"
+      ],
+      "keywords": [
+        "tween",
+        "tweeninfo",
+        "tweenService",
+        "smooth",
+        "animation"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 4
+    },
+    {
+      "slug": "camera-control",
+      "title": "Custom cameras — taking control",
+      "description": "Point the camera anywhere you want with a LocalScript — the foundation of cutscenes, cinematic views, and locked-camera puzzles.",
+      "sectionId": "objects",
+      "order": 11,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "camera",
+        "cframe",
+        "localscript"
+      ],
+      "objectives": [
+        "Grab the active camera with Workspace.CurrentCamera",
+        "Switch it to Scriptable and move it with camera.CFrame",
+        "Aim it at a target with CFrame.lookAt",
+        "Keep a moving target framed with a RenderStepped loop"
+      ],
+      "prerequisites": [
+        "tweens"
+      ],
+      "keywords": [
+        "camera",
+        "currentcamera",
+        "cameratype",
+        "cframe.lookat",
+        "renderstepped"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 5
+    },
+    {
+      "slug": "camera-cutscenes",
+      "title": "Cutscenes — directing the camera",
+      "description": "Choreograph scripted camera moves with tweens, shakes, and FOV punches — the director's toolkit for intros, reveals, and boss moments.",
+      "sectionId": "objects",
+      "order": 12,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "cutscene",
+        "camera",
+        "tween"
+      ],
+      "objectives": [
+        "Tween the camera CFrame for a smooth scripted shot",
+        "Chain shots with a beat between them",
+        "Add camera shake with a per-frame random offset",
+        "Hand camera control back when the scene ends"
+      ],
+      "prerequisites": [
+        "camera-control",
+        "tweens"
+      ],
+      "keywords": [
+        "cutscene",
+        "camerashake",
+        "tween",
+        "fieldofview",
+        "scriptable"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 5
+    },
+    {
+      "slug": "lighting-atmosphere",
+      "title": "Lighting and atmosphere — setting the mood",
+      "description": "Use Lighting, Sky, Atmosphere, and PostEffects to turn a flat workspace into a world with time of day, fog, and bloom.",
+      "sectionId": "objects",
+      "order": 13,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "lighting",
+        "atmosphere",
+        "sky",
+        "bloom",
+        "posteffect",
+        "fog",
+        "mood"
+      ],
+      "objectives": [
+        "Change the time of day and ambient lighting",
+        "Add Sky, Atmosphere, and fog for depth",
+        "Use PostEffects like Bloom and ColorCorrection",
+        "Animate lighting changes from a script for day/night cycles"
+      ],
+      "prerequisites": [
+        "instances",
+        "sounds"
+      ],
+      "keywords": [
+        "lighting",
+        "atmosphere",
+        "sky",
+        "fog",
+        "bloom",
+        "color correction",
+        "post effect",
+        "time of day",
+        "ambient"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "raycasting",
+      "title": "Raycasting — asking the world what's in the way",
+      "description": "Fire an invisible ray from any point and read exactly what it hits — the tool behind line of sight, ground checks, and laser beams.",
+      "sectionId": "objects",
+      "order": 14,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "raycast",
+        "raycasting",
+        "world",
+        "collision"
+      ],
+      "objectives": [
+        "Cast a ray from an origin in a direction with workspace:Raycast",
+        "Read what the ray hit from the RaycastResult",
+        "Filter a raycast so it ignores parts you don't care about",
+        "Find the ground below a character with a downward ray"
+      ],
+      "prerequisites": [
+        "camera-control",
+        "tweens"
+      ],
+      "keywords": [
+        "raycast",
+        "raycasting",
+        "raycastparams",
+        "raycastresult",
+        "normal"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 5
+    },
+    {
+      "slug": "bug-hunt-world",
+      "title": "Bug hunt — the world around you",
+      "description": "Hunt down the nil characters, the silent tweens, and the sounds nobody hears.",
+      "sectionId": "objects",
+      "order": 15,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "bug-hunt",
+        "debugging",
+        "objects",
+        "review"
+      ],
+      "objectives": [
+        "Fix the grab-the-character-too-early bug",
+        "Remember :Play() for tweens and sounds",
+        "Type one-line fixes for world-object bugs"
+      ],
+      "prerequisites": [
+        "tweens"
+      ],
+      "keywords": [
+        "bug-hunt",
+        "fix",
+        "character",
+        "tween",
+        "sound"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 6
+    },
+    {
+      "slug": "arrange-tween",
+      "title": "Drag and drop — polish and objects",
+      "description": "Assemble a tween, a safe character grab, a sound, and a coin pickup from shuffled lines.",
+      "sectionId": "objects",
+      "order": 16,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "arrange",
+        "drag-and-drop",
+        "objects",
+        "review"
+      ],
+      "objectives": [
+        "Order the tween recipe correctly",
+        "Assemble a safe character grab",
+        "Arrange a sound and a coin pickup"
+      ],
+      "prerequisites": [
+        "bug-hunt-world"
+      ],
+      "keywords": [
+        "arrange",
+        "order",
+        "tween",
+        "character",
+        "sound"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 5
+    },
+    {
+      "slug": "studio-features",
+      "title": "Built-in features — spawns, force fields, highlights",
+      "description": "Use Studio's built-in objects — SpawnLocation, ForceField, and SelectionBox — to add instant polish without re-inventing the wheel.",
+      "sectionId": "objects",
+      "order": 17,
+      "difficulty": "beginner",
+      "estimatedMinutes": 4,
+      "tags": [
+        "spawn",
+        "forcefield",
+        "highlight",
+        "selectionbox",
+        "studio"
+      ],
+      "objectives": [
+        "Respawn players at a SpawnLocation",
+        "Protect a player with a ForceField",
+        "Outline parts with SelectionBox and Highlight"
+      ],
+      "prerequisites": [
+        "players",
+        "instances"
+      ],
+      "keywords": [
+        "spawnlocation",
+        "forcefield",
+        "selectionbox",
+        "highlight",
+        "studio",
+        "builtin"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 3
+    },
+    {
+      "slug": "recap-objects",
+      "title": "Recap — the world and the players in it",
+      "description": "Refresh players, characters, instances, attributes, sounds, and tweens before you take your game live.",
+      "sectionId": "publishing",
+      "order": 0,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "recap",
+        "review",
+        "objects",
+        "players",
+        "tweens"
+      ],
+      "objectives": [
+        "Remember the Player vs character split",
+        "Remember how parts, attributes, and sounds work",
+        "Remember the tween recipe"
+      ],
+      "prerequisites": [
+        "tweens"
+      ],
+      "keywords": [
+        "recap",
+        "review",
+        "players",
+        "instances",
+        "tweens"
+      ],
+      "sectionTitle": "Publishing & Testing",
+      "sectionOrder": 6,
+      "activityCount": 4
+    },
+    {
+      "slug": "publishing",
+      "title": "Publishing — getting your game online",
+      "description": "Take the clicker from a Studio test to a live Roblox experience, and handle the settings that matter.",
+      "sectionId": "publishing",
+      "order": 1,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "publish",
+        "upload",
+        "experience",
+        "settings"
+      ],
+      "objectives": [
+        "Publish a place as an experience",
+        "Set up basic experience settings and permissions",
+        "Understand the difference between Studio and live"
+      ],
+      "prerequisites": [
+        "clicker",
+        "modules"
+      ],
+      "keywords": [
+        "publish",
+        "upload",
+        "experience",
+        "live",
+        "robux"
+      ],
+      "sectionTitle": "Publishing & Testing",
+      "sectionOrder": 6,
+      "activityCount": 3
+    },
+    {
+      "slug": "sharing-permissions",
+      "title": "Permissions and sharing",
+      "description": "Decide who can play your game, test safely with friends, and get the link into testers' hands.",
+      "sectionId": "publishing",
+      "order": 2,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "permissions",
+        "sharing",
+        "testing"
+      ],
+      "objectives": [
+        "Set who can play with Permissions",
+        "Share the experience link",
+        "Explain private servers and dev testing"
+      ],
+      "prerequisites": [
+        "publishing"
+      ],
+      "keywords": [
+        "permissions",
+        "share",
+        "friends",
+        "link"
+      ],
+      "sectionTitle": "Publishing & Testing",
+      "sectionOrder": 6,
+      "activityCount": 3
+    },
+    {
+      "slug": "datastore-testing",
+      "title": "Testing saves — the live persistence loop",
+      "description": "Enable data stores in Studio, then watch your coins survive across restarts, sessions, and even other players.",
+      "sectionId": "publishing",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "datastore",
+        "testing",
+        "saves",
+        "persistence"
+      ],
+      "objectives": [
+        "Enable Studio access to data stores",
+        "Verify coins persist across restarts and sessions",
+        "Test the load-on-join, save-on-leave loop live"
+      ],
+      "prerequisites": [
+        "datastores",
+        "publishing"
+      ],
+      "keywords": [
+        "datastore",
+        "test",
+        "save",
+        "load",
+        "persist",
+        "studioaccess"
+      ],
+      "sectionTitle": "Publishing & Testing",
+      "sectionOrder": 6,
+      "activityCount": 4
+    },
+    {
+      "slug": "monetization",
+      "title": "Monetization — making money from your game",
+      "description": "Turn a popular game into income with game passes, developer products, and an approach that treats players like people.",
+      "sectionId": "publishing",
+      "order": 4,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "monetization",
+        "game-pass",
+        "developer-product",
+        "robux"
+      ],
+      "objectives": [
+        "Tell a game pass from a developer product",
+        "Wire up a game pass purchase with MarketplaceService",
+        "Process a developer product receipt server-side, exactly once",
+        "Explain Premium Payouts and DevEx"
+      ],
+      "prerequisites": [
+        "datastore-testing",
+        "modules"
+      ],
+      "keywords": [
+        "monetization",
+        "game pass",
+        "developer product",
+        "robux",
+        "devex",
+        "premium payout"
+      ],
+      "sectionTitle": "Publishing & Testing",
+      "sectionOrder": 6,
+      "activityCount": 3
+    },
+    {
+      "slug": "recap-publishing",
+      "title": "Recap — taking your game live",
+      "description": "Refresh publishing, permissions, and data store testing before the final stretch.",
+      "sectionId": "leveling-up",
+      "order": 0,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "recap",
+        "review",
+        "publishing",
+        "testing"
+      ],
+      "objectives": [
+        "Remember how to publish an experience",
+        "Remember how permissions control who plays",
+        "Remember how to verify saves live"
+      ],
+      "prerequisites": [
+        "datastore-testing",
+        "monetization"
+      ],
+      "keywords": [
+        "recap",
+        "review",
+        "publish",
+        "permissions",
+        "testing"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 3
+    },
+    {
+      "slug": "debugging",
+      "title": "Debugging — reading errors like a pro",
+      "description": "Turn scary red Output lines into a precise map of what's wrong, and fix errors in a set order.",
+      "sectionId": "leveling-up",
+      "order": 1,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "debugging",
+        "errors",
+        "output"
+      ],
+      "objectives": [
+        "Decode the structure of a Roblox error message",
+        "Locate the failing line from a stack trace",
+        "[object Object]"
+      ],
+      "prerequisites": [
+        "modules",
+        "players"
+      ],
+      "keywords": [
+        "debugging",
+        "error",
+        "stacktrace",
+        "output"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 3
+    },
+    {
+      "slug": "print-debugging",
+      "title": "Print debugging — narrating your code",
+      "description": "Strategic print statements turn a black box into a story — and reveal exactly which step failed.",
+      "sectionId": "leveling-up",
+      "order": 2,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "debugging",
+        "print",
+        "output",
+        "tracing"
+      ],
+      "objectives": [
+        "Place prints before and after a suspicious step",
+        "Bisect a bug by reading which prints appear",
+        "Use prints to trace an event firing"
+      ],
+      "prerequisites": [
+        "debugging"
+      ],
+      "keywords": [
+        "print",
+        "debugging",
+        "trace",
+        "bisect"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 3
+    },
+    {
+      "slug": "common-errors",
+      "title": "The classic errors — and their smell",
+      "description": "Match a symptom to its usual cause — nil indexing, string arithmetic, wrong-side changes — and fix in one line.",
+      "sectionId": "leveling-up",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "errors",
+        "bugs",
+        "troubleshooting"
+      ],
+      "objectives": [
+        "Recognize the four classic beginner bugs",
+        "Match each error to its usual fix",
+        "Know the Studio-vs-live difference"
+      ],
+      "prerequisites": [
+        "debugging"
+      ],
+      "keywords": [
+        "errors",
+        "bugs",
+        "nil",
+        "troubleshooting"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 4
+    },
+    {
+      "slug": "optimization",
+      "title": "Optimization — speed without guessing",
+      "description": "Make your game smooth — measure first, then attack the three biggest costs — parts, loops, and events.",
+      "sectionId": "leveling-up",
+      "order": 4,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 5,
+      "tags": [
+        "optimization",
+        "performance",
+        "fps"
+      ],
+      "objectives": [
+        "Measure before changing anything",
+        "[object Object]",
+        "Throttle non-critical loops with task.wait",
+        "Clean up instances and disconnect listeners"
+      ],
+      "prerequisites": [
+        "debugging"
+      ],
+      "keywords": [
+        "optimization",
+        "performance",
+        "fps",
+        "throttle",
+        "cleanup"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 5
+    },
+    {
+      "slug": "client-performance",
+      "title": "Client performance — running smooth on the player's machine",
+      "description": "Performance is measured on the player's machine — learn the frame budget, the per-frame work that eats it, and how to measure before you optimize.",
+      "sectionId": "leveling-up",
+      "order": 5,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 6,
+      "tags": [
+        "performance",
+        "client",
+        "fps",
+        "frame time"
+      ],
+      "objectives": [
+        "Explain the frame budget and why per-frame work matters",
+        "Use Heartbeat and RenderStepped without making them expensive",
+        "Avoid unnecessary loops, repeated Instance searches, allocation churn, and pricey UI updates",
+        "Measure a suspected bottleneck before touching code",
+        "Tell a real bottleneck from a micro-optimization"
+      ],
+      "prerequisites": [
+        "optimization",
+        "debugging"
+      ],
+      "keywords": [
+        "performance",
+        "fps",
+        "frame time",
+        "RenderStepped",
+        "Heartbeat",
+        "profiling",
+        "allocation",
+        "instance search"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 5
+    },
+    {
+      "slug": "memory-leaks",
+      "title": "Memory leaks — why dead things stick around",
+      "description": "Roblox removes what you Destroy — until a reference quietly keeps it alive. Meet the three classic leaks and learn the habits that prevent them.",
+      "sectionId": "leveling-up",
+      "order": 6,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "memory",
+        "performance",
+        "cleanup",
+        "garbage collection"
+      ],
+      "objectives": [
+        "Explain what a memory leak is on Roblox — an instance or listener that should be gone but still has a reference",
+        "[object Object]",
+        "Clean up behind respawns and player leaves",
+        "Read the Stats memory number to confirm a leak is real before chasing it"
+      ],
+      "prerequisites": [
+        "optimization"
+      ],
+      "keywords": [
+        "memory",
+        "leak",
+        "garbage collection",
+        "cleanup",
+        "destroy",
+        "disconnect",
+        "stats"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 5
+    },
+    {
+      "slug": "refactoring",
+      "title": "Refactoring — same game, cleaner code",
+      "description": "Read a messy script, spot the smells, and restructure it in small safe steps until the code matches the plan — without changing a single pixel of gameplay.",
+      "sectionId": "leveling-up",
+      "order": 7,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "refactoring",
+        "code quality",
+        "clean code",
+        "maintainability"
+      ],
+      "objectives": [
+        "[object Object]",
+        "Explain what makes a refactor safe, and why one small step at a time is non-negotiable",
+        "Rename and restructure to remove unclear names and magic values",
+        "Flatten nested conditionals with guard clauses",
+        "Extract responsibilities out of a giant handler into small functions",
+        "Clean up a script and prove the behavior came through unchanged"
+      ],
+      "prerequisites": [
+        "debugging"
+      ],
+      "keywords": [
+        "refactor",
+        "refactoring",
+        "clean code",
+        "magic value",
+        "guard clause",
+        "nesting",
+        "extract",
+        "code quality"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 6
+    },
+    {
+      "slug": "testing-fundamentals",
+      "title": "Testing fundamentals — claims that prove code works",
+      "description": "Turn \"I think it works\" into a claim the machine checks every run — cover happy paths, edge cases, and invalid input, and lock in every fix with a regression test.",
+      "sectionId": "leveling-up",
+      "order": 8,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 9,
+      "tags": [
+        "testing",
+        "assertions",
+        "regression",
+        "verification",
+        "quality"
+      ],
+      "objectives": [
+        "Say exactly what one passing test proves — and what it still doesn't",
+        "Cover happy paths, edge cases, invalid input, and failure cases",
+        "Write assertions whose failure messages explain themselves",
+        "Test pure functions in isolation, and plan how to verify systems that depend on Instances and events",
+        "Turn a bug fix into a regression test that never lets the bug return"
+      ],
+      "prerequisites": [
+        "debugging",
+        "refactoring"
+      ],
+      "keywords": [
+        "testing",
+        "test",
+        "assertion",
+        "check",
+        "regression",
+        "edge case",
+        "verification"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 6
+    },
+    {
+      "slug": "next-steps",
+      "title": "Next steps — the map of what you've learned",
+      "description": "Take stock of the full system you've built, then chart your course beyond this course.",
+      "sectionId": "leveling-up",
+      "order": 9,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 4,
+      "tags": [
+        "roadmap",
+        "next steps",
+        "review"
+      ],
+      "objectives": [
+        "Review the complete system you've built across this course",
+        "Name the three pillars that make a game trustworthy",
+        "Pick a direction for your next project"
+      ],
+      "prerequisites": [
+        "debugging"
+      ],
+      "keywords": [
+        "next steps",
+        "roadmap",
+        "review",
+        "continue"
+      ],
+      "sectionTitle": "Leveling Up",
+      "sectionOrder": 7,
+      "activityCount": 3
+    },
+    {
+      "slug": "recap-course",
+      "title": "Recap — everything you've built",
+      "description": "One lap around the whole journey — the pipeline, the pillars, and the debugging habits — before the final project.",
+      "sectionId": "final-project",
+      "order": 0,
+      "difficulty": "advanced",
+      "estimatedMinutes": 5,
+      "tags": [
+        "recap",
+        "review",
+        "full course"
+      ],
+      "objectives": [
+        "Remember the full game pipeline you've built",
+        "Remember the three pillars of a trustworthy game",
+        "Remember the debugging reading order"
+      ],
+      "prerequisites": [
+        "next-steps"
+      ],
+      "keywords": [
+        "recap",
+        "review",
+        "pipeline",
+        "pillars",
+        "debugging"
+      ],
+      "sectionTitle": "Final Project",
+      "sectionOrder": 8,
+      "activityCount": 3
+    },
+    {
+      "slug": "final-project",
+      "title": "The final project — one complete game",
+      "description": "Build one complete game — a clicker or a pet-collecting game — with a shop, persistent saves, and polish. Every system in this course in one place.",
+      "sectionId": "final-project",
+      "order": 1,
+      "difficulty": "advanced",
+      "estimatedMinutes": 12,
+      "tags": [
+        "project",
+        "capstone",
+        "game"
+      ],
+      "objectives": [
+        "Choose which game to build as your capstone",
+        "Assemble every system from the course into one complete game",
+        "Organize the code with ModuleScripts",
+        "[object Object]"
+      ],
+      "prerequisites": [
+        "datastore-testing",
+        "upgrades",
+        "clicker",
+        "debugging"
+      ],
+      "keywords": [
+        "project",
+        "capstone",
+        "full game",
+        "assemble"
+      ],
+      "sectionTitle": "Final Project",
+      "sectionOrder": 8,
+      "activityCount": 7
+    },
+    {
+      "slug": "viewport-frames",
+      "title": "ViewportFrames — 3D previews in your GUI",
+      "description": "Render a real 3D Roblox model inside a GUI element with ViewportFrame and a Camera, so UI can show a live preview of a vehicle, item, or character.",
+      "sectionId": "advanced-studio",
+      "order": 1,
+      "difficulty": "advanced",
+      "estimatedMinutes": 8,
+      "tags": [
+        "viewportframe",
+        "camera",
+        "gui",
+        "preview",
+        "3d"
+      ],
+      "objectives": [
+        "Create a ViewportFrame inside a ScreenGui",
+        "Build and configure a Camera",
+        "Clone a 3D model into the ViewportFrame",
+        "Point the camera so the model is visible and rotatable"
+      ],
+      "prerequisites": [
+        "guis",
+        "udim2",
+        "instances"
+      ],
+      "keywords": [
+        "viewportframe",
+        "camera",
+        "currentcamera",
+        "worldtoviewport",
+        "clone",
+        "gui"
+      ],
+      "sectionTitle": "Advanced Studio",
+      "sectionOrder": 9,
+      "activityCount": 5
+    },
+    {
+      "slug": "plugin-basics",
+      "title": "Plugin Basics — tools that build for you",
+      "description": "Automate repetitive Roblox Studio tasks by writing your own plugins — toolbars, buttons, the Plugin API, and how to keep them safe.",
+      "sectionId": "advanced-studio",
+      "order": 2,
+      "difficulty": "advanced",
+      "estimatedMinutes": 8,
+      "tags": [
+        "plugin",
+        "toolbar",
+        "studio",
+        "automation",
+        "pluginapi"
+      ],
+      "objectives": [
+        "Explain what a Studio plugin is and when to use one",
+        "Create a toolbar and toolbar button",
+        "Respond to button clicks with the Plugin API",
+        "Automate a repetitive task and manage plugins safely"
+      ],
+      "prerequisites": [
+        "modules",
+        "studio-features"
+      ],
+      "keywords": [
+        "plugin",
+        "pluginapi",
+        "toolbar",
+        "createbutton",
+        "pluginaction",
+        "studio",
+        "automation"
+      ],
+      "sectionTitle": "Advanced Studio",
+      "sectionOrder": 9,
+      "activityCount": 5
+    }
+  ],
+  "headings": {
+    "animations": [
+      {
+        "id": "loading-an-animation",
+        "text": "Loading an animation",
+        "level": 2
+      },
+      {
+        "id": "playing-and-stopping",
+        "text": "Playing and stopping",
+        "level": 2
+      },
+      {
+        "id": "speed-and-looping",
+        "text": "Speed and looping",
+        "level": 2
+      },
+      {
+        "id": "stopping-with-events",
+        "text": "Stopping with events",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "arrange-code-basics": [
+      {
+        "id": "the-rule",
+        "text": "The rule",
+        "level": 2
+      },
+      {
+        "id": "order-the-branches",
+        "text": "Order the branches",
+        "level": 2
+      },
+      {
+        "id": "count-with-style",
+        "text": "Count with style",
+        "level": 2
+      },
+      {
+        "id": "listen-to-the-world",
+        "text": "Listen to the world",
+        "level": 2
+      },
+      {
+        "id": "the-judgment-call",
+        "text": "The judgment call",
+        "level": 2
+      }
+    ],
+    "arrange-save-loop": [
+      {
+        "id": "load-on-join",
+        "text": "Load on join",
+        "level": 2
+      },
+      {
+        "id": "save-on-leave",
+        "text": "Save on leave",
+        "level": 2
+      },
+      {
+        "id": "the-autosave-loop",
+        "text": "The autosave loop",
+        "level": 2
+      },
+      {
+        "id": "the-secure-click-flow",
+        "text": "The secure click flow",
+        "level": 2
+      },
+      {
+        "id": "the-loop-in-one-picture",
+        "text": "The loop in one picture",
+        "level": 2
+      }
+    ],
+    "arrange-shop": [
+      {
+        "id": "the-buy-button-client",
+        "text": "The buy button (client)",
+        "level": 2
+      },
+      {
+        "id": "the-checkout-counter-server",
+        "text": "The checkout counter (server)",
+        "level": 2
+      },
+      {
+        "id": "idle-income",
+        "text": "Idle income",
+        "level": 2
+      },
+      {
+        "id": "the-live-ui",
+        "text": "The live UI",
+        "level": 2
+      },
+      {
+        "id": "the-whole-loop",
+        "text": "The whole loop",
+        "level": 2
+      }
+    ],
+    "arrange-tween": [
+      {
+        "id": "the-tween-recipe",
+        "text": "The tween recipe",
+        "level": 2
+      },
+      {
+        "id": "grab-the-body-safely",
+        "text": "Grab the body safely",
+        "level": 2
+      },
+      {
+        "id": "give-the-coin-a-voice",
+        "text": "Give the coin a voice",
+        "level": 2
+      },
+      {
+        "id": "the-coin-pickup",
+        "text": "The coin pickup",
+        "level": 2
+      },
+      {
+        "id": "the-polish-pattern",
+        "text": "The polish pattern",
+        "level": 2
+      }
+    ],
+    "attributes": [
+      {
+        "id": "writing-and-reading-attributes",
+        "text": "Writing and reading attributes",
+        "level": 2
+      },
+      {
+        "id": "attributes-beat-name-checks",
+        "text": "Attributes beat name checks",
+        "level": 2
+      },
+      {
+        "id": "building-with-attributes",
+        "text": "Building with attributes",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "booleans": [
+      {
+        "id": "the-comparison-operators",
+        "text": "The comparison operators",
+        "level": 2
+      },
+      {
+        "id": "questions-have-answers",
+        "text": "Questions have answers",
+        "level": 2
+      },
+      {
+        "id": "combining-questions-and-or",
+        "text": "Combining questions: and / or",
+        "level": 2
+      }
+    ],
+    "bug-hunt-basics": [
+      {
+        "id": "hunt-one-the-missing-local",
+        "text": "Hunt one — the missing local",
+        "level": 2
+      },
+      {
+        "id": "hunt-two-the-wrong-equals",
+        "text": "Hunt two — the wrong equals",
+        "level": 2
+      },
+      {
+        "id": "hunt-three-the-frozen-game",
+        "text": "Hunt three — the frozen game",
+        "level": 2
+      },
+      {
+        "id": "hunt-four-the-nil-argument",
+        "text": "Hunt four — the nil argument",
+        "level": 2
+      },
+      {
+        "id": "hunt-five-type-the-fix",
+        "text": "Hunt five — type the fix",
+        "level": 2
+      },
+      {
+        "id": "hunt-six-put-the-loop-together",
+        "text": "Hunt six — put the loop together",
+        "level": 2
+      }
+    ],
+    "bug-hunt-data": [
+      {
+        "id": "hunt-one-the-swapped-arguments",
+        "text": "Hunt one — the swapped arguments",
+        "level": 2
+      },
+      {
+        "id": "hunt-two-the-crashing-new-player",
+        "text": "Hunt two — the crashing new player",
+        "level": 2
+      },
+      {
+        "id": "hunt-three-the-invisible-leaderboard",
+        "text": "Hunt three — the invisible leaderboard",
+        "level": 2
+      },
+      {
+        "id": "hunt-four-the-wrong-save-moment",
+        "text": "Hunt four — the wrong save moment",
+        "level": 2
+      },
+      {
+        "id": "hunt-five-type-the-fix",
+        "text": "Hunt five — type the fix",
+        "level": 2
+      },
+      {
+        "id": "hunt-six-arrange-the-secure-flow",
+        "text": "Hunt six — arrange the secure flow",
+        "level": 2
+      }
+    ],
+    "bug-hunt-first": [
+      {
+        "id": "hunt-one-a-misspelled-function",
+        "text": "Hunt one — a misspelled function",
+        "level": 2
+      },
+      {
+        "id": "hunt-two-a-missing-piece",
+        "text": "Hunt two — a missing piece",
+        "level": 2
+      },
+      {
+        "id": "hunt-three-the-script-ran-but-did-nothing",
+        "text": "Hunt three — the script ran, but did nothing",
+        "level": 2
+      },
+      {
+        "id": "hunt-four-type-the-fix-yourself",
+        "text": "Hunt four — type the fix yourself",
+        "level": 2
+      },
+      {
+        "id": "the-hunt-is-a-loop",
+        "text": "The hunt is a loop",
+        "level": 2
+      }
+    ],
+    "bug-hunt-systems": [
+      {
+        "id": "hunt-one-the-check-on-the-wrong-computer",
+        "text": "Hunt one — the check on the wrong computer",
+        "level": 2
+      },
+      {
+        "id": "hunt-two-the-function-that-ran-too-soon",
+        "text": "Hunt two — the function that ran too soon",
+        "level": 2
+      },
+      {
+        "id": "hunt-three-the-coins-fountain",
+        "text": "Hunt three — the coins fountain",
+        "level": 2
+      },
+      {
+        "id": "hunt-four-the-silent-mismatch",
+        "text": "Hunt four — the silent mismatch",
+        "level": 2
+      },
+      {
+        "id": "hunt-five-type-the-fix",
+        "text": "Hunt five — type the fix",
+        "level": 2
+      },
+      {
+        "id": "hunt-six-arrange-the-purchase",
+        "text": "Hunt six — arrange the purchase",
+        "level": 2
+      }
+    ],
+    "bug-hunt-world": [
+      {
+        "id": "hunt-one-the-too-early-character",
+        "text": "Hunt one — the too-early character",
+        "level": 2
+      },
+      {
+        "id": "hunt-two-type-the-fix",
+        "text": "Hunt two — type the fix",
+        "level": 2
+      },
+      {
+        "id": "hunt-three-the-statue-tween",
+        "text": "Hunt three — the statue tween",
+        "level": 2
+      },
+      {
+        "id": "hunt-four-the-silent-coin",
+        "text": "Hunt four — the silent coin",
+        "level": 2
+      },
+      {
+        "id": "hunt-five-type-the-fix",
+        "text": "Hunt five — type the fix",
+        "level": 2
+      },
+      {
+        "id": "hunt-six-arrange-the-pickup",
+        "text": "Hunt six — arrange the pickup",
+        "level": 2
+      }
+    ],
+    "camera-control": [
+      {
+        "id": "meet-the-camera",
+        "text": "Meet the camera",
+        "level": 2
+      },
+      {
+        "id": "taking-the-wheel-scriptable",
+        "text": "Taking the wheel: Scriptable",
+        "level": 2
+      },
+      {
+        "id": "aiming-cframelookat",
+        "text": "Aiming: CFrame.lookAt",
+        "level": 2
+      },
+      {
+        "id": "the-follow-cam",
+        "text": "The follow cam",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "camera-cutscenes": [
+      {
+        "id": "the-shot",
+        "text": "The shot",
+        "level": 2
+      },
+      {
+        "id": "chaining-shots",
+        "text": "Chaining shots",
+        "level": 2
+      },
+      {
+        "id": "camera-shake",
+        "text": "Camera shake",
+        "level": 2
+      },
+      {
+        "id": "the-fov-punch",
+        "text": "The FOV punch",
+        "level": 2
+      },
+      {
+        "id": "the-wrap",
+        "text": "The wrap",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "characters": [
+      {
+        "id": "the-character-spawns-on-an-event",
+        "text": "The character spawns on an event",
+        "level": 2
+      },
+      {
+        "id": "waitforchild-grab-it-safely",
+        "text": "WaitForChild — grab it safely",
+        "level": 2
+      },
+      {
+        "id": "the-humanoid-vital-signs",
+        "text": "The Humanoid — vital signs",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "checkpoints": [
+      {
+        "id": "remembering-each-players-checkpoint",
+        "text": "Remembering each player's checkpoint",
+        "level": 2
+      },
+      {
+        "id": "detecting-a-checkpoint-touch",
+        "text": "Detecting a checkpoint touch",
+        "level": 2
+      },
+      {
+        "id": "respawn-in-the-right-place",
+        "text": "Respawn in the right place",
+        "level": 2
+      },
+      {
+        "id": "wiring-it-into-death",
+        "text": "Wiring it into death",
+        "level": 2
+      },
+      {
+        "id": "putting-it-together",
+        "text": "Putting it together",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "clicker": [
+      {
+        "id": "the-system-map",
+        "text": "The system map",
+        "level": 2
+      },
+      {
+        "id": "the-server-a-script-in-serverscriptservice",
+        "text": "The server (a Script in ServerScriptService)",
+        "level": 2
+      },
+      {
+        "id": "the-client-a-localscript-in-starterplayerscripts",
+        "text": "The client (a LocalScript in StarterPlayerScripts)",
+        "level": 2
+      },
+      {
+        "id": "closing-the-loop-the-server-sends-back",
+        "text": "Closing the loop: the server sends back",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "client-performance": [
+      {
+        "id": "smooth-is-measured-on-the-players-machine",
+        "text": "Smooth is measured on the player's machine",
+        "level": 2
+      },
+      {
+        "id": "the-16-millisecond-frame-budget",
+        "text": "The 16 millisecond frame budget",
+        "level": 2
+      },
+      {
+        "id": "continued-work-is-expensive-work",
+        "text": "Continued work is expensive work",
+        "level": 2
+      },
+      {
+        "id": "the-four-costs-beginner-clients-pay",
+        "text": "The four costs beginner clients pay",
+        "level": 2
+      },
+      {
+        "id": "measure-before-you-optimize",
+        "text": "Measure before you optimize",
+        "level": 2
+      },
+      {
+        "id": "a-measured-fix-start-to-finish",
+        "text": "A measured fix, start to finish",
+        "level": 2
+      },
+      {
+        "id": "now-fix-it-yourself",
+        "text": "Now fix it yourself",
+        "level": 2
+      },
+      {
+        "id": "the-checklist-on-your-toolbelt",
+        "text": "The checklist on your toolbelt",
+        "level": 2
+      }
+    ],
+    "comments": [
+      {
+        "id": "the-basic-comment",
+        "text": "The basic comment",
+        "level": 2
+      },
+      {
+        "id": "comment-the-why-not-the-what",
+        "text": "Comment the why, not the what",
+        "level": 2
+      },
+      {
+        "id": "comments-lie-when-you-edit",
+        "text": "Comments lie when you edit",
+        "level": 2
+      }
+    ],
+    "common-errors": [
+      {
+        "id": "the-four-classic-bugs",
+        "text": "The four classic bugs",
+        "level": 2
+      },
+      {
+        "id": "the-nil-index-family",
+        "text": "The nil-index family",
+        "level": 2
+      },
+      {
+        "id": "syntax-slips-type-the-fix",
+        "text": "Syntax slips — type the fix",
+        "level": 2
+      },
+      {
+        "id": "string-arithmetic-and-wrong-side-changes",
+        "text": "String arithmetic and wrong-side changes",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "conditionals": [
+      {
+        "id": "the-basic-shape",
+        "text": "The basic shape",
+        "level": 2
+      },
+      {
+        "id": "more-branches-elseif-and-else",
+        "text": "More branches: elseif and else",
+        "level": 2
+      },
+      {
+        "id": "combining-conditions",
+        "text": "Combining conditions",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "context-action-service": [
+      {
+        "id": "the-problem-with-hard-coded-keys",
+        "text": "The problem with hard-coded keys",
+        "level": 2
+      },
+      {
+        "id": "bindaction",
+        "text": "BindAction",
+        "level": 2
+      },
+      {
+        "id": "input-states",
+        "text": "Input states",
+        "level": 2
+      },
+      {
+        "id": "unbindaction",
+        "text": "UnbindAction",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "controller-support": [
+      {
+        "id": "detecting-a-gamepad",
+        "text": "Detecting a gamepad",
+        "level": 2
+      },
+      {
+        "id": "reading-buttons-and-sticks",
+        "text": "Reading buttons and sticks",
+        "level": 2
+      },
+      {
+        "id": "bind-actions-dont-hard-code-buttons",
+        "text": "Bind actions, don't hard-code buttons",
+        "level": 2
+      },
+      {
+        "id": "virtualcursormode-menus-without-a-mouse",
+        "text": "VirtualCursorMode — menus without a mouse",
+        "level": 2
+      },
+      {
+        "id": "a-controller-ready-menu",
+        "text": "A controller-ready menu",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "data-security": [
+      {
+        "id": "the-bad-version-client-gives-client-coins",
+        "text": "The bad version: client gives client coins",
+        "level": 2
+      },
+      {
+        "id": "the-good-version-server-decides-client-asks",
+        "text": "The good version: server decides, client asks",
+        "level": 2
+      },
+      {
+        "id": "the-first-security-habit-verify",
+        "text": "The first security habit: verify",
+        "level": 2
+      },
+      {
+        "id": "three-rules-to-live-by",
+        "text": "Three rules to live by",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "datastore-testing": [
+      {
+        "id": "enable-data-store-access-in-studio",
+        "text": "Enable data store access in Studio",
+        "level": 2
+      },
+      {
+        "id": "verify-the-loop-earn-stop-play",
+        "text": "Verify the loop: earn, stop, play",
+        "level": 2
+      },
+      {
+        "id": "verify-across-restarts-and-players",
+        "text": "Verify across restarts and players",
+        "level": 2
+      },
+      {
+        "id": "watch-the-store-from-the-creator-page",
+        "text": "Watch the store from the creator page",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "datastores": [
+      {
+        "id": "the-shape-of-saving",
+        "text": "The shape of saving",
+        "level": 2
+      },
+      {
+        "id": "save-and-load",
+        "text": "Save and load",
+        "level": 2
+      },
+      {
+        "id": "the-full-save-loop",
+        "text": "The full save loop",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "debugging": [
+      {
+        "id": "anatomy-of-an-error",
+        "text": "Anatomy of an error",
+        "level": 2
+      },
+      {
+        "id": "the-reading-order",
+        "text": "The reading order",
+        "level": 2
+      },
+      {
+        "id": "one-change-one-test",
+        "text": "One change, one test",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "events": [
+      {
+        "id": "the-idea-roblox-calls-you-back",
+        "text": "The idea: Roblox calls you back",
+        "level": 2
+      },
+      {
+        "id": "touched-the-first-event",
+        "text": ".Touched — the first event",
+        "level": 2
+      },
+      {
+        "id": "clickdetector-for-clickable-parts",
+        "text": "ClickDetector — for clickable parts",
+        "level": 2
+      },
+      {
+        "id": "other-events-youll-meet-soon",
+        "text": "Other events you'll meet soon",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "final-project": [
+      {
+        "id": "choose-your-build",
+        "text": "Choose your build",
+        "level": 2
+      },
+      {
+        "id": "step-0-folder-layout-and-gameconfig",
+        "text": "Step 0 — folder layout and GameConfig",
+        "level": 2
+      },
+      {
+        "id": "step-1-the-math-module",
+        "text": "Step 1 — the math module",
+        "level": 2
+      },
+      {
+        "id": "step-2-savesystem",
+        "text": "Step 2 — SaveSystem",
+        "level": 2
+      },
+      {
+        "id": "step-3-economy",
+        "text": "Step 3 — Economy",
+        "level": 2
+      },
+      {
+        "id": "step-4-clientui",
+        "text": "Step 4 — ClientUI",
+        "level": 2
+      },
+      {
+        "id": "step-5-polish",
+        "text": "Step 5 — polish",
+        "level": 2
+      },
+      {
+        "id": "playtest-and-ship",
+        "text": "Playtest and ship",
+        "level": 2
+      }
+    ],
+    "for-loops": [
+      {
+        "id": "the-basic-for-loop",
+        "text": "The basic for loop",
+        "level": 2
+      },
+      {
+        "id": "using-the-counter",
+        "text": "Using the counter",
+        "level": 2
+      },
+      {
+        "id": "counting-backward-and-in-steps",
+        "text": "Counting backward and in steps",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "function-returns": [
+      {
+        "id": "how-return-works",
+        "text": "How return works",
+        "level": 2
+      },
+      {
+        "id": "calls-become-values",
+        "text": "Calls become values",
+        "level": 2
+      },
+      {
+        "id": "return-stops-the-function",
+        "text": "Return stops the function",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "functions": [
+      {
+        "id": "writing-your-first-function",
+        "text": "Writing your first function",
+        "level": 2
+      },
+      {
+        "id": "parameters-and-arguments",
+        "text": "Parameters and arguments",
+        "level": 2
+      },
+      {
+        "id": "the-pattern-youll-see-everywhere",
+        "text": "The pattern you'll see everywhere",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "funnel-analysis": [
+      {
+        "id": "a-session-is-a-sequence-of-stages",
+        "text": "A session is a sequence of stages",
+        "level": 2
+      },
+      {
+        "id": "count-each-stage-once",
+        "text": "Count each stage once",
+        "level": 2
+      },
+      {
+        "id": "the-counter-lives-on-the-server",
+        "text": "The counter lives on the server",
+        "level": 2
+      },
+      {
+        "id": "flush-on-a-timer-not-on-every-mark",
+        "text": "Flush on a timer, not on every mark",
+        "level": 2
+      },
+      {
+        "id": "read-it-as-percentages-not-counts",
+        "text": "Read it as percentages, not counts",
+        "level": 2
+      },
+      {
+        "id": "left-or-stuck-two-different-problems",
+        "text": "Left or stuck: two different problems",
+        "level": 2
+      },
+      {
+        "id": "fix-one-leak-then-look-again",
+        "text": "Fix one leak, then look again",
+        "level": 2
+      }
+    ],
+    "gui-styling": [
+      {
+        "id": "colors",
+        "text": "Colors",
+        "level": 2
+      },
+      {
+        "id": "rounded-corners",
+        "text": "Rounded corners",
+        "level": 2
+      },
+      {
+        "id": "text",
+        "text": "Text",
+        "level": 2
+      }
+    ],
+    "guis": [
+      {
+        "id": "the-gui-family-tree",
+        "text": "The GUI family tree",
+        "level": 2
+      },
+      {
+        "id": "the-recipe-create-style-parent",
+        "text": "The recipe: create, style, parent",
+        "level": 2
+      },
+      {
+        "id": "clicking-the-button-client-side",
+        "text": "Clicking the button — client side",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "health-damage": [
+      {
+        "id": "detecting-a-hard-landing",
+        "text": "Detecting a hard landing",
+        "level": 2
+      },
+      {
+        "id": "a-reusable-damage-function",
+        "text": "A reusable damage function",
+        "level": 2
+      },
+      {
+        "id": "a-health-bar-above-the-character",
+        "text": "A health bar above the character",
+        "level": 2
+      },
+      {
+        "id": "death-and-respawn",
+        "text": "Death and respawn",
+        "level": 2
+      },
+      {
+        "id": "putting-it-together",
+        "text": "Putting it together",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "idle-loop": [
+      {
+        "id": "the-passive-loop",
+        "text": "The passive loop",
+        "level": 2
+      },
+      {
+        "id": "the-guard-matters",
+        "text": "The guard matters",
+        "level": 2
+      },
+      {
+        "id": "one-fireclient-for-everything",
+        "text": "One FireClient for everything",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "input-validation": [
+      {
+        "id": "it-arrives-as-whatever-the-client-sent",
+        "text": "It arrives as \"whatever the client sent\"",
+        "level": 2
+      },
+      {
+        "id": "shape-first-is-it-even-a-string",
+        "text": "Shape first: is it even a string?",
+        "level": 2
+      },
+      {
+        "id": "then-size-how-big-is-too-big",
+        "text": "Then size: how big is too big?",
+        "level": 2
+      },
+      {
+        "id": "numbers-cross-the-wire-as-claims-too",
+        "text": "Numbers cross the wire as claims too",
+        "level": 2
+      },
+      {
+        "id": "shapes-whitelist-dont-guess",
+        "text": "Shapes: whitelist, don't guess",
+        "level": 2
+      },
+      {
+        "id": "the-validation-checklist",
+        "text": "The validation checklist",
+        "level": 2
+      }
+    ],
+    "installing-studio": [
+      {
+        "id": "download-and-sign-in",
+        "text": "Download and sign in",
+        "level": 2
+      },
+      {
+        "id": "start-from-a-baseplate",
+        "text": "Start from a Baseplate",
+        "level": 2
+      },
+      {
+        "id": "your-workspace-is-ready",
+        "text": "Your workspace is ready",
+        "level": 2
+      }
+    ],
+    "instances": [
+      {
+        "id": "creating-a-part-from-a-script",
+        "text": "Creating a part from a script",
+        "level": 2
+      },
+      {
+        "id": "anchored-and-moving-parts",
+        "text": "Anchored and moving parts",
+        "level": 2
+      },
+      {
+        "id": "materials-and-enums",
+        "text": "Materials and Enums",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "inventory-hotbar": [
+      {
+        "id": "the-inventory-data",
+        "text": "The inventory data",
+        "level": 2
+      },
+      {
+        "id": "building-the-hotbar-ui",
+        "text": "Building the hotbar UI",
+        "level": 2
+      },
+      {
+        "id": "picking-up-items",
+        "text": "Picking up items",
+        "level": 2
+      },
+      {
+        "id": "equipping-with-a-click",
+        "text": "Equipping with a click",
+        "level": 2
+      },
+      {
+        "id": "putting-it-together",
+        "text": "Putting it together",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "leaderstats": [
+      {
+        "id": "the-recipe",
+        "text": "The recipe",
+        "level": 2
+      },
+      {
+        "id": "the-join-hook",
+        "text": "The join hook",
+        "level": 2
+      },
+      {
+        "id": "updating-stats",
+        "text": "Updating stats",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "lighting-atmosphere": [
+      {
+        "id": "time-of-day",
+        "text": "Time of day",
+        "level": 2
+      },
+      {
+        "id": "sky-and-atmosphere",
+        "text": "Sky and Atmosphere",
+        "level": 2
+      },
+      {
+        "id": "fog-for-depth",
+        "text": "Fog for depth",
+        "level": 2
+      },
+      {
+        "id": "posteffects-for-polish",
+        "text": "PostEffects for polish",
+        "level": 2
+      },
+      {
+        "id": "animating-a-daynight-cycle",
+        "text": "Animating a day/night cycle",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "loading-data": [
+      {
+        "id": "loading-on-join",
+        "text": "Loading on join",
+        "level": 2
+      },
+      {
+        "id": "first-time-players-the-nil-check",
+        "text": "First-time players: the nil check",
+        "level": 2
+      },
+      {
+        "id": "from-loaded-number-to-leaderboard",
+        "text": "From loaded number to leaderboard",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "loops": [
+      {
+        "id": "the-forever-loop-while-true",
+        "text": "The forever loop: while true",
+        "level": 2
+      },
+      {
+        "id": "a-loop-that-ends",
+        "text": "A loop that ends",
+        "level": 2
+      },
+      {
+        "id": "the-one-that-checks-at-the-end-repeat",
+        "text": "The one that checks at the end: repeat",
+        "level": 2
+      },
+      {
+        "id": "how-loops-break",
+        "text": "How loops break",
+        "level": 2
+      }
+    ],
+    "melee-combat": [
+      {
+        "id": "casting-a-ray-from-the-camera",
+        "text": "Casting a ray from the camera",
+        "level": 2
+      },
+      {
+        "id": "identifying-the-target",
+        "text": "Identifying the target",
+        "level": 2
+      },
+      {
+        "id": "server-side-damage-with-a-cooldown",
+        "text": "Server-side damage with a cooldown",
+        "level": 2
+      },
+      {
+        "id": "the-server-validates-and-applies",
+        "text": "The server validates and applies",
+        "level": 2
+      },
+      {
+        "id": "putting-it-together",
+        "text": "Putting it together",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "memory-leaks": [
+      {
+        "id": "a-leak-is-a-reference-that-never-lets-go",
+        "text": "A leak is a reference that never lets go",
+        "level": 2
+      },
+      {
+        "id": "leak-1-created-never-destroyed",
+        "text": "Leak 1 — created, never destroyed",
+        "level": 2
+      },
+      {
+        "id": "leak-2-connections-that-stack",
+        "text": "Leak 2 — connections that stack",
+        "level": 2
+      },
+      {
+        "id": "leak-3-lists-that-never-let-go",
+        "text": "Leak 3 — lists that never let go",
+        "level": 2
+      },
+      {
+        "id": "cleanup-on-player-leave",
+        "text": "Cleanup on player leave",
+        "level": 2
+      },
+      {
+        "id": "check-your-work-before-you-chase-anything",
+        "text": "Check your work before you chase anything",
+        "level": 2
+      }
+    ],
+    "modules": [
+      {
+        "id": "what-a-modulescript-is",
+        "text": "What a ModuleScript is",
+        "level": 2
+      },
+      {
+        "id": "the-simplest-module-shared-config",
+        "text": "The simplest module: shared config",
+        "level": 2
+      },
+      {
+        "id": "a-module-of-functions",
+        "text": "A module of functions",
+        "level": 2
+      },
+      {
+        "id": "refactor-your-clicker",
+        "text": "Refactor your clicker",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "monetization": [
+      {
+        "id": "the-money-map",
+        "text": "The money map",
+        "level": 2
+      },
+      {
+        "id": "sell-something-the-game-pass",
+        "text": "Sell something: the game pass",
+        "level": 2
+      },
+      {
+        "id": "sell-it-again-developer-products",
+        "text": "Sell it again: developer products",
+        "level": 2
+      },
+      {
+        "id": "the-part-money-cant-buy",
+        "text": "The part money can't buy",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "next-steps": [
+      {
+        "id": "the-system-youve-assembled",
+        "text": "The system you've assembled",
+        "level": 2
+      },
+      {
+        "id": "the-three-pillars",
+        "text": "The three pillars",
+        "level": 2
+      },
+      {
+        "id": "what-you-havent-covered-and-where-to-go",
+        "text": "What you haven't covered (and where to go)",
+        "level": 2
+      },
+      {
+        "id": "your-next-project",
+        "text": "Your next project",
+        "level": 2
+      }
+    ],
+    "npcs": [
+      {
+        "id": "the-simplest-npc",
+        "text": "The simplest NPC",
+        "level": 2
+      },
+      {
+        "id": "pathfindingservice-navigation-around-obstacles",
+        "text": "PathfindingService — navigation around obstacles",
+        "level": 2
+      },
+      {
+        "id": "following-the-path",
+        "text": "Following the path",
+        "level": 2
+      },
+      {
+        "id": "a-patrol-loop",
+        "text": "A patrol loop",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "numbers": [
+      {
+        "id": "the-five-operators",
+        "text": "The five operators",
+        "level": 2
+      },
+      {
+        "id": "doing-math-on-boxes",
+        "text": "Doing math on boxes",
+        "level": 2
+      },
+      {
+        "id": "order-of-operations",
+        "text": "Order of operations",
+        "level": 2
+      }
+    ],
+    "oop-metatables": [
+      {
+        "id": "what-a-metatable-is",
+        "text": "What a metatable is",
+        "level": 2
+      },
+      {
+        "id": "building-a-constructor",
+        "text": "Building a constructor",
+        "level": 2
+      },
+      {
+        "id": "inheritance-extending-a-class",
+        "text": "Inheritance — extending a class",
+        "level": 2
+      },
+      {
+        "id": "when-to-use-oop",
+        "text": "When to use OOP",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "optimization": [
+      {
+        "id": "smooth-is-a-budget",
+        "text": "Smooth is a budget",
+        "level": 2
+      },
+      {
+        "id": "measure-before-you-change",
+        "text": "Measure before you change",
+        "level": 2
+      },
+      {
+        "id": "parts-every-part-is-a-bill",
+        "text": "Parts: every part is a bill",
+        "level": 2
+      },
+      {
+        "id": "loops-throttle-or-spin",
+        "text": "Loops: throttle or spin",
+        "level": 2
+      },
+      {
+        "id": "events-disconnect-what-you-dont-need",
+        "text": "Events: disconnect what you don't need",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "output-errors": [
+      {
+        "id": "the-anatomy-of-an-error",
+        "text": "The anatomy of an error",
+        "level": 2
+      },
+      {
+        "id": "make-an-error-on-purpose",
+        "text": "Make an error on purpose",
+        "level": 2
+      },
+      {
+        "id": "the-habit-that-separates-developers",
+        "text": "The habit that separates developers",
+        "level": 2
+      }
+    ],
+    "particle-effects": [
+      {
+        "id": "your-first-emitter",
+        "text": "Your first emitter",
+        "level": 2
+      },
+      {
+        "id": "shape-and-direction",
+        "text": "Shape and direction",
+        "level": 2
+      },
+      {
+        "id": "color-and-size-over-time",
+        "text": "Color and size over time",
+        "level": 2
+      },
+      {
+        "id": "toggling-effects",
+        "text": "Toggling effects",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "pcall": [
+      {
+        "id": "the-problem-one-crash-kills-everything",
+        "text": "The problem — one crash kills everything",
+        "level": 2
+      },
+      {
+        "id": "pcall-catches-the-crash",
+        "text": "pcall catches the crash",
+        "level": 2
+      },
+      {
+        "id": "the-pattern-always-check-success",
+        "text": "The pattern — always check success",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "play-testing": [
+      {
+        "id": "play-and-stop",
+        "text": "Play and Stop",
+        "level": 2
+      },
+      {
+        "id": "test-changes-dont-save",
+        "text": "Test changes don't save",
+        "level": 2
+      },
+      {
+        "id": "your-first-script",
+        "text": "Your first script",
+        "level": 2
+      },
+      {
+        "id": "make-it-run",
+        "text": "Make it run",
+        "level": 2
+      }
+    ],
+    "player-added": [
+      {
+        "id": "grabbing-the-service",
+        "text": "Grabbing the service",
+        "level": 2
+      },
+      {
+        "id": "greeting-new-players-playeradded",
+        "text": "Greeting new players: PlayerAdded",
+        "level": 2
+      },
+      {
+        "id": "localplayer-the-clients-own-view",
+        "text": "LocalPlayer — the client's own view",
+        "level": 2
+      }
+    ],
+    "players": [
+      {
+        "id": "the-player-object",
+        "text": "The Player object",
+        "level": 2
+      },
+      {
+        "id": "player-vs-character",
+        "text": "Player vs character",
+        "level": 2
+      },
+      {
+        "id": "why-the-separation-matters",
+        "text": "Why the separation matters",
+        "level": 2
+      }
+    ],
+    "plugin-basics": [
+      {
+        "id": "what-a-plugin-is",
+        "text": "What a plugin is",
+        "level": 2
+      },
+      {
+        "id": "the-toolbar-and-button",
+        "text": "The toolbar and button",
+        "level": 2
+      },
+      {
+        "id": "respond-to-the-click",
+        "text": "Respond to the click",
+        "level": 2
+      },
+      {
+        "id": "automating-a-real-task",
+        "text": "Automating a real task",
+        "level": 2
+      },
+      {
+        "id": "a-little-plugin-ui",
+        "text": "A little plugin UI",
+        "level": 2
+      },
+      {
+        "id": "security-and-testing",
+        "text": "Security and testing",
+        "level": 2
+      },
+      {
+        "id": "a-practical-example-the-scene-cleaner",
+        "text": "A practical example: the scene cleaner",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "print-debugging": [
+      {
+        "id": "the-before-after-trick",
+        "text": "The before / after trick",
+        "level": 2
+      },
+      {
+        "id": "bisecting-with-prints",
+        "text": "Bisecting with prints",
+        "level": 2
+      },
+      {
+        "id": "tracing-an-event",
+        "text": "Tracing an event",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "proximity-prompt": [
+      {
+        "id": "adding-a-proximityprompt",
+        "text": "Adding a ProximityPrompt",
+        "level": 2
+      },
+      {
+        "id": "handling-the-interaction",
+        "text": "Handling the interaction",
+        "level": 2
+      },
+      {
+        "id": "customizing-the-look",
+        "text": "Customizing the look",
+        "level": 2
+      },
+      {
+        "id": "proximityprompt-vs-the-alternatives",
+        "text": "ProximityPrompt vs the alternatives",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "publishing": [
+      {
+        "id": "publish-the-place",
+        "text": "Publish the place",
+        "level": 2
+      },
+      {
+        "id": "the-settings-that-matter",
+        "text": "The settings that matter",
+        "level": 2
+      },
+      {
+        "id": "what-changes-when-its-live",
+        "text": "What changes when it's live",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "rate-limiting": [
+      {
+        "id": "the-flood",
+        "text": "The flood",
+        "level": 2
+      },
+      {
+        "id": "debounce-is-ux-not-security",
+        "text": "Debounce is UX, not security",
+        "level": 2
+      },
+      {
+        "id": "server-side-cooldown-one-per-window-per-player",
+        "text": "Server-side cooldown — one per window, per player",
+        "level": 2
+      },
+      {
+        "id": "clean-up-when-players-leave",
+        "text": "Clean up when players leave",
+        "level": 2
+      },
+      {
+        "id": "cooldown-vs-debounce-vs-rate-limit",
+        "text": "Cooldown vs debounce vs rate limit",
+        "level": 2
+      },
+      {
+        "id": "the-full-hardened-flow",
+        "text": "The full hardened flow",
+        "level": 2
+      }
+    ],
+    "raycasting": [
+      {
+        "id": "the-ray",
+        "text": "The ray",
+        "level": 2
+      },
+      {
+        "id": "reading-the-hit",
+        "text": "Reading the hit",
+        "level": 2
+      },
+      {
+        "id": "filtering-the-cast",
+        "text": "Filtering the cast",
+        "level": 2
+      },
+      {
+        "id": "a-real-use-is-there-ground",
+        "text": "A real use: is there ground?",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "recap-basics": [
+      {
+        "id": "boxes-that-remember",
+        "text": "Boxes that remember",
+        "level": 2
+      },
+      {
+        "id": "jobs-and-choices",
+        "text": "Jobs and choices",
+        "level": 2
+      },
+      {
+        "id": "loops-tables-and-timing",
+        "text": "Loops, tables, and timing",
+        "level": 2
+      },
+      {
+        "id": "events-let-roblox-call-you",
+        "text": "Events — let Roblox call you",
+        "level": 2
+      },
+      {
+        "id": "all-wired-up",
+        "text": "All wired up",
+        "level": 2
+      }
+    ],
+    "recap-course": [
+      {
+        "id": "the-pipeline",
+        "text": "The pipeline",
+        "level": 2
+      },
+      {
+        "id": "the-three-pillars",
+        "text": "The three pillars",
+        "level": 2
+      },
+      {
+        "id": "the-debugging-habit",
+        "text": "The debugging habit",
+        "level": 2
+      },
+      {
+        "id": "the-big-build",
+        "text": "The big build",
+        "level": 2
+      }
+    ],
+    "recap-data": [
+      {
+        "id": "the-leaderboard",
+        "text": "The leaderboard",
+        "level": 2
+      },
+      {
+        "id": "the-save-loop",
+        "text": "The save loop",
+        "level": 2
+      },
+      {
+        "id": "the-security-rule",
+        "text": "The security rule",
+        "level": 2
+      },
+      {
+        "id": "the-bridge",
+        "text": "The bridge",
+        "level": 2
+      },
+      {
+        "id": "ready-to-build",
+        "text": "Ready to build",
+        "level": 2
+      }
+    ],
+    "recap-gameplay": [
+      {
+        "id": "guis-built-in-code",
+        "text": "GUIs built in code",
+        "level": 2
+      },
+      {
+        "id": "the-clicker-loop",
+        "text": "The clicker loop",
+        "level": 2
+      },
+      {
+        "id": "idle-income-and-the-shop",
+        "text": "Idle income and the shop",
+        "level": 2
+      },
+      {
+        "id": "modules",
+        "text": "Modules",
+        "level": 2
+      },
+      {
+        "id": "ready-for-the-world",
+        "text": "Ready for the world",
+        "level": 2
+      }
+    ],
+    "recap-objects": [
+      {
+        "id": "the-player-and-the-character",
+        "text": "The Player and the character",
+        "level": 2
+      },
+      {
+        "id": "grab-the-body-safely",
+        "text": "Grab the body safely",
+        "level": 2
+      },
+      {
+        "id": "building-and-tagging-the-world",
+        "text": "Building and tagging the world",
+        "level": 2
+      },
+      {
+        "id": "sound-and-motion",
+        "text": "Sound and motion",
+        "level": 2
+      },
+      {
+        "id": "ready-to-ship",
+        "text": "Ready to ship",
+        "level": 2
+      }
+    ],
+    "recap-publishing": [
+      {
+        "id": "studio-vs-live",
+        "text": "Studio vs live",
+        "level": 2
+      },
+      {
+        "id": "who-gets-in",
+        "text": "Who gets in",
+        "level": 2
+      },
+      {
+        "id": "proving-the-saves",
+        "text": "Proving the saves",
+        "level": 2
+      },
+      {
+        "id": "ready-to-level-up",
+        "text": "Ready to level up",
+        "level": 2
+      }
+    ],
+    "recap-studio": [
+      {
+        "id": "the-three-panels-you-live-in",
+        "text": "The three panels you live in",
+        "level": 2
+      },
+      {
+        "id": "play-test-throw-away",
+        "text": "Play, test, throw away",
+        "level": 2
+      },
+      {
+        "id": "red-text-is-a-map-not-a-verdict",
+        "text": "Red text is a map, not a verdict",
+        "level": 2
+      },
+      {
+        "id": "ready-for-the-real-thing",
+        "text": "Ready for the real thing",
+        "level": 2
+      }
+    ],
+    "refactoring": [
+      {
+        "id": "same-game-different-code",
+        "text": "Same game, different code",
+        "level": 2
+      },
+      {
+        "id": "the-smell-catalog",
+        "text": "The smell catalog",
+        "level": 2
+      },
+      {
+        "id": "names-you-can-trust",
+        "text": "Names you can trust",
+        "level": 2
+      },
+      {
+        "id": "kill-the-magic-values",
+        "text": "Kill the magic values",
+        "level": 2
+      },
+      {
+        "id": "flatten-the-nesting-with-guard-clauses",
+        "text": "Flatten the nesting with guard clauses",
+        "level": 2
+      },
+      {
+        "id": "split-the-giant-into-pieces",
+        "text": "Split the giant into pieces",
+        "level": 2
+      }
+    ],
+    "remotes": [
+      {
+        "id": "the-layout",
+        "text": "The layout",
+        "level": 2
+      },
+      {
+        "id": "client-asks-fireserver",
+        "text": "Client asks (FireServer)",
+        "level": 2
+      },
+      {
+        "id": "server-decides-onserverevent",
+        "text": "Server decides (OnServerEvent)",
+        "level": 2
+      },
+      {
+        "id": "server-sends-back-fireclient-fireallclients",
+        "text": "Server sends back (FireClient / FireAllClients)",
+        "level": 2
+      },
+      {
+        "id": "the-full-secure-coin-flow",
+        "text": "The full secure coin flow",
+        "level": 2
+      }
+    ],
+    "save-loop": [
+      {
+        "id": "save-on-leave",
+        "text": "Save on leave",
+        "level": 2
+      },
+      {
+        "id": "the-autosave-loop",
+        "text": "The autosave loop",
+        "level": 2
+      },
+      {
+        "id": "saving-in-bounds",
+        "text": "Saving in bounds",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "scripts": [
+      {
+        "id": "every-roblox-game-is-two-programs",
+        "text": "Every Roblox game is two programs",
+        "level": 2
+      },
+      {
+        "id": "reading-a-script-top-to-bottom",
+        "text": "Reading a script top to bottom",
+        "level": 2
+      },
+      {
+        "id": "finding-things-workspace-and-scriptparent",
+        "text": "Finding things: workspace and script.Parent",
+        "level": 2
+      },
+      {
+        "id": "where-to-put-scripts",
+        "text": "Where to put scripts",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "security-audit": [
+      {
+        "id": "an-audit-is-a-map-of-trust-boundaries",
+        "text": "An audit is a map of trust boundaries",
+        "level": 2
+      },
+      {
+        "id": "three-questions-for-every-boundary",
+        "text": "Three questions for every boundary",
+        "level": 2
+      },
+      {
+        "id": "the-first-finding-unchecked-arguments",
+        "text": "The first finding: unchecked arguments",
+        "level": 2
+      },
+      {
+        "id": "harden-the-handler",
+        "text": "Harden the handler",
+        "level": 2
+      },
+      {
+        "id": "the-free-typed-door",
+        "text": "The free-typed door",
+        "level": 2
+      },
+      {
+        "id": "pace-every-door",
+        "text": "Pace every door",
+        "level": 2
+      },
+      {
+        "id": "your-audit-checklist",
+        "text": "Your audit checklist",
+        "level": 2
+      }
+    ],
+    "server-authority": [
+      {
+        "id": "where-the-rules-live",
+        "text": "Where the rules live",
+        "level": 2
+      },
+      {
+        "id": "send-the-intention-not-the-numbers",
+        "text": "Send the intention, not the numbers",
+        "level": 2
+      },
+      {
+        "id": "even-the-check-is-yours",
+        "text": "Even the check is yours",
+        "level": 2
+      },
+      {
+        "id": "silence-is-the-answer",
+        "text": "Silence is the answer",
+        "level": 2
+      },
+      {
+        "id": "the-authority-checklist",
+        "text": "The authority checklist",
+        "level": 2
+      }
+    ],
+    "sharing-permissions": [
+      {
+        "id": "who-can-play",
+        "text": "Who can play",
+        "level": 2
+      },
+      {
+        "id": "getting-the-link-to-testers",
+        "text": "Getting the link to testers",
+        "level": 2
+      },
+      {
+        "id": "private-servers-and-test-servers",
+        "text": "Private servers and test servers",
+        "level": 2
+      }
+    ],
+    "shop-ui": [
+      {
+        "id": "the-panel-frame",
+        "text": "The panel frame",
+        "level": 2
+      },
+      {
+        "id": "children-position-inside-the-frame",
+        "text": "Children position inside the frame",
+        "level": 2
+      },
+      {
+        "id": "the-buy-button-and-the-mirror",
+        "text": "The buy button and the mirror",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "sounds": [
+      {
+        "id": "creating-a-sound",
+        "text": "Creating a sound",
+        "level": 2
+      },
+      {
+        "id": "playing-where-its-heard",
+        "text": "Playing where it's heard",
+        "level": 2
+      },
+      {
+        "id": "stopping-and-controlling",
+        "text": "Stopping and controlling",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "string-patterns": [
+      {
+        "id": "stringfind-locate-text",
+        "text": "string.find — locate text",
+        "level": 2
+      },
+      {
+        "id": "stringgsub-find-and-replace",
+        "text": "string.gsub — find and replace",
+        "level": 2
+      },
+      {
+        "id": "pattern-characters-d-a-and-more",
+        "text": "Pattern characters — %d, %a, and more",
+        "level": 2
+      },
+      {
+        "id": "putting-it-together-extract-data-from-text",
+        "text": "Putting it together — extract data from text",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "strings": [
+      {
+        "id": "what-a-string-is",
+        "text": "What a string is",
+        "level": 2
+      },
+      {
+        "id": "gluing-strings-together",
+        "text": "Gluing strings together: ..",
+        "level": 2
+      },
+      {
+        "id": "building-messages-that-change",
+        "text": "Building messages that change",
+        "level": 2
+      }
+    ],
+    "studio-features": [
+      {
+        "id": "spawnlocation-where-players-appear",
+        "text": "SpawnLocation — where players appear",
+        "level": 2
+      },
+      {
+        "id": "forcefield-a-bubble-of-protection",
+        "text": "ForceField — a bubble of protection",
+        "level": 2
+      },
+      {
+        "id": "selectionbox-and-highlight-making-parts-stand-out",
+        "text": "SelectionBox and Highlight — making parts stand out",
+        "level": 2
+      },
+      {
+        "id": "combining-them-a-protected-respawn",
+        "text": "Combining them — a protected respawn",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "studio-interface": [
+      {
+        "id": "the-explorer-what-exists",
+        "text": "The Explorer — what exists",
+        "level": 2
+      },
+      {
+        "id": "properties-the-details-of-whats-selected",
+        "text": "Properties — the details of what's selected",
+        "level": 2
+      },
+      {
+        "id": "the-output-window-what-the-code-said",
+        "text": "The Output window — what the code said",
+        "level": 2
+      },
+      {
+        "id": "which-panel-has-the-answer",
+        "text": "Which panel has the answer?",
+        "level": 2
+      }
+    ],
+    "tables": [
+      {
+        "id": "making-a-table",
+        "text": "Making a table",
+        "level": 2
+      },
+      {
+        "id": "adding-and-counting",
+        "text": "Adding and counting",
+        "level": 2
+      },
+      {
+        "id": "walking-through-a-table-ipairs",
+        "text": "Walking through a table: ipairs",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "task-wait": [
+      {
+        "id": "taskwait-pause",
+        "text": "task.wait — pause",
+        "level": 2
+      },
+      {
+        "id": "taskdelay-schedule-dont-pause",
+        "text": "task.delay — schedule, don't pause",
+        "level": 2
+      },
+      {
+        "id": "running-at-the-same-time-taskspawn",
+        "text": "Running at the same time: task.spawn",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "teams": [
+      {
+        "id": "creating-teams",
+        "text": "Creating teams",
+        "level": 2
+      },
+      {
+        "id": "assigning-players",
+        "text": "Assigning players",
+        "level": 2
+      },
+      {
+        "id": "team-scores-with-leaderstats",
+        "text": "Team scores with leaderstats",
+        "level": 2
+      },
+      {
+        "id": "a-simple-round-system",
+        "text": "A simple round system",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "teleporting": [
+      {
+        "id": "teleporting-around-the-same-map",
+        "text": "Teleporting around the same map",
+        "level": 2
+      },
+      {
+        "id": "teleporting-to-another-place",
+        "text": "Teleporting to another Place",
+        "level": 2
+      },
+      {
+        "id": "teleporting-back-to-the-same-place",
+        "text": "Teleporting back to the same Place",
+        "level": 2
+      },
+      {
+        "id": "sending-data-along-with-the-teleport",
+        "text": "Sending data along with the teleport",
+        "level": 2
+      },
+      {
+        "id": "reading-the-data-on-arrival",
+        "text": "Reading the data on arrival",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "testing-fundamentals": [
+      {
+        "id": "a-test-is-a-claim-with-a-verdict",
+        "text": "A test is a claim with a verdict",
+        "level": 2
+      },
+      {
+        "id": "the-four-cases",
+        "text": "The four cases",
+        "level": 2
+      },
+      {
+        "id": "assertions-that-explain-themselves",
+        "text": "Assertions that explain themselves",
+        "level": 2
+      },
+      {
+        "id": "pure-functions-are-the-friendliest-to-test",
+        "text": "Pure functions are the friendliest to test",
+        "level": 2
+      },
+      {
+        "id": "red-green-done-write-the-test-before-the-fix",
+        "text": "Red, green, done — write the test before the fix",
+        "level": 2
+      },
+      {
+        "id": "regression-tests-lock-in-fixes",
+        "text": "Regression tests lock in fixes",
+        "level": 2
+      }
+    ],
+    "tweens": [
+      {
+        "id": "the-recipe",
+        "text": "The recipe",
+        "level": 2
+      },
+      {
+        "id": "easing-moving-vs-feeling",
+        "text": "Easing — moving vs feeling",
+        "level": 2
+      },
+      {
+        "id": "cframe-vs-position",
+        "text": "CFrame vs Position",
+        "level": 2
+      },
+      {
+        "id": "tweening-the-ui",
+        "text": "Tweening the UI",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "types": [
+      {
+        "id": "the-four-types-youll-use",
+        "text": "The four types you'll use",
+        "level": 2
+      },
+      {
+        "id": "why-1-is-not-1",
+        "text": "Why \"1\" is not 1",
+        "level": 2
+      },
+      {
+        "id": "converting-on-purpose",
+        "text": "Converting on purpose",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "udim2": [
+      {
+        "id": "scale-and-offset",
+        "text": "Scale and offset",
+        "level": 2
+      },
+      {
+        "id": "size-and-position",
+        "text": "Size and Position",
+        "level": 2
+      },
+      {
+        "id": "anchorpoint-the-secret-to-centering",
+        "text": "AnchorPoint — the secret to centering",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "ui-menus": [
+      {
+        "id": "visible-is-the-onoff-switch",
+        "text": "Visible is the on/off switch",
+        "level": 2
+      },
+      {
+        "id": "one-button-that-toggles",
+        "text": "One button that toggles",
+        "level": 2
+      },
+      {
+        "id": "the-close-button-x",
+        "text": "The close button (X)",
+        "level": 2
+      },
+      {
+        "id": "escape-closes-it-too",
+        "text": "Escape closes it too",
+        "level": 2
+      },
+      {
+        "id": "click-outside-to-close-the-backdrop",
+        "text": "Click outside to close — the backdrop",
+        "level": 2
+      },
+      {
+        "id": "one-function-to-rule-them-all",
+        "text": "One function to rule them all",
+        "level": 2
+      },
+      {
+        "id": "common-menu-mistakes",
+        "text": "Common menu mistakes",
+        "level": 2
+      },
+      {
+        "id": "the-checklist-on-your-toolbelt",
+        "text": "The checklist on your toolbelt",
+        "level": 2
+      }
+    ],
+    "upgrades": [
+      {
+        "id": "where-the-upgrade-lives",
+        "text": "Where the upgrade lives",
+        "level": 2
+      },
+      {
+        "id": "the-purchase-flow",
+        "text": "The purchase flow",
+        "level": 2
+      },
+      {
+        "id": "server-the-checkout-counter",
+        "text": "Server: the checkout counter",
+        "level": 2
+      },
+      {
+        "id": "applying-the-multiplier-to-clicks",
+        "text": "Applying the multiplier to clicks",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "user-id": [
+      {
+        "id": "reading-a-userid",
+        "text": "Reading a UserId",
+        "level": 2
+      },
+      {
+        "id": "why-userid-and-not-the-name",
+        "text": "Why UserId and not the name",
+        "level": 2
+      }
+    ],
+    "user-input-service": [
+      {
+        "id": "the-input-service",
+        "text": "The input service",
+        "level": 2
+      },
+      {
+        "id": "the-inputobject",
+        "text": "The InputObject",
+        "level": 2
+      },
+      {
+        "id": "gameprocessedevent",
+        "text": "gameProcessedEvent",
+        "level": 2
+      },
+      {
+        "id": "a-complete-press-handler",
+        "text": "A complete press handler",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "variable-naming": [
+      {
+        "id": "the-hard-rules",
+        "text": "The hard rules",
+        "level": 2
+      },
+      {
+        "id": "the-style-roblox-uses-camelcase",
+        "text": "The style Roblox uses: camelCase",
+        "level": 2
+      },
+      {
+        "id": "the-real-rule-name-it-what-it-is",
+        "text": "The real rule: name it what it is",
+        "level": 2
+      }
+    ],
+    "variables": [
+      {
+        "id": "what-a-variable-is",
+        "text": "What a variable is",
+        "level": 2
+      },
+      {
+        "id": "using-the-box",
+        "text": "Using the box",
+        "level": 2
+      },
+      {
+        "id": "naming-rules-and-the-habit-that-saves-your-sanity",
+        "text": "Naming rules (and the habit that saves your sanity)",
+        "level": 2
+      },
+      {
+        "id": "the-counting-pattern",
+        "text": "The counting pattern",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "vector3-cframe": [
+      {
+        "id": "vector3-a-point-in-space",
+        "text": "Vector3 — a point in space",
+        "level": 2
+      },
+      {
+        "id": "moving-things-with-vector3",
+        "text": "Moving things with Vector3",
+        "level": 2
+      },
+      {
+        "id": "cframe-position-plus-rotation",
+        "text": "CFrame — position plus rotation",
+        "level": 2
+      },
+      {
+        "id": "cframe-in-action",
+        "text": "CFrame in action",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "vehicles": [
+      {
+        "id": "the-root-part-drives-everything",
+        "text": "The root part drives everything",
+        "level": 2
+      },
+      {
+        "id": "reading-the-keyboard",
+        "text": "Reading the keyboard",
+        "level": 2
+      },
+      {
+        "id": "moving-a-fixed-distance-per-frame",
+        "text": "Moving a fixed distance per frame",
+        "level": 2
+      },
+      {
+        "id": "steering-by-rotation",
+        "text": "Steering by rotation",
+        "level": 2
+      },
+      {
+        "id": "putting-it-together",
+        "text": "Putting it together",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "viewport-frames": [
+      {
+        "id": "what-a-viewportframe-is",
+        "text": "What a ViewportFrame is",
+        "level": 2
+      },
+      {
+        "id": "when-to-use-it",
+        "text": "When to use it",
+        "level": 2
+      },
+      {
+        "id": "build-the-frame-add-a-camera",
+        "text": "Build the frame, add a camera",
+        "level": 2
+      },
+      {
+        "id": "clone-the-model-in",
+        "text": "Clone the model in",
+        "level": 2
+      },
+      {
+        "id": "point-the-camera-at-it",
+        "text": "Point the camera at it",
+        "level": 2
+      },
+      {
+        "id": "make-it-rotate",
+        "text": "Make it rotate",
+        "level": 2
+      },
+      {
+        "id": "a-practical-example-the-shop-preview",
+        "text": "A practical example: the shop preview",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "welcome": [
+      {
+        "id": "what-youll-build",
+        "text": "What you'll build",
+        "level": 2
+      },
+      {
+        "id": "how-these-lessons-work",
+        "text": "How these lessons work",
+        "level": 2
+      },
+      {
+        "id": "the-one-habit-that-matters",
+        "text": "The one habit that matters",
+        "level": 2
+      },
+      {
+        "id": "before-you-continue",
+        "text": "Before you continue",
+        "level": 2
+      }
+    ],
+    "workspace-parts": [
+      {
+        "id": "the-workspace-is-the-game-world",
+        "text": "The Workspace is the game world",
+        "level": 2
+      },
+      {
+        "id": "make-some-parts",
+        "text": "Make some parts",
+        "level": 2
+      },
+      {
+        "id": "where-is-a-part-the-position-property",
+        "text": "Where is a part? The Position property",
+        "level": 2
+      },
+      {
+        "id": "size-color-and-saving",
+        "text": "Size, color, and saving",
+        "level": 2
+      }
+    ]
+  }
+}

@@ -35,7 +35,7 @@ rate limiting. On Cloudflare these become **Pages Functions**.
 | Blob client-token upload flow | `@vercel/blob` in `submit-form.tsx` + `upload/route.ts` | R2 presigned-PUT |
 | Blob host whitelist | `BLOB_HOST_RE` in `resources/submit/route.ts` and `resources.ts` | R2 bucket host regex |
 | Vercel Analytics | `<Analytics />` in `[locale]/layout.tsx` + CSP entries | Cloudflare Web Analytics beacon |
-| Build orchestrator | `scripts/vercel-build.js` | Pages build command (`opennextjs-cloudflare build`) |
+| Build orchestrator | `scripts/vercel-build.js` | `npm run cf-build` (snapshot → build → cache populate) |
 | CLI artifacts | `.vercel/project.json`, `.vercelignore` | irrelevant (keep, harmless) |
 
 ### Storage / database
@@ -149,8 +149,9 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
   unchanged). Analytics is swap-ready via baked `NEXT_PUBLIC_ANALYTICS`
   (`cloudflare` loads the Cloudflare Web Analytics beacon through the new
   `CloudflareAnalytics` client component and swaps the CSP hosts;
-  anything else keeps Vercel Analytics and its CSP hosts). `next/image` is
-  left as-is pending the OpenNext preview in Phase 4.
+  anything else keeps Vercel Analytics and its CSP hosts). The Cloudflare build
+  sets `images.unoptimized` — the site only uses `next/image` on two local
+  logos — which avoids needing the paid Cloudflare Images binding.
 - **Phase 4 — Pages pipeline + DB layer (implemented, validated):**
   - **DB:** `src/lib/db/neon.ts` is a raw `@neondatabase/serverless` SQL layer
     covering the whole data model (find/update/upsert/count/aggregate/
@@ -161,10 +162,37 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
     the real `PrismaClient` (call sites unchanged and still typecheck). All
     24 prisma importers were converted to work through the gate.
   - **Build/runtime:** `open-next.config.ts` + `wrangler.jsonc` +
-    `npm run cf-build` (builds `.open-next`; `NEXT_PUBLIC_ANALYTICS=cloudflare`
-    must be set in the build shell). `wrangler dev` needs `.dev.vars` (DB
+    `npm run cf-build`, which regenerates the content snapshot, builds
+    `.open-next`, and populates the static-assets cache — a bare build is
+    directly servable by `wrangler dev`. `NEXT_PUBLIC_ANALYTICS=cloudflare`
+    must be set in the build shell. `wrangler dev` needs `.dev.vars` (DB
     URLs via `DATABASE_URL_UNPOOLED ?? DATABASE_URL`, `AUTH_SECRET`, blob
     token) — `.dev.vars` is local-only and gitignored, never commit it.
+  - **Content on a read-only bundle (resolved):** the Worker serves from
+    `/bundle`, where `content/lessons` does not exist — `process.cwd()`
+    resolves there and `fs` throws
+    `ENOENT: no such file or directory, readdir '/bundle/content/lessons'`,
+    even though Next's file tracing does copy the `.mdx` files into the server
+    function. `src/lib/lessons.ts` now probes for the files once and falls back
+    to `src/generated/content-snapshot.json`: every lesson's meta plus its
+    headings, baked by `scripts/generate-content-snapshot.mjs`
+    (`npm run content:snapshot`). Both sources derive from the same parser in
+    `src/lib/lesson-content.ts`, so they cannot drift apart. Vercel, `next dev`
+    and `next start` keep reading the real files and never touch the snapshot,
+    and both build paths regenerate it — so it can never serve stale content on
+    either host. Raw MDX is deliberately excluded: `/review/[slug]` is now
+    statically generated like `/lessons/[slug]`, so no route needs lesson
+    source at request time.
+  - **Prerendered pages + revalidation (resolved):** OpenNext defaults its
+    incremental cache to `"dummy"`, which persists nothing — so every
+    statically generated route (468 of them) answered 404 on Workers.
+    `open-next.config.ts` now selects `staticAssetsIncrementalCache`, which
+    serves prerendered pages from the Worker's own static assets with no R2
+    bucket, KV namespace, Durable Object or paid plan, plus the `memoryQueue`
+    (which uses the `WORKER_SELF_REFERENCE` binding already declared in
+    `wrangler.jsonc`). Its two write methods are shadowed to no-ops so an
+    expected read-only rejection is not logged as an ERROR on every
+    revalidation.
   - **Validated locally against the real Neon DB under `wrangler dev`:**
     `/api/leaderboard`, `/api/questions`, `/api/questions/[id]` → 200;
     `POST /api/guest-xp` valid → 200 and the row persists in Postgres,
@@ -172,14 +200,23 @@ Alternative (hand-rolled Workers + static export) is a rewrite and unnecessary.
     (auth-gated before DB); `POST /api/feedback` → 503 without
     `FEEDBACK_GITHUB_TOKEN` (correct guard). `$queryRaw` site-stats JSONB
     aggregates verified against Postgres.
-  - **Known open items (not blockers for this phase):**
-    - OpenNext serves from a read-only bundle (`/bundle`), so dynamic/SSR
-      pages that read `content/lessons` from disk with `fs` (e.g. the home
-      page via `getCourseStructure`) 500 with `ENOENT`. Static assets are
-      fine. Needs a content-into-bundle strategy before a full cutover.
+  - **Validated end to end — `wrangler dev` against the real Neon DB, and
+    `npm run build` + `next start` on Node:** all 31 page routes and API
+    endpoints swept on both hosts return 200, including the home page,
+    `/lessons/[slug]`, `/es/lessons/[slug]`, `/review/[slug]`, `/profile`,
+    `/questions`, `/certificate`, `/resources` and `/showcase`. On the Worker
+    the only console output is the once-per-isolate `[lessons]` fallback line;
+    the Node runtime never falls back and keeps reading files from disk.
+  - **Remaining open items:** none blocking the hosting move.
     - R2 stays blocked (payment-verified account); Vercel Blob remains the
-      upload path.
-    - `engineType = "client"` (working tree) removes the binary engine from
-      Vercel functions and runs green locally.
+      upload path on either host.
+    - `/resources` and `/showcase` declare `revalidate = 60`, and a read-only
+      cache cannot persist a revalidated copy, so on Cloudflare they serve
+      their build-time HTML and refresh on the next deploy rather than every 60
+      seconds. Vercel is unaffected. True ISR needs a durable cache — KV is the
+      free-tier option that needs no payment verification. Follow-up, not a
+      blocker.
+    - `engineType = "client"` removes the binary engine from Vercel functions
+      and runs green locally.
 - **Phase 5 — cutover:** only with explicit approval. DNS/domain changes are
   out of scope until then.

@@ -9,10 +9,11 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
+    "content:snapshot": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-content-snapshot.mjs",
     "vercel-build": "node scripts/vercel-build.js",
-    "cf-build": "opennextjs-cloudflare build",
-    "cf-preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf-deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "cf-build": "npm run content:snapshot && opennextjs-cloudflare build && opennextjs-cloudflare populateCache local",
+    "cf-preview": "npm run cf-build && opennextjs-cloudflare preview",
+    "cf-deploy": "npm run cf-build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",
