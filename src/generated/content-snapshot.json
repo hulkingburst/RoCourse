@@ -2474,11 +2474,53 @@
       "activityCount": 3
     },
     {
+      "slug": "custom-movement",
+      "title": "Custom Movement — beyond the default character",
+      "description": "Build movement mechanics beyond default Roblox character movement — tune speed and jump height, add a sprint, a dash, and a double jump, and keep the final say on the server.",
+      "sectionId": "objects",
+      "order": 4,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "movement",
+        "walkspeed",
+        "jumppower",
+        "sprint",
+        "dash",
+        "doublejump"
+      ],
+      "objectives": [
+        "Tune a character's walk speed and jump height from code",
+        "Detect input and turn it into a sprint",
+        "Dash with a burst of velocity instead of a speed change",
+        "Track jump state so a character gets exactly one extra jump",
+        "Keep the final say on movement server-side"
+      ],
+      "prerequisites": [
+        "characters",
+        "user-input-service"
+      ],
+      "keywords": [
+        "movement",
+        "walkspeed",
+        "jumppower",
+        "jumpheight",
+        "sprint",
+        "dash",
+        "double jump",
+        "humanoid",
+        "assemblylinearvelocity"
+      ],
+      "sectionTitle": "World & Players",
+      "sectionOrder": 5,
+      "activityCount": 7
+    },
+    {
       "slug": "animations",
       "title": "Animations — making characters move",
       "description": "Load and play AnimationTracks so your characters run, jump, attack, and emote — not just stand around.",
       "sectionId": "objects",
-      "order": 4,
+      "order": 5,
       "difficulty": "intermediate",
       "estimatedMinutes": 5,
       "tags": [
@@ -2512,7 +2554,7 @@
       "title": "NPCs and PathfindingService — making the world walk",
       "description": "Create non-player characters that patrol, chase, and navigate around obstacles using PathfindingService.",
       "sectionId": "objects",
-      "order": 5,
+      "order": 6,
       "difficulty": "intermediate",
       "estimatedMinutes": 6,
       "tags": [
@@ -2551,7 +2593,7 @@
       "title": "Instances — building the world in code",
       "description": "Create parts at runtime, pin them with Anchored, and style them with materials — no Studio viewport required.",
       "sectionId": "objects",
-      "order": 6,
+      "order": 7,
       "difficulty": "intermediate",
       "estimatedMinutes": 5,
       "tags": [
@@ -2585,7 +2627,7 @@
       "title": "Attributes — sticky notes on objects",
       "description": "Attach your own data to any object with SetAttribute and GetAttribute, so parts describe themselves.",
       "sectionId": "objects",
-      "order": 7,
+      "order": 8,
       "difficulty": "intermediate",
       "estimatedMinutes": 4,
       "tags": [
@@ -2616,7 +2658,7 @@
       "title": "Sounds — giving the world a voice",
       "description": "Add Sound objects, load audio with a SoundId, and play effects where the player can actually hear them.",
       "sectionId": "objects",
-      "order": 8,
+      "order": 9,
       "difficulty": "intermediate",
       "estimatedMinutes": 4,
       "tags": [
@@ -2648,7 +2690,7 @@
       "title": "Particle effects — making the world feel alive",
       "description": "Sparkle, smoke, and glow — add ParticleEmitters to parts so your game looks as good as it plays.",
       "sectionId": "objects",
-      "order": 9,
+      "order": 10,
       "difficulty": "intermediate",
       "estimatedMinutes": 4,
       "tags": [
@@ -2687,7 +2729,7 @@
       "title": "Tweens — smooth movement and polish",
       "description": "Animate parts and UI with TweenService instead of teleporting them, and feel the difference polish makes.",
       "sectionId": "objects",
-      "order": 10,
+      "order": 11,
       "difficulty": "intermediate",
       "estimatedMinutes": 5,
       "tags": [
@@ -2720,7 +2762,7 @@
       "title": "Custom cameras — taking control",
       "description": "Point the camera anywhere you want with a LocalScript — the foundation of cutscenes, cinematic views, and locked-camera puzzles.",
       "sectionId": "objects",
-      "order": 11,
+      "order": 12,
       "difficulty": "intermediate",
       "estimatedMinutes": 5,
       "tags": [
@@ -2753,7 +2795,7 @@
       "title": "Cutscenes — directing the camera",
       "description": "Choreograph scripted camera moves with tweens, shakes, and FOV punches — the director's toolkit for intros, reveals, and boss moments.",
       "sectionId": "objects",
-      "order": 12,
+      "order": 13,
       "difficulty": "intermediate",
       "estimatedMinutes": 6,
       "tags": [
@@ -2787,7 +2829,7 @@
       "title": "Lighting and atmosphere — setting the mood",
       "description": "Use Lighting, Sky, Atmosphere, and PostEffects to turn a flat workspace into a world with time of day, fog, and bloom.",
       "sectionId": "objects",
-      "order": 13,
+      "order": 14,
       "difficulty": "intermediate",
       "estimatedMinutes": 5,
       "tags": [
@@ -2829,7 +2871,7 @@
       "title": "Raycasting — asking the world what's in the way",
       "description": "Fire an invisible ray from any point and read exactly what it hits — the tool behind line of sight, ground checks, and laser beams.",
       "sectionId": "objects",
-      "order": 14,
+      "order": 15,
       "difficulty": "intermediate",
       "estimatedMinutes": 6,
       "tags": [
@@ -2864,7 +2906,7 @@
       "title": "Bug hunt — the world around you",
       "description": "Hunt down the nil characters, the silent tweens, and the sounds nobody hears.",
       "sectionId": "objects",
-      "order": 15,
+      "order": 16,
       "difficulty": "intermediate",
       "estimatedMinutes": 7,
       "tags": [
@@ -2897,7 +2939,7 @@
       "title": "Drag and drop — polish and objects",
       "description": "Assemble a tween, a safe character grab, a sound, and a coin pickup from shuffled lines.",
       "sectionId": "objects",
-      "order": 16,
+      "order": 17,
       "difficulty": "intermediate",
       "estimatedMinutes": 6,
       "tags": [
@@ -2930,7 +2972,7 @@
       "title": "Built-in features — spawns, force fields, highlights",
       "description": "Use Studio's built-in objects — SpawnLocation, ForceField, and SelectionBox — to add instant polish without re-inventing the wheel.",
       "sectionId": "objects",
-      "order": 17,
+      "order": 18,
       "difficulty": "beginner",
       "estimatedMinutes": 4,
       "tags": [
@@ -4250,6 +4292,43 @@
       {
         "id": "a-controller-ready-menu",
         "text": "A controller-ready menu",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "custom-movement": [
+      {
+        "id": "the-humanoid-is-the-control-panel",
+        "text": "The Humanoid is the control panel",
+        "level": 2
+      },
+      {
+        "id": "sprint-two-speeds-one-button",
+        "text": "Sprint — two speeds, one button",
+        "level": 2
+      },
+      {
+        "id": "a-dash-is-a-burst-not-a-speed",
+        "text": "A dash is a burst, not a speed",
+        "level": 2
+      },
+      {
+        "id": "double-jump-count-the-air-presses",
+        "text": "Double jump — count the air presses",
+        "level": 2
+      },
+      {
+        "id": "the-server-has-the-final-say",
+        "text": "The server has the final say",
+        "level": 2
+      },
+      {
+        "id": "one-clock-one-rule-cooldowns",
+        "text": "One clock, one rule: cooldowns",
         "level": 2
       },
       {

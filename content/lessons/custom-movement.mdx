@@ -1,0 +1,277 @@
+---
+slug: custom-movement
+title: Custom Movement — beyond the default character
+description: Build movement mechanics beyond default Roblox character movement — tune speed and jump height, add a sprint, a dash, and a double jump, and keep the final say on the server.
+sectionId: objects
+order: 4
+difficulty: intermediate
+estimatedMinutes: 8
+tags: [movement, walkspeed, jumppower, sprint, dash, doublejump]
+objectives:
+  - Tune a character's walk speed and jump height from code
+  - Detect input and turn it into a sprint
+  - Dash with a burst of velocity instead of a speed change
+  - Track jump state so a character gets exactly one extra jump
+  - Keep the final say on movement server-side
+prerequisites: [characters, user-input-service]
+keywords: [movement, walkspeed, jumppower, jumpheight, sprint, dash, double jump, humanoid, assemblylinearvelocity]
+---
+
+The default character walks at 16 studs per second and jumps the same height no matter what game it is in. That is fine for a baseplate — and wrong the moment your game has a speed boost, a dodge roll, or a double jump. **Custom movement** is about owning those numbers: one place that decides how the body moves, input that asks for a change, and a server that has the final say.
+
+<Step>
+
+## The Humanoid is the control panel
+
+Every number that decides how a character moves lives on its **Humanoid**. `WalkSpeed` is exactly what it sounds like: studs per second. The other two control the jump — `JumpPower` when `UseJumpPower` is true (the classic 50), or `JumpHeight` in studs when it is false (the default 7.2).
+
+```luau
+local humanoid = character:WaitForChild("Humanoid")
+
+humanoid.WalkSpeed = 24   -- default is 16 studs per second
+humanoid.JumpPower = 60   -- default is 50
+```
+
+Those two lines are the whole lesson in miniature. Inside a character-spawn handler — the one from the characters lesson — they run on every respawn, so the player always comes back with your tuning.
+
+<Note>
+The defaults every spawn resets to are set on **StarterPlayer** — `CharacterWalkSpeed` and `CharacterJumpPower`. Set them once in the Properties panel when the whole game should feel a certain way, and keep the code for changes that happen *during* play.
+</Note>
+
+<FillBlank
+  prompt="The Humanoid property that decides how many studs per second a character walks is ____"
+  answer="WalkSpeed"
+  explanation="WalkSpeed is the character's walking speed in studs per second. The default is 16."
+/>
+
+</Step>
+
+<Step>
+
+## Sprint — two speeds, one button
+
+Sprinting is the simplest custom movement: hold Shift to run, release to walk. The code listens for the press, the release, and flips one number. Movement code for your own character belongs in a **LocalScript** under StarterPlayerScripts — the character is simulated on the player's own machine, so a change there is instant instead of waiting for a server round-trip.
+
+```luau
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local WALK_SPEED = 16
+local SPRINT_SPEED = 28
+
+local function setSprinting(sprinting)
+    local character = player.Character
+    if not character then return end
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    humanoid.WalkSpeed = sprinting and SPRINT_SPEED or WALK_SPEED
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.LeftShift then
+        setSprinting(true)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.LeftShift then
+        setSprinting(false)
+    end
+end)
+```
+
+Three details carry the whole thing. The **`gameProcessedEvent` guard** stops the sprint from firing while the player is typing a capital letter in chat. The **`InputEnded`** handler is what stops it when they let go — without it the sprint never ends. And `sprinting and SPRINT_SPEED or WALK_SPEED` is Luau's pick-one idiom: the first value unless it is false, otherwise the second.
+
+<Warning>
+If your game has controllers, bind this as a ContextActionService action instead — one action, a keyboard key and a gamepad button, the same trick from the controller support lesson.
+</Warning>
+
+<WriteCode
+  instruction="Write the one line that sets WalkSpeed to SPRINT_SPEED while sprinting and WALK_SPEED otherwise."
+  answer={["humanoid.WalkSpeed = sprinting and SPRINT_SPEED or WALK_SPEED", "if sprinting then humanoid.WalkSpeed = SPRINT_SPEED else humanoid.WalkSpeed = WALK_SPEED end"]}
+  starterCode={'local WALK_SPEED = 16\nlocal SPRINT_SPEED = 28\n\nlocal function setSprinting(humanoid, sprinting)\n    -- sprint at 28, walk at 16\nend'}
+  explanation="The and/or idiom picks SPRINT_SPEED when sprinting is true and WALK_SPEED when it is false."
+/>
+
+</Step>
+
+<Step>
+
+## A dash is a burst, not a speed
+
+Walking is a **speed you hold**; a dash is a **burst of motion** that should trail off on its own. So don't dash by cranking `WalkSpeed` — you would have to time it back down, and the player keeps full steering at triple speed the whole way.
+
+Set the character's velocity instead. `AssemblyLinearVelocity` is in studs per second, so one line gives you one deliberate shove:
+
+```luau
+local DASH_SPEED = 90
+
+local function dash(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if humanoid.FloorMaterial == Enum.Material.Air then return end
+
+    local root = character.HumanoidRootPart
+    root.AssemblyLinearVelocity = root.CFrame.LookVector * DASH_SPEED
+end
+```
+
+`LookVector` points where the character is facing, so this dashes forward whichever way they look. Physics takes over on the next frame: friction and gravity peel the speed down and the character lands back at walking pace. The `FloorMaterial` check keeps it honest — a dash is something you do with your feet on the ground, not a mid-air second engine.
+
+<Tip>
+`root:ApplyImpulse(root.CFrame.LookVector * 5000)` is the other way to do this. An impulse is a shove scaled by mass — heavier characters get the same feel — while setting velocity gives you the exact same starting speed for everyone. For a snappy dash, setting the velocity is easier to tune.
+</Tip>
+
+<Mcq
+  question="Why set AssemblyLinearVelocity for a dash instead of raising WalkSpeed?"
+  options={[
+    "WalkSpeed stays raised until you lower it; a velocity burst trails off on its own",
+    "WalkSpeed does not work on the client",
+    "AssemblyLinearVelocity makes the character invincible during the dash",
+    "There is no difference — both are a speed in studs per second",
+  ]}
+  answer={0}
+  explanation="A walk speed is a mode you hold, so a dash built from one never ends by itself. A velocity burst decays through physics and needs no cleanup."
+/>
+
+</Step>
+
+<Step>
+
+## Double jump — count the air presses
+
+The engine already handles the ground jump. The trick is that `JumpRequest` fires on **every** jump press, including the ones in mid-air where the default jump does nothing. So you count air presses, spend one on a second jump, and refill the count on landing.
+
+```luau
+local MAX_AIR_JUMPS = 1
+local airJumpsUsed = 0
+local humanoid = character:WaitForChild("Humanoid")
+
+UserInputService.JumpRequest:Connect(function()
+    -- the ground jump belongs to the engine; only air presses spend one
+    if humanoid.FloorMaterial ~= Enum.Material.Air then return end
+    if airJumpsUsed >= MAX_AIR_JUMPS then return end
+
+    airJumpsUsed += 1
+    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+end)
+
+humanoid.StateChanged:Connect(function(_, newState)
+    if newState == Enum.HumanoidStateType.Landed then
+        airJumpsUsed = 0   -- feet on the ground: the air jump is refilled
+    end
+end)
+```
+
+`ChangeState(Enum.HumanoidStateType.Jumping)` is the programmatic jump — the same one the Space bar triggers. The `StateChanged` handler is the important half: **`Landed` is the moment the feet touch down**, and that is the only state that refills the air jump. Reset on the wrong state and the character can climb forever.
+
+<FillBlank
+  prompt="The air jump refills when the character touches down. Complete the check: if newState == Enum.HumanoidStateType.____ then airJumpsUsed = 0 end"
+  answer="Landed"
+  explanation="Landed fires the moment the character touches down. Reset the counter there and the next jump press gets its one extra jump back."
+/>
+
+<Note>
+Want a triple jump? Change `MAX_AIR_JUMPS` to 2. The pattern does not change — the count is the feature. Same story for a stamina bar that limits dashes: one more number, one more check.
+</Note>
+
+</Step>
+
+<Step>
+
+## The server has the final say
+
+Everything so far runs on the player's machine, and the moment another player is watching, that is a problem: a LocalScript is also a script *the player can run*. The handler below is the one people write first — it takes a speed off the wire and trusts it. An exploiter fires the event with `speed = 500` and crosses the map in a second.
+
+<FixBug
+  instruction="The server should never read a speed off the wire. Rewrite the buggy line so it ignores the number the client sent and applies its own SPRINT_SPEED constant instead."
+  fix={["character.Humanoid.WalkSpeed = SPRINT_SPEED"]}
+  placeholder="-- the server picks the speed, not the client"
+  explanation="Remotes carry intent; the server owns values. The client asks to sprint, and the server answers with a constant it chose — so 500 is never on the menu. (A two-state sprint would send a boolean and branch: sprinting and SPRINT_SPEED or WALK_SPEED.)"
+>
+```luau
+local SPRINT_SPEED = 28
+
+sprintEvent.OnServerEvent:Connect(function(player, speed)
+    local character = player.Character
+    if not character then return end
+    character.Humanoid.WalkSpeed = speed
+end)
+```
+</FixBug>
+
+After the fix, the contract is one sentence: **remotes carry intent, the server owns values.** That is the same rule behind the dash cooldown below and the jump count above — a client can ask, but the numbers and the clock stay on the server.
+
+<Warning>
+Movement cannot be fully prevented client-side — the character is simulated on the player's machine, so a determined exploiter can always claim to move too fast. What the server *can* do is detect and correct it: re-check WalkSpeed on a timer, clamp it back to the allowed value, rate-limit the dash and sprint remotes, and keep the cooldowns server-side so a spammed remote does nothing.
+</Warning>
+
+</Step>
+
+<Step>
+
+## One clock, one rule: cooldowns
+
+A dash without a cooldown is a teleport. The rule is one subtraction: enough time since the last dash, or no dash. Write it once as a function and the client can use it for instant feedback while the server uses the same logic as the real gate.
+
+<RunCode
+  instruction="Write canDash so it returns true only when the cooldown has fully elapsed. The starter code prints the two answers — false, then true."
+  starterCode={`local DASH_COOLDOWN = 3
+
+-- lastDashAt and now are os.clock() timestamps, in seconds.
+function canDash(lastDashAt, now)
+    -- your code here
+end
+
+print(canDash(10, 12))
+print(canDash(10, 13))`}
+  checks={`check(canDash(10, 12) == false, "two seconds after a dash is still on cooldown")
+check(canDash(10, 13) == true, "three seconds after a dash is ready again")
+check(canDash(4, 100) == true, "an old dash is definitely ready")
+check(__log[1] == "false", "the first print should be false")
+check(__log[2] == "true", "the second print should be true")`}
+  explanation="Return now - lastDashAt >= DASH_COOLDOWN. The subtraction gives elapsed time; the comparison answers the only question that matters. The server holds lastDashAt, so a client cannot reset the clock."
+/>
+
+Every mechanic in this lesson now has the same shape: one named constant, one check, one place that decides. Sprint is a speed choice, dash is a velocity plus a cooldown, a double jump is a count that refills on `Landed`. When you add a wall run or a slide next, it is one more branch in the same controller — not a new system.
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Raising WalkSpeed for a dash.** It stays raised until something lowers it. Dash with velocity; reserve WalkSpeed for modes like sprint.
+- **Forgetting to handle the release.** An `InputBegan` with no `InputEnded` leaves the player sprinting forever. Both halves or neither.
+- **Skipping the gameProcessed guard.** Without it, Shift in the chat box is a sprint. The guard costs one line.
+- **Resetting the jump counter on the wrong state.** `Landed` means feet down. Reset anywhere else and the air jump refills mid-flight.
+- **Taking a number off the wire.** A remote that accepts `speed` accepts `500`. Send the intent, apply the constant.
+
+Your movement checklist, before you ship:
+
+- **One place decides the numbers.** Walk, sprint, and dash speeds are named constants, not scattered literals.
+- **Input is paired.** Every press has a release, every request has a cooldown.
+- **Bursts use velocity.** A dash is motion, a walk speed is a mode.
+- **State is counted and reset.** Air jumps reset on `Landed`; cooldowns count from the last use.
+- **The server holds the truth.** Remotes carry intent, the server picks values, and anomalies get corrected.
+
+<Mcq
+  question="An exploiter sets their own WalkSpeed to 500. Which server-side habit actually catches that?"
+  options={[
+    "Re-checking each character's WalkSpeed on a timer and resetting it to the allowed value",
+    "Renaming the sprint remote so clients cannot find it",
+    "Adding a longer cooldown to the client's dash script",
+    "Writing the speeds as module constants instead of local variables",
+  ]}
+  answer={0}
+  explanation="The character is simulated on the player's machine, so the client can always claim impossible movement. The server cannot prevent the local change, but it can detect the deviation and correct it — and on a leaderboard that is the whole game."
+/>
+
+<Note>
+None of this replaces the character's default movement — it tunes it. The Humanoid still walks, jumps, and falls exactly as before; you have added named speeds, a burst, a counted jump, and the two rules that keep them honest: the server decides, and every burst has a cooldown.
+</Note>
+
+Next: animations — making characters move.
+
+</Step>

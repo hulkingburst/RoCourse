@@ -14,10 +14,6 @@ const isCloudflare = process.env.NEXT_PUBLIC_ANALYTICS === "cloudflare";
 const connectionString =
   process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 
-if (!isCloudflare && !connectionString) {
-  throw new Error("DATABASE_URL or DATABASE_URL_UNPOOLED is required");
-}
-
 // Driver adapter: talks to Postgres through a driver instead of the native
 // query engine binary, keeping serverless functions small (the engine no
 // longer ships in every function that touches the database).
@@ -29,13 +25,19 @@ if (!isCloudflare && !connectionString) {
 //     (pure fetch, no TCP/WebSocket sockets). Both connect to the same Neon
 //     database.
 function createPrismaClient(): PrismaClient {
+  if (!connectionString) {
+    throw new Error(
+      "DATABASE_URL or DATABASE_URL_UNPOOLED is required to query the database."
+    );
+  }
+
   const adapter =
     process.env.PRISMA_ADAPTER === "neon"
-      ? new PrismaNeonHTTP(connectionString!, {
+      ? new PrismaNeonHTTP(connectionString, {
           fullResults: true,
           arrayMode: false,
         })
-      : new PrismaPg({ connectionString: connectionString! });
+      : new PrismaPg({ connectionString });
 
   return new PrismaClient({
     adapter,
@@ -49,9 +51,30 @@ function createPrismaClient(): PrismaClient {
  */
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+/**
+ * Builds the client on first use instead of at import time.
+ *
+ * Next evaluates this module while collecting page data during a build (the
+ * API routes import it), so a missing DATABASE_URL raised at module scope
+ * failed the whole build - including on hosts that have no database
+ * configured, which scripts/vercel-build.js promises can still deploy. The
+ * guard now fires on the first query that needs a client. Members are read
+ * from the real client and called bound to it, so `this` is never the proxy.
+ */
+function lazyPrismaClient(): PrismaClient {
+  let client: PrismaClient | null = null;
+  return new Proxy({} as PrismaClient, {
+    get(_target, property) {
+      const real = client ?? (client = createPrismaClient());
+      const value = Reflect.get(real, property);
+      return typeof value === "function" ? value.bind(real) : value;
+    },
+  });
+}
+
 export const prisma: PrismaClient = isCloudflare
   ? (neonDb as unknown as PrismaClient)
-  : (globalForPrisma.prisma ?? createPrismaClient());
+  : (globalForPrisma.prisma ?? lazyPrismaClient());
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

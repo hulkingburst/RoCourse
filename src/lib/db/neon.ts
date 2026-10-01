@@ -476,16 +476,42 @@ interface FindArgs {
 
 type NeonRawResult = Record<string, unknown>[];
 
-const fetchSql = neon(
-  process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL ?? ""
-) as unknown as {
+interface NeonSql {
   (text: string): Promise<NeonRawResult>;
   query(text: string, values?: unknown[]): Promise<NeonRawResult>;
-};
+}
+
+/**
+ * The Neon client is built on the first query rather than at module load.
+ *
+ * `neon()` throws when it is handed no connection string, and this module is
+ * reached from the top of `src/lib/prisma.ts` on every host. Next evaluates
+ * those imports while it collects page data during a build, so resolving the
+ * client eagerly turned a missing DATABASE_URL into a failed build - on hosts
+ * that legitimately have no database configured, and which
+ * scripts/vercel-build.js promises can still deploy. Deferring it moves the
+ * failure to the query that actually needs a client.
+ */
+let sql: NeonSql | null = null;
+
+function getClient(): NeonSql {
+  if (!sql) {
+    const connectionString =
+      process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error(
+        "No database connection string was provided. Set DATABASE_URL_UNPOOLED or DATABASE_URL in the environment."
+      );
+    }
+    sql = neon(connectionString) as unknown as NeonSql;
+  }
+  return sql;
+}
 
 async function run(query: string, params: unknown[]): Promise<NeonRawResult> {
+  const client = getClient();
   try {
-    const raw = (await fetchSql.query(query, params)) as unknown;
+    const raw = (await client.query(query, params)) as unknown;
     if (Array.isArray(raw)) return raw as NeonRawResult;
     if (raw && typeof raw === "object" && Array.isArray((raw as { rows?: unknown }).rows)) {
       return (raw as { rows: NeonRawResult }).rows;
