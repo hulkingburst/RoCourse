@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { BADGES, extractBadgeStats } from "@/lib/badges";
 import { useGuestStore } from "@/lib/guest-store";
 import { useNotificationsStore } from "@/lib/notification-store";
+import { RETRACTED_NOTIFICATION_IDS } from "@/lib/notification-retractions";
 import { useProgressStore } from "@/lib/progress-store";
 import { SITE_UPDATES } from "@/lib/updates";
 import { POLLS, isPollRetired, type PollTally } from "@/lib/polls";
@@ -12,6 +13,7 @@ import type { NotificationState } from "@/lib/notification-types";
 
 /**
  * Drives the notifications system from the client:
+ *  - unsends retracted notifications (see `src/lib/notification-retractions.ts`),
  *  - seeds one-time site-update notifications,
  *  - seeds one-time notifications for open feature polls,
  *  - runs the poll close sweep and retires notifications for polls whose grace
@@ -75,6 +77,12 @@ export function useNotifications(totalLessons: number): void {
   React.useEffect(() => {
     if (!hydrated || hydratedRef.current) return;
     hydratedRef.current = true;
+    // Retractions come off the bell before anything is seeded, so a withdrawn
+    // announcement is gone for guests and signed-in learners alike — and marked
+    // as deleted, which is what keeps it gone across reloads and server merges.
+    useNotificationsStore
+      .getState()
+      .retractNotifications(RETRACTED_NOTIFICATION_IDS);
     useNotificationsStore.getState().seedUpdates(SITE_UPDATES);
     // A poll whose grace window is already over must not be seeded at all —
     // otherwise a first-time visitor is handed a bell entry for a poll that

@@ -555,16 +555,6 @@
     "resultsReport": "See the full results report",
     "unavailable": "This poll is no longer available.",
     "polls": {
-      "2026-09-27-next-feature": {
-        "question": "What should we build next?",
-        "body": "This poll decides what gets made next, so pick the one you'd actually use. The winner gets built first.",
-        "options": {
-          "a": "More Advanced Studio lessons",
-          "b": "A full DataStore save-system course",
-          "c": "Practice projects with starter code",
-          "d": "Dark mode and a nicer certificate"
-        }
-      },
       "dev-test-poll": {
         "question": "Dev test poll — does voting work?",
         "body": "This poll only exists in local development. Open it, pick an option, and check the tally updates.",

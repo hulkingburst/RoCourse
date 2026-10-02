@@ -21,6 +21,12 @@
  * Add a new poll at the TOP with a fresh `id` (use the date) and a `createdAt`
  * timestamp; learners who haven't seen it yet get a one-time "poll"
  * notification in the bell.
+ *
+ * A poll can also be withdrawn before it closes — deleted from this list, which
+ * retires it everywhere and stops it reporting, plus an entry in
+ * `src/lib/notification-retractions.ts` to unsend the bell notification it
+ * already seeded. Untouched `PollVote` rows are simply orphaned; nothing reads
+ * them once the poll id is gone.
  */
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -59,15 +65,18 @@ export interface PollDef {
   closesAt?: string | null;
 }
 
-/** Polls every learner can vote on. */
-const PUBLIC_POLLS: PollDef[] = [
-  {
-    id: "2026-09-27-next-feature",
-    options: ["a", "b", "c", "d"],
-    createdAt: "2026-09-27T12:00:00.000Z",
-    durationDays: DEFAULT_POLL_DURATION_DAYS,
-  },
-];
+/**
+ * Polls every learner can vote on. Empty on purpose right now: the first poll
+ * ("what should we build next?") was withdrawn on 2026-10-01 — most of its
+ * options had already shipped, dark mode among them, so the question was no
+ * longer worth asking, and an unreachable poll would still have filed a results
+ * issue when it closed. Removing it from this list is what retires the poll:
+ * an id that isn't here is rejected by `getPoll`, never seeded, and never swept
+ * for a report. Its bell entry was unsent separately — see
+ * `RETRACTED_NOTIFICATION_IDS` in `src/lib/notification-retractions.ts`. The
+ * next poll goes here with a fresh id.
+ */
+const PUBLIC_POLLS: PollDef[] = [];
 
 /**
  * Dev-only timestamps are relative to now, so a restarted dev server doesn't

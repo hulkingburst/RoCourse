@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { GITHUB_API, feedbackRepoConfig, githubHeaders } from "@/lib/github-api";
+import { unsendNotifications } from "@/lib/notifications-api";
 import { getTallies } from "@/lib/poll-votes";
 import {
   POLLS,
@@ -324,16 +325,15 @@ export async function getResultsUrls(
  * the bell goes away, so the bell stays a list of things still worth doing.
  *
  * Deletes for every user, not just the caller — a notification that should
- * have retired for the whole site should not linger on one account.
+ * have retired for the whole site should not linger on one account. Shares
+ * `unsendNotifications` with the retraction sweep so "delete this key for
+ * everyone" exists once.
  */
 export async function pruneRetiredPollNotifications(
   polls: PollDef[],
   now: number = Date.now()
 ): Promise<string[]> {
-  const keys = polls
-    .filter((poll) => isPollRetired(poll, now))
-    .map((poll) => `poll:${poll.id}`);
-  if (keys.length === 0) return [];
-  await prisma.notification.deleteMany({ where: { localKey: { in: keys } } });
-  return keys;
+  return unsendNotifications(
+    polls.filter((poll) => isPollRetired(poll, now)).map((poll) => `poll:${poll.id}`)
+  );
 }

@@ -8,6 +8,12 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Notifications (required)
+
+Never add, edit, or send a user-facing notification unless the user explicitly asks for it in the current request. That covers everything that hands a learner a bell entry — the broadcast lists such as site updates (`src/lib/updates.ts`) and feature polls (`src/lib/polls.ts`), badge awards, and any one-off push through the notifications API. Announcements are the user's call, not yours: build the thing, then ask whether it should be announced.
+
+A notification cannot be quietly edited once it has gone out, because every bell holds its own copy — removing one means a retraction that has to reach every account (`src/lib/notification-retractions.ts`) and un-authoring it where it was sent from. Sending is a decision to make deliberately, never a side effect of shipping a feature.
+
 ## Course content checklist (required)
 
 Whenever lessons are added or changed in `content/lessons/`, all of the following are REQUIRED:

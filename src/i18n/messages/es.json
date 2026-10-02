@@ -555,16 +555,6 @@
     "resultsReport": "Ver el informe completo de resultados",
     "unavailable": "Esta encuesta ya no está disponible.",
     "polls": {
-      "2026-09-27-next-feature": {
-        "question": "¿Qué deberíamos construir a continuación?",
-        "body": "Esta encuesta decide qué se hace después, así que elige lo que de verdad usarías. El ganador se construye primero.",
-        "options": {
-          "a": "Más lecciones de Advanced Studio",
-          "b": "Un curso completo de guardado con DataStore",
-          "c": "Proyectos de práctica con código inicial",
-          "d": "Modo oscuro y un certificado más bonito"
-        }
-      },
       "dev-test-poll": {
         "question": "Encuesta de prueba — ¿funciona el voto?",
         "body": "Esta encuesta solo existe en desarrollo local. Ábrela, elige una opción y comprueba que el total se actualiza.",

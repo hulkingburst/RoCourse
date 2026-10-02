@@ -89,6 +89,22 @@ export async function deleteNotifications(
   });
 }
 
+/**
+ * Deletes notifications with these ids for EVERY user, not just one account —
+ * the unsend for an announcement that has already gone out. Ids come from
+ * `src/lib/notification-retractions.ts`; the caller is a read a learner was
+ * making anyway, so a retraction reaches every account without a scheduler.
+ * Idempotent, and safe when nothing matches (a poll notification was never
+ * backed up in the first place).
+ */
+export async function unsendNotifications(
+  ids: readonly string[]
+): Promise<string[]> {
+  if (ids.length === 0) return [];
+  await prisma.notification.deleteMany({ where: { localKey: { in: [...ids] } } });
+  return [...ids];
+}
+
 /** Reads the user's notification backup from the DB, newest first. */
 export async function getUserNotifications(userId: string): Promise<NotificationState> {
   const rows = await prisma.notification.findMany({

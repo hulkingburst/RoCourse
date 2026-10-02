@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { isRetractedNotification } from "@/lib/notification-retractions";
 import type { AppNotification, NotificationType } from "@/lib/notification-types";
 
 const nowIso = () => new Date().toISOString();
@@ -70,6 +71,12 @@ interface NotificationsState {
   markBackedUp: (ids: string[]) => void;
   /** Removes a notification (and suppresses it being re-added by any source). */
   removeNotification: (id: string) => void;
+  /**
+   * Unsends the given notification ids: drops any copy already in the bell and
+   * records them as deleted, so nothing can put them back. See
+   * `src/lib/notification-retractions.ts` for which ids belong here and why.
+   */
+  retractNotifications: (ids: readonly string[]) => void;
   /** Queues a badge id for the celebration popup (deduped, FIFO). */
   enqueueCelebration: (badgeId: string) => void;
   /** Dequeues a badge id once its celebration has been shown. */
@@ -78,6 +85,8 @@ interface NotificationsState {
 }
 
 function upsert(list: AppNotification[], item: AppNotification): AppNotification[] {
+  // A retracted id is unsent for good — no seed adds it, ever.
+  if (isRetractedNotification(item.id)) return list;
   if (list.some((n) => n.id === item.id)) return list;
   return [item, ...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
@@ -104,6 +113,9 @@ function replaceIncoming(
   list: AppNotification[],
   item: AppNotification
 ): AppNotification[] {
+  // The server backup is authoritative for everything except a retraction: an
+  // unsent id must not be resurrected by a copy that hasn't been purged yet.
+  if (isRetractedNotification(item.id)) return list;
   const index = list.findIndex((n) => n.id === item.id);
   if (index === -1) {
     return [item, ...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -282,6 +294,32 @@ export const useNotificationsStore = create<NotificationsState>()(
             // Pop it from the backup tracker so a later re-push can't resurrect
             // it; the server row is removed by the caller via the API.
             backedUpIds: state.backedUpIds.filter((backedId) => backedId !== id),
+            lastUpdated: nowIso(),
+          };
+        }),
+
+      retractNotifications: (ids) =>
+        set((state) => {
+          const retracted = new Set(ids);
+          const notifications = state.notifications.filter(
+            (n) => !retracted.has(n.id)
+          );
+          // Nothing stored and every id already recorded as deleted: leave the
+          // state object alone so this doesn't re-render on every visit.
+          if (
+            notifications.length === state.notifications.length &&
+            ids.every((id) => state.deletedIds.includes(id))
+          ) {
+            return state;
+          }
+          return {
+            notifications,
+            // Same set `removeNotification` writes: a retraction is permanent,
+            // so it must survive reloads and any later server merge.
+            deletedIds: Array.from(new Set([...state.deletedIds, ...ids])),
+            // The server rows for these are deleted on read; dropping them
+            // here means a later backup push can't recreate one.
+            backedUpIds: state.backedUpIds.filter((id) => !retracted.has(id)),
             lastUpdated: nowIso(),
           };
         }),

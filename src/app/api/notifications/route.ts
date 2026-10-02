@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { RETRACTED_NOTIFICATION_IDS } from "@/lib/notification-retractions";
 import type { AppNotification, NotificationType } from "@/lib/notification-types";
 import {
   deleteNotifications,
@@ -7,6 +8,7 @@ import {
   markNotificationsRead,
   pushNotificationBackup,
   syncFeedbackResolutions,
+  unsendNotifications,
 } from "@/lib/notifications-api";
 
 export const runtime = "nodejs";
@@ -25,6 +27,13 @@ export async function GET() {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  }
+  // Retracted notifications are deleted before the backup is read, so the
+  // caller's own copy can't come back. The delete is by key across accounts, so
+  // this one read also unsends the notification for every other learner; it is
+  // best-effort like the poll sweeps — a retraction must never break the bell.
+  if (RETRACTED_NOTIFICATION_IDS.length > 0) {
+    await unsendNotifications(RETRACTED_NOTIFICATION_IDS).catch(() => null);
   }
   // Running the close-sync here means simply opening the app surfaces any
   // feedback that the author has since resolved.
