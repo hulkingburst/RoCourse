@@ -11,7 +11,8 @@
     "postinstall": "prisma generate",
     "content:snapshot": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-content-snapshot.mjs",
     "vercel-build": "node scripts/vercel-build.js",
-    "cf-build": "npm run content:snapshot && opennextjs-cloudflare build && opennextjs-cloudflare populateCache local",
+    "cf-build": "node scripts/check-cf-env.mjs && npm run content:snapshot && opennextjs-cloudflare build && opennextjs-cloudflare populateCache local",
+    "cf-ci-build": "node scripts/check-cf-env.mjs && npm run content:snapshot && opennextjs-cloudflare build",
     "cf-preview": "npm run cf-build && opennextjs-cloudflare preview",
     "cf-deploy": "npm run cf-build && opennextjs-cloudflare deploy"
   },

@@ -946,6 +946,10 @@
         "title": "CFrame",
         "body": "Un valor que guarda una posición y una rotación juntas. Se usa para colocar y orientar parts con precisión."
       },
+      "vector3": {
+        "title": "Vector3",
+        "body": "El tipo de vector 3D de Roblox — números x, y, z que describen posiciones, tamaños y direcciones. Se crea con Vector3.new(x, y, z)."
+      },
       "property": {
         "title": "Propiedad",
         "body": "Una configuración de una instancia — tamaño, color, posición, nombre. Las lees y cambias con un punto."

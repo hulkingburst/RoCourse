@@ -8,6 +8,20 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // Durable incremental cache (ISR). `open-next.config.ts` selects the KV
+  // cache; `opennextjs-cloudflare deploy` uploads the build-time entries into
+  // this namespace and revalidated pages are written back at runtime. Create
+  // the namespace once with:
+  //   npx wrangler kv namespace create NEXT_INC_CACHE_KV
+  // then paste the printed id over the placeholder below. Local development
+  // needs no account: `wrangler dev` simulates the namespace under
+  // .wrangler/state and `npm run cf-build` populates that local copy.
+  "kv_namespaces": [
+    {
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
   "services": [
     // Self-reference service binding, the service name must match the worker
     // name. See https://opennext.js.org/cloudflare/caching

@@ -946,6 +946,10 @@
         "title": "CFrame",
         "body": "A value that holds a position and a rotation together. Used to place and point parts precisely."
       },
+      "vector3": {
+        "title": "Vector3",
+        "body": "Roblox's 3D vector type — x, y, and z numbers that describe positions, sizes, and directions. You build one with Vector3.new(x, y, z)."
+      },
       "property": {
         "title": "Property",
         "body": "A setting on an instance — size, color, position, name. You read and change them with a dot."
