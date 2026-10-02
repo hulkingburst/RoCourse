@@ -30,6 +30,7 @@ const days = [
       "welcome",
       "installing-studio",
       "studio-interface",
+      "studio-window",
       "workspace-parts",
       "play-testing",
       "output-errors",

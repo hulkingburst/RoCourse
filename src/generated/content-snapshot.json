@@ -82,11 +82,46 @@
       "activityCount": 1
     },
     {
+      "slug": "studio-window",
+      "title": "Moving around Studio — toolbar, camera, windows",
+      "description": "The toolbar across the top, the camera in the middle, and the windows you can rearrange — how to stop feeling lost in Studio.",
+      "sectionId": "getting-started",
+      "order": 3,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "studio",
+        "interface",
+        "toolbar",
+        "camera",
+        "windows"
+      ],
+      "objectives": [
+        "Name the three zones of the Studio window — toolbar, 3D view, windows",
+        "Move the camera with the mouse and WASD",
+        "Rearrange, pin, and bring back a window"
+      ],
+      "prerequisites": [
+        "studio-interface"
+      ],
+      "keywords": [
+        "camera",
+        "viewport",
+        "toolbar",
+        "panel",
+        "layout",
+        "navigation"
+      ],
+      "sectionTitle": "Getting Started",
+      "sectionOrder": 0,
+      "activityCount": 3
+    },
+    {
       "slug": "workspace-parts",
       "title": "The Workspace and parts",
       "description": "Build your first objects — parts in the Workspace, and the three numbers that place anything in 3D space.",
       "sectionId": "getting-started",
-      "order": 3,
+      "order": 4,
       "difficulty": "beginner",
       "estimatedMinutes": 5,
       "tags": [
@@ -101,7 +136,7 @@
         "Read and change Position and Size in Properties"
       ],
       "prerequisites": [
-        "studio-interface"
+        "studio-window"
       ],
       "keywords": [
         "parts",
@@ -118,7 +153,7 @@
       "title": "Playtesting and your first script",
       "description": "Press Play, run your first script, and learn why test changes don't stick around.",
       "sectionId": "getting-started",
-      "order": 4,
+      "order": 5,
       "difficulty": "beginner",
       "estimatedMinutes": 5,
       "tags": [
@@ -150,7 +185,7 @@
       "title": "The Output window and errors",
       "description": "Read error messages like a pro — which script, which line, and what went wrong.",
       "sectionId": "getting-started",
-      "order": 5,
+      "order": 6,
       "difficulty": "beginner",
       "estimatedMinutes": 4,
       "tags": [
@@ -181,7 +216,7 @@
       "title": "Bug hunt — your first fixes",
       "description": "A calm first hunt — read the red text, spot the typo, fix the line, and press Play again.",
       "sectionId": "getting-started",
-      "order": 6,
+      "order": 7,
       "difficulty": "beginner",
       "estimatedMinutes": 6,
       "tags": [
@@ -5935,6 +5970,28 @@
       {
         "id": "which-panel-has-the-answer",
         "text": "Which panel has the answer?",
+        "level": 2
+      }
+    ],
+    "studio-window": [
+      {
+        "id": "the-toolbar-three-zones",
+        "text": "The toolbar — three zones",
+        "level": 2
+      },
+      {
+        "id": "the-3d-view-is-a-camera",
+        "text": "The 3D view is a camera",
+        "level": 2
+      },
+      {
+        "id": "the-windows-are-yours-to-arrange",
+        "text": "The windows are yours to arrange",
+        "level": 2
+      },
+      {
+        "id": "when-the-interface-changes-read-the-tool-not-the-spot",
+        "text": "When the interface changes, read the tool, not the spot",
         "level": 2
       }
     ],
