@@ -51,9 +51,12 @@ are optional and exist purely to sync your progress across devices.
 - **Inline glossary popovers** — hover any key term in a lesson (part,
   workspace, tween, event, …) for a one-line definition and a link to the
   lesson that teaches it.
-- **A free read-aloud** (no API keys, no cost) — every lesson step can be read
-  aloud with your device's built-in text-to-speech, glossary words included,
-  stopping automatically when you move to the next step.
+- **Read aloud in a teacher's voice** — every lesson step can be narrated by
+  "Caleb - Trusted Guide" (ElevenLabs), reading only the lesson's prose: no
+  navigation, no controls, and no code read out character by character, with
+  acronyms like GUI spoken naturally and pauses at every heading and list item.
+  Audio is generated once and cached for everyone; with no narration API key
+  configured, the button falls back to your device's built-in voice.
 - **Progress backup** — export your progress to a download any time, and import
   a backup to restore it on any device. Guest progress lives on your device;
   signing in syncs it to the cloud.

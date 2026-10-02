@@ -124,7 +124,12 @@ export function CodeBlock({
         className
       )}
     >
-      <div className="flex h-9 items-center justify-between border-b border-white/10 px-4">
+      {/* The language badge and run/copy controls are chrome, not lesson prose
+          (read-aloud skips any subtree marked data-narration-skip). */}
+      <div
+        data-narration-skip
+        className="flex h-9 items-center justify-between border-b border-white/10 px-4"
+      >
         <span className="flex items-center gap-1.5 font-mono text-xs text-zinc-400">
           <Terminal className="h-3.5 w-3.5" />
           {language ? languageLabel(language) : t("code")}

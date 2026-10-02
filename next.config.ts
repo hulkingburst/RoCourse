@@ -29,6 +29,10 @@ const contentSecurityPolicy = [
   `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' ${analyticsScriptSrc}${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
+  // Lesson narration: the cached MP3 is served from the public Vercel Blob
+  // store the resource uploads already use (plus the silent unlock clip and
+  // object URLs, which stay in the page).
+  "media-src 'self' blob: data: https://*.public.blob.vercel-storage.com",
   "font-src 'self' data:",
   "connect-src 'self' https://vercel.com https://*.public.blob.vercel-storage.com " +
     `${analyticsConnectSrc} https://*.r2.cloudflarestorage.com https://*.r2.dev`,

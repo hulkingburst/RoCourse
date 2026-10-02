@@ -28,7 +28,9 @@ export function ActivityCard({
   const t = useTranslations("activity");
   return (
     <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-      <div className="flex items-center gap-2 border-b px-5 py-3">
+      {/* The label and Correct/Wrong badge are chrome, not lesson prose —
+          read-aloud skips any subtree marked with data-narration-skip. */}
+      <div data-narration-skip className="flex items-center gap-2 border-b px-5 py-3">
         <Icon className="h-4 w-4 text-primary" />
         <span className="text-sm font-semibold">{label}</span>
         <span className="ml-auto">

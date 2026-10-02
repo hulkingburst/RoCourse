@@ -48,6 +48,7 @@ One codebase, two hosts, no fork:
    | `DATABASE_URL_UNPOOLED` (falls back to `DATABASE_URL`) | Neon connection string for the HTTPS SQL layer. |
    | `AUTH_SECRET` | Keep identical to Vercel's, or every existing session is invalidated at cutover. |
    | `BLOB_READ_WRITE_TOKEN` | Vercel Blob uploads (the active upload path on either host). |
+   | `ELEVENLABS_API_KEY` | Lesson narration (Read Aloud). Optional: without it the button falls back to the browser voice. |
    | `FEEDBACK_GITHUB_TOKEN` | Feedback / showcase / resources filing; those endpoints answer 503 without it. |
    | `FEEDBACK_GITHUB_REPO`, `RESOURCES_GITHUB_REPO` | Optional repo overrides. |
 
@@ -208,6 +209,8 @@ leaves the old entry), they just stop caching.
 | `AUTH_SECRET` | runtime secret | same value as Vercel |
 | `AUTH_TRUST_HOST` | runtime var | `true` |
 | `FEEDBACK_GITHUB_TOKEN` | runtime secret | GitHub issue filing |
+| `ELEVENLABS_API_KEY` | runtime secret | lesson narration; unset falls back to the browser voice |
+| `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID` | runtime secret, optional | pin the narration voice/model (default: the account's "Caleb - Trusted Guide"; on a free plan the library entry is refused over the API and narration automatically speaks with the same voice under its legacy id, so no configuration is needed) |
 | `FEEDBACK_GITHUB_REPO`, `RESOURCES_GITHUB_REPO` | runtime secret, optional | repo overrides |
 | `BLOB_READ_WRITE_TOKEN` | runtime secret | Vercel Blob uploads |
 | `FILE_STORAGE`, `R2_*` | runtime | dormant until R2 exists |
@@ -224,3 +227,11 @@ leaves the old entry), they just stop caching.
   feedback / showcase / resources endpoints can file anything.
 - DNS / domain cutover is undecided and out of scope until approved.
 - R2 remains blocked on payment verification, so uploads stay on Vercel Blob.
+- `ELEVENLABS_API_KEY` is not uploaded yet, so narration currently falls back to
+  the browser voice on the Worker; the blob cache it writes to uses the same
+  `BLOB_READ_WRITE_TOKEN` already deployed. Note that the token in this
+  checkout's `.env.local` is stale — the Blob API answers "Invalid token" — so
+  local narration serves freshly generated audio without caching until
+  `vercel env pull` refreshes it. Neither the store nor the database is
+  required for narration: a failed lookup acts as a miss and a failed store
+  returns the audio bytes instead of an error.
