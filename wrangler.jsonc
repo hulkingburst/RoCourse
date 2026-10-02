@@ -13,15 +13,22 @@
   // this namespace and revalidated pages are written back at runtime. Create
   // the namespace once with:
   //   npx wrangler kv namespace create NEXT_INC_CACHE_KV
-  // then paste the printed id over the placeholder below. Local development
-  // needs no account: `wrangler dev` simulates the namespace under
-  // .wrangler/state and `npm run cf-build` populates that local copy.
+  // then paste the printed id below (`wrangler kv namespace list` reprints
+  // it). Local development needs no account: `wrangler dev` simulates the
+  // namespace under .wrangler/state and `npm run cf-build` populates that
+  // local copy.
   "kv_namespaces": [
     {
       "binding": "NEXT_INC_CACHE_KV",
-      "id": "00000000000000000000000000000000"
+      "id": "de4317a6f8574be58d86efd8d4ac2766"
     }
   ],
+  // next-auth behind the Worker. The app also hardcodes `trustHost: true` in
+  // src/lib/auth.ts, so this is belt-and-braces; keeping it here makes the
+  // deployed environment explicit and versioned with the worker.
+  "vars": {
+    "AUTH_TRUST_HOST": "true"
+  },
   "services": [
     // Self-reference service binding, the service name must match the worker
     // name. See https://opennext.js.org/cloudflare/caching

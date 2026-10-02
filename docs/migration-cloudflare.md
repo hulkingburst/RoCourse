@@ -4,8 +4,11 @@ How to serve this site from Cloudflare Workers with `@opennextjs/cloudflare`.
 
 The port is complete and merged on `main`; **Vercel is still the production
 host**, and this document is the runbook for the day Cloudflare is actually
-deployed. Nothing has been deployed so far — all validation is local
-(`wrangler dev` against the real Neon database) plus the Node build.
+deployed. No Worker has been deployed yet — all validation is local
+(`wrangler dev` against the real Neon database) plus the Node build — but the
+account-side setup is done: Wrangler is authenticated, the
+`NEXT_INC_CACHE_KV` namespace exists, and the runtime secrets are uploaded,
+so the first deploy is one command.
 
 ## Architecture
 
@@ -32,9 +35,11 @@ One codebase, two hosts, no fork:
    npx wrangler kv namespace create NEXT_INC_CACHE_KV
    ```
 
-   The repo ships a placeholder id (`0000…`). It works for local development
-   (`wrangler dev` simulates the namespace under `.wrangler/state`), but the
-   placeholder must be replaced before a deploy.
+   `wrangler.jsonc` carries this account's real namespace id (`wrangler kv
+   namespace list` reprints it). Local development does not need it —
+   `wrangler dev` simulates the namespace under `.wrangler/state` — but a
+   deploy reads the real one, so a namespace created in a different account
+   must be swapped in before deploying there.
 
 3. Worker secrets (`npx wrangler secret put <NAME>`):
 
@@ -46,7 +51,8 @@ One codebase, two hosts, no fork:
    | `FEEDBACK_GITHUB_TOKEN` | Feedback / showcase / resources filing; those endpoints answer 503 without it. |
    | `FEEDBACK_GITHUB_REPO`, `RESOURCES_GITHUB_REPO` | Optional repo overrides. |
 
-4. Plain vars: `AUTH_TRUST_HOST=true` (next-auth behind the Worker).
+4. Plain vars: `AUTH_TRUST_HOST=true` — committed in `wrangler.jsonc`'s `vars`
+   block, so there is nothing to set in the dashboard for it.
 5. Defer every `R2_*` variable until R2 exists.
 
 ## Build and deploy
@@ -76,6 +82,11 @@ Notes:
   (`scripts/check-cf-env.mjs`) and stop with a reminder.
 - `.dev.vars` (gitignored) is what `wrangler dev` reads locally; deployed values
   come from `wrangler secret put`.
+- `wrangler deploy --dry-run` is not a safe validation in this repo: Wrangler
+  auto-detects OpenNext and hands its arguments to `opennextjs-cloudflare
+  deploy`, which populates the **remote** KV before Wrangler's dry-run flag is
+  ever reached. To validate `wrangler.jsonc` without spending writes, run
+  `npx wrangler types` (then delete the generated `worker-configuration.d.ts`).
 - On Windows the build prints three `Failed to copy …node_modules/hast-util-*`
   errors and a "not fully compatible with Windows" warning. They are harmless —
   the build completes and the worker serves correctly — but WSL is the supported
@@ -205,11 +216,11 @@ leaves the old entry), they just stop caching.
 
 ## Not done yet
 
-- No `wrangler deploy` has ever succeeded against this account; the worker has
-  only been exercised under `wrangler dev`. The first Git-connected build ran
-  on 2026-10-01 but failed at the deploy step; the dashboard still needs the
-  settings from "Git deploys" (build command and build variable).
-- The KV namespace id in `wrangler.jsonc` is still the placeholder; the first
-  Git deploy needs the real one.
+- No `wrangler deploy` has run yet; the worker has only been exercised under
+  `wrangler dev`. Account setup is done (login, the KV namespace, the runtime
+  secrets), but two things still stand in front of a deploy: the Workers
+  Builds dashboard needs the settings from "Git deploys" (build command and
+  build variable), and `FEEDBACK_GITHUB_TOKEN` must be uploaded before the
+  feedback / showcase / resources endpoints can file anything.
 - DNS / domain cutover is undecided and out of scope until approved.
 - R2 remains blocked on payment verification, so uploads stay on Vercel Blob.
