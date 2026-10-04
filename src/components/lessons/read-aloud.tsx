@@ -17,7 +17,10 @@ import { isSpeakableCode, toNarrationText } from "@/lib/narration";
  * as a blob so identical narration is never generated twice. If narration
  * isn't configured, the quota is spent, or the request fails, the same
  * narration text is spoken with the browser's built-in voice, which also uses
- * the shared preprocessing rules.
+ * the shared preprocessing rules. That failure is then remembered for the rest
+ * of the page load, so later taps start the browser voice synchronously inside
+ * the tap — iOS Safari silently drops speech that begins after an await, which
+ * is exactly where the normal fallback lands.
  *
  * Controls keep the existing footprint: one button that plays, pauses, and
  * resumes, plus a stop button that only appears while narration is active.
@@ -224,6 +227,14 @@ let session: NarrationSession | null = null;
 /** Monotonic token: any stop or new read invalidates older async work. */
 let epoch = 0;
 const cancelListeners = new Set<() => void>();
+/**
+ * Sticky per-page-load memory: `/api/tts` has failed for real (no key, spent
+ * quota, offline, blocked playback). The next read must start the browser
+ * voice *synchronously inside the tap* — waiting for the request to fail first
+ * loses the user gesture, and iOS Safari drops speech that begins after an
+ * await. A page reload retries cloud narration.
+ */
+let cloudNarrationFailed = false;
 
 /** Stops any currently playing narration, cloud or browser (safe to call even
  * when idle). Step changes call this so audio never outlives its lesson step. */
@@ -398,6 +409,26 @@ export function ReadAloudButton({
       objectUrl: null,
     };
     session = mySession;
+
+    // A previous read already found the cloud pipeline unavailable. Start the
+    // browser voice *now*, before any await, while iOS Safari still counts
+    // this as a user gesture.
+    if (cloudNarrationFailed) {
+      engineRef.current = "browser";
+      const started = speakWithBrowser(prose, () => {
+        if (myEpoch !== epoch) return;
+        session = null;
+        engineRef.current = null;
+        setStatus("idle");
+      });
+      if (started) {
+        setStatus("playing");
+        return;
+      }
+      // This browser has no speech synthesis after all: let the cloud try.
+      cloudNarrationFailed = false;
+    }
+
     engineRef.current = "cloud";
     setStatus("loading");
 
@@ -464,6 +495,9 @@ export function ReadAloudButton({
         setStatus("idle");
       });
       if (fellBack) {
+        // Remember the failure for the rest of the page load, so the next tap
+        // starts the browser voice inside its own gesture (see above).
+        cloudNarrationFailed = true;
         setStatus("playing");
         return;
       }
