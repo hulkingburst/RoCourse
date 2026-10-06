@@ -1,0 +1,248 @@
+---
+slug: quest-systems
+title: Quest Systems — design reusable objectives, progress tracking, and rewards
+description: Design reusable objectives, progress tracking, and rewards with one engine — quests as data, a single progress funnel, and server-paid rewards.
+sectionId: gameplay
+order: 17
+difficulty: intermediate
+estimatedMinutes: 7
+tags: [quests, objectives, progress, rewards, systems, data]
+objectives:
+  - Describe a quest as data instead of writing a script per quest
+  - Track progress per player in a state table keyed by UserId
+  - Route every game system through one recordProgress funnel
+  - Pay a reward exactly once when an objective completes
+  - Save and restore quest progress through the existing save loop
+prerequisites: [clicker, modules, datastores]
+keywords: [quest, quest system, objective, progress tracking, reward, quest state, funnel]
+---
+
+A quest is a promise: do this, get that. Defeat five dummies, collect ten coins, reach the tower. The tempting shortcut is a fresh script per quest — and it works, for about three quests. The better version treats every quest as **data** and runs them all through one small engine. Adding a quest becomes three lines of table, not three pages of code.
+
+<Step>
+
+## A quest is a definition, not a script
+
+Write the quest down as a table entry:
+
+```luau
+local QuestDefs = {
+    DummyHunt = {
+        title = "Wooden Warriors",
+        objective = { kind = "Defeat", target = "Dummy", count = 5 },
+        reward = { coins = 50 },
+    },
+    CoinCollector = {
+        title = "Pocket Change",
+        objective = { kind = "Collect", target = "Coin", count = 10 },
+        reward = { coins = 25 },
+    },
+}
+```
+
+Every definition answers the same three questions: **what counts** (`kind` + `target`), **how much** (`count`), and **what you get** (`reward`). `kind` is the verb — Defeat, Collect, Reach — and `target` is the noun it applies to. Two quests can share a kind and stay separate because the *pair* must match. Want a new quest? Add an entry. The engine never changes.
+
+<Note>
+Definitions never hold player data. `QuestDefs` is the same for everyone — the rules of the quest, not anyone's progress in it.
+</Note>
+
+<FillBlank
+  prompt="A quest definition says what counts, how much, and what you get. The field that stores how many times the objective must happen is ____"
+  answer="count"
+  explanation="count is the target number: defeat 5 dummies means count = 5."
+/>
+
+</Step>
+
+<Step>
+
+## Per-player quest state
+
+Progress is per player, so it needs its own table:
+
+```luau
+local questState = {}  -- [userId] = { [questId] = { progress = 0, done = false } }
+
+local function startQuest(player, questId)
+    if not QuestDefs[questId] then return end
+
+    local state = questState[player.UserId]
+    if state[questId] then return end  -- already started — don't reset it
+
+    state[questId] = { progress = 0, done = false }
+    questChanged:FireClient(player, questId)  -- the UI draws the new quest
+end
+```
+
+One table keyed by `UserId` — the same key you already use for saves — holds every player's quests. Each entry is one quest in flight: `progress` counts up from zero, `done` locks the reward. Note the guard: starting a quest twice must never reset progress the player already earned.
+
+<Mcq
+  question="Why is each player's quest state keyed by UserId?"
+  options={[
+    "Because the client needs the key to draw the quest panel",
+    "Because UserId is permanent and every server script can look the player up by it",
+    "Because tables cannot have player objects as values",
+    "Because UserId is required to fire a RemoteEvent",
+  ]}
+  answer={1}
+  explanation="UserId never changes, survives reconnects, and matches the key your save data already uses."
+/>
+
+</Step>
+
+<Step>
+
+## One funnel for every event
+
+Here is the move that makes the system reusable: no other system knows quests exist. Combat doesn't hunt for the DummyHunt definition — it just reports what happened:
+
+```luau
+-- melee-combat, pickups, zones — everyone reports the same way
+recordProgress(player, "Defeat", "Dummy", 1)
+recordProgress(player, "Collect", "Coin", 1)
+```
+
+The funnel itself is short — it walks the player's active quests and finds the ones this event counts toward:
+
+```luau
+local completeQuest  -- defined in the next step: lock the quest, pay the reward
+
+local function recordProgress(player, kind, target, amount)
+    local state = questState[player.UserId]
+
+    for questId, entry in state do
+        if entry.done then continue end
+
+        local objective = QuestDefs[questId].objective
+        if objective.kind == kind and objective.target == target then
+            entry.progress += amount
+
+            if entry.progress >= objective.count then
+                completeQuest(player, questId)
+            end
+        end
+    end
+end
+```
+
+Because matching happens inside the funnel, one kill can count toward several quests at once — "defeat 5 dummies" and "defeat 20 enemies" both tick on the same event. The systems stay ignorant, and the quests stay independent.
+
+<Note>
+Check `progress >= count`, not `== count`. One event can report a batch of 3 and blow past the target — `>=` still completes the quest.
+</Note>
+
+<FillBlank
+  prompt="Every game system reports events by calling the same ____ function."
+  answer="recordProgress"
+  explanation="One funnel keeps every objective in one place — system code never touches quest tables directly."
+/>
+
+</Step>
+
+<Step>
+
+## Rewards, paid exactly once
+
+Completion is where quest systems usually leak money, so order the steps deliberately:
+
+```luau
+local function completeQuest(player, questId)
+    local entry = questState[player.UserId][questId]
+    if entry.done then return end
+
+    entry.done = true  -- lock first, pay second
+
+    local reward = QuestDefs[questId].reward
+    if reward.coins then
+        local coins = player.leaderstats.Coins
+        coins.Value += reward.coins
+    end
+
+    questChanged:FireClient(player, questId)
+end
+```
+
+Mark `done` **before** paying. If the payout could ever run twice — two events in the same frame, a retry, a reconnect — the second call sees `done` and returns early. The server pays, exactly like every other award in this course: `leaderstats.Coins` belongs to the server, and the client only learns the new number by watching the value change.
+
+<WriteCode
+  instruction="The reward is about to be paid. Write the line that locks the quest so a second call cannot pay it again."
+  answer={["entry.done = true"]}
+  starterCode="local entry = questState[player.UserId][questId]
+if entry.done then return end
+-- lock the quest before paying the reward
+
+local coins = player.leaderstats.Coins"
+  explanation="entry.done = true first makes completeQuest idempotent — every later call returns early instead of paying twice."
+/>
+
+</Step>
+
+<Step>
+
+## Saving quest progress
+
+The state table is already save-shaped: numbers and booleans under string keys. Send it through the same pcall-and-save loop as the rest of your player data:
+
+```luau
+local function saveQuests(player)
+    local store = DataStoreService:GetDataStore("QuestData")
+
+    local ok, err = pcall(function()
+        store:SetAsync(tostring(player.UserId), questState[player.UserId])
+    end)
+
+    if not ok then warn("Quest save failed:", err) end
+end
+
+-- on join, before anything can be earned:
+local saved = store:GetAsync(tostring(player.UserId))
+questState[player.UserId] = saved or {}
+```
+
+A separate store (`QuestData`) keeps quests isolated from your coins save; you can also nest the same table inside one big player-data table, as long as it is saved and loaded as one unit. The rule is the same either way: **never let a player earn progress you wouldn't be able to write down.**
+
+<Mcq
+  question="GetAsync returns nil for a player. What should happen?"
+  options={[
+    "Kick the player so the data can be repaired",
+    "Start them with an empty quest table — they simply have no saved quests yet",
+    "Copy another player's quest table",
+    "Mark every quest complete so they can catch up",
+  ]}
+  answer={1}
+  explanation="nil means a new save, not an error. questState[player.UserId] = saved or {} gives them a clean slate."
+/>
+
+</Step>
+
+<Step>
+
+## Putting it together
+
+The whole engine is four small functions around two tables:
+
+```luau
+-- Define:  QuestDefs[id] = { objective = { kind, target, count }, reward = { coins } }
+-- Start:   startQuest(player, id)      → entry = { progress = 0, done = false }
+-- Report:  recordProgress(player, kind, target, amount) → progress += amount
+-- Finish:  progress >= count → done = true → pay coins → tell the client
+-- Save:    the state table through the same DataStore loop as everything else
+```
+
+What makes it reusable is that nothing above knows about dummies or coins. Daily quests change only the `count` and reset on a timer. Quest chains call `startQuest` for the next quest when they see `done` on the first. Multi-objective quests turn `objective` into an array and let the funnel match any entry. The engine stays; the data grows.
+
+</Step>
+
+<Step>
+
+## Common mistakes
+
+- **Paying inside the progress loop.** The funnel should only raise a flag; the reward belongs in `completeQuest` where the `done` guard protects it.
+- **Counting on the client.** If a LocalScript raises progress and tells the server "I'm done," every exploiter finishes every quest instantly. The server counts; the client only draws.
+- **Resetting on re-accept.** `startQuest` must check for an existing entry before writing a fresh `progress = 0`.
+- **Keying state by the player object.** Use `UserId`, like every other save — player objects disappear on reconnect.
+- **Forgetting to save.** The worst bug, because everything *looks* fine until the player rejoins and their quests are gone.
+
+Next: the game-systems recap — then out into the world itself.
+
+</Step>

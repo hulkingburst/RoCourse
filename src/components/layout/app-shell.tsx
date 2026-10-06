@@ -136,18 +136,6 @@ export function AppShell({
                 {t("guides")}
               </Link>
               <Link
-                href="/leaderboard"
-                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-              >
-                {t("leaderboard")}
-              </Link>
-              <Link
-                href="/questions"
-                className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-              >
-                {t("questions")}
-              </Link>
-              <Link
                 href="/contact"
                 className="flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >

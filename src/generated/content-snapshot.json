@@ -2372,6 +2372,47 @@
       "activityCount": 3
     },
     {
+      "slug": "quest-systems",
+      "title": "Quest Systems — design reusable objectives, progress tracking, and rewards",
+      "description": "Design reusable objectives, progress tracking, and rewards with one engine — quests as data, a single progress funnel, and server-paid rewards.",
+      "sectionId": "gameplay",
+      "order": 17,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 7,
+      "tags": [
+        "quests",
+        "objectives",
+        "progress",
+        "rewards",
+        "systems",
+        "data"
+      ],
+      "objectives": [
+        "Describe a quest as data instead of writing a script per quest",
+        "Track progress per player in a state table keyed by UserId",
+        "Route every game system through one recordProgress funnel",
+        "Pay a reward exactly once when an objective completes",
+        "Save and restore quest progress through the existing save loop"
+      ],
+      "prerequisites": [
+        "clicker",
+        "modules",
+        "datastores"
+      ],
+      "keywords": [
+        "quest",
+        "quest system",
+        "objective",
+        "progress tracking",
+        "reward",
+        "quest state",
+        "funnel"
+      ],
+      "sectionTitle": "Game Systems",
+      "sectionOrder": 4,
+      "activityCount": 5
+    },
+    {
       "slug": "recap-gameplay",
       "title": "Recap — your first game systems",
       "description": "Refresh GUIs, the clicker loop, idle income, upgrades, and modules before you start building the world around them.",
@@ -5406,6 +5447,43 @@
       {
         "id": "what-changes-when-its-live",
         "text": "What changes when it's live",
+        "level": 2
+      },
+      {
+        "id": "common-mistakes",
+        "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "quest-systems": [
+      {
+        "id": "a-quest-is-a-definition-not-a-script",
+        "text": "A quest is a definition, not a script",
+        "level": 2
+      },
+      {
+        "id": "per-player-quest-state",
+        "text": "Per-player quest state",
+        "level": 2
+      },
+      {
+        "id": "one-funnel-for-every-event",
+        "text": "One funnel for every event",
+        "level": 2
+      },
+      {
+        "id": "rewards-paid-exactly-once",
+        "text": "Rewards, paid exactly once",
+        "level": 2
+      },
+      {
+        "id": "saving-quest-progress",
+        "text": "Saving quest progress",
+        "level": 2
+      },
+      {
+        "id": "putting-it-together",
+        "text": "Putting it together",
         "level": 2
       },
       {
