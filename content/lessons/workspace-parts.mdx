@@ -57,6 +57,26 @@ Those are **X, Y, Z** — left/right, up/down, forward/back. Every point in the 
 
 Change the Y number to `10` and press Enter. Your part teleported straight up. You just "wrote" a position — a script will do the same thing later, but with code.
 
+<Note>
+Properties lists more than one set of coordinates, and only **Position** moves your part:
+
+- **Position** — where the part sits in the world. Change these three numbers to move it.
+- **CFrame** — Position and rotation packed into one value. Scripts use it constantly, but it's not the field to edit by hand.
+- **Origin Position** and **Pivot Offset** — these describe the part's *pivot*, the point Studio's tools grab, rotate, and scale around. Origin Position is read-only and just reports where that point is; Pivot Offset moves the point, not the part. Leave both alone for now.
+</Note>
+
+<Mcq
+  question="You want to move a part by typing numbers into Properties. Which field do you change?"
+  options={[
+    "CFrame",
+    "Position",
+    "Origin Position",
+    "Pivot Offset",
+  ]}
+  answer={1}
+  explanation="Position is the part's place in the world. CFrame wraps those numbers together with rotation, and the pivot fields describe where Studio's tools grab the part — not where it lives."
+/>
+
 </Step>
 
 <Step>

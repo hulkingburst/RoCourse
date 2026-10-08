@@ -146,7 +146,7 @@
       ],
       "sectionTitle": "Getting Started",
       "sectionOrder": 0,
-      "activityCount": 1
+      "activityCount": 2
     },
     {
       "slug": "play-testing",
@@ -209,7 +209,7 @@
       ],
       "sectionTitle": "Getting Started",
       "sectionOrder": 0,
-      "activityCount": 2
+      "activityCount": 3
     },
     {
       "slug": "bug-hunt-first",

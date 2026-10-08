@@ -53,13 +53,41 @@ You won't understand every error yet. But notice how much information is there.
 
 ## Make an error on purpose
 
-Open your script from the last lesson and break it on purpose — change the print to:
+Open your script from the last lesson, the one that prints a message. You're going to break it on purpose, in a safe place where nothing real can be lost.
+
+First, notice what *doesn't* break. Delete the text inside the parentheses so the line reads:
 
 ```luau
 print()
 ```
 
-Press Play. `print()` needs something between the parentheses, so Output reports an error about a missing argument.
+Press Play. Output shows an empty line, not a red one. `print()` doesn't need anything between the parentheses — with nothing to print, it prints a blank line. Not everything you see in Output is an error.
+
+<Mcq
+  question="You run a script containing only print(). What does Output show?"
+  options={[
+    "A red error saying print is missing an argument",
+    "An empty line, and no error",
+    "A warning that the script is empty",
+    "The last message you printed",
+  ]}
+  answer={1}
+  explanation="print() is happy with nothing inside — a blank line is still a successful print. For a red line, the script has to actually fail."
+/>
+
+To make a real one, replace the line with this:
+
+```luau
+error("I broke it on purpose")
+```
+
+Press Play. Output turns red:
+
+```text
+Workspace.Script:1: I broke it on purpose
+```
+
+Read it with the anatomy from the first step: *which script* (`Workspace.Script`), *which line* (`:1`), and the problem — the message you gave it. `error()` is the function whose whole job is to stop a script and leave that red line behind.
 
 That's success. You just created your first real error on purpose, on your terms, in a safe empty place. An error doesn't mean you broke your game — it means that one line stopped. Read the message, fix the line, try again.
 
