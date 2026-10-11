@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import yaml from "js-yaml";
 import { courseSections } from "@content/course";
 import { slugify } from "@/lib/utils";
 import { countActivitySteps } from "@/lib/steps";
@@ -39,9 +39,48 @@ interface LessonFile {
   raw: string;
 }
 
+/**
+ * Lesson frontmatter helpers.
+ *
+ * Every lesson file is one YAML block between `---` fences followed by the MDX
+ * body, so the split is done here and the block handed to `js-yaml` — the YAML
+ * parser the app already ships — instead of to a frontmatter package that
+ * carries a second, differently-versioned YAML parser of its own.
+ */
+
+const FRONTMATTER_FENCE = "---";
+
+/** Parses a YAML block, treating an empty or non-object document as no data. */
+function parseYaml(block: string): Record<string, unknown> {
+  const parsed = yaml.load(block);
+  return parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)
+    ? (parsed as Record<string, unknown>)
+    : {};
+}
+
+/** Splits a lesson file into its frontmatter data and its MDX body. */
+function splitFrontmatter(raw: string): { data: Record<string, unknown>; content: string } {
+  // A UTF-8 BOM must not hide the opening fence.
+  const source = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
+  if (!source.startsWith(FRONTMATTER_FENCE) || source[FRONTMATTER_FENCE.length] === "-") {
+    return { data: {}, content: source };
+  }
+
+  const rest = source.slice(FRONTMATTER_FENCE.length);
+  const closeIndex = rest.indexOf(`\n${FRONTMATTER_FENCE}`);
+  if (closeIndex === -1) {
+    return { data: parseYaml(rest), content: "" };
+  }
+
+  let content = rest.slice(closeIndex + FRONTMATTER_FENCE.length + 1);
+  if (content.startsWith("\r")) content = content.slice(1);
+  if (content.startsWith("\n")) content = content.slice(1);
+  return { data: parseYaml(rest.slice(0, closeIndex)), content };
+}
+
+/** Frontmatter data for a lesson file — what `normalizeMeta` consumes. */
 function parseFrontmatter(raw: string): Record<string, unknown> {
-  const { data } = matter(raw);
-  return data;
+  return splitFrontmatter(raw).data;
 }
 
 function normalizeMeta(
@@ -153,7 +192,7 @@ function readLessonFile(slug: string): LessonFile | null {
 export function readLesson(slug: string): Lesson | null {
   const file = readLessonFile(slug);
   if (!file) return null;
-  const { content } = matter(file.raw);
+  const { content } = splitFrontmatter(file.raw);
   return {
     meta: toMeta(file),
     content,
