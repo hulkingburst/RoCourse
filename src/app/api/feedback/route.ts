@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { recordFeedbackTicket } from "@/lib/db/atomic-writes";
 import { trustedIp } from "@/lib/auth-limiter";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 
@@ -104,35 +104,21 @@ export async function POST(request: Request) {
   const created = (await response.json()) as { number?: number };
   if (userId && typeof created.number === "number") {
     try {
-      await prisma.$transaction([
-        prisma.feedbackTicket.upsert({
-          where: { repo_issueNumber: { repo, issueNumber: created.number } },
-          create: {
-            userId,
-            repo,
-            issueNumber: created.number,
-            title: title.slice(0, 200),
-          },
-          update: { title: title.slice(0, 200) },
-        }),
-        prisma.notification.upsert({
-          where: {
-            userId_localKey: {
-              userId,
-              localKey: `feedback:${created.number}:received`,
-            },
-          },
-          create: {
-            userId,
-            localKey: `feedback:${created.number}:received`,
-            type: "feedback_received",
-            title: "Feedback received",
-            body: text.slice(0, 2000),
-            link: `https://github.com/${repo}/issues/${created.number}`,
-          },
-          update: {},
-        }),
-      ]);
+      // Ticket and notification land in one statement, so a failure can't
+      // record one without the other (see src/lib/db/atomic-writes.ts).
+      await recordFeedbackTicket({
+        userId,
+        repo,
+        issueNumber: created.number,
+        title: title.slice(0, 200),
+        notification: {
+          localKey: `feedback:${created.number}:received`,
+          type: "feedback_received",
+          title: "Feedback received",
+          body: text.slice(0, 2000),
+          link: `https://github.com/${repo}/issues/${created.number}`,
+        },
+      });
     } catch {
       // A failed backup must not take down an otherwise-successful submission.
     }

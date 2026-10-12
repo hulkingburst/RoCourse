@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { trustedIp } from "@/lib/auth-limiter";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import {
@@ -12,6 +13,7 @@ import {
   findNarrationAudio,
   narrationCacheAvailable,
   narrationCacheKey,
+  pruneNarrationCache,
   saveNarrationAudio,
 } from "@/lib/narration-cache";
 import {
@@ -30,20 +32,28 @@ export const maxDuration = 60;
  * The client posts the visible prose of the current lesson step; the route
  * preprocesses it (`toNarrationText`), looks up audio for the exact speech
  * text in the blob cache, and only calls ElevenLabs on a miss. A miss is the
- * only thing that costs credits, so that is where the per-IP guard sits.
+ * only thing that costs credits.
+ *
+ * A cache hit is free and stays open to everyone, so any learner can replay
+ * narration that already exists. A miss — the paid ElevenLabs call — requires a
+ * signed-in account and is budgeted per account as well as per IP, so an
+ * anonymous caller can't spend the project's quota. Signed-out readers lose
+ * nothing: the client falls back to the browser voice.
  *
  * Every failure answers with a JSON error, which the client turns into the
  * browser-voice fallback — Read Aloud keeps working when narration has no API
  * key, the quota is spent, or ElevenLabs is down.
  */
 
-// Generous guard on generation only (cached audio is free to replay): a
-// learner never hits it, while hammering the endpoint on uncached text can't
-// drain the ElevenLabs quota.
+// Budgets on generation only (cached audio is free to replay): a learner never
+// hits them, while hammering the endpoint on uncached text can't drain the
+// ElevenLabs quota.
 const LIMIT_PER_IP = 60;
+const LIMIT_PER_USER = 30;
 const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 
 const limitKey = (ip: string) => `narration:${ip}`;
+const userLimitKey = (userId: string) => `narration:user:${userId}`;
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -90,6 +100,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ url: cached, cached: true });
     }
 
+    // Everything past this line can cost money, so it needs an account. The
+    // session is only checked here, after the free cache lookup, so anonymous
+    // readers keep hearing already-generated narration.
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Sign in to generate narration" },
+        { status: 401 }
+      );
+    }
+
     const ip = trustedIp(request.headers);
     // The database may be unconfigured (local dev, previews): a broken guard
     // must not break narration, so it fails open and only logs.
@@ -100,6 +122,17 @@ export async function POST(request: Request) {
       }
     );
     if (limited) {
+      return NextResponse.json({ error: "Too many narration requests" }, { status: 429 });
+    }
+    const overUserBudget = await isRateLimited(
+      userLimitKey(userId),
+      LIMIT_PER_USER,
+      LIMIT_WINDOW_MS
+    ).catch((error) => {
+      console.error("[tts:rate-limit]", error);
+      return false;
+    });
+    if (overUserBudget) {
       return NextResponse.json({ error: "Too many narration requests" }, { status: 429 });
     }
 
@@ -121,7 +154,11 @@ export async function POST(request: Request) {
     }
 
     await recordRateLimit(limitKey(ip)).catch(() => {});
+    await recordRateLimit(userLimitKey(userId)).catch(() => {});
     await pruneRateLimits().catch(() => {});
+    // Retention for the cache this generation just wrote to. Throttled and
+    // fire-and-forget: housekeeping must not slow down or fail a read-aloud.
+    void pruneNarrationCache().catch((error) => console.error("[tts:cache]", error));
 
     if (url) return NextResponse.json({ url, cached: false });
     return new NextResponse(audio.audio, {

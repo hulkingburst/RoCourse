@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { list, put } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 
 /**
  * Audio cache for lesson narration.
@@ -75,4 +75,39 @@ export async function saveNarrationAudio(
     cacheControlMaxAge: 60 * 60 * 24 * 365,
   });
   return result.url;
+}
+
+/**
+ * How long cached audio is kept. Long enough that a lesson edit re-uploads
+ * rather than regenerates, bounded so the public store can't grow forever.
+ */
+const CACHE_MAX_AGE_MS = 180 * 24 * 60 * 60 * 1000;
+/** At most one retention pass per process per hour. */
+const PRUNE_INTERVAL_MS = 60 * 60 * 1000;
+let lastPruneAt = 0;
+
+/** True when a retention pass is due — lets callers avoid scheduling a no-op. */
+export function narrationPruneDue(now: number = Date.now()): boolean {
+  return now - lastPruneAt >= PRUNE_INTERVAL_MS;
+}
+
+/**
+ * Retention for cached narration: audio older than the window is deleted.
+ *
+ * Every generation writes an immutable object that nothing else ever removes,
+ * so without this the store grows for the lifetime of the deployment. One page
+ * per pass keeps the work bounded, and the hour throttle keeps it off the hot
+ * path; a replayed lesson simply regenerates the audio once, which is also how
+ * an expired pronunciation is refreshed. Failures are the caller's to swallow —
+ * housekeeping must never affect a learner's request.
+ */
+export async function pruneNarrationCache(now: number = Date.now()): Promise<void> {
+  if (!narrationPruneDue(now)) return;
+  lastPruneAt = now;
+  const result = await list({ prefix: `${CACHE_PREFIX}/`, limit: 1000 });
+  const stale = result.blobs.filter(
+    (blob) => now - new Date(blob.uploadedAt).getTime() > CACHE_MAX_AGE_MS
+  );
+  if (stale.length === 0) return;
+  await del(stale.map((blob) => blob.url));
 }

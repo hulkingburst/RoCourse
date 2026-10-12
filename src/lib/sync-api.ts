@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getVerifiedCompletions } from "@/lib/completions";
 import { getFeedbackResolvedCount } from "@/lib/feedback-resolved";
 import { sanitizeSnapshot } from "@/lib/sanitize-snapshot";
 import { getWeeklyFirstCount } from "@/lib/weekly-first";
@@ -49,11 +50,20 @@ export async function getCloudState(userId: string): Promise<CloudState> {
 }
 
 /**
- * Stores a progress blob and merges completion records (additive union). The
- * blob is sanitized server-side before being persisted: every field is
+ * Stores a progress blob and re-derives the user's completion records from it.
+ * The blob is sanitized server-side before being persisted: every field is
  * type-checked and bounded (lesson records, counters, day keys, weekly XP, and
  * a lifetime-XP cap), so a malformed or inflated payload can never poison a
  * stored profile or inflate a public one.
+ *
+ * Completions are never taken from the payload. The client-supplied
+ * `completions` field is ignored entirely: the only thing that can create a
+ * `CourseCompletion` is the capstone evidence inside the sanitized blob
+ * (`getVerifiedCompletions`), so a request cannot mint a certificate for a
+ * course the learner did not finish and a stored record always matches the
+ * progress it came from. Rows whose evidence is gone (the learner un-completed
+ * the capstone) are removed, which is what keeps the showcase gate and the
+ * weekly board resting on the same server-derived truth.
  */
 export async function saveCloudState(
   userId: string,
@@ -66,41 +76,42 @@ export async function saveCloudState(
     update: { data: clean as unknown as Prisma.InputJsonValue },
   });
 
-  if (Array.isArray(payload.completions)) {
-    for (const completion of payload.completions) {
-      if (!completion.courseId || !completion.title) continue;
-      await prisma.courseCompletion.upsert({
-        where: { userId_courseId: { userId, courseId: completion.courseId } },
-        create: {
-          userId,
-          courseId: completion.courseId,
-          title: completion.title,
-          completedAt: safeDate(completion.completedAt),
-        },
-        update: { title: completion.title },
-      });
-    }
+  const completions = getVerifiedCompletions(clean);
+  for (const completion of completions) {
+    const completedAt = new Date(completion.completedAt);
+    await prisma.courseCompletion.upsert({
+      where: { userId_courseId: { userId, courseId: completion.courseId } },
+      create: {
+        userId,
+        courseId: completion.courseId,
+        title: completion.title,
+        completedAt,
+      },
+      update: { title: completion.title, completedAt },
+    });
   }
+  await prisma.courseCompletion.deleteMany({
+    where: {
+      userId,
+      courseId: { notIn: completions.map((completion) => completion.courseId) },
+    },
+  });
 
   await saveWeeklyXpRows(userId, clean);
-}
-
-/** Parses a client-provided completion timestamp, falling back to now. */
-function safeDate(value: string | undefined): Date {
-  if (typeof value === "string") {
-    const parsed = new Date(value);
-    if (!Number.isNaN(parsed.getTime())) return parsed;
-  }
-  return new Date();
 }
 
 /**
  * Keeps the user's weekly XP leaderboard rows in sync with the progress blob.
  * Values are clamped (see sanitizeWeeklyXp) and only ever raised, never
  * lowered, so a stale device pushing an older weekly total can't erase XP that
- * was already recorded. Display names are refreshed whenever they differ, and
- * rows for weeks outside the kept window are pruned so the table can't grow
- * without bound.
+ * was already recorded. Display names are refreshed whenever they differ.
+ *
+ * Incoming weeks are unioned with what is already stored: a device that only
+ * knows about the current week (a fresh sign-in, a second device, a cleared
+ * browser) must never delete rows another device earned. The table stays
+ * bounded by the retention window alone — rows older than the weeks the
+ * leaderboard still reads are dropped — so nothing that is still being
+ * displayed can be pruned by the shape of the latest payload.
  */
 async function saveWeeklyXpRows(
   userId: string,
@@ -141,14 +152,14 @@ async function saveWeeklyXpRows(
     }
   }
 
-  // Prune rows older than the oldest week we keep. Every week older than this
-  // window is either no longer in the blob (superseded) or was never part of
-  // the kept set, so the row is stale and safe to drop.
-  const oldestKept = weeks[0];
+  // Prune by the retention window only. Every week older than the window is no
+  // longer read by the leaderboard, so its row is stale; weeks inside the
+  // window are kept even when the payload doesn't mention them, because
+  // another device may be the one that earned them.
   const oldestAllowed = new Date(Date.now() - MAX_WEEKLY_XP_ENTRIES * WEEK_MS);
   const oldestAllowedKey = oldestAllowed.toISOString().slice(0, 10);
   await prisma.weeklyXp.deleteMany({
-    where: { userId, week: { lt: oldestKept < oldestAllowedKey ? oldestKept : oldestAllowedKey } },
+    where: { userId, week: { lt: oldestAllowedKey } },
   });
 }
 

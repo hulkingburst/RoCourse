@@ -74,14 +74,17 @@ function validateZip(
 /**
  * Uploads the validated zip through whichever storage backend the server is
  * running. The probe tells us the backend without issuing a Blob token; on R2
- * the same call returns a presigned PUT and we upload directly, then verify
- * the object so a non-zip can be rejected and cleaned up before submission.
+ * the same call returns a presigned PUT — signed for this file's exact byte
+ * length, so the cap holds even if this client is lying — plus the upload token
+ * that later proves the object is ours. We upload directly, then verify the
+ * object so a non-zip can be rejected and cleaned up before submission, and
+ * keep the URL verify hands back (the claimed copy the submission stores).
  */
 async function uploadResourceFile(file: File, signal: AbortSignal): Promise<string> {
   const probe = await fetch("/api/resources/upload", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ probe: true, networkFilename: file.name }),
+    body: JSON.stringify({ probe: true, networkFilename: file.name, size: file.size }),
     signal,
   });
   if (!probe.ok) throw new Error("probe");
@@ -90,19 +93,21 @@ async function uploadResourceFile(file: File, signal: AbortSignal): Promise<stri
     storage?: string;
     uploadUrl?: string;
     fileUrl?: string;
+    uploadToken?: string;
   };
   if (info.storage === "r2") {
-    if (!info.uploadUrl || !info.fileUrl) throw new Error("probe");
+    if (!info.uploadUrl || !info.fileUrl || !info.uploadToken) throw new Error("probe");
     const result = await fetch(info.uploadUrl, { method: "PUT", body: file, signal });
     if (!result.ok) throw new Error("upload");
     const verify = await fetch("/api/resources/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fileUrl: info.fileUrl }),
+      body: JSON.stringify({ fileUrl: info.fileUrl, uploadToken: info.uploadToken }),
       signal,
     });
-    if (!verify.ok) throw new Error("verify");
-    return info.fileUrl;
+    const verified = (await verify.json().catch(() => null)) as { fileUrl?: string } | null;
+    if (!verify.ok || !verified?.fileUrl) throw new Error("verify");
+    return verified.fileUrl;
   }
   const blob = await upload(file.name, file, {
     access: "public",

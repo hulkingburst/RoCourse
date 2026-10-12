@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { trustedIp } from "@/lib/auth-limiter";
+import {
+  GUEST_ID_RE,
+  issueGuestToken,
+  newGuestId,
+  verifyGuestToken,
+} from "@/lib/guest-identity";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import { isValidWeekKey, MAX_WEEKLY_XP, weekKey } from "@/lib/xp";
@@ -10,11 +16,19 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // Guests are unauthenticated, so this is the abuse surface for the weekly
-// leaderboard. The per-IP cap is generous for a single learner while keeping
-// automated spam from hammering the DB, and every claimed value is clamped.
+// leaderboard. Posting is still generous for a single learner (a device posts
+// whenever XP changes); the real ceiling is identity issuance below, because a
+// fake learner needs a token before it can post at all. Every claimed value is
+// clamped.
 const LIMIT_PER_IP = 120;
+/** Per-identity budget, so one id can't be hammered as a free posting slot. */
+const LIMIT_PER_GUEST = 60;
+/** Identity issuance: how many new learners one address may mint per hour. */
+const LIMIT_ISSUE_PER_IP = 6;
 const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const limitKey = (ip: string) => `guest-xp:${ip}`;
+const guestLimitKey = (guestId: string) => `guest-xp-id:${guestId}`;
+const issueLimitKey = (ip: string) => `guest-xp-issue:${ip}`;
 
 // Guests may only post to the current week or one in each direction. Without a
 // window, a guest could scatter rows across arbitrary past or future weeks and
@@ -23,7 +37,6 @@ const limitKey = (ip: string) => `guest-xp:${ip}`;
 // near the week boundary the two can disagree by a week either way.
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-const GUEST_ID_RE = /^[A-Za-z0-9-]{8,64}$/;
 const MAX_NAME_LENGTH = 24;
 
 function cleanName(value: unknown): string | null {
@@ -45,12 +58,35 @@ function isRecentWeek(week: string): boolean {
 }
 
 /**
+ * Issues (or re-confirms) an anonymous identity for a device, returning the
+ * signed token that posting requires.
+ *
+ * The caller may present the id it already has, so a returning guest keeps the
+ * same row on the board; anything else — no id, a malformed one, or one it
+ * cannot prove it owns — gets a fresh server-generated id. Issuance is the
+ * budget that limits how many learners one address can create in an hour.
+ */
+export async function GET(request: Request) {
+  const ip = trustedIp(request.headers);
+  if (await isRateLimited(issueLimitKey(ip), LIMIT_ISSUE_PER_IP, LIMIT_WINDOW_MS)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
+  const requested = new URL(request.url).searchParams.get("guestId") ?? "";
+  const guestId = GUEST_ID_RE.test(requested) ? requested : newGuestId();
+  await recordRateLimit(issueLimitKey(ip));
+  await pruneRateLimits();
+  return NextResponse.json({ ok: true, guestId, token: issueGuestToken(guestId) });
+}
+
+/**
  * Records a guest's weekly XP for the leaderboard. Guests have no account, so
- * they identify with a client-generated anonymous id plus a self-chosen name.
- * The stored value only ever rises: a stale device pushing an older total
- * can't lower what's already on the board. The write is race-safe (create
- * collisions fall back to a raise-only update) and the display name is kept
- * fresh even when the claimed XP doesn't change.
+ * they identify with a server-issued anonymous id plus a self-chosen name, and
+ * only a signed token for that id is accepted — a caller cannot invent a
+ * learner or post as someone else's. The stored value only ever rises: a stale
+ * device pushing an older total can't lower what's already on the board. The
+ * write is race-safe (create collisions fall back to a raise-only update) and
+ * the display name is kept fresh even when the claimed XP doesn't change.
  */
 export async function POST(request: Request) {
   const ip = trustedIp(request.headers);
@@ -67,6 +103,7 @@ export async function POST(request: Request) {
 
   const record = body as {
     guestId?: unknown;
+    token?: unknown;
     name?: unknown;
     week?: unknown;
     xp?: unknown;
@@ -74,6 +111,11 @@ export async function POST(request: Request) {
 
   if (typeof record.guestId !== "string" || !GUEST_ID_RE.test(record.guestId)) {
     return NextResponse.json({ error: "Invalid guest id" }, { status: 400 });
+  }
+  // No token, a token for another id, an expired one, or a token we never
+  // issued: nothing is written. The client asks GET for a fresh identity.
+  if (!verifyGuestToken(record.guestId, record.token)) {
+    return NextResponse.json({ error: "Invalid guest token" }, { status: 401 });
   }
   const rawName = cleanName(record.name);
   if (!rawName) {
@@ -105,6 +147,9 @@ export async function POST(request: Request) {
   }
 
   const guestId = record.guestId;
+  if (await isRateLimited(guestLimitKey(guestId), LIMIT_PER_GUEST, LIMIT_WINDOW_MS)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   const where = { week_guestId: { week: record.week, guestId } };
 
   const existing = await prisma.weeklyXp.findUnique({
@@ -153,6 +198,7 @@ export async function POST(request: Request) {
   }
 
   await recordRateLimit(limitKey(ip));
+  await recordRateLimit(guestLimitKey(guestId));
   await pruneRateLimits();
 
   return NextResponse.json({ ok: true });

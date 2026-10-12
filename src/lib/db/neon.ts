@@ -806,13 +806,17 @@ async function queryRaw(
   return run(query, params);
 }
 
-async function transaction(operations: Array<PromiseLike<unknown>>): Promise<unknown[]> {
-  const results: unknown[] = [];
-  for (const operation of operations) {
-    results.push(await operation);
-  }
-  return results;
-}
+/**
+ * There is deliberately no `$transaction` here. A sequential loop over already
+ * issued statements is not a transaction — it half-applies on a mid-sequence
+ * failure, which is exactly the bug this shim used to have — and the HTTP
+ * driver offers no interactive session to put `BEGIN`/`COMMIT` around, since
+ * every call is its own round trip. Multi-write operations that must be
+ * all-or-nothing are written as a single data-modifying CTE statement instead;
+ * see `src/lib/db/atomic-writes.ts` for the two callers that relied on the old
+ * method. Anything calling `$transaction` on the Workers build would be
+ * silently non-atomic, so it is absent rather than misleading.
+ */
 
 function modelApi(name: string) {
   const model = (): ModelDef => MODELS[name];
@@ -859,5 +863,4 @@ export const neonDb = {
   pollResult: modelApi("PollResult"),
   follow: modelApi("Follow"),
   $queryRaw: queryRaw,
-  $transaction: transaction,
 };

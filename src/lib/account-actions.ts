@@ -7,6 +7,7 @@ import { isValidAvatar } from "@/lib/avatar";
 import { isValidTitle } from "@/lib/titles";
 import { getUnlockedTitleIds } from "@/lib/title-data";
 import { prisma } from "@/lib/prisma";
+import { renameUserWithLeaderboardName } from "@/lib/db/atomic-writes";
 import { prohibitedNameReason } from "@/lib/profanity";
 import { moderatePublicText } from "@/lib/moderation";
 
@@ -77,16 +78,9 @@ export async function changeUsername(
     }
   }
 
-  await prisma.$transaction([
-    prisma.user.update({
-      where: { id: userId },
-      data: { name, nameChangedAt: new Date() },
-    }),
-    prisma.weeklyXp.updateMany({
-      where: { userId },
-      data: { name },
-    }),
-  ]);
+  // One statement, so the user row and the denormalized leaderboard names can
+  // never disagree (see src/lib/db/atomic-writes.ts).
+  await renameUserWithLeaderboardName(userId, name);
 
   await unstable_update({ user: { name } });
 

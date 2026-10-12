@@ -1,5 +1,6 @@
 "use client";
 
+import { getCompletions } from "@/lib/completions";
 import { useProgressStore } from "@/lib/progress-store";
 import { sanitizeSnapshot } from "@/lib/sanitize-snapshot";
 import { CONFLICT_TOLERANCE_MS } from "@/lib/sync-types";
@@ -53,24 +54,11 @@ export function hasAnyProgress(snapshot: ProgressSnapshot): boolean {
 }
 
 /**
- * Derives the courses a learner has finished from their progress. Today that
- * is the single capstone lesson, named by the chosen project path. This is the
- * seam where future courses (clicker, tycoon, collector, obby, zombie survival)
- * plug in.
+ * Completion derivation lives in `@/lib/completions` so the client sync engine,
+ * the progress export, and the server-side sync API share one implementation.
+ * Re-exported here to keep every existing client caller unchanged.
  */
-export function getCompletions(snapshot: ProgressSnapshot): CompletionRecord[] {
-  const record = snapshot.lessons["final-project"];
-  if (!record?.completedAt) return [];
-
-  const base = { completedAt: record.completedAt };
-  if (snapshot.finishedPath === "tycoon") {
-    return [{ courseId: "rocourse-coin-tycoon", title: "Coin Tycoon", ...base }];
-  }
-  if (snapshot.finishedPath === "collector") {
-    return [{ courseId: "rocourse-collector", title: "The Collector", ...base }];
-  }
-  return [{ courseId: "rocourse", title: "RoCourse", ...base }];
-}
+export { getCompletions };
 
 export function applySnapshot(
   snapshot: ProgressSnapshot,

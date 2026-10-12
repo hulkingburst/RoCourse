@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { RETRACTED_NOTIFICATION_IDS } from "@/lib/notification-retractions";
+import { scheduleNotificationSweeps } from "@/lib/notification-sweeps";
 import type { AppNotification, NotificationType } from "@/lib/notification-types";
 import {
   deleteNotifications,
   getUserNotifications,
   markNotificationsRead,
   pushNotificationBackup,
-  syncFeedbackResolutions,
-  unsendNotifications,
 } from "@/lib/notifications-api";
 
 export const runtime = "nodejs";
@@ -28,18 +27,22 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }
-  // Retracted notifications are deleted before the backup is read, so the
-  // caller's own copy can't come back. The delete is by key across accounts, so
-  // this one read also unsends the notification for every other learner; it is
-  // best-effort like the poll sweeps — a retraction must never break the bell.
-  if (RETRACTED_NOTIFICATION_IDS.length > 0) {
-    await unsendNotifications(RETRACTED_NOTIFICATION_IDS).catch(() => null);
-  }
-  // Running the close-sync here means simply opening the app surfaces any
-  // feedback that the author has since resolved.
-  await syncFeedbackResolutions(session.user.id);
+  // Retractions and the author's feedback resolutions are scheduled, not run
+  // here: this endpoint is polled, and both are throttled writes/GitHub calls
+  // that the read must not wait on (see src/lib/notification-sweeps.ts). The
+  // bell therefore answers from the stored backup alone, and a due sweep lands
+  // in a later poll rather than in this response.
+  scheduleNotificationSweeps(session.user.id);
   const state = await getUserNotifications(session.user.id);
-  return NextResponse.json(state);
+  // A retracted notification must never be shown, and that guarantee cannot
+  // depend on the background sweep having run yet: the read filters them out
+  // itself (no write on this path), so a poll can be early but never wrong.
+  const retracted = new Set<string>(RETRACTED_NOTIFICATION_IDS);
+  const notifications = state.notifications.filter((n) => !retracted.has(n.id));
+  return NextResponse.json({
+    notifications,
+    lastUpdated: notifications[0]?.createdAt ?? null,
+  });
 }
 
 export async function POST(request: Request) {

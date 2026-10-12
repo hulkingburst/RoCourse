@@ -5,8 +5,14 @@ import {
   type HandleUploadBody,
 } from "@vercel/blob/client";
 import { trustedIp } from "@/lib/auth-limiter";
-import { looksLikeZip } from "@/lib/zip-check";
-import { fileStorage, issueR2Upload, r2ConfigError } from "@/lib/file-storage";
+import { sniffZip } from "@/lib/zip-check";
+import {
+  fileStorage,
+  issueR2Upload,
+  r2ConfigError,
+  sweepUnclaimedUploads,
+  uploadSweepDue,
+} from "@/lib/file-storage";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { MAX_ZIP_BYTES } from "@/lib/resources-shared";
 
@@ -44,10 +50,38 @@ export async function POST(request: Request) {
       try {
         const filename =
           (body as { networkFilename?: string }).networkFilename ?? "file.zip";
-        const { uploadUrl, fileUrl } = await issueR2Upload(filename);
+        // The declared size is signed into the PUT, so the store itself rejects
+        // an upload of any other length — this cap is enforced server-side, not
+        // by the client's own JSZip check (see issueR2Upload).
+        const size = (body as { size?: unknown }).size;
+        if (typeof size !== "number" || !Number.isInteger(size) || size <= 0) {
+          return NextResponse.json(
+            { ok: false, error: "Upload failed. Please try again." },
+            { status: 400 }
+          );
+        }
+        if (size > MAX_ZIP_BYTES) {
+          return NextResponse.json(
+            { ok: false, error: "Upload failed. Please try again." },
+            { status: 413 }
+          );
+        }
+        const { uploadUrl, fileUrl, uploadToken } = await issueR2Upload(filename, size);
+        // Housekeeping rides along with uploads rather than needing a scheduler
+        // (the Cloudflare build has no cron handler): throttled, prefix-limited,
+        // and never allowed to affect the response.
+        if (uploadSweepDue()) {
+          void sweepUnclaimedUploads().catch((error) => console.error("[resource-sweep]", error));
+        }
         await recordRateLimit(limitKey(ip));
         await pruneRateLimits();
-        return NextResponse.json({ ok: true, storage: "r2", uploadUrl, fileUrl });
+        return NextResponse.json({
+          ok: true,
+          storage: "r2",
+          uploadUrl,
+          fileUrl,
+          uploadToken,
+        });
       } catch (error) {
         console.error("[resource-upload:r2]", error);
         return NextResponse.json(
@@ -69,7 +103,13 @@ export async function POST(request: Request) {
         maximumSizeInBytes: MAX_ZIP_BYTES,
       }),
       onUploadCompleted: async ({ blob }) => {
-        if (!(await looksLikeZip(blob.url))) {
+        const sniffed = await sniffZip(blob.url);
+        if (sniffed === "zip") return;
+        // A fetch that could not read the object is not evidence that it is
+        // invalid, so only a positive non-ZIP finding deletes anything — and
+        // the target is the URL Vercel just handed us for this upload, never a
+        // caller-supplied one. Either way the submission is rejected.
+        if (sniffed === "not-zip") {
           const token = process.env.BLOB_READ_WRITE_TOKEN;
           if (token) {
             try {
@@ -78,8 +118,8 @@ export async function POST(request: Request) {
               // Best-effort cleanup; the upload is rejected regardless.
             }
           }
-          throw new Error("Uploaded file is not a ZIP archive.");
         }
+        throw new Error("Uploaded file is not a ZIP archive.");
       },
     });
     await recordRateLimit(limitKey(ip));
