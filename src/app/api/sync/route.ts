@@ -7,6 +7,8 @@ import {
 } from "@/lib/sync-api";
 import { CONFLICT_TOLERANCE_MS } from "@/lib/sync-types";
 import type { SyncPayload } from "@/lib/sync-types";
+import { PRIVATE_JSON_HEADERS } from "@/lib/private-json";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,10 +22,14 @@ export async function GET() {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }
   const state = await getCloudState(session.user.id);
-  return NextResponse.json(state);
+  return NextResponse.json(state, { headers: PRIVATE_JSON_HEADERS });
 }
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });

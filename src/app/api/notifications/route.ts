@@ -9,6 +9,8 @@ import {
   markNotificationsRead,
   pushNotificationBackup,
 } from "@/lib/notifications-api";
+import { PRIVATE_JSON_HEADERS } from "@/lib/private-json";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,13 +41,20 @@ export async function GET() {
   // itself (no write on this path), so a poll can be early but never wrong.
   const retracted = new Set<string>(RETRACTED_NOTIFICATION_IDS);
   const notifications = state.notifications.filter((n) => !retracted.has(n.id));
-  return NextResponse.json({
-    notifications,
-    lastUpdated: notifications[0]?.createdAt ?? null,
-  });
+  return NextResponse.json(
+    {
+      notifications,
+      lastUpdated: notifications[0]?.createdAt ?? null,
+    },
+    { headers: PRIVATE_JSON_HEADERS }
+  );
 }
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
@@ -111,6 +120,10 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });

@@ -354,12 +354,3 @@ export function moderateName(text: string): string {
 export function guestFallbackName(guestId: string): string {
   return `Guest-${guestId.slice(-4).toUpperCase()}`;
 }
-
-/**
- * Guest-specific fallback tied to the guest's id, so a name already stored in
- * the browser that turns out banned still yields a stable, anonymous display
- * name instead of rejecting the XP post outright.
- */
-export function moderateGuestName(name: string, guestId: string): string {
-  return prohibitedNameReason(name) === null ? name : guestFallbackName(guestId);
-}

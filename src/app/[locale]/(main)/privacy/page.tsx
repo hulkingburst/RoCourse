@@ -15,7 +15,7 @@ export async function generateMetadata({
   };
 }
 
-const LAST_UPDATED = "August 8, 2026";
+const LAST_UPDATED = "October 13, 2026";
 
 export default async function PrivacyPage({
   params,
@@ -44,7 +44,7 @@ export default async function PrivacyPage({
           <li>Guests can use the whole course with zero personal data. Progress stays in your browser.</li>
           <li>Accounts are optional and store only a name, an email, and a hashed password.</li>
           <li>Signed-in progress is synced to our servers so you can continue on another device.</li>
-          <li>We use Vercel Analytics to count visits; it doesn&apos;t include your email or lesson content.</li>
+          <li>We count visits with privacy-friendly analytics (Cloudflare Web Analytics on our Cloudflare deployment, Vercel Analytics otherwise); neither includes your email or lesson content.</li>
           <li>Public profiles are opt-in — never automatic — and never show your email.</li>
         </ul>
 
@@ -65,8 +65,11 @@ export default async function PrivacyPage({
         </p>
         <h3>{t("analytics")}</h3>
         <p>
-          We use Vercel Analytics to understand aggregate traffic, such as page
-          views, referrer, and device type. It does not include your account
+          We use Vercel Analytics and Cloudflare Web Analytics to understand
+          aggregate traffic, such as page views, referrer, and device type.
+          Cloudflare describes its Web Analytics as cookieless: it does not use
+          cookies or local storage, does not fingerprint visitors, and does not
+          track people across sites. Neither product includes your account
           data, email, or progress.
         </p>
         <h3>{t("communityResources")}</h3>
@@ -94,11 +97,34 @@ export default async function PrivacyPage({
 
         <h2>{t("thirdParties")}</h2>
         <ul>
-          <li>Vercel — hosting and Vercel Analytics.</li>
-          <li>Vercel Blob — storage for submitted resource files.</li>
+          <li>Vercel — hosting, Vercel Analytics, and Vercel Blob (storage for submitted resource files).</li>
+          <li>Cloudflare — hosting and Cloudflare Web Analytics for the deployment that runs on Cloudflare, and Cloudflare R2 when submitted resource files are stored there.</li>
           <li>GitHub — the feedback and resource-review workflow (issues in a private repository).</li>
           <li>A hosted Postgres database (e.g. Vercel Postgres or Neon) — account and progress storage.</li>
+          <li>PurgoMalum — profanity filtering. Text meant to be public (a display name, a question, a resource or showcase entry) is sent there to be checked before it is stored.</li>
+          <li>ElevenLabs — lesson narration. The text you ask the site to read aloud is sent there to generate the audio.</li>
+          <li>DiceBear — the avatar images shown on profiles (credit below).</li>
         </ul>
+
+        <p>
+          Only the text a feature needs is sent to those services: narration
+          sends the passage being read, and moderation sends the text you are
+          about to publish. Your password, email, and progress are never sent to
+          them.
+        </p>
+
+        <h3>{t("avatarCredit")}</h3>
+        <p>
+          Profile pictures come from DiceBear&apos;s &ldquo;neutral&rdquo;
+          avatar styles. Adventurer Neutral was created by Lisa Wischofsky, Big
+          Ears Neutral by The Visual Team, and Croodles Neutral by Vijay Verma;
+          those three are used under the Creative Commons Attribution 4.0
+          license (CC BY 4.0). Lorelei Neutral, Notionists Neutral, and Pixel
+          Art Neutral are used under CC0 1.0, and Avataaars Neutral and Bottts
+          Neutral under DiceBear&apos;s own terms, which permit personal and
+          commercial use. The artwork itself is not modified — the site only
+          picks one of the ready-made variants.
+        </p>
 
         <h2>{t("yourChoices")}</h2>
         <ul>

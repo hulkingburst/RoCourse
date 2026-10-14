@@ -40,8 +40,6 @@ export interface LessonRecord {
 /** Which final-project game the learner chose to build as their capstone. */
 export type FinishedPath = "tycoon" | "collector";
 
-export const FINISHED_PATHS: FinishedPath[] = ["tycoon", "collector"];
-
 const nowIso = () => new Date().toISOString();
 
 interface ProgressState {

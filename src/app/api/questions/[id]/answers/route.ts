@@ -5,6 +5,7 @@ import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limi
 import { validateAnswerInput } from "@/lib/questions";
 import { moderateName } from "@/lib/profanity";
 import { moderatePublicText } from "@/lib/moderation";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +20,10 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });

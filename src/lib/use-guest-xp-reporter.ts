@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 import { useGuestStore } from "@/lib/guest-store";
+import { requestGuestIdentity } from "@/lib/guest-identity-client";
 import { useProgressStore } from "@/lib/progress-store";
 import { weekKey } from "@/lib/xp";
 
@@ -33,31 +34,6 @@ async function postGuestXp(
   }
 }
 
-/**
- * Asks the server for an identity token, caching whatever it answers with.
- * Called once per token lifetime for a real device (the token is persisted),
- * and only after a rejected post, so it stays off the common path.
- */
-async function requestGuestIdentity(guestId: string): Promise<string | null> {
-  try {
-    const response = await fetch(
-      `/api/guest-xp?guestId=${encodeURIComponent(guestId)}`,
-      { cache: "no-store" }
-    );
-    if (!response.ok) return null;
-    const payload = (await response.json()) as { guestId?: unknown; token?: unknown };
-    if (typeof payload.token !== "string") return null;
-    const identity =
-      typeof payload.guestId === "string" && payload.guestId.length > 0
-        ? payload.guestId
-        : guestId;
-    useGuestStore.getState().setIdentity(identity, payload.token);
-    return payload.token;
-  } catch {
-    return null;
-  }
-}
-
 export function useGuestXpReporter() {
   const { status } = useSession();
   const hydrated = useProgressStore((state) => state.hydrated);
@@ -78,8 +54,10 @@ export function useGuestXpReporter() {
         const first = await postGuestXp(payload, token);
         if (first !== 401) return;
         // No token, or an expired/rotated one: get an identity and try once
-        // more. A second rejection is left for the next scheduled report.
-        const fresh = await requestGuestIdentity(guestId);
+        // more. The token we hold (even an expired one) is presented with the
+        // id, which is what keeps this device's existing board row. A second
+        // rejection is left for the next scheduled report.
+        const fresh = await requestGuestIdentity(guestId, token);
         if (!fresh) return;
         await postGuestXp(
           { ...payload, guestId: useGuestStore.getState().guestId },

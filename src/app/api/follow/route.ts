@@ -8,7 +8,9 @@ import {
   resolveUserByHandle,
   unfollowUser,
 } from "@/lib/follows";
-import { isRateLimited, recordRateLimit } from "@/lib/rate-limit";
+import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
+import { PRIVATE_JSON_HEADERS } from "@/lib/private-json";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,21 +32,32 @@ export async function GET(request: Request) {
   const counts = await getFollowCounts(target.id);
   if (!session?.user?.id) {
     // Counts are public-safe; guests just don't carry follow identity.
-    return NextResponse.json({
-      isSelf: false,
-      isFollowing: false,
-      ...counts,
-    });
+    return NextResponse.json(
+      {
+        isSelf: false,
+        isFollowing: false,
+        ...counts,
+      },
+      { headers: PRIVATE_JSON_HEADERS }
+    );
   }
   const isSelf = target.id === session.user.id;
-  return NextResponse.json({
-    isSelf,
-    isFollowing: isSelf ? false : await isFollowing(session.user.id, target.id),
-    ...counts,
-  });
+  // Whether the caller follows this account is theirs alone.
+  return NextResponse.json(
+    {
+      isSelf,
+      isFollowing: isSelf ? false : await isFollowing(session.user.id, target.id),
+      ...counts,
+    },
+    { headers: PRIVATE_JSON_HEADERS }
+  );
 }
 
 async function respondTo(METHOD: "POST" | "DELETE", request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
@@ -78,6 +91,7 @@ async function respondTo(METHOD: "POST" | "DELETE", request: Request) {
   }
 
   await recordRateLimit(key);
+  await pruneRateLimits();
 
   const target = await resolveUserByHandle(handle);
   const counts = target ? await getFollowCounts(target.id) : { followers: 0, following: 0 };

@@ -39,14 +39,3 @@ export function markActivity<T>(component: T): T {
   return component;
 }
 
-export function isActivityType(
-  type: unknown
-): type is React.ComponentType {
-  return (
-    typeof type === "function" ||
-    (typeof type === "object" &&
-      type !== null &&
-      "type" in (type as object))
-  ) &&
-    ((type as Record<PropertyKey, unknown>)[ACTIVITY_MARKER] === true);
-}

@@ -4,11 +4,6 @@ export type FollowOutcome =
   | { ok: true }
   | { ok: false; reason: "not-found" | "self" };
 
-export type ProfileViewer =
-  | { status: "guest" }
-  | { status: "self" }
-  | { status: "visitor"; isFollowing: boolean };
-
 /** Server-side handle validation — the client never picks the target identity. */
 export function isValidHandle(handle: unknown): handle is string {
   return (
@@ -43,22 +38,6 @@ export async function isFollowing(followerId: string, followedId: string): Promi
       select: { id: true },
     })) !== null
   );
-}
-
-/**
- * Who is the current viewer on a public profile? Guests are anonymous (no
- * follow state), self is the profile owner, and visitors get whether they
- * already follow the profile owner.
- */
-export async function getProfileViewer(
-  viewerId: string | undefined,
-  targetHandle: string
-): Promise<ProfileViewer> {
-  if (!viewerId) return { status: "guest" };
-  const target = await resolveUserByHandle(targetHandle);
-  if (!target) return { status: "guest" };
-  if (target.id === viewerId) return { status: "self" };
-  return { status: "visitor", isFollowing: await isFollowing(viewerId, target.id) };
 }
 
 /** Follows `handle` as `followerId`. Idempotent; self-follow is rejected. */

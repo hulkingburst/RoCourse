@@ -156,11 +156,6 @@ export function isPollClosed(poll: PollDef, now: number = Date.now()): boolean {
   return closes !== null && now >= closes.getTime();
 }
 
-/** A closed poll still shows its tally, it just can't be voted on. */
-export function isPollVotable(poll: PollDef, now: number = Date.now()): boolean {
-  return !isPollClosed(poll, now);
-}
-
 /**
  * When the poll's notification should retire, or null when the poll never
  * closes (and so is never retired). Deliberately `null` rather than "already

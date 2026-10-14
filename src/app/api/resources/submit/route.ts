@@ -14,6 +14,7 @@ import {
   type ResourceKind,
 } from "@/lib/resources-shared";
 import { moderatePublicText } from "@/lib/moderation";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -27,6 +28,10 @@ const clean = (value: unknown): string => (typeof value === "string" ? value.tri
 const cleanLine = (value: unknown): string => clean(value).replace(/[\r\n]+/g, " ");
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ ok: false }, { status: 403 });
+  }
+
   const ip = trustedIp(request.headers);
 
   // DB-backed rate limit (shared across instances) so the review queue stays

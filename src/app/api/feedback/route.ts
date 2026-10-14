@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { recordFeedbackTicket } from "@/lib/db/atomic-writes";
 import { trustedIp } from "@/lib/auth-limiter";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -23,6 +24,10 @@ const TYPE_LABELS: Record<string, string> = {
 const limitKey = (ip: string) => `feedback:${ip}`;
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ ok: false }, { status: 403 });
+  }
+
   const session = await auth();
   const userId = session?.user?.id ?? null;
   const ip = trustedIp(request.headers);

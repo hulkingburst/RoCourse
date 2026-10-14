@@ -66,11 +66,6 @@ let resolvedVoiceId: string | null = null;
  */
 let planFallbackVoiceId: string | null = null;
 
-/** The legacy id narration fell back to, or null when the chosen voice works. */
-export function narrationVoiceFallbackId(): string | null {
-  return planFallbackVoiceId;
-}
-
 /**
  * The voice id to synthesize with: an explicit `ELEVENLABS_VOICE_ID` wins,
  * otherwise the account's voice list is searched for Caleb, otherwise the

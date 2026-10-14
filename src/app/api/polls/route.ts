@@ -15,6 +15,8 @@ import {
   reportClosedPolls,
 } from "@/lib/poll-results";
 import type { PollTalliesResponse } from "@/lib/polls";
+import { PRIVATE_JSON_HEADERS } from "@/lib/private-json";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -50,11 +52,16 @@ export async function GET(request: Request) {
   const resultsUrls = await getResultsUrls(POLLS.map((poll) => poll.id));
   const polls = await getTallies(POLLS, voterKey, Date.now(), resultsUrls);
   const body: PollTalliesResponse = { polls };
-  return NextResponse.json(body);
+  // The tally carries the caller's own vote, so it is personalized.
+  return NextResponse.json(body, { headers: PRIVATE_JSON_HEADERS });
 }
 
 /** Cast (or change) a vote. Returns the refreshed tally. */
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const ip = trustedIp(request.headers);
   if (await isRateLimited(limitKey(ip), LIMIT_PER_IP, LIMIT_WINDOW_MS)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });

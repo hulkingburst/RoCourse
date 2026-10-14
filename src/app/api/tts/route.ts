@@ -21,6 +21,7 @@ import {
   MAX_NARRATION_INPUT_CHARS,
   toNarrationText,
 } from "@/lib/narration";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,6 +57,10 @@ const limitKey = (ip: string) => `narration:${ip}`;
 const userLimitKey = (userId: string) => `narration:user:${userId}`;
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();

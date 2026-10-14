@@ -48,6 +48,8 @@ model CourseCompletion {
   completedAt DateTime @default(now())
 
   @@unique([userId, courseId])
+  // Completion lists are read per user in date order.
+  @@index([userId, completedAt])
 }
 
 model AuthAttempt {
@@ -116,6 +118,8 @@ model WeeklyXp {
   @@unique([week, guestId])
   @@index([week, xp])
   @@index([userId])
+  // Identity issuance asks whether an id already has rows, by id alone.
+  @@index([guestId])
 }
 
 // Permanently records the winner of a completed weekly XP leaderboard. A row

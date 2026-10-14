@@ -46,6 +46,20 @@ yarn-error.log*
 monitor.out
 server.log
 dev-server.log
+*.log
+
+# local verification scratch: build/dev logs, page captures, harnesses and
+# generated narration samples (never part of the site)
+cf-*-build.log
+dev-start.cmd
+.tmp-*/
+.tmp-*
+.verify-*
+narration-samples/
+/*.html
+
+# local tool metadata (never part of the site)
+.freebuff/
 
 # vercel
 .vercel

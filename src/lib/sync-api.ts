@@ -120,8 +120,15 @@ async function saveWeeklyXpRows(
   const weeklyXp = sanitizeWeeklyXp(progress?.weeklyXp);
   const weeks = Object.keys(weeklyXp);
   if (weeks.length === 0) {
-    // Nothing claimed — drop any rows this user may have accumulated. This
-    // bounds the table even when progress is reset or the blob is cleared.
+    // An empty bucket from a client that still reports lesson progress is a
+    // stale one — its weekly totals were lost, not deliberately cleared — and
+    // deleting on its word would drop the learner off the board and throw away
+    // rows another device earned. The rows are left untouched; the progress
+    // itself is stored either way.
+    if (hasLessonProgress(progress)) return;
+    // Nothing claimed and no lessons to speak of: this is the genuine wipe
+    // (`resetProgress` empties `lessons` too), so drop the rows. That is what
+    // still bounds the table when a learner clears their progress.
     await prisma.weeklyXp.deleteMany({ where: { userId } });
     return;
   }
@@ -161,6 +168,17 @@ async function saveWeeklyXpRows(
   await prisma.weeklyXp.deleteMany({
     where: { userId, week: { lt: oldestAllowedKey } },
   });
+}
+
+/**
+ * True when a snapshot still carries lesson records. A learner who reset their
+ * progress has none, because `resetProgress` clears the map — which is how an
+ * intentional wipe is told apart from a stale client that merely lost its
+ * weekly XP totals.
+ */
+function hasLessonProgress(progress: ProgressSnapshot): boolean {
+  const lessons = progress?.lessons;
+  return !!lessons && Object.keys(lessons).length > 0;
 }
 
 /** Milliseconds of the last stored cloud update (0 when the account is fresh). */

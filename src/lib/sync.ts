@@ -161,13 +161,6 @@ export function cloudIsNewer(cloud: CloudState, local: ProgressSnapshot): boolea
   return cloudTime > localTime + CONFLICT_TOLERANCE_MS;
 }
 
-/** True when the local snapshot is clearly newer than the cloud side. */
-export function localIsNewer(cloud: CloudState, local: ProgressSnapshot): boolean {
-  const localTime = local.lastUpdated ? Date.parse(local.lastUpdated) : 0;
-  const cloudTime = cloud.lastUpdated ? Date.parse(cloud.lastUpdated) : 0;
-  return localTime > cloudTime + CONFLICT_TOLERANCE_MS;
-}
-
 /**
  * Merges two snapshots when both sides have progress. The newer (cloud) side
  * is authoritative for counters and timestamps — every prior local change was

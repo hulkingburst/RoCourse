@@ -14,6 +14,8 @@ import {
 import type { LeaderboardRow } from "@/app/api/leaderboard/route";
 import { Link } from "@/i18n/navigation";
 import { useGuestStore } from "@/lib/guest-store";
+import { requestGuestIdentity } from "@/lib/guest-identity-client";
+import { GUEST_TOKEN_HEADER } from "@/lib/guest-protocol";
 import { useProgressStore } from "@/lib/progress-store";
 import { weekKey } from "@/lib/xp";
 import { prohibitedNameReason } from "@/lib/profanity";
@@ -36,8 +38,7 @@ function shiftWeek(week: string, offset: number): string {
 
 export function LeaderboardClient() {
   const t = useTranslations("leaderboard");
-  const { data: session, status } = useSession();
-  const guestId = useGuestStore((state) => state.guestId);
+  const { status } = useSession();
   const guestName = useGuestStore((state) => state.name);
   const setName = useGuestStore((state) => state.setName);
   const myWeeklyXp = useProgressStore((state) => state.weeklyXp[weekKey(new Date())] ?? 0);
@@ -62,16 +63,43 @@ export function LeaderboardClient() {
   const [nameInput, setNameInput] = React.useState(guestName);
   const [editing, setEditing] = React.useState(!guestName);
   const [nameError, setNameError] = React.useState(false);
+  // One token refresh per mount at most, so a server that keeps answering
+  // "stale" can never turn into a refresh loop.
+  const healed = React.useRef(false);
 
   React.useEffect(() => {
     let cancelled = false;
-    fetch(`/api/leaderboard?week=${week}&view=${view}`, { cache: "no-store" })
+    // The guest identity is read from the store instead of subscribed to: it is
+    // needed once per request, and a token the server refreshes for us comes
+    // back through the retry below. Sending it while signed in is harmless —
+    // the server marks a guest row only for a caller with no session.
+    const { guestId, token } = useGuestStore.getState();
+    const params = new URLSearchParams({ week, view });
+    if (guestId) params.set("guestId", guestId);
+    fetch(`/api/leaderboard?${params.toString()}`, {
+      cache: "no-store",
+      headers: token ? { [GUEST_TOKEN_HEADER]: token } : undefined,
+    })
       .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then((next: { rows: LeaderboardRow[] }) => {
-        if (cancelled) return;
-        setData({ week, rows: next.rows });
-        setError(false);
-      })
+      .then(
+        async (next: { rows: LeaderboardRow[]; guestTokenStale?: boolean }) => {
+          if (cancelled) return;
+          setData({ week, rows: next.rows });
+          setError(false);
+          // The server did not recognise the token we presented, which is what
+          // an aged-out one looks like. Ask for a fresh one — only its owner can
+          // have an id re-signed — and re-fetch so this learner's own row is
+          // still marked. Skipped when there is no name or no XP this week:
+          // without either there is no row of ours on the board to mark.
+          if (!next.guestTokenStale || healed.current) return;
+          const { name } = useGuestStore.getState();
+          const weeklyXp = useProgressStore.getState().weeklyXp[currentWeek] ?? 0;
+          if (!name || weeklyXp <= 0) return;
+          healed.current = true;
+          const fresh = await requestGuestIdentity(guestId, token);
+          if (fresh && !cancelled) setRetry((count) => count + 1);
+        }
+      )
       .catch(() => {
         if (cancelled) return;
         setData(null);
@@ -80,15 +108,16 @@ export function LeaderboardClient() {
     return () => {
       cancelled = true;
     };
-  }, [week, view, retry]);
+  }, [week, view, retry, currentWeek]);
 
   const loading = !error && (data === null || data.week !== week);
   const rows = data?.week === week ? data.rows : [];
 
-  const isMe = (row: LeaderboardRow) =>
-    status === "authenticated"
-      ? row.handle === session?.user?.handle
-      : status === "unauthenticated" && row.guestId === guestId;
+  // The server decides the marker (it knows the session and can verify a guest
+  // token), so the highlight needs no id comparison here. The session still has
+  // to have resolved first, exactly as before: while it is loading, neither
+  // viewer kind was marked.
+  const isMe = (row: LeaderboardRow) => status !== "loading" && row.you;
 
   const saveName = () => {
     const name = nameInput.trim();

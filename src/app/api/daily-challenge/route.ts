@@ -8,6 +8,7 @@ import {
 } from "@/lib/daily";
 import { QUIZ_QUESTIONS } from "@/lib/quiz-data";
 import { getDebugAnswer } from "@/lib/daily-debug-answers";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,6 +39,10 @@ function isValidDateKey(key: string): boolean {
  * a learner can't harvest the answer by calling the endpoint beforehand.
  */
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const ip = trustedIp(request.headers);
   if (await isRateLimited(limitKey(ip), LIMIT_PER_IP, LIMIT_WINDOW_MS)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });

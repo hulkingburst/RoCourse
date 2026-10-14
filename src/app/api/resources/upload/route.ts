@@ -15,6 +15,7 @@ import {
 } from "@/lib/file-storage";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { MAX_ZIP_BYTES } from "@/lib/resources-shared";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -26,6 +27,10 @@ const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const limitKey = (ip: string) => `resource-upload:${ip}`;
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ ok: false, error: "Upload failed." }, { status: 403 });
+  }
+
   const ip = trustedIp(request.headers);
   if (await isRateLimited(limitKey(ip), LIMIT_PER_IP, LIMIT_WINDOW_MS)) {
     return NextResponse.json({ ok: false, error: "Upload limit reached." }, { status: 429 });

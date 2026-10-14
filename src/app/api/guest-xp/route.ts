@@ -4,13 +4,17 @@ import {
   GUEST_ID_RE,
   issueGuestToken,
   newGuestId,
+  provenGuestId,
   verifyGuestToken,
 } from "@/lib/guest-identity";
+import { GUEST_TOKEN_HEADER } from "@/lib/guest-protocol";
 import { isRateLimited, pruneRateLimits, recordRateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import { isValidWeekKey, MAX_WEEKLY_XP, weekKey } from "@/lib/xp";
 import { guestFallbackName } from "@/lib/profanity";
 import { moderatePublicText } from "@/lib/moderation";
+import { PRIVATE_JSON_HEADERS } from "@/lib/private-json";
+import { isSameOriginRequest } from "@/lib/same-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,10 +65,11 @@ function isRecentWeek(week: string): boolean {
  * Issues (or re-confirms) an anonymous identity for a device, returning the
  * signed token that posting requires.
  *
- * The caller may present the id it already has, so a returning guest keeps the
- * same row on the board; anything else — no id, a malformed one, or one it
- * cannot prove it owns — gets a fresh server-generated id. Issuance is the
- * budget that limits how many learners one address can create in an hour.
+ * The caller presents the id it already has — and, in the `x-guest-token`
+ * header, the token that came with it — so a returning guest keeps the same row
+ * on the board. The proof is demanded only for an id that has something to
+ * lose; see `resolveGuestId`. Issuance is the budget that limits how many
+ * learners one address can create in an hour.
  */
 export async function GET(request: Request) {
   const ip = trustedIp(request.headers);
@@ -73,22 +78,57 @@ export async function GET(request: Request) {
   }
 
   const requested = new URL(request.url).searchParams.get("guestId") ?? "";
-  const guestId = GUEST_ID_RE.test(requested) ? requested : newGuestId();
+  const guestId = await resolveGuestId(
+    requested,
+    request.headers.get(GUEST_TOKEN_HEADER)
+  );
   await recordRateLimit(issueLimitKey(ip));
   await pruneRateLimits();
-  return NextResponse.json({ ok: true, guestId, token: issueGuestToken(guestId) });
+  return NextResponse.json(
+    { ok: true, guestId, token: issueGuestToken(guestId) },
+    // A bearer credential for this device alone: never cacheable.
+    { headers: PRIVATE_JSON_HEADERS }
+  );
+}
+
+/**
+ * The identity this request is allowed to use.
+ *
+ * An id nobody has posted for is adopted just as it is, so a first-time guest
+ * — or a device that cleared its storage and asks again — needs no proof at
+ * all. An id that already has board rows belongs to whoever created it, so it
+ * is only re-signed for a caller holding a token this server issued for it; a
+ * caller that merely names a live id is handed a fresh server-generated one
+ * instead, which leaves the real owner's row untouched.
+ */
+async function resolveGuestId(
+  requested: string,
+  token: string | null
+): Promise<string> {
+  if (!GUEST_ID_RE.test(requested)) return newGuestId();
+  // The common returning-device path: proof already in hand, no query needed.
+  if (provenGuestId(requested, token)) return requested;
+  const claimed = await prisma.weeklyXp.findFirst({
+    where: { guestId: requested },
+    select: { id: true },
+  });
+  return claimed ? newGuestId() : requested;
 }
 
 /**
  * Records a guest's weekly XP for the leaderboard. Guests have no account, so
  * they identify with a server-issued anonymous id plus a self-chosen name, and
- * only a signed token for that id is accepted — a caller cannot invent a
+ * only a live signed token for that id is accepted — a caller cannot invent a
  * learner or post as someone else's. The stored value only ever rises: a stale
  * device pushing an older total can't lower what's already on the board. The
  * write is race-safe (create collisions fall back to a raise-only update) and
  * the display name is kept fresh even when the claimed XP doesn't change.
  */
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
   const ip = trustedIp(request.headers);
   if (await isRateLimited(limitKey(ip), LIMIT_PER_IP, LIMIT_WINDOW_MS)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });

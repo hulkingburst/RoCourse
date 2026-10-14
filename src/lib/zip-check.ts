@@ -38,8 +38,3 @@ export async function sniffZip(url: string): Promise<ZipSniff> {
     return "unreadable";
   }
 }
-
-/** Convenience wrapper: true only for a positively identified ZIP. */
-export async function looksLikeZip(url: string): Promise<boolean> {
-  return (await sniffZip(url)) === "zip";
-}
