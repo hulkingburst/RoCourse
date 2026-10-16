@@ -7,6 +7,7 @@ import { Heart, Mail, Star } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
 import { FeedbackButton } from "@/components/feedback/feedback-button";
+import { useBottomDockGuard } from "@/lib/use-bottom-dock-guard";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SidebarNav } from "@/components/layout/course-sidebar";
 import { useGuestXpReporter } from "@/lib/use-guest-xp-reporter";
@@ -54,6 +55,10 @@ export function AppShell({
   );
   const footerObserverAvailable =
     typeof window !== "undefined" && "IntersectionObserver" in window;
+  // True while the bottom strip holds something the learner has to tap — a
+  // lesson's Continue row, the completion screen's buttons. The floating
+  // actions own that strip, so they step aside rather than sit on top of it.
+  const dockOccupied = useBottomDockGuard();
 
   // Hide the fixed actions only when the footer is actually in view on
   // narrow screens. Browsers without IntersectionObserver get Option 1's
@@ -73,7 +78,7 @@ export function AppShell({
     return () => observer.disconnect();
   }, [footerObserverAvailable, isMobile]);
 
-  const hideFloatingControls = isMobile && footerVisible;
+  const hideFloatingControls = dockOccupied || (isMobile && footerVisible);
 
   useGuestXpReporter();
   useNotifications(totalLessons);
@@ -142,6 +147,10 @@ export function AppShell({
                 <Mail className="h-3 w-3" />
                 {t("contact")}
               </Link>
+              {/* The floating actions yield to whatever is in the bottom
+                  strip, so the footer is the one place feedback is always
+                  reachable from. */}
+              <FeedbackButton />
               <a
                 href="https://throne.com/hulkingburst"
                 target="_blank"
@@ -169,10 +178,10 @@ export function AppShell({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={navT("starOnGithub")}
-          className="flex h-11 items-center gap-2 rounded-full border border-border bg-card/90 px-4 text-sm font-semibold text-foreground shadow-lg backdrop-blur transition-all duration-200 hover:scale-[1.04] hover:bg-accent active:scale-95"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card/90 text-sm font-semibold text-foreground shadow-lg backdrop-blur transition-all duration-200 hover:scale-[1.04] hover:bg-accent active:scale-95 sm:w-auto sm:gap-2 sm:px-4"
         >
           <Star className="h-4 w-4 fill-current text-amber-400" />
-          {navT("star")}
+          <span className="hidden sm:inline">{navT("star")}</span>
         </a>
         <FeedbackButton variant="floating" />
       </div>

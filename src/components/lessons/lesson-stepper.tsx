@@ -265,7 +265,13 @@ export function LessonStepper({
               </StepperContext.Provider>
             </div>
 
-            <div className="mt-8 flex items-center justify-between gap-3 border-t pt-5">
+            {/* Marked keep-clear so the floating actions step aside while this
+                row is in the corner they occupy — on a phone the Continue
+                button and the Feedback pill want the same pixels. */}
+            <div
+              data-keep-clear
+              className="mt-8 flex items-center justify-between gap-3 border-t pt-5"
+            >
               <button
                 type="button"
                 onClick={back}

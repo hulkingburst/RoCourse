@@ -121,7 +121,12 @@ export function StepCompletion({
           {t("streakDays", { count: streak })}
         </p>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row">
+        {/* Keep-clear: these are the taps that finish the lesson, and on a
+            phone they land under the floating actions. */}
+        <div
+          data-keep-clear
+          className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row"
+        >
           {nextSlug && nextTitle ? (
             <Link
               href={`/lessons/${nextSlug}`}

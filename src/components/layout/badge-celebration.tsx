@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { X } from "lucide-react";
 import { BADGES, BADGE_TIER_STYLES, type BadgeTier } from "@/lib/badges";
 import { useNotificationsStore } from "@/lib/notification-store";
+import { useBottomDockGuard } from "@/lib/use-bottom-dock-guard";
 import { cn } from "@/lib/utils";
 
 const AUTO_DISMISS_MS = 8000;
@@ -28,6 +29,11 @@ export function BadgeCelebration() {
   const badgeT = useTranslations("badge");
   const queue = useNotificationsStore((s) => s.celebrations);
   const [paused, setPaused] = React.useState(false);
+  // This card lives in the bottom-left corner, which is where a lesson puts
+  // its Back button. When the lesson's action row is in that strip — which is
+  // exactly when the learner is about to tap it — the card lifts clear instead
+  // of covering the button.
+  const dockOccupied = useBottomDockGuard();
 
   const currentId = queue[0] ?? null;
   const current = React.useMemo(
@@ -71,7 +77,10 @@ export function BadgeCelebration() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-5 left-5 z-50 w-[min(22rem,calc(100vw-2rem))]"
+      className={cn(
+        "fixed left-5 z-50 w-[min(22rem,calc(100vw-2rem))] transition-[bottom] duration-200 motion-reduce:transition-none",
+        dockOccupied ? "bottom-28" : "bottom-5"
+      )}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
