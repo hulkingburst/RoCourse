@@ -424,15 +424,19 @@ export function isLessonComplete(
 }
 
 /**
- * A lesson is locked unless it is the first lesson in the course or the
- * previous lesson in reading order has been completed.
+ * A lesson is locked unless it is the first lesson in the course, the opening
+ * lesson of an optional section (`openSlugs`), or the previous lesson in
+ * reading order has been completed.
  */
 export function isLessonLocked(
   lessons: Record<string, LessonRecord>,
   orderedLessons: { slug: string }[],
-  index: number
+  index: number,
+  openSlugs?: ReadonlySet<string>
 ): boolean {
   if (index <= 0) return false;
+  const current = orderedLessons[index];
+  if (current && openSlugs?.has(current.slug)) return false;
   const prev = orderedLessons[index - 1];
   if (!prev) return false;
   return !isLessonComplete(lessons, prev.slug);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { compileLesson } from "@/lib/mdx";
 import { getCourseStructure, getLesson, getLessonMeta, getPrevNext } from "@/lib/lessons";
+import { isOpenFromStart } from "@/lib/course-access";
 import { splitLessonSource } from "@/lib/steps";
 import { LessonProvider } from "@/components/lessons/lesson-provider";
 import { LessonStepper } from "@/components/lessons/lesson-stepper";
@@ -103,7 +104,9 @@ export default async function LessonPage({
   );
 
   const { prev, next } = getPrevNext(slug);
-  const isFirstLesson = getCourseStructure()[0]?.lessons[0]?.slug === slug;
+  // The first lesson of the course and the first lesson of every optional
+  // section are reachable with no progress at all.
+  const startsOpen = isOpenFromStart(getCourseStructure(), slug);
 
   return (
     <LessonProvider slug={lesson.meta.slug} title={lesson.meta.title}>
@@ -115,7 +118,7 @@ export default async function LessonPage({
           description={lesson.meta.description}
           stepMetas={compiledSteps.map((step) => ({ hasActivity: step.hasActivity }))}
           activityCount={lesson.meta.activityCount}
-          isFirstLesson={isFirstLesson}
+          startsOpen={startsOpen}
           prevSlug={prev?.slug ?? null}
           prevTitle={prev?.title ?? null}
           nextSlug={next?.slug ?? null}

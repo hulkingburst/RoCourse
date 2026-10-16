@@ -24,7 +24,11 @@ interface LessonStepperProps {
   description: string;
   stepMetas: StepMeta[];
   activityCount: number;
-  isFirstLesson: boolean;
+  /**
+   * True when this lesson may be opened with no progress: the first lesson of
+   * the course, or the opening lesson of an optional section.
+   */
+  startsOpen: boolean;
   prevSlug: string | null;
   prevTitle: string | null;
   nextSlug: string | null;
@@ -43,7 +47,7 @@ export function LessonStepper({
   description,
   stepMetas,
   activityCount,
-  isFirstLesson,
+  startsOpen,
   prevSlug,
   prevTitle,
   nextSlug,
@@ -79,7 +83,7 @@ export function LessonStepper({
 
   const complete = isLessonComplete(lessons, slug);
   const prevComplete = prevSlug ? isLessonComplete(lessons, prevSlug) : true;
-  const locked = mounted && !complete && !isFirstLesson && !prevComplete;
+  const locked = mounted && !complete && !startsOpen && !prevComplete;
 
   const total = stepMetas.length;
   const currentMeta = stepMetas[active] ?? { hasActivity: false };

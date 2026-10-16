@@ -102,8 +102,16 @@ export function CourseOverview({ sections }: { sections: CourseSection[] }) {
                 className="group rounded-xl border bg-card p-5 transition-all duration-200 motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-semibold group-hover:text-primary">
+                  <h3 className="flex items-center gap-2 font-semibold group-hover:text-primary">
                     {section.title}
+                    {section.optional && (
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground"
+                      >
+                        {t("optionalBadge")}
+                      </Badge>
+                    )}
                   </h3>
                   <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />

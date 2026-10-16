@@ -25,14 +25,18 @@ are optional and exist purely to sync your progress across devices.
   concept, a tiny example, one activity. You're never more than a minute from
   the next win.
 - **Solved-activity gating.** Lessons lock in order — the next step unlocks only
-  when you've solved the current one. No skipping ahead, no fake progress.
+  when you've solved the current one. No skipping ahead, no fake progress. Past
+  the final project, the optional sections (Anti-Cheat & Safety, Advanced
+  Studio) are the exception: their first lesson is open from day one, so you can
+  start there without working through the course first.
 - **Autosaved progress.** Everything saves as you go, and it syncs to the cloud
   the moment you sign in.
 
 ## What's inside
 
-- **108 lessons across two complete games** — a Coin Tycoon and a collection
-  game — covering real Roblox Studio workflows, Luau fundamentals, and an
+- **111 lessons across two complete games** — a Coin Tycoon and a collection
+  game — covering real Roblox Studio workflows and Luau fundamentals, plus
+  optional extra sections: an Anti-Cheat & Safety practice track and an
   Advanced Studio section on ViewportFrames rendering and plugin development.
 - **Eight activity types** that make you write, predict, fix, and arrange real
   code: multiple choice, fill-in-the-blank, write-the-code, predict-the-output,

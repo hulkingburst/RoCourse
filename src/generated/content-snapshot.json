@@ -1129,39 +1129,6 @@
       "activityCount": 3
     },
     {
-      "slug": "data-security",
-      "title": "Data security — never trust the player",
-      "description": "Why the server is the only one who can give out coins, and what happens when you forget.",
-      "sectionId": "data",
-      "order": 7,
-      "difficulty": "beginner",
-      "estimatedMinutes": 5,
-      "tags": [
-        "security",
-        "exploiters",
-        "server",
-        "authority"
-      ],
-      "objectives": [
-        "Explain why the server must be the source of truth",
-        "Recognize the exploit where clients give themselves rewards",
-        "Understand what players can and can't change from their own computer"
-      ],
-      "prerequisites": [
-        "datastores",
-        "events"
-      ],
-      "keywords": [
-        "security",
-        "exploiter",
-        "server authority",
-        "trust"
-      ],
-      "sectionTitle": "Player Data & Security",
-      "sectionOrder": 2,
-      "activityCount": 4
-    },
-    {
       "slug": "save-loop",
       "title": "The save loop and autosave",
       "description": "Save on leave, and back that up with periodic autosaves so a crash can't wipe an hour of progress.",
@@ -1228,82 +1195,6 @@
       "activityCount": 4
     },
     {
-      "slug": "rate-limiting",
-      "title": "Rate limiting — slow down the flood",
-      "description": "Stop request spam at the server with per-player limits, and learn why a client debounce can never protect your game.",
-      "sectionId": "data",
-      "order": 10,
-      "difficulty": "intermediate",
-      "estimatedMinutes": 8,
-      "tags": [
-        "ratelimit",
-        "cooldown",
-        "debounce",
-        "security",
-        "remotes"
-      ],
-      "objectives": [
-        "Explain why client-side timing can't protect your server",
-        "Tell a cooldown, debounce, and rate limit apart",
-        "Enforce a per-player limit in Luau on the server",
-        "Clean up per-player state when the player leaves"
-      ],
-      "prerequisites": [
-        "remotes",
-        "data-security"
-      ],
-      "keywords": [
-        "ratelimit",
-        "cooldown",
-        "debounce",
-        "throttle",
-        "remoteevent",
-        "spam"
-      ],
-      "sectionTitle": "Player Data & Security",
-      "sectionOrder": 2,
-      "activityCount": 4
-    },
-    {
-      "slug": "server-authority",
-      "title": "Server authority — the server is the referee",
-      "description": "Keep every rule on the server — recompute real prices, verify ownership, and let the client only report what it wants.",
-      "sectionId": "data",
-      "order": 11,
-      "difficulty": "intermediate",
-      "estimatedMinutes": 8,
-      "tags": [
-        "security",
-        "authority",
-        "validation",
-        "remotes",
-        "server"
-      ],
-      "objectives": [
-        "Explain why authority means the server owns the rules, not just the code",
-        "Recompute the real values on the server instead of trusting client numbers",
-        "Verify ownership and affordability before rewarding",
-        "Reject silently when a request doesn't hold up"
-      ],
-      "prerequisites": [
-        "remotes",
-        "rate-limiting",
-        "data-security"
-      ],
-      "keywords": [
-        "server",
-        "authority",
-        "trust",
-        "validate",
-        "remote",
-        "price",
-        "exploit"
-      ],
-      "sectionTitle": "Player Data & Security",
-      "sectionOrder": 2,
-      "activityCount": 2
-    },
-    {
       "slug": "input-validation",
       "title": "Input validation — never trust a string",
       "description": "Double-check everything a player types or sends — shape, length, and control characters — before the server acts on it.",
@@ -1343,47 +1234,6 @@
       "sectionTitle": "Player Data & Security",
       "sectionOrder": 2,
       "activityCount": 4
-    },
-    {
-      "slug": "security-audit",
-      "title": "Security audit — hunt the gaps in your wall",
-      "description": "Walk your game with an exploiter's checklist — every remote, every trust boundary, every free-typed value — and harden each gap before you ship.",
-      "sectionId": "data",
-      "order": 13,
-      "difficulty": "intermediate",
-      "estimatedMinutes": 8,
-      "tags": [
-        "security",
-        "audit",
-        "remotes",
-        "validation",
-        "authority",
-        "review"
-      ],
-      "objectives": [
-        "Build a map of every trust boundary by inventorying your remotes",
-        "[object Object]",
-        "Harden the two most common findings — unchecked arguments and client-owned prices",
-        "Audit free-typed text before publishing"
-      ],
-      "prerequisites": [
-        "input-validation",
-        "server-authority",
-        "rate-limiting",
-        "data-security"
-      ],
-      "keywords": [
-        "audit",
-        "security",
-        "remote",
-        "trust",
-        "exploit",
-        "checklist",
-        "harden"
-      ],
-      "sectionTitle": "Player Data & Security",
-      "sectionOrder": 2,
-      "activityCount": 6
     },
     {
       "slug": "bug-hunt-data",
@@ -3663,6 +3513,275 @@
       "activityCount": 7
     },
     {
+      "slug": "cs-understanding-trust-boundaries",
+      "title": "Trust boundaries — where a claim becomes a decision",
+      "description": "Find every line where a claim from a player's machine becomes a decision on yours, and the three questions that audit each one.",
+      "sectionId": "anti-cheat",
+      "order": 1,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 10,
+      "tags": [
+        "security",
+        "anti-cheat",
+        "trust",
+        "remotes",
+        "audit"
+      ],
+      "objectives": [
+        "Point at every trust boundary in a game and say which value crosses it",
+        "Tell a client-owned value from a server-derived one, and move the number across the line",
+        "Run the three-question audit — value, rules, pace — on any remote handler",
+        "Read a FireServer call and its OnServerEvent handler as one boundary seen from two sides"
+      ],
+      "prerequisites": [
+        "remotes",
+        "data-security",
+        "server-authority"
+      ],
+      "keywords": [
+        "trust boundary",
+        "remote",
+        "fireserver",
+        "onserverevent",
+        "audit",
+        "authority",
+        "validation",
+        "anticheat"
+      ],
+      "sectionTitle": "Anti-Cheat & Safety",
+      "sectionOrder": 9,
+      "activityCount": 5
+    },
+    {
+      "slug": "cs-identity-proof",
+      "title": "Identity proof — proving a caller owns the id it names",
+      "description": "A caller can name any id it likes — so the server has to prove who owns it before the row behind that id counts for anything.",
+      "sectionId": "anti-cheat",
+      "order": 2,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 11,
+      "tags": [
+        "security",
+        "anti-cheat",
+        "identity",
+        "tokens",
+        "guests",
+        "authority"
+      ],
+      "objectives": [
+        "Explain why naming an identity is not owning it",
+        "Require ownership proof only for an id that already has data to protect",
+        "[object Object]",
+        "Keep a bearer token out of URLs, logs, and anything a stranger can read"
+      ],
+      "prerequisites": [
+        "cs-understanding-trust-boundaries"
+      ],
+      "keywords": [
+        "identity",
+        "token",
+        "guest",
+        "hijack",
+        "ownership",
+        "proof",
+        "header",
+        "anticheat"
+      ],
+      "sectionTitle": "Anti-Cheat & Safety",
+      "sectionOrder": 9,
+      "activityCount": 5
+    },
+    {
+      "slug": "cs-shield-test",
+      "title": "The shield test — playing the attacker against your own game",
+      "description": "Build a probe that plays the attacker against your own game — forge a completion, a guest id, and a row — log what the server did, and fix the boundary each failure points at.",
+      "sectionId": "anti-cheat",
+      "order": 3,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 12,
+      "tags": [
+        "security",
+        "anti-cheat",
+        "probing",
+        "testing",
+        "identity",
+        "xp"
+      ],
+      "objectives": [
+        "Explain what a shield test proves that an audit cannot",
+        "[object Object]",
+        "Read each result as PASS or FAIL against a boundary you already mapped",
+        "Turn a FAIL into one fix and re-run the probe"
+      ],
+      "prerequisites": [
+        "security-audit",
+        "server-authority"
+      ],
+      "keywords": [
+        "probe",
+        "shield test",
+        "forge",
+        "identity",
+        "xp",
+        "log",
+        "regression",
+        "anticheat"
+      ],
+      "sectionTitle": "Anti-Cheat & Safety",
+      "sectionOrder": 9,
+      "activityCount": 5
+    },
+    {
+      "slug": "data-security",
+      "title": "Data security — never trust the player",
+      "description": "Why the server is the only one who can give out coins, and what happens when you forget.",
+      "sectionId": "anti-cheat",
+      "order": 4,
+      "difficulty": "beginner",
+      "estimatedMinutes": 5,
+      "tags": [
+        "security",
+        "exploiters",
+        "server",
+        "authority"
+      ],
+      "objectives": [
+        "Explain why the server must be the source of truth",
+        "Recognize the exploit where clients give themselves rewards",
+        "Understand what players can and can't change from their own computer"
+      ],
+      "prerequisites": [
+        "datastores",
+        "events"
+      ],
+      "keywords": [
+        "security",
+        "exploiter",
+        "server authority",
+        "trust"
+      ],
+      "sectionTitle": "Anti-Cheat & Safety",
+      "sectionOrder": 9,
+      "activityCount": 4
+    },
+    {
+      "slug": "rate-limiting",
+      "title": "Rate limiting — slow down the flood",
+      "description": "Stop request spam at the server with per-player limits, and learn why a client debounce can never protect your game.",
+      "sectionId": "anti-cheat",
+      "order": 5,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "ratelimit",
+        "cooldown",
+        "debounce",
+        "security",
+        "remotes"
+      ],
+      "objectives": [
+        "Explain why client-side timing can't protect your server",
+        "Tell a cooldown, debounce, and rate limit apart",
+        "Enforce a per-player limit in Luau on the server",
+        "Clean up per-player state when the player leaves"
+      ],
+      "prerequisites": [
+        "remotes",
+        "data-security"
+      ],
+      "keywords": [
+        "ratelimit",
+        "cooldown",
+        "debounce",
+        "throttle",
+        "remoteevent",
+        "spam"
+      ],
+      "sectionTitle": "Anti-Cheat & Safety",
+      "sectionOrder": 9,
+      "activityCount": 4
+    },
+    {
+      "slug": "server-authority",
+      "title": "Server authority — the server is the referee",
+      "description": "Keep every rule on the server — recompute real prices, verify ownership, and let the client only report what it wants.",
+      "sectionId": "anti-cheat",
+      "order": 6,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "security",
+        "authority",
+        "validation",
+        "remotes",
+        "server"
+      ],
+      "objectives": [
+        "Explain why authority means the server owns the rules, not just the code",
+        "Recompute the real values on the server instead of trusting client numbers",
+        "Verify ownership and affordability before rewarding",
+        "Reject silently when a request doesn't hold up"
+      ],
+      "prerequisites": [
+        "remotes",
+        "rate-limiting",
+        "data-security"
+      ],
+      "keywords": [
+        "server",
+        "authority",
+        "trust",
+        "validate",
+        "remote",
+        "price",
+        "exploit"
+      ],
+      "sectionTitle": "Anti-Cheat & Safety",
+      "sectionOrder": 9,
+      "activityCount": 2
+    },
+    {
+      "slug": "security-audit",
+      "title": "Security audit — hunt the gaps in your wall",
+      "description": "Walk your game with an exploiter's checklist — every remote, every trust boundary, every free-typed value — and harden each gap before you ship.",
+      "sectionId": "anti-cheat",
+      "order": 7,
+      "difficulty": "intermediate",
+      "estimatedMinutes": 8,
+      "tags": [
+        "security",
+        "audit",
+        "remotes",
+        "validation",
+        "authority",
+        "review"
+      ],
+      "objectives": [
+        "Build a map of every trust boundary by inventorying your remotes",
+        "[object Object]",
+        "Harden the two most common findings — unchecked arguments and client-owned prices",
+        "Audit free-typed text before publishing"
+      ],
+      "prerequisites": [
+        "input-validation",
+        "server-authority",
+        "rate-limiting",
+        "data-security"
+      ],
+      "keywords": [
+        "audit",
+        "security",
+        "remote",
+        "trust",
+        "exploit",
+        "checklist",
+        "harden"
+      ],
+      "sectionTitle": "Anti-Cheat & Safety",
+      "sectionOrder": 9,
+      "activityCount": 6
+    },
+    {
       "slug": "viewport-frames",
       "title": "ViewportFrames — 3D previews in your GUI",
       "description": "Render a real 3D Roblox model inside a GUI element with ViewportFrame and a Camera, so UI can show a live preview of a vehicle, item, or character.",
@@ -3697,7 +3816,7 @@
         "gui"
       ],
       "sectionTitle": "Advanced Studio",
-      "sectionOrder": 9,
+      "sectionOrder": 10,
       "activityCount": 5
     },
     {
@@ -3735,7 +3854,7 @@
         "automation"
       ],
       "sectionTitle": "Advanced Studio",
-      "sectionOrder": 9,
+      "sectionOrder": 10,
       "activityCount": 5
     }
   ],
@@ -4373,6 +4492,102 @@
       {
         "id": "common-mistakes",
         "text": "Common mistakes",
+        "level": 2
+      }
+    ],
+    "cs-identity-proof": [
+      {
+        "id": "the-showdown-over-an-id",
+        "text": "The showdown over an id",
+        "level": 2
+      },
+      {
+        "id": "naming-is-not-owning",
+        "text": "Naming is not owning",
+        "level": 2
+      },
+      {
+        "id": "proof-only-when-there-is-something-to-lose",
+        "text": "Proof only when there is something to lose",
+        "level": 2
+      },
+      {
+        "id": "the-issue-and-prove-flow",
+        "text": "The issue-and-prove flow",
+        "level": 2
+      },
+      {
+        "id": "where-the-token-travels",
+        "text": "Where the token travels",
+        "level": 2
+      },
+      {
+        "id": "the-playbook-for-a-clean-game",
+        "text": "The playbook for a clean game",
+        "level": 2
+      }
+    ],
+    "cs-shield-test": [
+      {
+        "id": "what-the-probe-is",
+        "text": "What the probe is",
+        "level": 2
+      },
+      {
+        "id": "probe-1-forge-a-completion",
+        "text": "Probe 1: forge a completion",
+        "level": 2
+      },
+      {
+        "id": "probe-2-forge-an-identity",
+        "text": "Probe 2: forge an identity",
+        "level": 2
+      },
+      {
+        "id": "probe-3-forge-a-row",
+        "text": "Probe 3: forge a row",
+        "level": 2
+      },
+      {
+        "id": "probe-4-read-a-strangers-identity",
+        "text": "Probe 4: read a stranger's identity",
+        "level": 2
+      },
+      {
+        "id": "read-the-log-close-the-loop",
+        "text": "Read the log, close the loop",
+        "level": 2
+      }
+    ],
+    "cs-understanding-trust-boundaries": [
+      {
+        "id": "a-boundary-is-where-a-claim-becomes-a-decision",
+        "text": "A boundary is where a claim becomes a decision",
+        "level": 2
+      },
+      {
+        "id": "one-boundary-two-sides",
+        "text": "One boundary, two sides",
+        "level": 2
+      },
+      {
+        "id": "client-owned-vs-server-derived",
+        "text": "Client-owned vs server-derived",
+        "level": 2
+      },
+      {
+        "id": "three-questions-for-every-boundary",
+        "text": "Three questions for every boundary",
+        "level": 2
+      },
+      {
+        "id": "move-the-number-across-the-line",
+        "text": "Move the number across the line",
+        "level": 2
+      },
+      {
+        "id": "the-boundary-map",
+        "text": "The boundary map",
         "level": 2
       }
     ],

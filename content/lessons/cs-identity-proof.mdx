@@ -1,0 +1,188 @@
+---
+slug: cs-identity-proof
+title: Identity proof — proving a caller owns the id it names
+description: A caller can name any id it likes — so the server has to prove who owns it before the row behind that id counts for anything.
+sectionId: anti-cheat
+order: 2
+difficulty: intermediate
+estimatedMinutes: 11
+tags: [security, anti-cheat, identity, tokens, guests, authority]
+objectives:
+  - Explain why naming an identity is not owning it
+  - Require ownership proof only for an id that already has data to protect
+  - Sketch the issue-and-prove flow: server-assigned id, signed token, token required on write
+  - Keep a bearer token out of URLs, logs, and anything a stranger can read
+prerequisites: [cs-understanding-trust-boundaries]
+keywords: [identity, token, guest, hijack, ownership, proof, header, anticheat]
+---
+
+There is one trust boundary where the *claim itself* is the value. Everywhere else a client sends a number and the server re-derives it. Here the client sends an identity — "I am this player" — and there is no number to look up, because the identity is the thing in question. Get this boundary wrong and every other wall becomes decorative: an attacker who can claim someone else's identity inherits everything that identity was ever allowed to do.
+
+<Step>
+
+## The showdown over an id
+
+A learner plays without an account. Their row on the weekly board belongs to an anonymous id their browser keeps. Somebody else — with no account either, no password to steal, nothing to guess — sends that same id and claims the row.
+
+```luau
+-- the honest device, once, on first launch
+local guestId = "7f3a91c4-..."      -- a local id it generated itself
+```
+
+```luau
+-- the attacker's device, moments later
+local guestId = "7f3a91c4-..."      -- the same string, typed in
+```
+
+From the server's side of the boundary those two requests are identical. Both are a machine saying a string. The whole design question of this lesson is: what would have to be true for the second one to fail while the first one succeeds?
+
+<Mcq
+  question="A client sends guestId=abcdef123. What has it proven to the server?"
+  options={[
+    "That the id belongs to it",
+    "That the id exists",
+    "Nothing — it has chosen a string",
+    "That it has played before",
+  ]}
+  answer={2}
+  explanation="A string in a request is a claim, exactly like a price or a score. It proves only that the caller can spell it. Ownership has to be established some other way."
+/>
+
+</Step>
+
+<Step>
+
+## Naming is not owning
+
+If the server answers an identity request by echoing whatever it was handed, it has turned the identity into a *client-owned value* — the one thing a boundary is supposed to prevent. Two consequences follow, and both are worse than they look.
+
+The obvious one: a stranger can read someone's id and post as them, raising their XP, renaming their row, or poisoning it.
+
+The quiet one: the server has now *signed off* on a lie. Even if the row is harmless today, every future feature keyed on that id inherits the false ownership — a muted list, a claimed daily reward, a saved inventory. The id is the root of the trust tree, so a forged root means every branch under it is forged too.
+
+So the server needs two things it currently has neither of: a way to **issue** identities itself, and a way to **recognize** one it issued. That recognition is a token.
+
+<FillBlank
+  prompt="The server may only re-sign an id for a caller that presents a token the server itself ____ for that id."
+  answer="issued"
+  explanation="A token only means something when the server can verify its own signature and see which id it was minted for. That is the whole point of issuing it centrally."
+/>
+
+</Step>
+
+<Step>
+
+## Proof only when there is something to lose
+
+Here is the design decision that keeps this from turning into a login screen. Demanding proof for *every* id would punish every honest device — a returning player who cleared their browser storage, a first-time visitor, a player switching from phone to laptop. None of them is attacking anything.
+
+So the requirement is conditional, and the condition is data:
+
+- **An id with nothing behind it is adopted as-is.** No proof. A first-time player and a device with cleared storage both land here, and their experience is unchanged.
+- **An id that already has rows is protected.** It is only re-signed for a caller holding a valid token for it. Everyone else gets a *fresh server-generated id* instead — the owner's data is untouched, and the stranger simply starts over.
+
+That last detail matters: the response to a failed proof is a new identity, not an error. A rejected identity shouldn't break a game for an honest player who genuinely lost their token; it just means they begin again with a clean row.
+
+<Mcq
+  question="Which request must be rejected?"
+  options={[
+    "A first-time device asking for a brand-new id",
+    "A returning device with a valid token for its own id",
+    "A device with cleared storage re-adding an id that has no rows yet",
+    "A stranger naming an id that already has board rows, with no token for it",
+  ]}
+  answer={3}
+  explanation="Only the last one has something to lose and no proof to show. The other three are ordinary honesty, and rejecting them would break normal play for no security gain."
+/>
+
+</Step>
+
+<Step>
+
+## The issue-and-prove flow
+
+Two endpoints, one rule. The first hands out an identity; the second only accepts work from an identity that already proved itself.
+
+```luau
+-- identity issuance (GET): the caller offers what it already has
+local requested = query.guestId          -- a claim
+local token     = headers["x-guest-token"]  -- the caller's proof, if any
+
+local guestId
+if not isValidId(requested) then
+    guestId = newId()                    -- nonsense: mint a fresh one
+elseif proven(requested, token) then     -- our own signature, for that id
+    guestId = requested                  -- welcome back, same row
+elseif idHasData(requested) then         -- belongs to somebody else
+    guestId = newId()                    -- stranger starts over, row untouched
+else
+    guestId = requested                  -- unclaimed: free to adopt
+end
+
+return { guestId = guestId, token = sign(guestId) }
+```
+
+```luau
+-- posting XP (POST): no token, no write
+if not verifySignature(body.guestId, body.token) then
+    return reject(401)                   -- never reuse someone else's row
+end
+```
+
+Read the shape of it: the write path has exactly one identity check and it happens before any data is touched. Issuance is generous — it is *supposed* to hand out identities freely, because the only thing it refuses is taking a live one.
+
+<WriteCode
+  instruction="The XP handler has verified the payload's shape but not its identity. Fill in the guard that refuses the write unless the caller's token proves it owns guestId."
+  answer={["if not verifySignature(body.guestId, body.token) then return reject(401) end", "if not verifySignature(body.guestId, body.token) then return end"]}
+  starterCode="weeklyXpEvent.OnServerEvent:Connect(function(player, body)
+    -- the token must prove this caller owns this id
+
+    saveWeeklyXp(body.guestId, body.xp)
+end)"
+  explanation="Verification comes before the write, and a failed check returns without touching data. The signature ties the token to one specific id, so a token for your own row proves nothing about someone else's."
+/>
+
+</Step>
+
+<Step>
+
+## Where the token travels
+
+A token is a credential, so treat it like one — the same way you would treat a password. The rule that catches people is not about cryptography: it is about *where* the value ends up after the request is done.
+
+- **Never in a URL.** Query strings land in access logs, proxy logs, browser history, and `Referer` headers sent to third parties. A credential on the wire that way is a credential you have published.
+- **In a header on reads, in the body on writes.** Both stay out of the URL and out of the places URLs get copied to.
+- **Returned only to the device that earned it.** Never included in a public payload — not on a leaderboard row, not in a friend's feed, not in a shareable link.
+- **Signed, not stored.** The server only needs to verify its own signature; it never has to keep a table of every id it ever issued.
+
+<FillBlank
+  prompt="A bearer token belongs in a request ____ on a read and in the body on a write, because a URL is copied into logs, history, and referrers."
+  answer="header"
+  explanation="Headers and bodies stay out of the URL, and the URL is the part of a request that gets written down in places you don't control."
+/>
+
+</Step>
+
+<Step>
+
+## The playbook for a clean game
+
+Nine lines, and this boundary is closed for good:
+
+- **Assign the id yourself.** The server mints identities; the client only ever holds one.
+- **Sign what you hand out.** A token the server can verify without a lookup table.
+- **Require it on every write.** One check, before any data moves.
+- **Demand proof only where data exists.** Fresh ids stay free; live ids stay protected.
+- **Answer a failed proof with a new identity,** not an error page.
+- **Keep tokens out of URLs** and out of every public payload.
+- **Rate-limit issuance.** Minting identities is free to an honest device and shouldn't be free to a script.
+- **Don't punish the attempt.** A replayed id is not a crime you can attribute; reject it and move on.
+- **Never publish an id.** If a public board needs to show whose row is whose, mark the caller's own row in-band instead of shipping every id to every reader.
+
+<Warning>
+The ownership requirement only bites where there is data to protect, and that is exactly why it costs honest players nothing. The moment you demand proof for a fresh id — or worse, tie an identity to an IP address or a fingerprint — you have rebuilt a login system badly, and you have taught attackers to rotate addresses instead of tokens.
+</Warning>
+
+Next up: the security audit lab — walking a finished game boundary by boundary and writing down what you find.
+
+</Step>

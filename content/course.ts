@@ -6,6 +6,10 @@ import type { CourseSectionConfig } from "@/lib/types";
  *
  * Adding a new section here + a `content/lessons/*.mdx` file with the matching
  * `sectionId` is all that's needed to grow the course.
+ *
+ * Sections marked `optional` sit past the end of the main path (after the final
+ * project) and their first lesson is unlocked from the start, so a newcomer who
+ * already knows the basics can jump straight into them.
  */
 export const courseSections: CourseSectionConfig[] = [
   {
@@ -72,11 +76,20 @@ export const courseSections: CourseSectionConfig[] = [
     order: 8,
   },
   {
+    id: "anti-cheat",
+    title: "Anti-Cheat & Safety",
+    description:
+      "Read the walls before the walls read you — optional safety and anti-cheat practice for the whole course.",
+    order: 9,
+    optional: true,
+  },
+  {
     id: "advanced-studio",
     title: "Advanced Studio",
     description:
       "Go beyond scripting the game: render live 3D previews with ViewportFrames and build your own Roblox Studio plugins.",
-    order: 9,
+    order: 10,
+    optional: true,
   },
 ];
 

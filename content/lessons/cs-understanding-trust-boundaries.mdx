@@ -1,0 +1,190 @@
+---
+slug: cs-understanding-trust-boundaries
+title: Trust boundaries — where a claim becomes a decision
+description: Find every line where a claim from a player's machine becomes a decision on yours, and the three questions that audit each one.
+sectionId: anti-cheat
+order: 1
+difficulty: intermediate
+estimatedMinutes: 10
+tags: [security, anti-cheat, trust, remotes, audit]
+objectives:
+  - Point at every trust boundary in a game and say which value crosses it
+  - Tell a client-owned value from a server-derived one, and move the number across the line
+  - Run the three-question audit — value, rules, pace — on any remote handler
+  - Read a FireServer call and its OnServerEvent handler as one boundary seen from two sides
+prerequisites: [remotes, data-security, server-authority]
+keywords: [trust boundary, remote, fireserver, onserverevent, audit, authority, validation, anticheat]
+---
+
+Every online game is two computers disagreeing politely. The player's machine decides what the player *wants* to do. Your server decides what actually *happens*. A **trust boundary** is the exact line where a claim from the player's computer reaches code that can change real state — coins, inventory, a save file, the leaderboard. This section is about those lines: finding them, judging them, and closing the ones that are open.
+
+<Step>
+
+## A boundary is where a claim becomes a decision
+
+The word that matters is *claim*. On the client's side of the line, a value is a wish: the player clicked, the player owns a sword, a hop costs five coins. On your side, it's a fact your game is now stuck with. Nothing that crosses left to right is evidence of anything — it's a sentence spoken by a machine the player controls completely.
+
+Two scripts, one boundary:
+
+```luau
+-- LocalScript: a claim leaves the player's machine
+coinEvent:FireServer()
+```
+
+```luau
+-- ServerScriptService: the claim arrives as an argument, not a fact
+coinEvent.OnServerEvent:Connect(function(player)
+    player.leaderstats.Coins.Value += 10
+end)
+```
+
+That second snippet is *the* boundary in the clicker: the moment `OnServerEvent` fires, code that owns real data starts acting on a message from outside. Whether that message is honest is not something the server can read off it.
+
+<Mcq
+  question="Which of these is a trust boundary?"
+  options={[
+    "A LocalScript reading player.leaderstats.Coins",
+    "A server handler connected to a RemoteEvent's OnServerEvent",
+    "A server script awarding a coin after a purchase check",
+    "A LocalScript playing a sound",
+  ]}
+  answer={1}
+  explanation="The boundary is where an outside claim reaches code that can change real state. Reading a server-replicated value and playing a sound change nothing on the server; the OnServerEvent handler is where a stranger's message lands in your logic."
+/>
+
+</Step>
+
+<Step>
+
+## One boundary, two sides
+
+`FireServer` and `OnServerEvent` are not two features. They are the two ends of one line: the call that speaks and the handler that listens. That pairing is the canonical trust boundary on Roblox for two reasons.
+
+First, it is the *only* place a client's code can reach a server's code. If a value never crosses a remote, a client can't put it there.
+
+Second, the handler's argument list is a list of claims. Look at where each one comes from:
+
+```luau
+buyEvent.OnServerEvent:Connect(function(player, itemId, price)
+    -- player: filled in by Roblox from the connection — server-derived
+    -- itemId: whatever the caller typed — client-owned
+    -- price:  whatever the caller typed — client-owned
+end)
+```
+
+`player` is safe because Roblox itself supplies it from the connection: the caller cannot make it point at somebody else, and it cannot make it point at nobody. Every argument *after* it came from the other machine.
+
+<FillBlank
+  prompt="In buyEvent.OnServerEvent:Connect(function(player, itemId, price), the argument that Roblox fills in from the connection — and which is therefore server-derived — is ____."
+  answer="player"
+  explanation="Roblox supplies the player from the connection, so it can't be spoofed. itemId and price are whatever the caller sent; both are client-owned."
+/>
+
+</Step>
+
+<Step>
+
+## Client-owned vs server-derived
+
+Sorting every value in your head into two columns is the whole skill. Ask one question: *could the player have made this number up?*
+
+- **Client-owned:** every remote argument after `player`; anything a LocalScript computed (a price, a reward, a timer, a position, a health value, an item id); anything the player's own clock produced.
+- **Server-derived:** the `player` object; `leaderstats` values your server writes; anything read back from a DataStore; anything the server looked up in its own tables.
+
+A client-owned value is fine to *receive*. It is never fine to *act on directly*. The fix is always the same shape: take the claim, then re-derive the number on your side of the line.
+
+<FixBug
+  instruction="The client should not choose its own payout. Replace the client's number with the server's constant."
+  fix={["local amount = REWARD_PER_CLICK", "amount = REWARD_PER_CLICK"]}
+  placeholder="-- the server decides the amount"
+  explanation="The handler still receives a claim, but it stops using it. REWARD_PER_CLICK lives in server code, so the request can no longer name its own reward."
+>
+
+```luau
+local REWARD_PER_CLICK = 10
+
+clickEvent.OnServerEvent:Connect(function(player, amount)
+    -- the client still gets to pick the payout
+    player.leaderstats.Coins.Value += amount
+end)
+```
+
+</FixBug>
+
+</Step>
+
+<Step>
+
+## Three questions for every boundary
+
+Once you can see the lines, judging them is a checklist. For each one, all three answers must be yes:
+
+1. **Value** — is every argument verified before it is used? Shape, size, content.
+2. **Rules** — does the server own the numbers, or did they arrive in the request?
+3. **Pace** — is there a per-player limit on how often this can fire?
+
+The questions only ever change in their details. A chat handler, a buy button, a save trigger, a "claim daily reward" remote — same three checks, different constants.
+
+<Mcq
+  question="A handler refuses anything that isn't a number, and reads the price from its own catalog. A single player can still fire it a thousand times a second. What is the finding?"
+  options={[
+    "The value check is missing",
+    "The server needs a per-player limit on this boundary",
+    "Nothing — a server-owned price already caps the damage",
+    "The argument should be checked for shape a second time",
+  ]}
+  answer={1}
+  explanation="Value and rules pass; pace does not. A correct price times a million accepted requests is still a broken economy, and a flood costs the server work even when every request is refused."
+/>
+
+</Step>
+
+<Step>
+
+## Move the number across the line
+
+When a boundary fails, you have two ways to fix it and only one is right. You can try to detect a lie — compare the claim against what you expect, look for suspicious patterns, guess at the player's intent. Or you can stop needing the claim at all: move the number to your side of the line, where nobody outside your server can name it.
+
+Detection is a race you lose eventually, because the attacker gets the last word. Re-derivation ends the conversation: the request asks *may I?* and the server answers with a number it already owns.
+
+```luau
+-- weak: the claim is used
+coins.Value += amount
+
+-- strong: the claim is received, then replaced
+local amount = REWARD_PER_CLICK
+coins.Value += amount
+```
+
+<WriteCode
+  instruction="The client reports its own score. Fill in the guard that drops the request unless the reported value is actually a number — before anything adds it to the leaderboard."
+  answer={["if typeof(score) ~= \"number\" then return end", "if typeof(score) ~= 'number' then return end"]}
+  starterCode="scoreEvent.OnServerEvent:Connect(function(player, score)
+    -- only real numbers get past this line
+
+    player.leaderstats.Score.Value += score
+end)"
+  explanation="typeof never errors and never guesses, so a table, a string, or a boolean-shaped payload dies here instead of turning a silent reject into a server error."
+/>
+
+</Step>
+
+<Step>
+
+## The boundary map
+
+Before you write another feature, draw the map once. It is five lines long and it is the entire security surface of a small game:
+
+- **Find every remote.** Search for `FireServer(` and `OnServerEvent`. If the two numbers don't match, you've already found a bug.
+- **Name the owner.** For each argument, write down whether the client owns it or the server derives it.
+- **Ask the three questions.** Value, rules, pace — one pass per boundary.
+- **Fix the two most common answers.** An unchecked argument, and a number the client named.
+- **Keep the map.** Every new remote adds a line, and an audit is just the map re-read out loud.
+
+<Warning>
+The dangerous boundaries are the ones you forgot you wrote: the debug remote you added on a Tuesday, the "skip intro" flag from a prototype, the save trigger that takes a slot name. An exploiter reads your map by searching for the same strings you would — so the boring, un-remembered remote is the one that bites.
+</Warning>
+
+Next up: rate limiting and spam — pacing every door on that map, and why a client's own timer is never evidence.
+
+</Step>

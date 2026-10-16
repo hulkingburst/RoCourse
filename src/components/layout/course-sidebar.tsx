@@ -30,6 +30,7 @@ import {
   isLessonLocked,
   useProgressStore,
 } from "@/lib/progress-store";
+import { optionalStartSlugs } from "@/lib/course-access";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -135,6 +136,7 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations("nav");
+  const tCourse = useTranslations("course");
   const hydrated = useProgressStore((state) => state.hydrated);
   const lessonsRecord = useProgressStore((state) => state.lessons);
   const bookmarks = useProgressStore((state) => state.bookmarks);
@@ -155,9 +157,14 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
 
   const allLessons = sections.flatMap((section) => section.lessons);
   const slugIndex = new Map(allLessons.map((lesson, index) => [lesson.slug, index]));
+  // Optional sections open on their first lesson, so they stay reachable with
+  // no progress at all.
+  const openSlugs = optionalStartSlugs(sections);
   const isLocked = (slug: string) => {
     const index = slugIndex.get(slug);
-    return index === undefined ? false : isLessonLocked(lessonsRecord, allLessons, index);
+    return index === undefined
+      ? false
+      : isLessonLocked(lessonsRecord, allLessons, index, openSlugs);
   };
   const completed = allLessons.filter((lesson) =>
     isLessonComplete(lessonsRecord, lesson.slug)
@@ -234,19 +241,29 @@ export function SidebarNav({ sections }: { sections: CourseSection[] }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-1 pb-4 [scrollbar-gutter:stable]">
-        {sections.map((section) => (
-          <SidebarSection
-            key={section.id}
-            section={section}
-            currentSlug={currentSlug}
-            lessonsRecord={lessonsRecord}
-            bookmarks={bookmarks}
-            isLocked={isLocked}
-            open={open[section.id] ?? true}
-            onToggle={() =>
-              setOpen((state) => ({ ...state, [section.id]: !state[section.id] }))
-            }
-          />
+        {sections.map((section, sectionIndex) => (
+          <React.Fragment key={section.id}>
+            {section.optional === true && sections[sectionIndex - 1]?.optional !== true && (
+              <div className="flex items-center gap-2 px-4 pb-1 pt-4">
+                <span aria-hidden className="h-px flex-1 bg-border" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {tCourse("optionalTitle")}
+                </span>
+                <span aria-hidden className="h-px flex-1 bg-border" />
+              </div>
+            )}
+            <SidebarSection
+              section={section}
+              currentSlug={currentSlug}
+              lessonsRecord={lessonsRecord}
+              bookmarks={bookmarks}
+              isLocked={isLocked}
+              open={open[section.id] ?? true}
+              onToggle={() =>
+                setOpen((state) => ({ ...state, [section.id]: !state[section.id] }))
+              }
+            />
+          </React.Fragment>
         ))}
       </div>
 

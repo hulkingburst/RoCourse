@@ -1,0 +1,194 @@
+---
+slug: cs-shield-test
+title: The shield test — playing the attacker against your own game
+description: Build a probe that plays the attacker against your own game — forge a completion, a guest id, and a row — log what the server did, and fix the boundary each failure points at.
+sectionId: anti-cheat
+order: 3
+difficulty: intermediate
+estimatedMinutes: 12
+tags: [security, anti-cheat, probing, testing, identity, xp]
+objectives:
+  - Explain what a shield test proves that an audit cannot
+  - Run four probes against a private test build: forged completion, forged identity, forged row, and leaked id
+  - Read each result as PASS or FAIL against a boundary you already mapped
+  - Turn a FAIL into one fix and re-run the probe
+prerequisites: [security-audit, server-authority]
+keywords: [probe, shield test, forge, identity, xp, log, regression, anticheat]
+---
+
+An audit is a reading. A shield test is an experiment. Instead of checking that a handler *looks* guarded, you build a small probe that does the attacking part — sends the forged request and watches what your server does with it. The value is that it produces a result you can fail: either the server refused, or it didn't, and no amount of reading the code substitutes for knowing which.
+
+<Step>
+
+## What the probe is
+
+A shield test is a throwaway build — a spectator script, a debug remote, or just a console session in a test place — whose only job is to attempt the things an exploiter would attempt, in order, and print one line per attempt:
+
+```luau
+local function probe(name, attempt)
+    local ok = attempt()                       -- try the forgery
+    print(string.format("[shield] %-22s %s", name, ok and "PASS" or "FAIL"))
+end
+```
+
+Three rules make it trustworthy:
+
+- **A private, clean copy.** Run it in a test place with test data, never on the live game. The probes are supposed to be rejected; you do not want to find out otherwise with real players watching.
+- **One probe, one boundary.** Each attempt maps to a row on your boundary map, so a FAIL names the fix.
+- **PASS means the server refused.** A probe that "succeeds" is a finding, not a win — the log is written the way around that confusion invites.
+
+<Mcq
+  question="What does a shield test prove that reading the handler cannot?"
+  options={[
+    "That the code is well written",
+    "That the server actually refuses the forgery when it is sent, on this build, right now",
+    "That no exploiter will ever try this",
+    "That the remote is hard to discover",
+  ]}
+  answer={1}
+  explanation="Reading tells you what you intended. Sending the forged request tells you what the deployed code does — including the guard someone deleted, the path that shadows another, and the case the audit missed."
+/>
+
+</Step>
+
+<Step>
+
+## Probe 1: forge a completion
+
+The oldest probe there is. Ask the server to mark progress you didn't earn: a lesson, a stage, a reward, an achievement — whatever your game records.
+
+```luau
+probe("forge completion", function()
+    progressEvent:FireServer(stageId, true)    -- "I finished this"
+    return not game:GetService("ServerStorage").State:GetAttribute("progressed")
+end)
+```
+
+The server passes only if it **re-derives** progress from something it decided itself: a purchase that actually happened, a stage it marked when the event fired, a count it owns. If any progress can be set by a report that arrived from outside, this probe fails — and the fix is not a stricter report, it is deleting the report path.
+
+<FillBlank
+  prompt="A stage counts as reached only when the ____ marked it while handling the real event, not when a client said it did."
+  answer="server"
+  explanation="Progress reports from a client are claims. The server marks its own progress at the moment it performs the action the stage describes."
+/>
+
+</Step>
+
+<Step>
+
+## Probe 2: forge an identity
+
+Identity is the probe people skip, because the honest flow works so well that the boundary never looks exposed. It is the one worth running first, since everything else is keyed on it.
+
+Two attempts, and only one of them should fail:
+
+- **Adopt an unclaimed id.** A fresh device asks for an id nobody has used. It must be accepted, with no proof required — a returning player who cleared their browser storage is not an attacker, and a system that locks them out is broken for everyone.
+- **Claim a live id with no proof.** A caller names an id that already has data behind it and offers no token. That must be refused — and ideally answered with a *different* id, so the stranger plays on cleanly while the owner's row is untouched.
+
+```luau
+probe("claim live id", function()
+    local response = requestIdentity("7f3a91c4-...", nil)   -- no token at all
+    return response.guestId ~= "7f3a91c4-..."
+end)
+```
+
+That single asymmetry — free for an unused id, proof required for a live one — is what makes the protection cost honest players nothing. A design that demands proof from everyone is secure and annoying; a design that demands it from nobody is convenient and broken.
+
+<Mcq
+  question="Your probe sends a live id with no token and the server hands back the same id. What is the finding?"
+  options={[
+    "None — the id was already in use, so returning it is polite",
+    "A stranger can take over any row by naming it, so identity is a client-owned value",
+    "The probe should have sent a token, so the result says nothing",
+    "The server needs a rate limit on identity requests",
+  ]}
+  answer={1}
+  explanation="Handing a live id to whoever names it is exactly the hijack: the caller proved nothing. Issuance should mint a fresh id for that caller and leave the owner's data alone."
+/>
+
+</Step>
+
+<Step>
+
+## Probe 3: forge a row
+
+Now the payloads. Two probes cover the shapes that matter on a public board, and they catch different classes of bug.
+
+**The inflated total.** Send a score you didn't earn. If the server stores what it's given, the probe fails; a server that clamps the value and only ever *raises* an existing row survives both lies: an inflated one is capped, and a stale device pushing an old total can't overwrite a better one.
+
+**The empty overwrite.** Send a *valid-looking* payload whose totals are empty, from a device that still has local progress. Nothing is forged here — the request is honest and its shape is correct — but if the server stores it, a stale laptop silently erases a row a returning player earned. The server has to notice the contradiction between "this device reports lessons" and "this device reports no score".
+
+```luau
+probe("inflated total", function()
+    pushWeekly(1e9)                       -- an impossible score
+    return weeklyRow() <= MAX_WEEKLY      -- the server capped it
+end)
+
+probe("empty overwrite", function()
+    pushWeekly(nil, { lessons = 12 })     -- lessons but no totals
+    return weeklyRow() ~= nil             -- the stored row survived
+end)
+```
+
+<Mcq
+  question="A device reports twelve completed lessons but sends empty weekly totals. What should the server do?"
+  options={[
+    "Store it — the client is the authority on its own progress",
+    "Refuse the push and leave the stored row untouched",
+    "Store it and delete the row, since the player must have reset",
+    "Average the empty totals with the stored ones",
+  ]}
+  answer={1}
+  explanation="The two halves of the payload contradict each other, and the destructive half is the empty one. Refusing costs nothing when the player genuinely reset — they can clear their data deliberately — while storing it erases real work by accident."
+/>
+
+</Step>
+
+<Step>
+
+## Probe 4: read a stranger's identity
+
+The last probe is the one no forgery in it: read the public response and look for anything that shouldn't be public.
+
+Fetch a public payload — the leaderboard, a feed, a profile summary — as an anonymous viewer and inspect the fields. Then ask of each one: *if I were an attacker, what does this buy me?*
+
+A board that publishes every guest's id hands an attacker the exact input the identity boundary is built to defend against. The rows still need to show which one is yours, so the answer is a marker the server computes for the caller — this row is yours — rather than an id shipped to everyone.
+
+```luau
+probe("no ids in payload", function()
+    local body = jsonDecode(httpGet("/api/leaderboard"))
+    return body.rows[1].guestId == nil        -- no id travels to strangers
+end)
+```
+
+<FillBlank
+  prompt="Instead of publishing every id so clients can find their own row, the server marks the caller's own row in-band — a boolean like you = true — so the ____ still works and nothing leaks."
+  answer="board"
+  explanation="The client never needed other people's ids — it needed to know which row was its own. A server-computed marker answers that question without exposing an identity anyone could replay."
+/>
+
+</Step>
+
+<Step>
+
+## Read the log, close the loop
+
+A shield test is only worth running if a FAIL turns into a fix and the fix turns into a re-run. That is the same discipline as the audit lab and the same discipline as a bug hunt:
+
+- **Log the attempt, not the verdict.** `forge live id -> server minted a new id, owner row intact` is a result you can compare next week. "Identity is fine" is not.
+- **Map every FAIL to a row on the boundary map.** If a FAIL doesn't name a boundary, the probe was aimed badly.
+- **Fix one thing and re-run the whole set.** A guard added in one handler can quietly change the shape of a payload another probe relies on.
+- **Write the probe down as a test.** The four probes above are four lines you should be able to run again after any feature — a regression suite for the walls, not just the features.
+- **Run it on a clean copy,** with test data, at a time when a FAIL costs you nothing.
+
+<Warning>
+A probe build is an attacker's toolkit. Keep it in a private place, never point it at a live game, and never leave a debug remote it relies on enabled in a published build — the probe's own doors become the exploiter's doors.
+</Warning>
+
+<Note>
+Notice what the four probes have in common: none of them is a trick. Each one does exactly what the boundary was written to prevent, and each one passes only if the server's answer comes from its own side of the line. A wall you can only describe is a hope; a wall you can probe is a wall.
+</Note>
+
+Next up: the four walkthroughs this section grew around — data security, rate limiting, server authority, and the full security audit — in that order, closing out the section.
+
+</Step>

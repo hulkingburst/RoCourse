@@ -19,6 +19,11 @@ export interface CourseSectionConfig {
   title: string;
   description: string;
   order: number;
+  /**
+   * Sections that sit outside the main path. Their first lesson opens without
+   * the lessons before it, so a learner can start there at any point.
+   */
+  optional?: boolean;
 }
 
 export interface LessonMeta extends LessonFrontmatter {
@@ -33,6 +38,7 @@ export interface CourseSection {
   title: string;
   description: string;
   order: number;
+  optional?: boolean;
   lessons: LessonMeta[];
 }
 
