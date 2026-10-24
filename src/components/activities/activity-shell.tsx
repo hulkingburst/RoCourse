@@ -115,12 +115,17 @@ export function AnswerSpoiler({ answer }: { answer: string }) {
         aria-expanded={revealed}
         className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
-        {revealed ? (
-          <EyeOff className="h-3.5 w-3.5" />
-        ) : (
-          <Eye className="h-3.5 w-3.5" />
-        )}
-        {revealed ? t("hideAnswer") : t("revealAnswer")}
+        {/* Both icons and both labels stay mounted and are only hidden, never
+            swapped out. A browser translating the page rewrites the label's
+            text node into its own <font> wrapper; replacing that node on
+            toggle makes React insert the other icon before a node it no
+            longer owns, which throws NotFoundError: insertBefore — and takes
+            the whole page down the moment the spoiler is opened. Keeping the
+            button's children fixed removes the insertion entirely. */}
+        <Eye className={cn("h-3.5 w-3.5", revealed && "hidden")} />
+        <EyeOff className={cn("h-3.5 w-3.5", !revealed && "hidden")} />
+        <span className={cn(revealed && "hidden")}>{t("revealAnswer")}</span>
+        <span className={cn(!revealed && "hidden")}>{t("hideAnswer")}</span>
       </button>
       {revealed && (
         <div className="mt-2">
