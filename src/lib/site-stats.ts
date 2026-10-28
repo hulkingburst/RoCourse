@@ -8,6 +8,12 @@ export interface SiteStats {
   xpEarned: number;
   /** Total registered accounts. */
   learners: number;
+  /**
+   * True when the aggregate could not be read (the database is over quota or
+   * otherwise unreachable). The counters are then placeholders, and the page
+   * says they are disabled rather than presenting three zeros as real numbers.
+   */
+  unavailable: boolean;
 }
 
 interface ProfileTotalsRow {
@@ -68,14 +74,15 @@ async function loadSiteStats(): Promise<SiteStats> {
     lessonsCompleted: Number(totals?.lessonsCompleted ?? 0),
     xpEarned: Number(totals?.profileXp ?? 0) + (guestXp._sum.xp ?? 0),
     learners,
+    unavailable: false,
   };
 }
 
 /**
  * The cached read. The public wrapper keeps its catch outside the cache: a
  * failed read throws out of here (so nothing broken is stored) and the page
- * still renders with zeros, which is what keeps the landing page up when the
- * database is unreachable.
+ * still renders, with the counters marked disabled, which is what keeps the
+ * landing page up when the database is unreachable.
  */
 const cachedSiteStats = unstable_cache(loadSiteStats, ["site-stats"], {
   revalidate: STATS_REVALIDATE_SECONDS,
@@ -87,6 +94,6 @@ export async function getSiteStats(): Promise<SiteStats> {
   } catch (error) {
     // Decorative landing-page counters should never take the page down.
     console.error("Failed to load site stats", error);
-    return { lessonsCompleted: 0, xpEarned: 0, learners: 0 };
+    return { lessonsCompleted: 0, xpEarned: 0, learners: 0, unavailable: true };
   }
 }

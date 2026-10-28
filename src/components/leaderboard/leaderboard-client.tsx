@@ -20,6 +20,7 @@ import { useProgressStore } from "@/lib/progress-store";
 import { weekKey } from "@/lib/xp";
 import { prohibitedNameReason } from "@/lib/profanity";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -59,6 +60,10 @@ export function LeaderboardClient() {
     rows: LeaderboardRow[];
   } | null>(null);
   const [error, setError] = React.useState(false);
+  // The server could not read the board at all (database over quota or down).
+  // A separate state from `error` because there is nothing to retry into and
+  // the honest message is "temporarily disabled", not "couldn't load".
+  const [unavailable, setUnavailable] = React.useState(false);
   const [retry, setRetry] = React.useState(0);
   const [nameInput, setNameInput] = React.useState(guestName);
   const [editing, setEditing] = React.useState(!guestName);
@@ -80,10 +85,28 @@ export function LeaderboardClient() {
       cache: "no-store",
       headers: token ? { [GUEST_TOKEN_HEADER]: token } : undefined,
     })
-      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then(async (response) => {
+        if (response.status === 503) {
+          const body = (await response.json().catch(() => null)) as {
+            unavailable?: boolean;
+          } | null;
+          if (body?.unavailable) return { unavailable: true as const };
+        }
+        if (!response.ok) throw new Error("Leaderboard request failed");
+        return (await response.json()) as {
+          rows: LeaderboardRow[];
+          guestTokenStale?: boolean;
+        };
+      })
       .then(
-        async (next: { rows: LeaderboardRow[]; guestTokenStale?: boolean }) => {
+        async (next) => {
           if (cancelled) return;
+          if ("unavailable" in next) {
+            setData(null);
+            setError(false);
+            setUnavailable(true);
+            return;
+          }
           setData({ week, rows: next.rows });
           setError(false);
           // The server did not recognise the token we presented, which is what
@@ -104,13 +127,14 @@ export function LeaderboardClient() {
         if (cancelled) return;
         setData(null);
         setError(true);
+        setUnavailable(false);
       });
     return () => {
       cancelled = true;
     };
   }, [week, view, retry, currentWeek]);
 
-  const loading = !error && (data === null || data.week !== week);
+  const loading = !error && !unavailable && (data === null || data.week !== week);
   const rows = data?.week === week ? data.rows : [];
 
   // The server decides the marker (it knows the session and can verify a guest
@@ -221,6 +245,11 @@ export function LeaderboardClient() {
           <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             {t("loading")}
+          </div>
+        ) : unavailable ? (
+          <div className="flex flex-col items-center gap-2 py-16 text-center">
+            <Badge variant="muted">{t("temporarilyDisabled")}</Badge>
+            <p className="text-sm text-muted-foreground">{t("unavailableHint")}</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center">

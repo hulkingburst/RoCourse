@@ -51,6 +51,21 @@ const getPublicRows = unstable_cache(
   { revalidate: BOARD_REVALIDATE_SECONDS }
 );
 
+/**
+ * The board cannot be read at all — the database is over its quota, refusing
+ * connections, or otherwise down. The status and flag are how the client tells
+ * this apart from an ordinary failed request and shows its "temporarily
+ * disabled" label instead of an error with a retry button that cannot work.
+ * Detection is intentionally not a string match on one provider's quota text:
+ * any failed read on these paths means the same thing to the learner.
+ */
+function unavailableResponse() {
+  return NextResponse.json(
+    { error: "Unavailable", unavailable: true },
+    { status: 503, headers: PRIVATE_JSON_HEADERS }
+  );
+}
+
 export interface LeaderboardRow {
   id: string;
   name: string;
@@ -100,7 +115,14 @@ export async function GET(request: Request) {
     week = weekKey(new Date());
   }
 
-  const session = await auth().catch(() => null);
+  // A session that cannot be read at all is not a signed-out visitor. When the
+  // database is refusing connections the auth lookup fails, and answering 401
+  // on the friends view would hide the real reason from the client.
+  let sessionFailed = false;
+  const session = await auth().catch(() => {
+    sessionFailed = true;
+    return null;
+  });
   const sessionUserId = session?.user?.id ?? null;
   const sessionHandle = sessionUserId ? (session?.user?.handle ?? null) : null;
   // A guest is marked only for an id it can prove it owns, so naming someone
@@ -115,20 +137,26 @@ export async function GET(request: Request) {
 
   let rows: LedgerRow[] = [];
 
-  if (view === "friends") {
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  try {
+    if (view === "friends") {
+      if (!session?.user?.id) {
+        if (sessionFailed) return unavailableResponse();
+        return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+      }
+      const following = await getFollowingUserIds(session.user.id);
+      const userIds = Array.from(new Set([session.user.id, ...following]));
+      rows = await prisma.weeklyXp.findMany({
+        where: { week, userId: { in: userIds } },
+        orderBy,
+        take: ROWS_PER_PAGE,
+        select,
+      });
+    } else {
+      rows = await getPublicRows(week);
     }
-    const following = await getFollowingUserIds(session.user.id);
-    const userIds = Array.from(new Set([session.user.id, ...following]));
-    rows = await prisma.weeklyXp.findMany({
-      where: { week, userId: { in: userIds } },
-      orderBy,
-      take: ROWS_PER_PAGE,
-      select,
-    });
-  } else {
-    rows = await getPublicRows(week);
+  } catch (error) {
+    console.error("Failed to load leaderboard rows", error);
+    return unavailableResponse();
   }
 
   return NextResponse.json(

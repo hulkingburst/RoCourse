@@ -6,6 +6,7 @@ import { courseTagline } from "@content/course";
 import { getCourseStructure } from "@/lib/lessons";
 import { getSiteStats } from "@/lib/site-stats";
 import { CourseOverview } from "@/components/home/course-overview";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL } from "@/lib/site";
@@ -47,6 +48,11 @@ export default async function HomePage() {
   const sections = getCourseStructure();
   const allLessons = sections.flatMap((section) => section.lessons);
   const firstLesson = allLessons[0];
+  // A zero is a real value on these counters, so it cannot double as "we could
+  // not read them". When the database is over quota the cards show a dash and
+  // one small label instead of three plausible-looking zeros.
+  const statValue = (value: number) =>
+    stats.unavailable ? "—" : format.number(value);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-14">
@@ -81,7 +87,7 @@ export default async function HomePage() {
               {t("statsLessonsCompleted")}
             </dt>
             <dd className="mt-1 text-2xl font-bold">
-              {format.number(stats.lessonsCompleted)}
+              {statValue(stats.lessonsCompleted)}
             </dd>
           </div>
           <div className="rounded-xl border bg-card p-4">
@@ -89,7 +95,7 @@ export default async function HomePage() {
               {t("statsXpEarned")}
             </dt>
             <dd className="mt-1 text-2xl font-bold">
-              {format.number(stats.xpEarned)}
+              {statValue(stats.xpEarned)}
             </dd>
           </div>
           <div className="rounded-xl border bg-card p-4">
@@ -97,10 +103,15 @@ export default async function HomePage() {
               {t("statsLearners")}
             </dt>
             <dd className="mt-1 text-2xl font-bold">
-              {format.number(stats.learners)}
+              {statValue(stats.learners)}
             </dd>
           </div>
         </dl>
+        {stats.unavailable && (
+          <div className="mt-3">
+            <Badge variant="muted">{t("statsTemporarilyDisabled")}</Badge>
+          </div>
+        )}
       </section>
 
       <section className="mb-14 grid gap-4 sm:grid-cols-3">
