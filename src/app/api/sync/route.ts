@@ -56,23 +56,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const clientTime = payload.lastUpdated ? Date.parse(payload.lastUpdated) : 0;
-  const cloudTime = await getCloudUpdatedAt(session.user.id);
-
   // Never silently overwrite newer cloud progress. The client resolves the
   // conflict with the user and retries with force: true.
-  if (
-    !payload.force &&
-    Number.isFinite(clientTime) &&
-    cloudTime > clientTime + CONFLICT_TOLERANCE_MS
-  ) {
-    const cloud = await getCloudState(session.user.id);
-    return NextResponse.json({ conflict: true, cloud }, { status: 409 });
+  //
+  // A forced push already is the client's answer to a conflict, so it skips the
+  // watermark read entirely — there is nothing left to decide.
+  if (!payload.force) {
+    const clientTime = payload.lastUpdated ? Date.parse(payload.lastUpdated) : 0;
+    const cloudTime = await getCloudUpdatedAt(session.user.id);
+    if (Number.isFinite(clientTime) && cloudTime > clientTime + CONFLICT_TOLERANCE_MS) {
+      const cloud = await getCloudState(session.user.id);
+      return NextResponse.json({ conflict: true, cloud }, { status: 409 });
+    }
   }
 
   await saveCloudState(session.user.id, payload);
-  const cloud = await getCloudState(session.user.id);
-  return NextResponse.json({ ok: true, cloud });
+  // Nothing reads the persisted state back: the pushing client already holds
+  // this snapshot locally and only needs to know the write landed. Re-reading
+  // the whole cloud state here was five more queries on every progress change,
+  // and every caller discards the result. The next pull fetches it for real.
+  return NextResponse.json({ ok: true });
 }
 
 function isValidPayload(payload: SyncPayload): boolean {

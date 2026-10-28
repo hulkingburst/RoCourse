@@ -139,12 +139,18 @@ async function saveWeeklyXpRows(
   });
   if (!user) return;
 
+  // One read for every week instead of one per week. A snapshot carries several
+  // buckets, and the per-week `findUnique` made a single progress push several
+  // round trips deep before the first write.
+  const existingRows = await prisma.weeklyXp.findMany({
+    where: { userId, week: { in: weeks } },
+    select: { id: true, week: true, xp: true, name: true },
+  });
+  const existingByWeek = new Map(existingRows.map((row) => [row.week, row]));
+
   for (const week of weeks) {
     const xp = weeklyXp[week];
-    const existing = await prisma.weeklyXp.findUnique({
-      where: { week_userId: { week, userId } },
-      select: { id: true, xp: true, name: true },
-    });
+    const existing = existingByWeek.get(week);
     if (existing) {
       if (existing.name !== user.name || xp > existing.xp) {
         await prisma.weeklyXp.update({

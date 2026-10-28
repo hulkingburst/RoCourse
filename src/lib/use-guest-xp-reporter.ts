@@ -11,10 +11,22 @@ import { weekKey } from "@/lib/xp";
  * Keeps a guest's weekly XP row on the leaderboard fresh. Guests have no
  * account, so their totals are posted to /api/guest-xp under a server-issued
  * anonymous identity (id plus signed token) and their chosen name. Nothing is
- * posted until they pick a name, and posts are debounced so rapid XP gains
- * batch into one request. Signed-in users are handled by the normal progress
+ * posted until they pick a name, and posts are debounced so a burst of XP gains
+ * batches into one request. Signed-in users are handled by the normal progress
  * sync instead.
  */
+
+/**
+ * How long a change waits before it is posted.
+ *
+ * Every progress change used to post, and answering lesson steps happens more
+ * than two seconds apart, so an active guest wrote a row (plus a rate-limit
+ * read and insert) for nearly every step. The board is a weekly tally, so a few
+ * seconds of lag is invisible; eight seconds merges a working session into far
+ * fewer requests. Nothing is lost if the tab closes inside the window — the
+ * reporter posts the current total on the next load.
+ */
+const REPORT_DEBOUNCE_MS = 8000;
 
 /** Status of a guest XP post, or null when the request never landed. */
 async function postGuestXp(
@@ -72,7 +84,7 @@ export function useGuestXpReporter() {
 
     const schedule = () => {
       if (timer) clearTimeout(timer);
-      timer = setTimeout(report, 2000);
+      timer = setTimeout(report, REPORT_DEBOUNCE_MS);
     };
 
     const unsubscribeProgress = useProgressStore.subscribe((state, prev) => {

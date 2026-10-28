@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -13,6 +14,42 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export const ROWS_PER_PAGE = 50;
+
+/**
+ * How long the shared board may be served from cache. Every visitor used to pay
+ * for the same `findMany`; the rows only ever gain XP, and the caller's own-row
+ * marker is applied after the read, so a minute of staleness costs nothing. The
+ * friends view is not cached — it depends on who is asking.
+ */
+const BOARD_REVALIDATE_SECONDS = 60;
+
+const select = {
+  id: true,
+  name: true,
+  xp: true,
+  guestId: true,
+  user: { select: { handle: true } },
+} satisfies Prisma.WeeklyXpSelect;
+
+const orderBy: Prisma.WeeklyXpOrderByWithRelationInput[] = [
+  { xp: "desc" },
+  { updatedAt: "asc" },
+];
+
+type LedgerRow = Prisma.WeeklyXpGetPayload<{ select: typeof select }>;
+
+/** The public board for one week, shared by every caller. */
+const getPublicRows = unstable_cache(
+  async (week: string): Promise<LedgerRow[]> =>
+    prisma.weeklyXp.findMany({
+      where: { week },
+      orderBy,
+      take: ROWS_PER_PAGE,
+      select,
+    }),
+  ["leaderboard-week"],
+  { revalidate: BOARD_REVALIDATE_SECONDS }
+);
 
 export interface LeaderboardRow {
   id: string;
@@ -76,20 +113,6 @@ export async function GET(request: Request) {
     request.headers.get(GUEST_TOKEN_HEADER)
   );
 
-  const select = {
-    id: true,
-    name: true,
-    xp: true,
-    guestId: true,
-    user: { select: { handle: true } },
-  } satisfies Prisma.WeeklyXpSelect;
-
-  const orderBy: Prisma.WeeklyXpOrderByWithRelationInput[] = [
-    { xp: "desc" },
-    { updatedAt: "asc" },
-  ];
-
-  type LedgerRow = Prisma.WeeklyXpGetPayload<{ select: typeof select }>;
   let rows: LedgerRow[] = [];
 
   if (view === "friends") {
@@ -105,12 +128,7 @@ export async function GET(request: Request) {
       select,
     });
   } else {
-    rows = await prisma.weeklyXp.findMany({
-      where: { week },
-      orderBy,
-      take: ROWS_PER_PAGE,
-      select,
-    });
+    rows = await getPublicRows(week);
   }
 
   return NextResponse.json(

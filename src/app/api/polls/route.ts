@@ -31,6 +31,20 @@ const LIMIT_PER_IP = 30;
 const LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const limitKey = (ip: string) => `poll-vote:${ip}`;
 
+/**
+ * How often a read may run the poll-close housekeeping.
+ *
+ * This GET happens once per page load for every visitor, and the housekeeping
+ * was two database calls each time: a poll-result sweep and a `deleteMany` that
+ * retires closed polls' bell entries (a write, even when it deletes nothing).
+ * Both are idempotent and only matter when a poll's window ends, so running
+ * them at most once per five minutes per instance loses nothing a learner can
+ * see — the tally's own `closed`/`retired` flags are computed from the poll
+ * definitions, not from this sweep.
+ */
+const SWEEP_INTERVAL_MS = 5 * 60 * 1000;
+let lastSweepAt = 0;
+
 /** Tally for every poll, including which option the caller picked. */
 export async function GET(request: Request) {
   // A session is optional here: the auth failure path must not reject guests,
@@ -44,13 +58,17 @@ export async function GET(request: Request) {
   // Polls end on a clock and nothing here runs on one, so the poll read is
   // where a close gets noticed: the first read after a poll's window ends files
   // its results issue and retires the notification backup. Both steps are
-  // idempotent, and in the steady state they cost one indexed query each.
+  // idempotent, and throttling them still notices a close within minutes.
   // Neither is allowed to fail the read the learner actually asked for.
-  await reportClosedPolls();
-  await pruneRetiredPollNotifications(POLLS).catch(() => null);
+  const now = Date.now();
+  if (now - lastSweepAt >= SWEEP_INTERVAL_MS) {
+    lastSweepAt = now;
+    await reportClosedPolls(now);
+    await pruneRetiredPollNotifications(POLLS, now).catch(() => null);
+  }
 
   const resultsUrls = await getResultsUrls(POLLS.map((poll) => poll.id));
-  const polls = await getTallies(POLLS, voterKey, Date.now(), resultsUrls);
+  const polls = await getTallies(POLLS, voterKey, now, resultsUrls);
   const body: PollTalliesResponse = { polls };
   // The tally carries the caller's own vote, so it is personalized.
   return NextResponse.json(body, { headers: PRIVATE_JSON_HEADERS });

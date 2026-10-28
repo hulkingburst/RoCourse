@@ -98,7 +98,9 @@ export async function pullCloud(): Promise<CloudState | null> {
 }
 
 export type PushResult =
-  | { status: "ok"; cloud: CloudState }
+  // A successful push returns no state: the caller already has the snapshot it
+  // sent, and no caller ever read the cloud copy back out of this result.
+  | { status: "ok" }
   | { status: "conflict"; cloud: CloudState }
   | { status: "error" };
 
@@ -125,8 +127,7 @@ export async function pushCloud(
       return { status: "conflict", cloud: body.cloud };
     }
     if (!response.ok) return { status: "error" };
-    const body = (await response.json()) as { cloud: CloudState };
-    return { status: "ok", cloud: body.cloud };
+    return { status: "ok" };
   } catch {
     return { status: "error" };
   }
