@@ -85,6 +85,25 @@ export function WriteCode({
       setChecking(true);
       const result = await runLuau(buildChecksScript(value, checks));
       setChecking(false);
+
+      // The sandbox failing to start is not a wrong answer — the learner's
+      // code never ran. Grade the typed snippet the tolerant way the
+      // non-runtime exercises are graded instead, so a correct answer still
+      // unlocks the step (and an engine failure is never held against them).
+      if (result.engineFailure) {
+        const accepted = isAnswerCorrect(value, answer, {
+          strictLocal: requireLocal,
+        });
+        if (accepted) {
+          setStatus("correct");
+          setHiddenOutput(null);
+          onResult(true, firstTry);
+        } else {
+          setHiddenOutput(result.error ?? null);
+        }
+        return;
+      }
+
       const parsed = parseCheckResult(result.output);
       correct = !result.error && parsed !== null && parsed.total > 0 &&
         parsed.passed === parsed.total;

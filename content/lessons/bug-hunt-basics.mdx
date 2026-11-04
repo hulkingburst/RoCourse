@@ -132,23 +132,24 @@ coins == coins + 1
 
 <Step>
 
-## Hunt six — put the loop together
+## Hunt six — assemble the click handler
 
-One last hunt, but this time you assemble it. Arrange the lines so a part's click gives the player a coin each time — no imposters.
+One last hunt, but this time you assemble it. Arrange the lines so each click on the part counts one coin and prints the new total — no imposters.
 
 <ArrangeCode
   lines={[
+    "local coins = 0",
     "button.ClickDetector.MouseClick:Connect(function(player)",
-    "    local coins = player.leaderstats.Coins",
-    "    coins.Value = coins.Value + 1",
+    "    coins = coins + 1",
+    "    print(player.Name .. \" has \" .. coins .. \" coins\")",
     "end)",
   ]}
   distractors={[
     "while true do",
-    "coins.Value == coins.Value + 1",
-    "player.leaderstats.Coins = 1",
+    "coins == coins + 1",
+    "coins = 1",
   ]}
-  explanation="Connect the event, grab the player's Coins, count one up, and close the callback. The distractors loop forever or compare instead of assigning."
+  explanation="Start the counter, connect the click, add one on every click, and close the callback. The distractors loop forever, compare instead of assigning, or reset the counter to a fixed 1."
 />
 
 </Step>

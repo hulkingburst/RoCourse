@@ -77,6 +77,15 @@ export function RunCode({
     const result = await runLuau(buildChecksScript(value, checks));
     setRunning(false);
 
+    // The sandbox failing to start means the code never ran — show that as a
+    // runner problem, not as a wrong answer, so it does not queue the step for
+    // review or count against the learner.
+    if (result.engineFailure) {
+      setOutput(displayOutput(result));
+      setResultCounts(null);
+      return;
+    }
+
     const parsed = parseCheckResult(result.output);
     const correct =
       !result.error && parsed !== null && parsed.total > 0 &&
