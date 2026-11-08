@@ -11,6 +11,7 @@ import {
 } from "@/lib/notifications-api";
 import { PRIVATE_JSON_HEADERS } from "@/lib/private-json";
 import { isSameOriginRequest } from "@/lib/same-origin";
+import { getFeedbackResolvedCount } from "@/lib/feedback-resolved";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,7 +36,17 @@ export async function GET() {
   // bell therefore answers from the stored backup alone, and a due sweep lands
   // in a later poll rather than in this response.
   scheduleNotificationSweeps(session.user.id);
-  const state = await getUserNotifications(session.user.id);
+  // The response also carries the one badge input the client cannot derive,
+  // because it lives in the GitHub-facing ticket table: how many of this
+  // learner's feedback reports were resolved. Badge awards are fired from the
+  // bell (src/lib/use-notifications.ts), which otherwise only sees the local
+  // progress store, so the `successful-feedback` badge could never be earned.
+  // A plain count, not `getWeeklyFirstCount`: that one settles a week first,
+  // and this read must not write.
+  const [state, feedbackResolved] = await Promise.all([
+    getUserNotifications(session.user.id),
+    getFeedbackResolvedCount(session.user.id),
+  ]);
   // A retracted notification must never be shown, and that guarantee cannot
   // depend on the background sweep having run yet: the read filters them out
   // itself (no write on this path), so a poll can be early but never wrong.
@@ -45,6 +56,7 @@ export async function GET() {
     {
       notifications,
       lastUpdated: notifications[0]?.createdAt ?? null,
+      badgeStats: { feedbackResolved },
     },
     { headers: PRIVATE_JSON_HEADERS }
   );

@@ -20,8 +20,9 @@ import type { NotificationState } from "@/lib/notification-types";
  *    window has passed,
  *  - fires a one-time notification whenever a badge is newly earned,
  *  - for signed-in users, pulls the server DB backup (which also runs the
- *    feedback-close sync) and idempotently pushes any local-only notifications
- *    up as a backup so nothing is lost across devices.
+ *    feedback-close sync) and the server-only resolved-feedback count, and
+ *    idempotently pushes any local-only notifications up as a backup so
+ *    nothing is lost across devices.
  */
 export function useNotifications(totalLessons: number): void {
   const hydrated = useNotificationsStore((s) => s.hydrated);
@@ -41,31 +42,38 @@ export function useNotifications(totalLessons: number): void {
   const quickQuizzesCompleted = useProgressStore((s) => s.quickQuizzesCompleted);
   const finishedPath = useProgressStore((s) => s.finishedPath);
 
-  const badgeStats = React.useMemo(
-    () =>
-      extractBadgeStats(
-        {
-          lessons,
-          bookmarks,
-          streak,
-          longestStreak,
-          dailyChallengesCompleted,
-          quickQuizzesCompleted,
-          finishedPath,
-        },
-        totalLessons
-      ),
-    [
-      lessons,
-      bookmarks,
-      streak,
-      longestStreak,
-      dailyChallengesCompleted,
-      quickQuizzesCompleted,
-      finishedPath,
-      totalLessons,
-    ]
-  );
+  // Resolved feedback tickets are server-derived (GitHub issue state), so the
+  // progress store has no view of them and `extractBadgeStats` leaves the count
+  // at zero. The bell read below is what supplies it; without it the
+  // `successful-feedback` badge could never be awarded.
+  const [feedbackResolved, setFeedbackResolved] = React.useState(0);
+
+  const badgeStats = React.useMemo(() => {
+    const stats = extractBadgeStats(
+      {
+        lessons,
+        bookmarks,
+        streak,
+        longestStreak,
+        dailyChallengesCompleted,
+        quickQuizzesCompleted,
+        finishedPath,
+      },
+      totalLessons
+    );
+    stats.feedbackResolved = feedbackResolved;
+    return stats;
+  }, [
+    lessons,
+    bookmarks,
+    streak,
+    longestStreak,
+    dailyChallengesCompleted,
+    quickQuizzesCompleted,
+    finishedPath,
+    totalLessons,
+    feedbackResolved,
+  ]);
 
   const earnedBadgeKeys = React.useMemo(
     () => BADGES.filter((b) => b.earned(badgeStats)).map((b) => b.id),
@@ -170,10 +178,17 @@ export function useNotifications(totalLessons: number): void {
     void (async () => {
       const response = await fetch("/api/notifications", { cache: "no-store" });
       if (cancelled || !response.ok) return;
-      const data = (await response.json()) as NotificationState;
-      if (!cancelled) {
-        useNotificationsStore.getState().mergeServer(data.notifications);
-      }
+      const data = (await response.json()) as NotificationState & {
+        badgeStats?: { feedbackResolved?: number };
+      };
+      if (cancelled) return;
+      useNotificationsStore.getState().mergeServer(data.notifications);
+      const resolved = data.badgeStats?.feedbackResolved;
+      setFeedbackResolved(
+        typeof resolved === "number" && Number.isFinite(resolved)
+          ? Math.max(0, Math.floor(resolved))
+          : 0
+      );
     })();
     return () => {
       cancelled = true;
