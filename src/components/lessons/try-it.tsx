@@ -4,17 +4,8 @@ import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Play, RefreshCw, Square, Terminal } from "lucide-react";
 import { runLuau, stopLuau } from "@/lib/luau-runtime";
+import { useTabIndent } from "@/lib/tab-indent";
 import { cn } from "@/lib/utils";
-
-function insertTab(event: React.KeyboardEvent<HTMLTextAreaElement>): void {
-  event.preventDefault();
-  const textarea = event.currentTarget;
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  textarea.value =
-    textarea.value.slice(0, start) + "  " + textarea.value.slice(end);
-  textarea.selectionStart = textarea.selectionEnd = start + 2;
-}
 
 /**
  * Collapsible inline Luau runner attached to a lesson code sample. Reuses the
@@ -29,6 +20,7 @@ export function TryIt({ code }: { code: string }) {
   const [isError, setIsError] = React.useState(false);
   const [elapsed, setElapsed] = React.useState<number | null>(null);
   const [running, setRunning] = React.useState(false);
+  const indentOnTab = useTabIndent(setValue);
 
   const run = async () => {
     if (running) return;
@@ -102,11 +94,10 @@ export function TryIt({ code }: { code: string }) {
               value={value}
               onChange={(event) => setValue(event.target.value)}
               onKeyDown={(event) => {
+                indentOnTab(event);
                 if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
                   event.preventDefault();
                   run();
-                } else if (event.key === "Tab") {
-                  insertTab(event);
                 }
               }}
               spellCheck={false}

@@ -17,6 +17,7 @@ import {
   type AnswerSpec,
 } from "@/components/activities/grading";
 import { Mcq } from "@/components/activities/mcq";
+import { useTabIndent } from "@/lib/tab-indent";
 
 interface FixBugProps {
   /** The buggy code. Rendered above the editor/options. */
@@ -72,6 +73,7 @@ export function FixBug({
     alreadySolved || stepSolved ? "correct" : "idle"
   );
   const [wrongAttempts, setWrongAttempts] = React.useState(0);
+  const indentOnTab = useTabIndent(setValue);
 
   const isTypeMode = fix !== undefined;
 
@@ -121,6 +123,7 @@ export function FixBug({
         disabled={correct}
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={(event) => {
+          indentOnTab(event);
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") check();
         }}
         placeholder={placeholder}

@@ -22,6 +22,7 @@ import {
   parseCheckResult,
   stripResultMarker,
 } from "@/lib/luau-checks";
+import { useTabIndent } from "@/lib/tab-indent";
 
 interface WriteCodeProps {
   instruction: string;
@@ -75,6 +76,7 @@ export function WriteCode({
   const [wrongAttempts, setWrongAttempts] = React.useState(0);
   const [checking, setChecking] = React.useState(false);
   const [hiddenOutput, setHiddenOutput] = React.useState<string | null>(null);
+  const indentOnTab = useTabIndent(setValue);
 
   const check = async () => {
     if (checking) return;
@@ -144,6 +146,7 @@ export function WriteCode({
         disabled={correct}
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={(event) => {
+          indentOnTab(event);
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") check();
         }}
         placeholder={placeholder}

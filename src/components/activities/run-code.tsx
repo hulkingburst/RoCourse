@@ -16,6 +16,7 @@ import {
   parseCheckResult,
   stripResultMarker,
 } from "@/lib/luau-checks";
+import { useTabIndent } from "@/lib/tab-indent";
 
 interface RunCodeProps {
   instruction: string;
@@ -67,6 +68,7 @@ export function RunCode({
     passed: number;
     total: number;
   } | null>(null);
+  const indentOnTab = useTabIndent(setValue);
 
   const run = async () => {
     if (running) return;
@@ -117,6 +119,7 @@ export function RunCode({
         disabled={correct}
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={(event) => {
+          indentOnTab(event);
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") run();
         }}
         spellCheck={false}
