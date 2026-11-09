@@ -7,6 +7,8 @@ import { Heart, Mail, Star } from "lucide-react";
 import { useUiStore } from "@/lib/ui-store";
 import { cn } from "@/lib/utils";
 import { FeedbackButton } from "@/components/feedback/feedback-button";
+import { FeedbackDialog } from "@/components/feedback/feedback-dialog";
+import { IdeasBanner } from "@/components/feedback/ideas-banner";
 import { useBottomDockGuard } from "@/lib/use-bottom-dock-guard";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SidebarNav } from "@/components/layout/course-sidebar";
@@ -86,6 +88,7 @@ export function AppShell({
   return (
     <div className="min-h-screen">
       <BadgeCelebration />
+      <FeedbackDialog />
       {!sidebarCollapsed && (
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-80 border-r bg-sidebar text-sidebar-foreground lg:block">
           <SidebarNav sections={sections} />
@@ -99,6 +102,7 @@ export function AppShell({
         )}
       >
         <SiteHeader sections={sections} searchEntries={searchEntries} />
+        <IdeasBanner />
         <main
           key={pathname}
           className="flex-1 animate-in fade-in duration-200 motion-reduce:animate-none"

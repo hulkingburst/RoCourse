@@ -535,6 +535,12 @@
     "notifySignedIn": "We'll notify you here when the author replies to your feedback.",
     "notifyGuest": "Sign in to get a notification when your feedback gets a reply."
   },
+  "ideasBanner": {
+    "title": "We want your ideas!",
+    "description": "What should we build or teach next? Tell us what you'd like to see in the course.",
+    "cta": "Share an idea",
+    "dismiss": "Dismiss"
+  },
   "notifications": {
     "ariaLabel": "Notifications",
     "title": "Notifications",

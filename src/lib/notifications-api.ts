@@ -118,13 +118,40 @@ export async function getUserNotifications(userId: string): Promise<Notification
   };
 }
 
+interface GithubIssue {
+  state?: string;
+  html_url?: string;
+  body?: string | null;
+  user?: { login?: string };
+}
+
+interface GithubComment {
+  body?: string;
+  user?: { login?: string };
+}
+
 /**
- * Checks a signed-in user's submitted feedback issues against GitHub and, for
- * any that have since been closed with a real author comment, records a
- * "feedback_closed" notification whose message is that comment. Issues closed
- * without a comment are left alone — relaying the reporter's own submission
- * back to them would be noise, and leaving the ticket open means a comment
- * added later still reaches them. Idempotent: a ticket is only resolved once.
+ * Checks a signed-in user's submitted feedback issues against GitHub and
+ * resolves any that have since been closed.
+ *
+ * A closed issue IS a resolved report: the learner who filed it earns the
+ * `successful-feedback` badge (which counts closed tickets) whether or not the
+ * author left a closing message. Requiring a comment left every issue closed
+ * straight from the GitHub UI permanently unresolved, so the only accounts
+ * earning the badge were the ones whose issues happened to get a written
+ * reply.
+ *
+ * Credit follows the `**Account:** @handle` line the feedback route stamps into
+ * every issue filed by a signed-in reporter — the account that submitted it —
+ * never the GitHub account that opened the issue, which is the site's own
+ * token (the repo owner) on every report. The ticket is normally keyed to that
+ * learner already; this re-reads the issue text and moves the ticket when the
+ * two disagree, so a report cannot sit on the wrong account.
+ *
+ * The bell entry is still only written for a real closing message from the
+ * issue's author: a close with no note resolves the ticket silently (the badge
+ * is the recognition), and a reporter's own follow-up comment is never relayed
+ * back to them as the answer. Idempotent: a ticket resolves once.
  */
 export async function syncFeedbackResolutions(
   userId: string
@@ -140,47 +167,38 @@ export async function syncFeedbackResolutions(
 
   const created: AppNotification[] = [];
   for (const ticket of openTickets) {
-    let issue: { state?: string; html_url?: string };
+    let issue: GithubIssue;
     try {
       const response = await fetch(
         `${GITHUB_API}/repos/${ticket.repo}/issues/${ticket.issueNumber}`,
         { headers: githubHeaders(token) }
       );
       if (!response.ok) continue;
-      issue = (await response.json()) as typeof issue;
+      issue = (await response.json()) as GithubIssue;
     } catch {
       continue;
     }
     if (issue.state !== "closed") continue;
 
-    // Read the latest ISSUE COMMENT — the author's real resolution message.
-    let message: string | null = null;
-    try {
-      const commentsResponse = await fetch(
-        `${GITHUB_API}/repos/${ticket.repo}/issues/${ticket.issueNumber}/comments`,
-        { headers: githubHeaders(token) }
-      );
-      if (commentsResponse.ok) {
-        const comments = (await commentsResponse.json()) as { body?: string }[];
-        const latest = comments[comments.length - 1];
-        if (latest?.body?.trim()) message = latest.body.trim();
-      }
-    } catch {
-      // no comment reachable — treated as "resolved without a message"
-    }
-    // Resolved with no author comment: nothing real to relay, so don't notify
-    // (and don't transition the ticket — a later comment can still be picked
-    // up on the next sync).
-    if (!message) continue;
+    // Who the report belongs to, per the issue itself. Handles are unique and
+    // never change, so this is a stable id; an unknown or absent line keeps the
+    // ticket on its current account.
+    const reporterId = await creditedReporter(ticket.userId, issue.body);
+    const message = await closingMessage(ticket, issue, token);
 
     await prisma.feedbackTicket.update({
       where: { id: ticket.id },
       data: {
+        userId: reporterId,
         state: "closed",
         closedMessage: message,
         closedAt: new Date(),
       },
     });
+
+    // Nothing written to say: resolved, but there is no message to relay. The
+    // badge still counts the closed ticket on the reporter's next read.
+    if (!message) continue;
 
     const id = `feedback:${ticket.issueNumber}:closed`;
     const app: AppNotification = {
@@ -196,9 +214,9 @@ export async function syncFeedbackResolutions(
     // created as "received") and keep this row typed as a resolution even if
     // it already exists — both so the bell shows the real closing message.
     await prisma.notification.upsert({
-      where: { userId_localKey: { userId, localKey: id } },
+      where: { userId_localKey: { userId: reporterId, localKey: id } },
       create: {
-        userId,
+        userId: reporterId,
         localKey: id,
         type: "feedback_closed",
         title: app.title,
@@ -212,9 +230,65 @@ export async function syncFeedbackResolutions(
         link: app.link,
       },
     });
-    created.push(app);
+    // Only the caller's own resolutions belong in their response; a ticket
+    // moved to the account named by the issue is that account's to receive.
+    if (reporterId === userId) created.push(app);
   }
   return created;
+}
+
+/**
+ * The account a feedback issue belongs to: the "Account: @handle" line the
+ * feedback route appends after the reporter's text, resolved to a user.
+ * The LAST such line is the route's own, because it is written after anything
+ * a reporter typed. Falls back to the ticket's current owner when the line is
+ * missing or names an account that no longer exists.
+ */
+async function creditedReporter(
+  ticketOwnerId: string,
+  body: string | null | undefined
+): Promise<string> {
+  if (!body) return ticketOwnerId;
+  const matches = [...body.matchAll(/Account:\*\*\s*`?@?([a-z0-9-]+)/gi)];
+  const handle = matches[matches.length - 1]?.[1];
+  if (!handle) return ticketOwnerId;
+  const user = await prisma.user.findUnique({
+    where: { handle: handle.toLowerCase() },
+    select: { id: true },
+  });
+  return user?.id ?? ticketOwnerId;
+}
+
+/**
+ * The author's closing comment, if there is one. `issue.user.login` is the
+ * account the site's GitHub token files under, so only its comments are an
+ * answer — a reporter replying on the issue is not the author resolving it.
+ * Returns null when the issue was closed with nothing written.
+ */
+async function closingMessage(
+  ticket: { repo: string; issueNumber: number },
+  issue: GithubIssue,
+  token: string
+): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `${GITHUB_API}/repos/${ticket.repo}/issues/${ticket.issueNumber}/comments`,
+      { headers: githubHeaders(token) }
+    );
+    if (!response.ok) return null;
+    const comments = (await response.json()) as GithubComment[];
+    const author = issue.user?.login;
+    for (let index = comments.length - 1; index >= 0; index -= 1) {
+      const body = comments[index]?.body?.trim();
+      if (!body) continue;
+      if (author && comments[index].user?.login !== author) continue;
+      return body;
+    }
+    return null;
+  } catch {
+    // No comment reachable — treated as "resolved without a message".
+    return null;
+  }
 }
 
 function safeDate(value: string): Date {

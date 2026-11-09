@@ -535,6 +535,12 @@
     "notifySignedIn": "Te avisaremos aquí cuando el autor responda a tus comentarios.",
     "notifyGuest": "Inicia sesión para recibir una notificación cuando respondan a tus comentarios."
   },
+  "ideasBanner": {
+    "title": "¡Queremos tus ideas!",
+    "description": "¿Qué deberíamos crear o enseñar después? Cuéntanos qué te gustaría ver en el curso.",
+    "cta": "Compartir una idea",
+    "dismiss": "Descartar"
+  },
   "notifications": {
     "ariaLabel": "Notificaciones",
     "title": "Notificaciones",
