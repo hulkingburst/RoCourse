@@ -109,7 +109,19 @@ export function NotificationBell() {
   };
 
   const openReader = (n: AppNotification) => {
-    if (!n.read) useNotificationsStore.getState().markRead(n.id);
+    if (!n.read) {
+      useNotificationsStore.getState().markRead(n.id);
+      // The DB backup is authoritative on the next merge, so a read that stays
+      // local comes back unread on the next refresh. Send the same markRead the
+      // "Mark all read" button sends, best-effort like the rest of the bell.
+      if (signedIn) {
+        void fetch("/api/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ markRead: [n.id] }),
+        }).catch(() => null);
+      }
+    }
     setOpen(false);
     setSelected(n);
   };

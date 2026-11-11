@@ -47,6 +47,11 @@ export function useNotifications(totalLessons: number): void {
   // at zero. The bell read below is what supplies it; without it the
   // `successful-feedback` badge could never be awarded.
   const [feedbackResolved, setFeedbackResolved] = React.useState(0);
+  // Whether that server read has settled. The celebration baseline below must
+  // not be captured before it lands: the count arrives after mount as a 0 -> N
+  // change, so a baseline taken at mount would read an already-earned
+  // `successful-feedback` as newly earned and replay it on every refresh.
+  const [serverBadgeStatsLoaded, setServerBadgeStatsLoaded] = React.useState(false);
 
   const badgeStats = React.useMemo(() => {
     const stats = extractBadgeStats(
@@ -80,6 +85,13 @@ export function useNotifications(totalLessons: number): void {
     [badgeStats]
   );
 
+  // A celebration is only for a badge earned while this page is open, so the
+  // baseline separating "already earned" from "earned just now" has to know the
+  // server-side counts too — and those arrive from a fetch, not localStorage.
+  // Guests have no server badge state, so only the session check can hold them.
+  const badgeBaselineReady =
+    status !== "loading" && (!signedIn || serverBadgeStatsLoaded);
+
   // ----- run the side effects only after the local store hydrates -----
   const hydratedRef = React.useRef(false);
   React.useEffect(() => {
@@ -105,27 +117,47 @@ export function useNotifications(totalLessons: number): void {
   // badge catalog (badge.<id>.name), keeping the stored/synced data stable and
   // locale-independent.
   //
-  // Celebration popups are gated behind a baseline so they only play for badges
-  // actually earned (or newly synced in) during THIS session — never as a
-  // replay of what was already loaded from localStorage or pulled from the
-  // cloud. The bell notifications still fire once for every earned badge via
-  // the persisted `earnedBadgeKeys` dedup.
-  const baselineRef = React.useRef<Set<string> | null>(null);
+  // The bell entry is deduped by the persisted `earnedBadgeKeys`, so it fires
+  // once per badge whether or not this session sees the transition.
   React.useEffect(() => {
     if (!hydrated || !progressHydrated) return;
     const store = useNotificationsStore.getState();
-
-    if (baselineRef.current === null) {
-      baselineRef.current = new Set(earnedBadgeKeys);
-    }
-
     for (const badgeId of earnedBadgeKeys) {
       store.awardBadge(badgeId, badgeId);
-      if (baselineRef.current.has(badgeId)) continue;
-      baselineRef.current.add(badgeId);
-      store.enqueueCelebration(badgeId);
     }
   }, [earnedBadgeKeys, hydrated, progressHydrated]);
+
+  // ----- celebrate badges earned during THIS session -----
+  // Celebration popups are gated behind a baseline so they only play for badges
+  // actually earned during this session — never as a replay of what was already
+  // loaded from localStorage or pulled from the cloud.
+  //
+  // The baseline must wait for the server-derived badge input. `feedbackResolved`
+  // arrives after mount as a 0 -> N change, so a baseline captured at mount
+  // counted an already-earned `successful-feedback` as "not yet earned" and
+  // replayed its celebration on every refresh.
+  const baselineRef = React.useRef<{
+    signedIn: boolean;
+    earned: Set<string>;
+  } | null>(null);
+  React.useEffect(() => {
+    if (!hydrated || !progressHydrated || !badgeBaselineReady) return;
+    const store = useNotificationsStore.getState();
+
+    // A new identity (signing in mid-session) brings server-side badge state
+    // that was earned long before this page opened: capture it, don't celebrate.
+    const baseline =
+      baselineRef.current?.signedIn === signedIn
+        ? baselineRef.current
+        : { signedIn, earned: new Set(earnedBadgeKeys) };
+    baselineRef.current = baseline;
+
+    for (const badgeId of earnedBadgeKeys) {
+      if (baseline.earned.has(badgeId)) continue;
+      baseline.earned.add(badgeId);
+      store.enqueueCelebration(badgeId);
+    }
+  }, [earnedBadgeKeys, hydrated, progressHydrated, badgeBaselineReady, signedIn]);
 
   // ----- poll close sweep -----
   //
@@ -176,19 +208,26 @@ export function useNotifications(totalLessons: number): void {
     if (!signedIn || !hydrated) return;
     let cancelled = false;
     void (async () => {
-      const response = await fetch("/api/notifications", { cache: "no-store" });
-      if (cancelled || !response.ok) return;
-      const data = (await response.json()) as NotificationState & {
-        badgeStats?: { feedbackResolved?: number };
-      };
-      if (cancelled) return;
-      useNotificationsStore.getState().mergeServer(data.notifications);
-      const resolved = data.badgeStats?.feedbackResolved;
-      setFeedbackResolved(
-        typeof resolved === "number" && Number.isFinite(resolved)
-          ? Math.max(0, Math.floor(resolved))
-          : 0
-      );
+      try {
+        const response = await fetch("/api/notifications", { cache: "no-store" });
+        if (cancelled || !response.ok) return;
+        const data = (await response.json()) as NotificationState & {
+          badgeStats?: { feedbackResolved?: number };
+        };
+        if (cancelled) return;
+        useNotificationsStore.getState().mergeServer(data.notifications);
+        const resolved = data.badgeStats?.feedbackResolved;
+        setFeedbackResolved(
+          typeof resolved === "number" && Number.isFinite(resolved)
+            ? Math.max(0, Math.floor(resolved))
+            : 0
+        );
+      } catch {
+        // An unavailable read leaves the count at zero; the wait below still
+        // ends so a broken request can't suppress celebrations all session.
+      } finally {
+        if (!cancelled) setServerBadgeStatsLoaded(true);
+      }
     })();
     return () => {
       cancelled = true;
