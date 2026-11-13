@@ -44,6 +44,11 @@ interface WriteCodeProps {
    *   check(__log[1] == "Hello", "your code should print Hello")
    */
   checks?: string;
+  /**
+   * A nudge shown after two wrong attempts, before the answer reveal. Activities
+   * graded by `checks` get no generated hint, so they can pass one here.
+   */
+  hint?: string;
   placeholder?: string;
   explanation?: string;
   label?: string;
@@ -61,6 +66,7 @@ export function WriteCode({
   starterCode,
   requireLocal = false,
   checks,
+  hint: hintProp,
   placeholder = "local …",
   explanation,
   label,
@@ -128,7 +134,9 @@ export function WriteCode({
 
   const correct = status === "correct";
   const acceptedFirst = answerPreview(answer);
-  const hint =
+  // A run-graded exercise has no single-line answer to diagnose, so it uses the
+  // hint its lesson provides instead of the generated one.
+  const generatedHint =
     status === "wrong" && !checks
       ? generateHint(value, answer, { strictLocal: requireLocal }, t)
       : undefined;
@@ -172,7 +180,7 @@ export function WriteCode({
         status={status}
         explanation={explanation}
         correctAnswer={!correct && !checks ? acceptedFirst : undefined}
-        hint={hint}
+        hint={generatedHint ?? hintProp}
         wrongAttempts={wrongAttempts}
       />
     </ActivityCard>

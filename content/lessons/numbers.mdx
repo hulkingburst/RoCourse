@@ -78,12 +78,18 @@ print((2 + 3) * 4)  --> 20
 ```
 
 <WriteCode
-  instruction="A player earned 5 coins, then the game doubles everyone's total. Start a coins box at 0, add 5, then double it."
-  answer={["local coins = 0", "coins = coins + 5", "coins = coins * 2"]}
+  instruction="A player earned 5 coins, then the game doubles everyone's total. Make a box named coins holding 0, add the 5-coin pickup, then double it — three lines in all."
+  hint="Three lines: create the box with local coins = 0, add the pickup to the box, then multiply the box by 2. The hidden check reads a variable named exactly coins."
+  answer={[
+    ["local coins = 0", "coins = coins + 5", "coins = coins * 2"],
+    ["local coins = 0", "coins = coins + 5", "coins = coins * 2", "print(coins)"],
+    ["local coins = 0", "coins += 5", "coins *= 2"],
+    ["local coins = 5", "coins = coins * 2"],
+  ]}
   starterCode="-- your three lines here
 "
   checks='
-check(coins == 10, "after all three lines, coins should be 10")'
+check(coins == 10, "coins should end at 10 — start the box at 0, add 5, then double it")'
   explanation="Three steps: create the box, add the pickup, then multiply for the double."
 />
 
